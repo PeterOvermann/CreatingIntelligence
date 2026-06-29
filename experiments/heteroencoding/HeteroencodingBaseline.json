@@ -1,0 +1,17 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"11": [1000, 30], "12": [1000, 30], "21": [1000, 10], "101": [500, 5]},
+
+  "dataflow": [
+    {"component": "random", "send": [11]},
+
+    {"component": "random", "send": [12]},
+
+    {"component": "input", "arguments": ["codec"], "send": [21]},
+
+    {"component": "heteroencoder", "send": [101], "receive": [[{"slot": 11, "tags": ["show_population"]}, {"slot": 12, "tags": ["inhibit", "show_population"]}, {"slot": 21, "tags": ["show_population"]}]]},
+
+    {"component": "output", "arguments": ["binning"], "receive": [{"slot": 101, "tags": ["show_population"]}]}
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://creatingintelligence.org/schemas/circuit-v1.json",
+  "title": "Circuit",
+  "description": "https://creatingintelligence.org",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Version of the circuit format."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for the circuit (name, author, description)."
+    },
+    "multiplex": {
+      "type": "array",
+      "description": "Temporal evaluation sequence (array of 0s and 1s).",
+      "items": {
+        "type": "integer",
+        "enum": [0, 1]
+      }
+    },
+    "hyperparameters": {
+      "type": "object",
+      "description": "Global and slot-specific hyperparameter configurations.",
+      "patternProperties": {
+        "^(default|[0-9]+)$": {
+          "$ref": "#/definitions/hyperparameter"
+        }
+      },
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object",
+      "description": "Top-level configuration options.",
+      "additionalProperties": true
+    },
+    "dataflow": {
+      "type": "array",
+      "description": "The sequential list of circuit components (nodes).",
+      "items": {
+        "$ref": "#/definitions/component"
+      }
+    }
+  },
+  "required": ["hyperparameters", "dataflow"],
+  "additionalProperties": false,
+  
+  "definitions": {
+    "hyperparameter": {
+      "type": "array",
+      "description": "A tuple of [Dimension (N), Population (P)]",
+      "items": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "integer", "minimum": 1 }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "pathObject": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "multiset", "inhibit", "permute", "rate_limit", "threshold", 
+              "veto", "mandatory", "priority", "dependency", "fallback", 
+              "barrier", "kwta_excitatory", "kwta_absolute", "log", 
+              "show_slot", "show_dimension", "show_population"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "gating": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [0, 1]
+          }
+        }
+      },
+      "required": ["slot"],
+      "additionalProperties": false
+    },
+    "pathElement": {
+      "anyOf": [
+        { "type": "integer" },
+        { "$ref": "#/definitions/pathObject" },
+        { "type": "string" } 
+      ]
+    },
+    "pathBundle": {
+      "anyOf": [
+        { "$ref": "#/definitions/pathElement" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pathElement" }
+        }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "The type of node (e.g., input, output, delay, auto)."
+        },
+        "id": {
+          "type": "string",
+          "description": "Optional unique identifier for the node."
+        },
+        "label": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "options": {
+          "type": "object"
+        },
+        "send": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pathBundle" }
+        },
+        "receive": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pathBundle" }
+        }
+      },
+      "required": ["component"],
+      "additionalProperties": false
+    }
+  }
+}

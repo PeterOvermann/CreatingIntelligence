@@ -1,0 +1,611 @@
+/* style.css */
+
+/* creatingintelligence.org  (c) 2026 Peter Overmann */
+
+/* =============================================================================
+   CUSTOM FONT FACES (SELF-HOSTED)
+   ========================================================================== */
+
+@font-face {
+	font-family: "Inter";
+	src: url("fonts/Inter-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Inter";
+	src: url("fonts/Inter-Italic.woff2") format("woff2");
+	font-weight: 400;
+	font-style: italic;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Inter";
+	src: url("fonts/Inter-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Inter";
+	src: url("fonts/Inter-BoldItalic.woff2") format("woff2");
+	font-weight: 700;
+	font-style: italic;
+	font-display: block;
+}
+
+/* =============================================================================
+   GLOBAL STYLES
+   ========================================================================== */
+
+/* Add background for the paper effect */
+html {
+	background-color: #eceff4; /* nord snowstorm */
+}
+
+body {
+	font-family:
+		"Inter",
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
+	line-height: 1.6;
+	color: #2e3440;
+	max-width: 600px;
+	margin: 100px auto;
+	padding: 100px;
+	background-color: #ffffff;
+	/* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
+	border-radius: 8px;
+}
+
+::selection {
+	background-color: #ebcb8b;
+	color: #2e3440; /* Keeps the text dark for readability */
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	background-color: #ebcb8b;
+	margin: 40px auto;
+	width: 25%; /* Keeps it short and elegant rather than spanning the  page */
+	border-radius: 2px;
+}
+
+/* Prevent anchor targets from looking like links, explicitly using Nord0 */
+a:not([href]) {
+	color: #2e3440 !important;
+	text-decoration: none !important;
+}
+
+/* =============================================================================
+   PANDOC TITLE BLOCK STYLES
+   ========================================================================== */
+
+header#title-block-header {
+	background: linear-gradient(135deg, #eceff4 0%, #d8dee9 100%);
+	padding: 40px 20px;
+	margin: -100px -100px 40px -100px;
+	border-radius: 8px 8px 0 0;
+	border-bottom: 2px solid #ebcb8b; /* Nord13 yellow */
+	text-align: center;
+}
+
+header#title-block-header h1.title {
+	text-align: center;
+	font-size: 3em;
+	margin-bottom: 0.1em;
+	color: #2E3440; /* Nord0 */
+	margin-top: 0;
+}
+
+header#title-block-header p.subtitle {
+	color: #3b4252; /* Nord1 */
+	font-size: 1.4em;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 30px;
+}
+
+/* Base style for all author lines (Keeps Name big and bold) */
+header#title-block-header p.author,
+header#title-block-header p.author a {
+	color: #2e3440; /* Nord0 */
+	font-weight: bold;
+	margin: 5px 0 0 0;
+	font-size: 1.4em;
+	text-decoration: none;
+}
+
+/* Style for Email and GitHub link (Any author line that follows another) */
+header#title-block-header p.author + p.author {
+	color: #5e81ac; /* Nord10 */
+	font-style: italic;
+	font-weight: normal;
+	margin: 0;
+	font-size: 0.9em;
+}
+
+/* Container for the button row */
+header#title-block-header p.author + p.author + p.author {
+	margin-top: 30px;
+	display: flex;
+	justify-content: center;
+	gap: 10px; /* Space between buttons */
+	flex-wrap: wrap;
+}
+
+/* Flat Nord Button Styles */
+header#title-block-header p.author + p.author + p.author a {
+	background-color: #5e81ac; /* Nord10 Blue */
+	color: #eceff4 !important; /* Nord6 Snow Storm */
+	padding: 6px 12px;
+	border-radius: 4px; /* Slightly rounded corners */
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 0.85em;
+	font-style: normal;
+	font-weight: bold;
+	text-decoration: none; /* Remove underline */
+	box-shadow: none; /* Flat design */
+	transition: background-color 0.05s ease;
+	
+	/* Force uniform width and center the text */
+	width: 80px; 
+	text-align: center;
+	box-sizing: border-box; /* Ensures padding doesn't break the uniform width */
+
+}
+
+/* Hover state: Nord yellow background with dark text */
+header#title-block-header p.author + p.author + p.author a:hover {
+	background-color: #ebcb8b; /* Nord13 Yellow */
+	color: #2e3440 !important; /* Nord0 Dark text for high contrast */
+	text-decoration: none; 
+}
+
+header#title-block-header p.date {
+	color: #4c566a; /* Nord3 */
+	margin: 5px 0;
+	font-size: 0.85em;
+}
+
+/* =============================================================================
+   TYPOGRAPHY & CONTENT
+   ========================================================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+	color: #2e3440;
+	margin-top: 1.5em;
+}
+
+/* Update h1 spacing (ignoring the main document title) */
+h1:not(.title) {
+	position: relative;
+	margin-top: 2em; /* Ensures space above the cut */
+	padding-top: 2.5em; /* Space between the cut and the header text */
+}
+
+/* Paper cut effect */
+h1:not(.title)::before {
+	content: "";
+	position: absolute;
+	top: 0;
+
+	/* Pull it slightly PAST the 100px padding to hide the seam */
+	left: -105px;
+	width: calc(100% + 210px);
+
+	height: 25px;
+	background-color: #eceff4;
+
+	/* Ensure the shadow is fully removed here too */
+	box-shadow: none;
+}
+
+h2 {
+	margin-top: 0em;
+}
+
+h3 {
+	margin-bottom: 0em;
+	font-size: 1.4em;
+}
+
+h4 {
+	margin-top: 0.8em;
+	margin-bottom: 0em;
+	font-size: 0.9em;
+}
+
+/* h5 headers used for sub-navigation */
+h5 {
+	margin-left: 2.4em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	font-weight: normal;
+	color: #4c566a; /* Nord3 */
+}
+
+/* Blockquote Polish */
+blockquote {
+	border-left: 4px solid #ebcb8b; /* Nord13 yellow */
+	background-color: #eceff4;
+	padding: 2px 20px;
+	margin: 15px 0;
+	font-style: italic;
+	color: #4c566a; /* Nord 3 - Muted text */
+	border-radius: 0 8px 8px 0;
+	font-size: 0.92em; /* Scale the text down slightly */
+}
+
+/* Hyperlinks */
+a {
+	color: #5e81ac; /* Nord10 */
+	text-decoration: none;
+	transition: text-decoration-color 0.2s ease; /* Smooth fade in */
+}
+
+a:hover {
+	text-decoration: underline;
+	text-decoration-color: #ebcb8b;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 3px; /* Pushes the underline slightly down */
+}
+
+/* Scale up KaTeX math to match body font */
+.katex {
+	font-size: 1.08em !important;
+}
+
+/* Ensure breathing room for ANY element targeted by an anchor link */
+:target,
+[id] {
+	scroll-margin-top: 100px;
+}
+
+/* =============================================================================
+   MEDIA, TABLES & CODE
+   ========================================================================== */
+
+/* Make images responsive and centered */
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Style the figure container */
+figure {
+	margin: 40px 0; /* Adds breathing room above and below the image block */
+	text-align: center; /* Centers the caption text */
+}
+
+/* Style the caption text */
+figcaption {
+	font-size: 0.85em; /* Smaller font */
+	color: #555; /* Slightly muted color so it doesn't compete with body text */
+	margin-top: 2px; /* Space between the image and the caption */
+	font-style: italic; /* Optional: gives it a classic caption look */
+
+	/* Narrow the caption */
+	max-width: 75%; /* Restricts the width. Adjust this percentage as needed */
+	margin-left: auto; /* Keeps the narrowed caption centered */
+	margin-right: auto; /* Keeps the narrowed caption centered */
+}
+
+/* Style the tables */
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 20px 0;
+}
+
+th,
+td {
+	border: 1px solid #d8dee9; /* Nord4 Snow Storm */
+	padding: 4px 12px; /* Tighter padding for the standard data rows */
+	text-align: left;
+}
+
+th {
+	padding: 12px; /* Restores the larger, roomier padding for headers */
+	background-color: #e5e9f0;
+	border-top: 3px solid #ebcb8b; /* Nord13 - Yellow accent */
+	border-bottom: 1px solid #d8dee9; /* Nord4 - for the bottom edge */
+}
+
+/* Style the large code blocks - Unified Light/Framed Theme */
+pre {
+	background-color: #eceff4; /* Nord6 to match inline code/blockquotes */
+	color: #2e3440; /* Nord0 for high contrast */
+	border: 1px solid #d8dee9; /* Soft border matching the table borders */
+	padding: 8px 20px;
+	border-radius: 4px;
+	font-size: 0.75em;
+	line-height: 1.8;
+	margin: 25px 0;
+	font-family:
+		"JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	font-weight: normal;
+
+	/* Ensure long lines wrap gracefully on both screen and print */
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+/* Original Inline Code block - UNTOUCHED */
+code {
+	font-family: Consolas, Monaco, "Courier New", monospace;
+	background-color: #e5e9f0; /* Nord5 */
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+
+/* Strip background if code is inside pre and inherit lean font */
+pre code {
+	background-color: transparent;
+	color: inherit;
+	padding: 0;
+	font-family: inherit;
+}
+
+/* =============================================================================
+   EXPERIMENTAL / BROWSER-SPECIFIC OVERRIDES
+   ========================================================================== */
+
+pre,
+pre code {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVENESS
+   ========================================================================== */
+
+@media screen and (max-width: 800px) {
+	body {
+		margin: 20px;
+		padding: 40px 20px;
+	}
+
+	header#title-block-header {
+		margin: -40px -20px 30px -20px;
+		padding: 30px 15px;
+	}
+
+	header#title-block-header h1.title {
+		font-size: 1.8em;
+	}
+
+	/* Prevent tables from breaking the mobile layout */
+	table {
+		display: block;
+		overflow-x: auto;
+		white-space: nowrap;
+	}
+
+	/* Slightly tighter margins for blockquotes on small screens */
+	blockquote {
+		margin: 2px 0;
+		padding: 15px;
+	}
+	/* Adjust the paper cut for mobile padding and hide the seam */
+	h1:not(.title)::before {
+		left: -25px;
+		width: calc(100% + 50px);
+	}
+}
+
+/* =============================================================================
+   PRINT STYLES optimized for PDF Screen Reading
+   ========================================================================== */
+
+@media print {
+	/* Create a custom screen-optimized page size */
+	@page {
+		size: 7.5in 10in;
+		margin: 0.8in 0.6in;
+
+		/* Page number, perfectly centered */
+		@bottom-center {
+			content: counter(page);
+			font-family: "Inter", sans-serif;
+			font-size: 9pt;
+			color: #81a1c1;
+		}
+	}
+
+	/* Override for the first page only */
+	@page :first {
+		@bottom-center {
+			content: normal; /* Clears the page number */
+		}
+	}
+
+	/* 1. Base Container: Match the 600px width to protect images */
+	html,
+	body {
+		background-color: #ffffff;
+		color: #2e3440;
+		margin: 0 auto;
+		padding: 0;
+
+		width: 600px;
+		max-width: 100%;
+
+		font-size: 10pt;
+		line-height: 1.6;
+
+		box-sizing: border-box;
+		box-shadow: none;
+	}
+
+	/* 2. Strip backgrounds from Title Block */
+	header#title-block-header {
+		background: transparent !important;
+		border-bottom: 2px solid #ebcb8b;
+		padding: 0 0 20px 0;
+		margin: 0 auto 30px auto;
+		max-width: 500px;
+	}
+
+	/* Remove the paper cut effect entirely */
+	h1:not(.title)::before {
+		display: none !important;
+	}
+
+	h1:not(.title) {
+		break-before: page;
+		page-break-before: always; /* Safe fallback for older PDF engines */
+
+		/* Keep it flush to the top of the new printed page */
+		margin-top: 0 !important;
+		padding-top: 0 !important;
+
+		/* Prevent the text immediately following the header from breaking to the next page */
+		break-after: avoid;
+		page-break-after: avoid;
+	}
+
+	/* 3. Restrict text elements to 500px for comfortable reading */
+	p,
+	ul,
+	ol,
+	blockquote,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5 {
+		max-width: 500px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* Prevent list indentation from throwing off centering */
+	li > ul,
+	li > ol {
+		margin-left: 0;
+	}
+
+	/* 4. Block Elements: Enforce full 600px width */
+	figure,
+	table,
+	pre {
+		width: 100%;
+		max-width: 600px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* 5. Typography & Component Print-Specific Resets */
+	h1,
+	h2,
+	h3,
+	h4 {
+		color: #2e3440;
+		page-break-after: avoid;
+		break-after: avoid;
+	}
+
+	h5 {
+		/* 50px to align with the centered text block + 2em for the indent */
+		margin-left: calc(50px + 2em) !important;
+		margin-bottom: 1em;
+		color: #2e3440; /* Carry over the color from the previously shared rule */
+
+		/* Keep the block of links together, but allow the page to break after it */
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	a {
+		color: #4a6b92 !important;
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+
+	blockquote {
+		background-color: #eceff4;
+		border-left: 4px solid #ebcb8b;
+		padding: 2px 20px;
+		margin: 15px auto;
+		border-radius: 0 8px 8px 0;
+		color: #4c566a;
+		font-size: 0.92em;
+		page-break-inside: avoid;
+		break-inside: avoid;
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+
+	pre {
+		background-color: #eceff4;
+		color: #2e3440;
+		border: 1px solid #d8dee9;
+		white-space: pre-wrap;
+		word-break: break-all;
+		page-break-inside: avoid;
+		break-inside: avoid;
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+		box-sizing: border-box;
+	}
+
+	/* 6. Prevent awkward page breaks */
+	img,
+	figure,
+	table,
+	tr,
+	td,
+	th {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* 7. Image Rules - Center within the 600px width without stretching */
+	img {
+		max-width: 65%;
+		height: auto !important;
+		object-fit: contain;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	figcaption {
+		font-size: 9pt;
+		color: #4c566a; /* Nord3 */
+		max-width: 65%;
+		margin: 1px auto 0 auto;
+	}
+
+	/* 8. Enforce strict table boundaries */
+	table {
+		display: table !important;
+		width: 100%;
+		table-layout: fixed;
+		border-collapse: collapse;
+		white-space: normal !important;
+	}
+	th,
+	td {
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		word-break: break-word;
+	}
+}

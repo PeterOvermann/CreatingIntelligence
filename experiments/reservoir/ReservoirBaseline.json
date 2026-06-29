@@ -1,0 +1,15 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [2000, 10]},
+
+  "dataflow": [
+    {"component": "input", "arguments": ["codec"], "send": [11]},
+
+    {"component": "delay", "options": {"R": 60}, "send": [51], "receive": [[11, {"slot": 51, "tags": ["permute"]}]]},
+
+    {"component": "predictor", "send": [101], "receive": [11, 51]},
+
+    {"component": "output", "arguments": ["codec"], "receive": [101]}
+  ]
+}

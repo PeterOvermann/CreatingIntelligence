@@ -1,0 +1,399 @@
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[         0,          0]
+NotebookDataLength[     15896,        398]
+NotebookOptionsPosition[     13936,        344]
+NotebookOutlinePosition[     14977,        378]
+CellTagsIndexPosition[     14934,        375]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Memory - Wrapper for CLT", "Section",ExpressionUUID->"758f0609-2a40-4dc3-a3be-b190d4af81af"],
+
+Cell[BoxData[
+ StyleBox[
+  RowBox[{"(*", "\n", 
+   StyleBox[
+    RowBox[{
+     RowBox[{"Copyright", " ", 
+      RowBox[{"(", "c", ")"}], " ", "2026", " ", "Peter", " ", "Overmann"}], 
+     "\n", " ", "\n", 
+     RowBox[{"SPDX", "-", "License", "-", 
+      RowBox[{"Identifier", ":", " ", "MIT"}]}], "\n", " ", "\n", 
+     RowBox[{
+     "This", " ", "file", " ", "is", " ", "part", " ", "of", " ", "the", 
+      " ", "\"\<Creating Intelligence\>\"", " ", 
+      RowBox[{"project", ".", " ", "It"}], " ", "is", " ", "licensed"}], " ", 
+     "\n", 
+     RowBox[{"under", " ", "the", " ", "MIT", " ", 
+      RowBox[{"License", ".", " ", "You"}], " ", "may", " ", "obtain", " ", 
+      "a", " ", "copy", " ", "of", " ", "the", " ", "License", " ", "in", " ",
+       "the", " ", "LICENSE"}], " ", "\n", 
+     RowBox[{
+      RowBox[{
+      "file", " ", "in", " ", "the", " ", "root", " ", "directory", " ", "of",
+        " ", "this", " ", 
+       RowBox[{"repository", ".", "\n", " ", "\n", "THE"}], " ", "SOFTWARE", " ",
+        "IS", " ", "PROVIDED", " ", "\"\<AS IS\>\""}], ",", " ", 
+      RowBox[{
+      "WITHOUT", " ", "WARRANTY", " ", "OF", " ", "ANY", " ", "KIND"}], ",", 
+      " ", 
+      RowBox[{"EXPRESS", " ", "OR"}]}], " ", "\n", 
+     RowBox[{"IMPLIED", ",", " ", 
+      RowBox[{
+      "INCLUDING", " ", "BUT", " ", "NOT", " ", "LIMITED", " ", "TO", " ", 
+       "THE", " ", "WARRANTIES", " ", "OF", " ", "MERCHANTABILITY"}], ",", 
+      " ", "\n", 
+      RowBox[{
+      "FITNESS", " ", "FOR", " ", "A", " ", "PARTICULAR", " ", "PURPOSE", " ",
+        "AND", " ", 
+       RowBox[{"NONINFRINGEMENT", "."}]}]}]}],
+    FontFamily->"Courier New",
+    FontWeight->"Regular",
+    FontColor->GrayLevel[0]], "\n", "*)"}],
+  FontSize->9]], "Code",
+ CellLabel->"In[29]:=",ExpressionUUID->"114019a4-91bb-49c1-9ade-a2bc4f656fbf"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{
+    RowBox[{"EvaluationNotebook", "[", "]"}], ",", "\n", " ", 
+    RowBox[{"DockedCells", " ", "->", " ", 
+     RowBox[{"{", "\n", "    ", 
+      RowBox[{"Cell", "[", 
+       RowBox[{
+        RowBox[{"BoxData", "[", 
+         RowBox[{"ToBoxes", "[", "\n", "      ", 
+          RowBox[{"Row", "[", 
+           RowBox[{"{", "  ", "\n", "        ", 
+            RowBox[{"Button", "[", 
+             
+             RowBox[{"\"\<Install \
+$UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ", 
+              RowBox[{"FrontEndExecute", "[", 
+               RowBox[{"FrontEndToken", "[", 
+                RowBox[{
+                 RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
+                 " ", "\"\<EvaluateNotebook\>\""}], "]"}], "]"}], ",", "\n", 
+              "          ", 
+              RowBox[{"Method", " ", "->", " ", "\"\<Queued\>\""}]}], "\n", 
+             "        ", "]"}], "\n", "      ", "}"}], "]"}], "\n", "    ", 
+          "]"}], "]"}], ",", " ", "\"\<DockedCell\>\"", ",", " ", "\n", 
+        "    ", 
+        RowBox[{"Background", " ", "->", " ", 
+         RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", " ", "\n", 
+        "    ", 
+        RowBox[{"CellMargins", " ", "->", " ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}]}], "}"}]}]}], "]"}], "\n", 
+      "  ", "}"}]}]}], "]"}], ";"}]], "Input",
+ CellOpen->False,
+ CellLabel->"In[30]:=",ExpressionUUID->"24e940fd-9c59-4a1a-8697-22a1f09575db"],
+
+Cell[CellGroupData[{
+
+Cell["Memory", "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "Memory", "]"}], " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{"Threshold", " ", "->", " ", "Automatic"}], "}"}]}], 
+  ";"}]], "Code",ExpressionUUID->"d500fb7b-dfca-4baf-ac6c-5a872b22c3f3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Memory", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"NA_Integer", ",", " ", "PA_Integer"}], "}"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"NB_Integer", ",", " ", "PB_Integer"}], "}"}], ",", " ", 
+    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], " ", ":=", " ", 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
+  RowBox[{"Module", "[", " ", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"f", ",", " ", "process", ",", " ", "tostr", ",", " ", 
+      RowBox[{"opt", " ", "=", " ", "Nothing"}], ",", " ", 
+      RowBox[{"val", " ", "=", " ", "Nothing"}]}], "}"}], ",", "\n", "\t", 
+    "\n", "\t\t", 
+    RowBox[{
+     RowBox[{"f", " ", "=", " ", 
+      RowBox[{"Unique", "[", "\"\<memclt\>\"", "]"}]}], ";", "\n", "\t\t", 
+     "\n", "\t\t", 
+     RowBox[{"If", "[", " ", 
+      RowBox[{
+       RowBox[{"IntegerQ", "[", 
+        RowBox[{"OptionValue", "[", "Threshold", "]"}], "]"}], ",", "\n", 
+       "\t\t\t", 
+       RowBox[{
+        RowBox[{"opt", " ", "=", " ", "\"\<-a\>\""}], ";", " ", 
+        RowBox[{"val", " ", "=", " ", 
+         RowBox[{"OptionValue", "[", "Threshold", "]"}]}]}]}], "]"}], ";", 
+     "\n", "\n", "\t\t", 
+     RowBox[{"process", " ", "=", " ", 
+      RowBox[{"StartProcess", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"FileNameJoin", "[", " ", "\n", "\t\t\t", 
+          RowBox[{"{", 
+           RowBox[{
+           "$UserBaseDirectory", ",", " ", "\"\<SystemFiles\>\"", ",", 
+            " ", "\"\<LibraryResources\>\"", ",", " ", "\n", "\t\t\t  ", 
+            "$SystemID", ",", " ", "\"\<TAM_CLT\>\""}], "}"}], "]"}], ",", 
+         " ", "opt", ",", " ", "val", ",", " ", "NA", ",", " ", "PA", ",", 
+         " ", "NB", ",", " ", "PB"}], "}"}], "]"}]}], ";", "\n", 
+     "\t\t\t\t\t\t\t", "\[IndentingNewLine]", "\t\t", 
+     RowBox[{
+      RowBox[{"tostr", "[", 
+       RowBox[{"{", "x___Integer", "}"}], "]"}], " ", ":=", " ", 
+      RowBox[{"StringRiffle", "[", 
+       RowBox[{"ToString", "/@", 
+        RowBox[{"{", "x", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     "\[IndentingNewLine]", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Store", "."}], " ", "*)"}], "\[IndentingNewLine]", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", 
+       RowBox[{"A_List", " ", "->", " ", "B_List"}], "]"}], " ", ":=", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"WriteLine", "[", 
+         RowBox[{"process", ",", " ", 
+          RowBox[{
+           RowBox[{"tostr", "[", "A", "]"}], " ", "<>", " ", "\"\< -> \>\"", 
+           " ", "<>", " ", 
+           RowBox[{"tostr", "[", "B", "]"}]}]}], "]"}], ";"}], ")"}]}], ";", 
+     "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Retrieve", "."}], " ", "*)"}], "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "A_List", "]"}], " ", ":=", " ", 
+      RowBox[{"Module", "[", " ", 
+       RowBox[{
+        RowBox[{"{", "str", "}"}], ",", "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"WriteLine", "[", 
+          RowBox[{"process", ",", " ", 
+           RowBox[{"tostr", "[", "A", "]"}]}], "]"}], ";", "\n", "\t\t\t", 
+         RowBox[{"str", " ", "=", " ", 
+          RowBox[{"ReadLine", "[", "process", "]"}]}], ";", "\n", "\t\t\t", 
+         RowBox[{"If", "[", " ", 
+          RowBox[{
+           RowBox[{"str", " ", "===", " ", "\"\<\>\""}], ",", " ", 
+           RowBox[{"Return", "[", " ", 
+            RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\t\t\t", 
+         RowBox[{"ToExpression", " ", "/@", " ", 
+          RowBox[{"StringSplit", "[", "str", "]"}]}]}]}], "\n", "\t\t\t", 
+       "]"}]}], ";", "\n", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "\"\<memorycount\>\"", "]"}], " ", ":=", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"WriteLine", "[", 
+         RowBox[{"process", ",", " ", "\"\<mem\>\""}], "]"}], ";", " ", 
+        RowBox[{"ToExpression", "[", 
+         RowBox[{"ReadLine", "[", "process", "]"}], "]"}]}], ")"}]}], ";", 
+     "\[IndentingNewLine]", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "Clear", "]"}], " ", ":=", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"KillProcess", "[", "process", "]"}], ";", " ", 
+        RowBox[{"ClearAll", "[", 
+         RowBox[{"Evaluate", "[", "f", "]"}], "]"}]}], ")"}]}], ";", " ", 
+     "\n", "\n", "\t\t", "f"}]}], "\n", "\t\t", "]"}]}]], "Code",ExpressionUUI\
+D->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Build and Install", "Subsection",ExpressionUUID->"1eefe6ba-d2a1-4528-a9ed-22ea0b1b3508"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "nb", ",", " ", "source", ",", " ", "target", ",", " ", "srcdir"}], 
+     "}"}], ",", "\n", "    ", 
+    RowBox[{
+     RowBox[{"nb", " ", "=", " ", 
+      RowBox[{"EvaluationNotebook", "[", "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Check", " ", "if", " ", "the", " ", "notebook", " ", "has", " ", 
+       "been", " ", "saved", " ", "at", " ", "least", " ", "once", " ", "to", 
+       " ", "have", " ", "a", " ", 
+       RowBox[{"directory", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Quiet", "[", 
+         RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "===", " ", 
+        "$Failed"}], ",", "\n", "        ", 
+       RowBox[{
+        RowBox[{
+        "Print", 
+         "[", "\"\<Error: Save this notebook somewhere on your computer \
+first.\>\"", "]"}], ";", "\n", "        ", 
+        RowBox[{"Return", "[", "]"}]}]}], "\n", "    ", "]"}], ";", "\n", 
+     "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Build", " ", 
+       RowBox[{"library", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"srcdir", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"ParentDirectory", "[", 
+          RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
+         " ", "\"\<c\>\""}], "}"}], "]"}]}], ";", "\n", "\t", 
+     RowBox[{"Needs", "[", "\"\<CCompilerDriver`\>\"", "]"}], ";", "\n", 
+     "\t\t", "\n", "\t", 
+     RowBox[{"CCompilerDriver`CreateExecutable", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"FileNameJoin", "[", 
+          RowBox[{"{", 
+           RowBox[{"srcdir", ",", " ", "\"\<commandline.c\>\""}], "}"}], 
+          "]"}], ",", " ", "\n", "\t\t\t", 
+         RowBox[{"FileNameJoin", "[", 
+          RowBox[{"{", 
+           RowBox[{"srcdir", ",", " ", "\"\<memory.c\>\""}], "}"}], "]"}]}], 
+        "}"}], ",", " ", "\"\<TAM_CLT\>\"", ",", " ", "\n", "\t\t\t", 
+       RowBox[{"\"\<CompilerName\>\"", "->", "\"\<cc\>\""}], ",", " ", 
+       RowBox[{"\"\<CompileOptions\>\"", "->", " ", "\"\<-O3\>\""}]}], "]"}], 
+     ";", "\n", "\t\t", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Force", " ", "the", " ", "AutoGenerate", " ", "setting", " ", "for", " ",
+        "this", " ", 
+       RowBox[{"notebook", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"SetOptions", "[", 
+      RowBox[{"nb", ",", " ", 
+       RowBox[{"AutoGeneratedPackage", " ", "->", " ", "Automatic"}]}], "]"}],
+      ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Programmatically", " ", "save", " ", "to", " ", "trigger", " ", 
+       RowBox[{"the", " ", ".", "m"}], " ", "file", " ", 
+       RowBox[{"generation", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"NotebookSave", "[", "nb", "]"}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Pause", " ", "to", " ", "ensure", " ", "the", " ", "OS", " ", 
+       "finishes", " ", "writing", " ", "the", " ", "file"}], " ", "*)"}], 
+     "\n", "    ", 
+     RowBox[{"Pause", "[", "0.5", "]"}], ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Define", " ", "paths", " ", "dynamically", " ", "based", " ", "on", " ",
+        "the", " ", "current", " ", 
+       RowBox[{"notebook", "'"}], "s", " ", 
+       RowBox[{"name", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"source", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"NotebookDirectory", "[", "]"}], ",", " ", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{"FileBaseName", "[", 
+           RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "<>", 
+          " ", "\"\<.m\>\""}]}], "}"}], "]"}]}], ";", "\n", "    ", 
+     RowBox[{"target", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+        "$UserBaseDirectory", ",", " ", "\"\<Applications\>\"", ",", 
+         " ", "\"\<Memory.m\>\""}], "}"}], "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Install", " ", "the", " ", 
+       RowBox[{"file", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"FileExistsQ", "[", "source", "]"}], ",", "\n", "        ", 
+       RowBox[{"CopyFile", "[", 
+        RowBox[{"source", ",", " ", "target", ",", " ", 
+         RowBox[{"OverwriteTarget", " ", "->", " ", "True"}]}], "]"}], ",", 
+       "\n", "        ", 
+       RowBox[{"Print", "[", 
+        RowBox[{"\"\<Error: Auto-generation failed. Could not find \>\"", ",",
+          " ", "source"}], "]"}]}], "\n", "    ", "]"}]}]}], "\n", "]"}], 
+  ";"}]], "Code",
+ InitializationCell->False,
+ CellLabel->"In[33]:=",ExpressionUUID->"2cbb0ef7-a384-4594-849b-7de6ba1a2e8a"]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{924, 958},
+WindowMargins->{{Automatic, 251}, {Automatic, 44}},
+DockedCells->{
+  Cell[
+   BoxData[
+    TemplateBox[{
+      ButtonBox[
+      "\"Install $UserBaseDirectory/Applications/Memory.m\"", ButtonFunction :> 
+       FrontEndExecute[
+         FrontEndToken[
+          EvaluationNotebook[], "EvaluateNotebook"]], Method -> "Queued", 
+       Appearance -> Automatic, Evaluator -> Automatic]}, "RowDefault"]], 
+   "DockedCell", Background -> 
+   RGBColor[0.9215686274509803, 0.796078431372549, 0.5450980392156862], 
+   CellMargins -> {{0, 0}, {0, 0}}]},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+TaggingRules->{"TryRealOnly" -> False},
+DefaultNewCellStyle->"Code",
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"650b95e0-0e6d-43a4-af74-26167580d2b8"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[422, 15, 98, 0, 82, "Section",ExpressionUUID->"758f0609-2a40-4dc3-a3be-b190d4af81af"],
+Cell[523, 17, 1825, 42, 271, "Code",ExpressionUUID->"114019a4-91bb-49c1-9ade-a2bc4f656fbf"],
+Cell[2351, 61, 1668, 39, 23, "Input",ExpressionUUID->"24e940fd-9c59-4a1a-8697-22a1f09575db",
+ CellOpen->False],
+Cell[CellGroupData[{
+Cell[4044, 104, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+Cell[4130, 106, 250, 6, 63, "Code",ExpressionUUID->"d500fb7b-dfca-4baf-ac6c-5a872b22c3f3"],
+Cell[4383, 114, 4438, 103, 794, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8858, 222, 94, 0, 66, "Subsection",ExpressionUUID->"1eefe6ba-d2a1-4528-a9ed-22ea0b1b3508"],
+Cell[8955, 224, 4953, 116, 892, "Code",ExpressionUUID->"2cbb0ef7-a384-4594-849b-7de6ba1a2e8a",
+ InitializationCell->False]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"12": [16000, 160], "default": [150, 15]},
+
+  "dataflow": [
+    {"component": "input", "arguments": ["category[10]"], "send": [11]},
+
+    {"component": "input", "arguments": ["vectorencoder[]"], "send": [12]},
+
+    {"component": "associator", "send": [101], "receive": [{"slot": 11, "tags": ["show_population"]}, {"slot": 12, "tags": ["show_population"]}]},
+
+    {"component": "output", "arguments": ["category[10]"], "receive": [{"slot": 101, "tags": ["show_population"]}]}
+  ]
+}
