@@ -1,0 +1,15 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [2000, 10]},
+
+  "dataflow": [
+    {"component": "input", "arguments": ["codec"], "send": [11]},
+
+    {"component": "delay", "send": [21], "receive": [[{"slot": 11, "tags": ["priority"]}, 21, {"slot": 31, "tags": ["inhibit"]}]]},
+
+    {"component": "auto", "options": {"D": 0.8}, "send": [31], "receive": [[21, {"slot": 31, "tags": ["inhibit"]}]]},
+
+    {"component": "output", "arguments": ["codec"], "receive": [31]}
+  ]
+}

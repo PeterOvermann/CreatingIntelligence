@@ -1,0 +1,528 @@
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[         0,          0]
+NotebookDataLength[     21840,        527]
+NotebookOptionsPosition[     19618,        468]
+NotebookOutlinePosition[     20659,        502]
+CellTagsIndexPosition[     20616,        499]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Memory - Wrapper for Standard-C Implementation", "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574"],
+
+Cell[BoxData[
+ StyleBox[
+  RowBox[{"(*", "\n", 
+   StyleBox[
+    RowBox[{
+     RowBox[{"Copyright", " ", 
+      RowBox[{"(", "c", ")"}], " ", "2026", " ", "Peter", " ", "Overmann"}], 
+     "\n", " ", "\n", 
+     RowBox[{"SPDX", "-", "License", "-", 
+      RowBox[{"Identifier", ":", " ", "MIT"}]}], "\n", " ", "\n", 
+     RowBox[{
+     "This", " ", "file", " ", "is", " ", "part", " ", "of", " ", "the", 
+      " ", "\"\<Creating Intelligence\>\"", " ", 
+      RowBox[{"project", ".", " ", "It"}], " ", "is", " ", "licensed"}], " ", 
+     "\n", 
+     RowBox[{"under", " ", "the", " ", "MIT", " ", 
+      RowBox[{"License", ".", " ", "You"}], " ", "may", " ", "obtain", " ", 
+      "a", " ", "copy", " ", "of", " ", "the", " ", "License", " ", "in", " ",
+       "the", " ", "LICENSE"}], " ", "\n", 
+     RowBox[{
+      RowBox[{
+      "file", " ", "in", " ", "the", " ", "root", " ", "directory", " ", "of",
+        " ", "this", " ", 
+       RowBox[{"repository", ".", "\n", " ", "\n", "THE"}], " ", "SOFTWARE", " ",
+        "IS", " ", "PROVIDED", " ", "\"\<AS IS\>\""}], ",", " ", 
+      RowBox[{
+      "WITHOUT", " ", "WARRANTY", " ", "OF", " ", "ANY", " ", "KIND"}], ",", 
+      " ", 
+      RowBox[{"EXPRESS", " ", "OR"}]}], " ", "\n", 
+     RowBox[{"IMPLIED", ",", " ", 
+      RowBox[{
+      "INCLUDING", " ", "BUT", " ", "NOT", " ", "LIMITED", " ", "TO", " ", 
+       "THE", " ", "WARRANTIES", " ", "OF", " ", "MERCHANTABILITY"}], ",", 
+      " ", "\n", 
+      RowBox[{
+      "FITNESS", " ", "FOR", " ", "A", " ", "PARTICULAR", " ", "PURPOSE", " ",
+        "AND", " ", 
+       RowBox[{"NONINFRINGEMENT", "."}]}]}]}],
+    FontFamily->"Courier New",
+    FontWeight->"Regular",
+    FontColor->GrayLevel[0]], "\n", "*)"}],
+  FontSize->9]], "Code",
+ CellLabel->
+  "In[391]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{
+    RowBox[{"EvaluationNotebook", "[", "]"}], ",", "\n", " ", 
+    RowBox[{"DockedCells", " ", "->", " ", 
+     RowBox[{"{", "\n", "    ", 
+      RowBox[{"Cell", "[", 
+       RowBox[{
+        RowBox[{"BoxData", "[", 
+         RowBox[{"ToBoxes", "[", "\n", "      ", 
+          RowBox[{"Row", "[", 
+           RowBox[{"{", "  ", "\n", "        ", 
+            RowBox[{"Button", "[", 
+             
+             RowBox[{"\"\<Install \
+$UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ", 
+              RowBox[{"FrontEndExecute", "[", 
+               RowBox[{"FrontEndToken", "[", 
+                RowBox[{
+                 RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
+                 " ", "\"\<EvaluateNotebook\>\""}], "]"}], "]"}], ",", "\n", 
+              "          ", 
+              RowBox[{"Method", " ", "->", " ", "\"\<Queued\>\""}]}], "\n", 
+             "        ", "]"}], "\n", "      ", "}"}], "]"}], "\n", "    ", 
+          "]"}], "]"}], ",", " ", "\"\<DockedCell\>\"", ",", " ", "\n", 
+        "    ", 
+        RowBox[{"Background", " ", "->", " ", 
+         RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", " ", "\n", 
+        "    ", 
+        RowBox[{"CellMargins", " ", "->", " ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}]}], "}"}]}]}], "]"}], "\n", 
+      "  ", "}"}]}]}], "]"}], ";"}]], "Input",
+ CellOpen->False,
+ CellLabel->
+  "In[392]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+
+Cell[CellGroupData[{
+
+Cell["Memory", "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "Memory", "]"}], " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{"Threshold", " ", "->", " ", "Automatic"}], "}"}]}], 
+  ";"}]], "Code",
+ CellLabel->
+  "In[393]:=",ExpressionUUID->"fc2509db-7d86-4ed2-9106-0c1c70a6c116"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Memory", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"NA_Integer", ",", " ", "PA_Integer"}], "}"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"NB_Integer", ",", " ", "PB_Integer"}], "}"}], ",", " ", 
+    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], " ", ":=", " \t", "\n", 
+  "\[IndentingNewLine]", "\t", 
+  RowBox[{"Module", "[", " ", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "f", ",", " ", "M", ",", " ", "new", ",", " ", "setthreshold", ",", " ", 
+      "setfullmatch", ",", " ", "memory", ",", " ", "\n", "\t\t\t\t", "write",
+       ",", " ", "read", ",", " ", "free"}], "}"}], ",", "\n", "\n", "\t\t", 
+    RowBox[{
+     RowBox[{"new", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMnew\>\"", ",", " ", "\n", 
+        "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", 
+          
+          RowBox[{"\"\<CInt\>\"", ",", " ", "\"\<CInt\>\"", ",", 
+           " ", "\"\<CInt\>\"", ",", " ", "\"\<CInt\>\""}], "}"}], " ", "->", 
+         " ", "\"\<OpaqueRawPointer\>\""}]}], "]"}]}], ";", "\n", "\n", 
+     "\t\t", 
+     RowBox[{"setthreshold", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMsetthreshold\>\"", ",", " ", 
+        "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"\"\<OpaqueRawPointer\>\"", ",", " ", "\"\<CInt\>\""}], 
+          "}"}], " ", "->", " ", "\"\<Void\>\""}]}], "]"}]}], ";", "\t\t\t\t",
+      "\n", "\n", "\t\t", 
+     RowBox[{"memory", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMmemory\>\"", ",", " ", "\n", 
+        "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", "\"\<OpaqueRawPointer\>\"", "}"}], " ", "->", 
+         " ", "\"\<CInt\>\""}]}], "]"}]}], ";", "\n", "\n", "\t\t", 
+     RowBox[{"write", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMwrite\>\"", ",", " ", "\n", 
+        "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"\"\<OpaqueRawPointer\>\"", ",", " ", 
+           RowBox[{"\"\<RawPointer\>\"", "::[", "\"\<CInt\>\"", "]"}], ",", 
+           " ", "\"\<CInt\>\"", ",", " ", "\n", "\t\t\t", 
+           RowBox[{"\"\<RawPointer\>\"", "::[", "\"\<CInt\>\"", "]"}], ",", 
+           " ", "\"\<CInt\>\""}], "}"}], " ", "->", " ", "\"\<Void\>\""}]}], 
+       "]"}]}], ";", "\n", "\n", "\t\t", 
+     RowBox[{"read", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMread\>\"", ",", " ", "\n", 
+        "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"\"\<OpaqueRawPointer\>\"", ",", " ", 
+           RowBox[{"\"\<RawPointer\>\"", "::[", "\"\<CInt\>\"", "]"}], ",", 
+           " ", "\"\<CInt\>\"", ",", " ", "\n", "\t\t\t", 
+           RowBox[{"\"\<RawPointer\>\"", "::[", "\"\<CInt\>\"", "]"}], ",", 
+           " ", 
+           RowBox[{"\"\<RawPointer\>\"", "::[", "\"\<CInt\>\"", "]"}]}], 
+          "}"}], " ", "->", " ", "\"\<Void\>\""}]}], "]"}]}], ";", "\n", "\n",
+      "\t\t", 
+     RowBox[{"free", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMfree\>\"", ",", " ", "\n", 
+        "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", "\"\<OpaqueRawPointer\>\"", "}"}], " ", "->", 
+         " ", "\"\<Void\>\""}]}], "]"}]}], ";", "\n", "\t", "\n", "\t\t", 
+     RowBox[{"f", " ", "=", " ", 
+      RowBox[{"Unique", "[", "\"\<memffi\>\"", "]"}]}], ";", "\n", "\t\t", 
+     "\n", "\t\t", 
+     RowBox[{"M", " ", "=", " ", 
+      RowBox[{"new", "[", 
+       RowBox[{"NA", ",", " ", "PA", ",", " ", "NB", ",", " ", "PB"}], 
+       "]"}]}], ";", " ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Constructor", "."}], " ", "*)"}], "\n", "\n", "\t\t", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"IntegerQ", "[", 
+        RowBox[{"OptionValue", "[", "Threshold", "]"}], "]"}], ",", " ", "\n",
+        "\t\t\t", 
+       RowBox[{"setthreshold", "[", 
+        RowBox[{"M", ",", " ", 
+         RowBox[{"OptionValue", "[", "Threshold", "]"}]}], "]"}]}], "]"}], ";",
+      "\n", "\t\t", "\n", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Store", "."}], " ", "*)"}], "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", 
+       RowBox[{"A_List", " ", "->", " ", "B_List"}], "]"}], " ", ":=", " ", 
+      "\n", "\t\t\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{
+          RowBox[{"Length", "[", "A", "]"}], " ", ">", " ", "0"}], " ", "&&", 
+         " ", 
+         RowBox[{
+          RowBox[{"Length", "[", "B", "]"}], " ", ">", " ", "0"}]}], ",", " ", 
+        RowBox[{"write", "[", 
+         RowBox[{"M", ",", " ", 
+          RowBox[{"RawMemoryExport", "[", 
+           RowBox[{"A", ",", " ", "\"\<CInt\>\""}], "]"}], ",", " ", "\n", 
+          "\t\t\t\t", 
+          RowBox[{"Length", "[", "A", "]"}], ",", " ", 
+          RowBox[{"RawMemoryExport", "[", 
+           RowBox[{"B", ",", " ", "\"\<CInt\>\""}], "]"}], ",", " ", 
+          RowBox[{"Length", "[", "B", "]"}]}], "]"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", "\t\t", "\n", "\t\t", 
+     RowBox[{"(*", " ", "Retrieve", " ", "*)"}], "\[IndentingNewLine]", 
+     "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "A_List", "]"}], " ", ":=", " ", 
+      RowBox[{"Module", "[", " ", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"Y", ",", " ", "Yn"}], "}"}], ",", "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"Length", "[", "A", "]"}], " ", "===", " ", "0"}], ",", 
+           " ", 
+           RowBox[{"Return", "[", 
+            RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\t\t\t", 
+         RowBox[{"Y", " ", "=", " ", 
+          RowBox[{"RawMemoryAllocate", "[", 
+           RowBox[{"\"\<CInt\>\"", ",", " ", "NB"}], "]"}]}], ";", "\n", 
+         "\t\t\t", 
+         RowBox[{"Yn", " ", "=", " ", 
+          RowBox[{"RawMemoryAllocate", "[", "\"\<CInt\>\"", "]"}]}], ";", 
+         "\n", "\t\t\t", 
+         RowBox[{"read", "[", 
+          RowBox[{"M", ",", " ", 
+           RowBox[{"RawMemoryExport", "[", 
+            RowBox[{"A", ",", " ", "\"\<CInt\>\""}], "]"}], ",", " ", 
+           RowBox[{"Length", "[", "A", "]"}], ",", " ", "Y", ",", " ", "Yn"}],
+           "]"}], ";", "\n", "\t\t\t", 
+         RowBox[{"RawMemoryImport", "[", 
+          RowBox[{"Y", ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"\"\<List\>\"", ",", " ", 
+             RowBox[{"RawMemoryRead", "[", "Yn", "]"}]}], "}"}]}], "]"}]}]}], 
+       "\n", "\t\t\t", "]"}]}], ";", "\n", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "\"\<memorycount\>\"", "]"}], " ", ":=", " ", 
+      RowBox[{"memory", "[", "M", "]"}]}], ";", "\[IndentingNewLine]", "\t\t",
+      "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"f", "[", "Clear", "]"}], " ", ":=", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"free", "[", "M", "]"}], ";", " ", 
+        RowBox[{"ClearAll", "[", 
+         RowBox[{"Evaluate", "[", "f", "]"}], "]"}]}], ")"}]}], ";", " ", 
+     "\n", "\t\t", "\n", "\t\t", "f"}]}], "\n", "\t\t", "]"}]}]], "Code",
+ CellLabel->
+  "In[394]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Foreign Function Interface", "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+  "FFISource", " ", "=", 
+   " ", "\"\<\n\n// Standard C\n\n#include \\\"WolframLibrary.h\\\"\n#include \
+<stdlib.h>\n\n#include \\\"memory.h\\\"\n\n// Mathematica foreign-function \
+interface (FFI) for the memory library.\n// The functions named TAM.. are \
+linked into Mathematica. \n\nDLLEXPORT void* TAMnew(int Adim, int Apop, int \
+Bdim, int Bpop) \n\t{ return (void*) Memory_new (Adim, Apop, Bdim, Bpop);}\n\n\
+DLLEXPORT void TAMsetthreshold (void *m, int t)\n\t{ \
+Memory_set_threshold((Memory*) m, t); }\n\nDLLEXPORT int TAMmemory(void *m)\n\
+\t{ return Memory_count ( (Memory*) m); }\n\nDLLEXPORT void TAMfree(void *m) \
+\n\t{ Memory_free((Memory*) m); }\n\t\t\t\t\nDLLEXPORT void TAMwrite(void *m, \
+int *Abits, int Apop, int *Bbits, int Bpop)\n\t{\n\tMemory *M = (Memory*) m;\n\
+\t\n\tSet *A = Set_new(M->Adimension);\n\tSet *B = Set_new(M->Bdimension);\n\t\
+\n\t// Decrement to convert to zero-based numbering.\n\tA->p = Apop; for (int \
+i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;\n\tB->p = Bpop; for (int i = 0; \
+i < Bpop; i++) B->a[i] = Bbits[i] - 1;\n\n\tMemory_write(M, A, B);\n\n\t\
+Set_free(A);\n\tSet_free(B);\n\t}\n\nDLLEXPORT void TAMread(void *m, int \
+*Abits, int Apop, int *Bbits, int *Bpop)\n\t{\n\tMemory *M = (Memory*) m;\n\t\
+\n\tSet *A = Set_new(M->Adimension); \n\tSet *B = Set_new(M->Bdimension);\n\t\
+\n\t// Convert A to 0-based numbering.\n\tA->p = Apop; for (int i = 0; i < \
+Apop; i++) A->a[i] = Abits[i] - 1;\n\n\tMemory_read(M, A, B);\n\n\t// Convert \
+B to 1-based numbering. B can be a an empty list.\n\t*Bpop = B->p; for (int i \
+= 0; i < B->p; i++) Bbits[i] = B->a[i] + 1;\n\t\n\tSet_free(A);\n\t\
+Set_free(B);\n\t}\n\t\n\>\""}], ";"}]], "Code",
+ InitializationCell->False,
+ FontWeight->"Plain",
+ FontColor->GrayLevel[0],
+ CellLabel->
+  "In[395]:=",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Build and Install", "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "nb", ",", " ", "source", ",", " ", "target", ",", " ", "srcdir"}], 
+     "}"}], ",", "\n", "    ", 
+    RowBox[{
+     RowBox[{"nb", " ", "=", " ", 
+      RowBox[{"EvaluationNotebook", "[", "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Check", " ", "if", " ", "the", " ", "notebook", " ", "has", " ", 
+       "been", " ", "saved", " ", "at", " ", "least", " ", "once", " ", "to", 
+       " ", "have", " ", "a", " ", 
+       RowBox[{"directory", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Quiet", "[", 
+         RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "===", " ", 
+        "$Failed"}], ",", "\n", "        ", 
+       RowBox[{
+        RowBox[{
+        "Print", 
+         "[", "\"\<Error: Save this notebook somewhere on your computer \
+first.\>\"", "]"}], ";", "\n", "        ", 
+        RowBox[{"Return", "[", "]"}]}]}], "\n", "    ", "]"}], ";", "\n", 
+     "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Build", " ", 
+       RowBox[{"library", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"srcdir", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"ParentDirectory", "[", 
+          RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
+         " ", "\"\<c\>\""}], "}"}], "]"}]}], ";", "\n", "\t", 
+     RowBox[{"Needs", "[", "\"\<CCompilerDriver`\>\"", "]"}], ";", "\n", 
+     "\t\t", "\n", "\t", 
+     RowBox[{"Export", "[", " ", 
+      RowBox[{
+       RowBox[{"FileNameJoin", "[", 
+        RowBox[{"{", 
+         RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], ",", 
+       " ", "FFISource", ",", " ", "\"\<Lines\>\""}], "]"}], ";", "\n", 
+     "\t\t", "\n", "\t", 
+     RowBox[{"CCompilerDriver`CreateLibrary", "[", "\n", "\t\t", 
+      RowBox[{
+       RowBox[{"{", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"FileNameJoin", "[", 
+          RowBox[{"{", 
+           RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], ",", 
+         "\n", "\t\t", 
+         RowBox[{"FileNameJoin", "[", 
+          RowBox[{"{", 
+           RowBox[{"srcdir", ",", " ", "\"\<memory.c\>\""}], "}"}], "]"}]}], 
+        "\n", "\t\t", "}"}], ",", " ", "\"\<TAM\>\"", ",", " ", "\n", 
+       "\t\t\t", 
+       RowBox[{"\"\<CompilerName\>\"", " ", "->", " ", "\"\<cc\>\""}], ",", 
+       " ", "\n", "\t\t\t", 
+       RowBox[{"\"\<CompileOptions\>\"", " ", "->", 
+        " ", "\"\<-O3 -ffast-math\>\""}], ",", "\n", "\t\t\t", 
+       RowBox[{"\"\<IncludeDirectories\>\"", " ", "->", " ", 
+        RowBox[{"{", "srcdir", "}"}]}]}], "]"}], ";", "\n", "\t\t\t\t", "\n", 
+     "\t", 
+     RowBox[{"DeleteFile", "[", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], "]"}], ";",
+      "\t\t", "\n", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Force", " ", "the", " ", "AutoGenerate", " ", "setting", " ", "for", " ",
+        "this", " ", 
+       RowBox[{"notebook", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"SetOptions", "[", 
+      RowBox[{"nb", ",", " ", 
+       RowBox[{"AutoGeneratedPackage", " ", "->", " ", "Automatic"}]}], "]"}],
+      ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Programmatically", " ", "save", " ", "to", " ", "trigger", " ", 
+       RowBox[{"the", " ", ".", "m"}], " ", "file", " ", 
+       RowBox[{"generation", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"NotebookSave", "[", "nb", "]"}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Pause", " ", "to", " ", "ensure", " ", "the", " ", "OS", " ", 
+       "finishes", " ", "writing", " ", "the", " ", "file"}], " ", "*)"}], 
+     "\n", "    ", 
+     RowBox[{"Pause", "[", "0.5", "]"}], ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Define", " ", "paths", " ", "dynamically", " ", "based", " ", "on", " ",
+        "the", " ", "current", " ", 
+       RowBox[{"notebook", "'"}], "s", " ", 
+       RowBox[{"name", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"source", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"NotebookDirectory", "[", "]"}], ",", " ", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{"FileBaseName", "[", 
+           RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "<>", 
+          " ", "\"\<.m\>\""}]}], "}"}], "]"}]}], ";", "\n", "    ", 
+     RowBox[{"target", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+        "$UserBaseDirectory", ",", " ", "\"\<Applications\>\"", ",", 
+         " ", "\"\<Memory.m\>\""}], "}"}], "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Install", " ", "the", " ", 
+       RowBox[{"file", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"FileExistsQ", "[", "source", "]"}], ",", "\n", "        ", 
+       RowBox[{"CopyFile", "[", 
+        RowBox[{"source", ",", " ", "target", ",", " ", 
+         RowBox[{"OverwriteTarget", " ", "->", " ", "True"}]}], "]"}], ",", 
+       "\n", "        ", 
+       RowBox[{"Print", "[", 
+        RowBox[{"\"\<Error: Auto-generation failed. Could not find \>\"", ",",
+          " ", "source"}], "]"}]}], "\n", "    ", "]"}]}]}], "\n", "]"}], 
+  ";"}]], "Code",
+ InitializationCell->False,
+ CellLabel->
+  "In[396]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{862, 1030},
+WindowMargins->{{Automatic, 293}, {Automatic, 0}},
+DockedCells->{
+  Cell[
+   BoxData[
+    TemplateBox[{
+      ButtonBox[
+      "\"Install $UserBaseDirectory/Applications/Memory.m\"", ButtonFunction :> 
+       FrontEndExecute[
+         FrontEndToken[
+          EvaluationNotebook[], "EvaluateNotebook"]], Method -> "Queued", 
+       Appearance -> Automatic, Evaluator -> Automatic]}, "RowDefault"]], 
+   "DockedCell", Background -> 
+   RGBColor[0.9215686274509803, 0.796078431372549, 0.5450980392156862], 
+   CellMargins -> {{0, 0}, {0, 0}}]},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+TaggingRules->{"TryRealOnly" -> False},
+DefaultNewCellStyle->"Code",
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"650b95e0-0e6d-43a4-af74-26167580d2b8"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[422, 15, 120, 0, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574"],
+Cell[545, 17, 1829, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+Cell[2377, 62, 1672, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
+ CellOpen->False],
+Cell[CellGroupData[{
+Cell[4074, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+Cell[4160, 108, 278, 8, 63, "Code",ExpressionUUID->"fc2509db-7d86-4ed2-9106-0c1c70a6c116"],
+Cell[4441, 118, 7310, 168, 1265, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11788, 291, 103, 0, 66, "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
+Cell[11894, 293, 1884, 30, 1457, "Code",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51",
+ InitializationCell->False]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13815, 328, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
+Cell[13912, 330, 5678, 134, 1128, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
+ InitializationCell->False]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
