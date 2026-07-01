@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying paper instead of this software repository."
+authors:
+  - family-names: "Overmann"
+    given-names: "Peter"
+title: "Creating Intelligence"
+
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Overmann"
+      given-names: "Peter"
+  title: "Creating Intelligence: A Computational Foundation for AGI"
+  journal: "arXiv preprint arXiv:2606.31819"
+  year: 2026
+  url: "https://arxiv.org/abs/2606.31819"
+  
+  
