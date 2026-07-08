@@ -2,3 +2,5 @@
 Archive/
 Development/
 Notes/
+.venv/
+__pycache__/
