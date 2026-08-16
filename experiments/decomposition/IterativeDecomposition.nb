@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[     39684,        979]
-NotebookOptionsPosition[     34279,        858]
-NotebookOutlinePosition[     37970,        951]
-CellTagsIndexPosition[     37927,        948]
+NotebookDataLength[     39748,        980]
+NotebookOptionsPosition[     34315,        858]
+NotebookOutlinePosition[     38034,        952]
+CellTagsIndexPosition[     37991,        949]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -82,8 +82,8 @@ Cell[BoxData[
                    RowBox[{"Export", "[", 
                     RowBox[{
                     RowBox[{"cleanPath", "<>", "\"\<.json\>\""}], ",", 
-                    "dataflow", ",", " ", "\"\<Circuit\>\""}], "]"}]}]}], 
-                 "]"}], ",", 
+                    RowBox[{"FromDFD", "[", "dataflow", "]"}], ",", 
+                    " ", "\"\<Circuit\>\""}], "]"}]}]}], "]"}], ",", 
                 RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], "}"}], 
              "]"}], "]"}], "]"}], ",", "\"\<DockedCell\>\"", ",", 
           RowBox[{"Background", "->", 
@@ -336,7 +336,7 @@ Cell[BoxData[
               RowBox[{"\"\<ClosedCellHeight\>\"", "->", "0"}], "}"}]}]}], 
            "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
- CellLabel->"In[1]:=",ExpressionUUID->"16399655-8e4a-4d79-8080-533635f9e8d7"],
+ CellLabel->"In[24]:=",ExpressionUUID->"78d9b5c7-4a89-4c92-bd9f-f9fa4e132b26"],
 
 Cell[CellGroupData[{
 
@@ -391,7 +391,7 @@ Cell[BoxData[
       RowBox[{"{", 
        RowBox[{"2000", ",", " ", "10"}], "}"}]}]}], "\n", "\t", "}"}]}], 
   ";"}]], "Code",
- CellLabel->"In[3]:=",ExpressionUUID->"b26e9c04-7de9-4a0e-85ec-2d27dc835686"],
+ CellLabel->"In[23]:=",ExpressionUUID->"b26e9c04-7de9-4a0e-85ec-2d27dc835686"],
 
 Cell[BoxData[
  RowBox[{
@@ -871,9 +871,10 @@ $CellContext`cleanPath = FileNameJoin[{
              FileBaseName[
               NotebookFileName[$CellContext`nb]]}]; 
          Export[$CellContext`cleanPath <> ".pdf", $CellContext`nb]; 
-         Export[$CellContext`cleanPath <> ".json", $CellContext`dataflow, 
-           "Circuit"]], Method -> "Queued", Appearance -> Automatic, 
-       Evaluator -> Automatic]}, "RowDefault"]], "DockedCell", Background -> 
+         Export[$CellContext`cleanPath <> ".json", 
+           $CellContext`FromDFD[$CellContext`dataflow], "Circuit"]], Method -> 
+       "Queued", Appearance -> Automatic, Evaluator -> Automatic]}, 
+     "RowDefault"]], "DockedCell", Background -> 
    RGBColor[0.9215686274509803, 0.796078431372549, 0.5450980392156862], 
    CellMargins -> {{0, 0}, {0, 0}}]},
 PrintingCopies->1,
@@ -951,33 +952,33 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[554, 20, 392, 10, 34, "Text",ExpressionUUID->"68cf67fa-7141-40b7-a6f9-e072dbef9b14"],
-Cell[949, 32, 12985, 306, 23, "Input",ExpressionUUID->"16399655-8e4a-4d79-8080-533635f9e8d7",
+Cell[949, 32, 13020, 306, 23, "Input",ExpressionUUID->"78d9b5c7-4a89-4c92-bd9f-f9fa4e132b26",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[13959, 342, 95, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
-Cell[14057, 344, 117, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
-Cell[14177, 346, 231, 5, 96, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
-Cell[14411, 353, 144, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"],
+Cell[13994, 342, 95, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
+Cell[14092, 344, 117, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
+Cell[14212, 346, 231, 5, 96, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
+Cell[14446, 353, 144, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"],
 Cell[CellGroupData[{
-Cell[14580, 359, 84, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
-Cell[14667, 361, 1179, 32, 228, "Code",ExpressionUUID->"b26e9c04-7de9-4a0e-85ec-2d27dc835686"],
-Cell[15849, 395, 172, 4, 23, "Input",ExpressionUUID->"1824c92a-f4e3-42cb-8226-bcab15549a7b",
+Cell[14615, 359, 84, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
+Cell[14702, 361, 1180, 32, 228, "Code",ExpressionUUID->"b26e9c04-7de9-4a0e-85ec-2d27dc835686"],
+Cell[15885, 395, 172, 4, 23, "Input",ExpressionUUID->"1824c92a-f4e3-42cb-8226-bcab15549a7b",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[16046, 403, 313, 7, 63, "Code",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
-Cell[16362, 412, 15942, 381, 260, "Output",ExpressionUUID->"6f676544-efba-44f0-a977-6868c8c73236"]
+Cell[16082, 403, 313, 7, 63, "Code",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
+Cell[16398, 412, 15942, 381, 260, "Output",ExpressionUUID->"6f676544-efba-44f0-a977-6868c8c73236"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[32353, 799, 83, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
-Cell[32439, 801, 464, 12, 110, "Code",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"]
+Cell[32389, 799, 83, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
+Cell[32475, 801, 464, 12, 110, "Code",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[32940, 818, 84, 0, 66, "Subsection",ExpressionUUID->"587caed8-e242-45da-89a9-34e9caa7dda5"],
-Cell[33027, 820, 447, 11, 63, "Code",ExpressionUUID->"b9ba9e9e-69e0-48b5-835b-d8c8022ea493"],
+Cell[32976, 818, 84, 0, 66, "Subsection",ExpressionUUID->"587caed8-e242-45da-89a9-34e9caa7dda5"],
+Cell[33063, 820, 447, 11, 63, "Code",ExpressionUUID->"b9ba9e9e-69e0-48b5-835b-d8c8022ea493"],
 Cell[CellGroupData[{
-Cell[33499, 835, 347, 9, 63, "Code",ExpressionUUID->"21c5e4db-ae92-43e9-8507-07f5c41a21dc"],
-Cell[33849, 846, 390, 7, 41, "Output",ExpressionUUID->"1af93c4b-4272-4f18-bfc3-aa8cfc5d1fb9"]
+Cell[33535, 835, 347, 9, 63, "Code",ExpressionUUID->"21c5e4db-ae92-43e9-8507-07f5c41a21dc"],
+Cell[33885, 846, 390, 7, 41, "Output",ExpressionUUID->"1af93c4b-4272-4f18-bfc3-aa8cfc5d1fb9"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
