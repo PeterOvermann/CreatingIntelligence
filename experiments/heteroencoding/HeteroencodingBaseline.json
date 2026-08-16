@@ -4,9 +4,9 @@
   "hyperparameters": {"11": [1000, 30], "12": [1000, 30], "21": [1000, 10], "101": [500, 5]},
 
   "dataflow": [
-    {"component": "random", "send": [11]},
+    {"component": "noise", "send": [11]},
 
-    {"component": "random", "send": [12]},
+    {"component": "noise", "send": [12]},
 
     {"component": "input", "arguments": ["codec"], "send": [21]},
 
