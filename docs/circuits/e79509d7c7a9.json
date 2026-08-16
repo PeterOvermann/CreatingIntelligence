@@ -1,0 +1,11 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [900, 10]},
+
+  "dataflow": [
+    {"component": "input", "send": [11]},
+
+    {"component": "output", "receive": [{"slot": 11, "tags": ["show_dimension"]}]}
+  ]
+}
