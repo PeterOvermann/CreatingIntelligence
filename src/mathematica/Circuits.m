@@ -480,11 +480,11 @@ Input nodes have no callback function and no "receive" slots.
 Input data can be excitatory or inhibitory, or a mix.
 *)
 	
-input[a_Association] := Module[ {args, c},
+input[config_Association] := Module[ {args, c},
 
-	args = Lookup[a, "arguments", {raw}];
+	args = Lookup[config, "arguments", {raw}];
 
-	c = Prepend[Construct @@ args, First[a["blocks_out"]]];	
+	c = Prepend[Construct @@ args, First[config["blocks_out"]]];	
 	
 	<| "label" -> c["label"], "encode" -> c["encode"], 
 		"size" -> Small, "clear" -> c, "checks" -> {"input", "oneout"} |> 
@@ -498,11 +498,11 @@ Output nodes have no callback function and no "send" slots.
 Output data can be excitatory or inhibitory, or a mix.
 *)
 
-output[a_Association] := Module[ {args, c},
+output[config_Association] := Module[ {args, c},
 
-	args = Lookup[a, "arguments", {raw}];
+	args = Lookup[config, "arguments", {raw}];
 
-	c = Prepend[Construct @@ args, First[a["blocks_inp"]]];	
+	c = Prepend[Construct @@ args, First[config["blocks_inp"]]];	
 
 	<| "label" -> c["label"], "decode" -> c["decode"], 
 		"size" -> Small, "clear" -> c, "checks" -> {"oneinp", "output"} |> 
@@ -522,16 +522,16 @@ Multisets and inhibitory signals are handled transparently.
 Temporal integration resolves inhibition.
 *)
 
-delay[a_Association] := 
+delay[config_Association] := 
 	Module[ {f, n, p, dims1, dims2, options, decimation, 
 			ratelimit, capacity, Y = {}, label = ""},
 
-	{n, p} = First[a["blocks_out"]]; 
+	{n, p} = First[config["blocks_out"]]; 
 
-	dims1 = First /@ a["blocks_inp"];
-	dims2 = First /@ a["blocks_out"];
+	dims1 = First /@ config["blocks_inp"];
+	dims2 = First /@ config["blocks_out"];
 
-	options = Lookup[a, "options", <||>];
+	options = Lookup[config, "options", <||>];
 
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[options, "D", 1];
@@ -575,12 +575,12 @@ Latches onto a signal if its population meets threshold T.
 Holds and broadcasts the state for up to W additional cycles.
 *)
 
-latch[a_Association] := 
+latch[config_Association] := 
 	Module[ {f, dims1, dims2, options, threshold, window, state, timer},
 
-	dims1 = First /@ a["blocks_inp"];
-	dims2 = First /@ a["blocks_out"];
-	options = Lookup[a, "options", <||>];
+	dims1 = First /@ config["blocks_inp"];
+	dims2 = First /@ config["blocks_out"];
+	options = Lookup[config, "options", <||>];
 
 	(* Hyperparameters *)
 	(* Must have at least 1 element to latch by default. *)
@@ -632,16 +632,16 @@ Note about the source of multisets: A single input pathway may already carry
 a multiset ("+" modifier), or receive a multiset through pathway merging.
 *)
 	
-kwta[a_Association] := 
+kwta[config_Association] := 
 	Module[ {f, dims1, dims2, options, k, cutoff, cycles, capacity, threshold, 
 		window},
 
-	dims1 = First /@ a["blocks_inp"];
-	dims2 = First /@ a["blocks_out"];
-	options = Lookup[a, "options", <||>];
+	dims1 = First /@ config["blocks_inp"];
+	dims2 = First /@ config["blocks_out"];
+	options = Lookup[config, "options", <||>];
 	
 	(* k is the population of the output channel. *)
-	k = a["blocks_out"][[1, 2]]; 
+	k = config["blocks_out"][[1, 2]]; 
 	
 	(* Temporal and space bounding parameters *)
 	cycles    = Lookup[options, "W", 1];
@@ -712,15 +712,15 @@ and update rules for auto-associative memory. This prototype captures the
 geneneric cases. Modify as needed.
 *)
 
-auto[a_Association] := 
+auto[config_Association] := 
 	Module[ {f, updaterule, dims, options, p, M, label, size, min, max, 
 		 ratelimit, decimation},
 			
-	updaterule = Lookup[a, "arguments", {replacement}][[1]];
+	updaterule = Lookup[config, "arguments", {replacement}][[1]];
 			
-	dims = First /@ a["blocks_inp"];
-	options = Lookup[a, "options", <||>];
-	p = Last[Plus @@ a["blocks_inp"]];
+	dims = First /@ config["blocks_inp"];
+	options = Lookup[config, "options", <||>];
+	p = Last[Plus @@ config["blocks_inp"]];
 
 	{label, size} = 
 		Switch[ updaterule, 
@@ -746,7 +746,7 @@ auto[a_Association] :=
 	
 	(* Memory with identical input and output parameters. *)
 	M = Memory[#, #, Threshold -> Lookup[options, "T", Automatic]]& 
-			[Plus @@ a["blocks_inp"]];
+			[Plus @@ config["blocks_inp"]];
 		
 	f[blocks__List] := Module[ {A, X, Y, Xdec},
 
@@ -789,12 +789,12 @@ A is given by the rest of the input arguments. Can be block-coded.
 Always learns if B =!= {}.
 *)
 
-associator[a_Association] := 
+associator[config_Association] := 
 	Module[ {f, options, Adims, M, decimation, oversampling},
 
-	options = Lookup[a, "options", <||>];
+	options = Lookup[config, "options", <||>];
 
-	Adims = First /@ Rest[a["blocks_inp"]]; (* Dimensions of input blocks A *)
+	Adims = First /@ Rest[config["blocks_inp"]]; (* Dimensions of input blocks A *)
 
 	(* Proportional stochastic subsampling for training.  *)
 	decimation = Lookup[options, "D", 1];
@@ -802,7 +802,7 @@ associator[a_Association] :=
 	oversampling = Lookup[options, "O", 1];
 	
 	(* Memory instance: *)
-	M = Memory[Plus@@Rest[a["blocks_inp"]], First[a["blocks_out"]], 
+	M = Memory[Plus@@Rest[config["blocks_inp"]], First[config["blocks_out"]], 
 				Threshold -> Lookup[options, "T", Automatic]];
 
 	f[B_List, blocks__List] := Module[{X, Y},
@@ -836,13 +836,13 @@ associator[a_Association] :=
 Heteroencoder A -> B. A may be partitioned. Has no input for B.
 *)
 
-heteroencoder[a_Association] := 
+heteroencoder[config_Association] := 
 	Module[ {f, options, dims, M},
 	
-	options = Lookup[a, "options", <||>];
-	dims = First /@ a["blocks_inp"];
+	options = Lookup[config, "options", <||>];
+	dims = First /@ config["blocks_inp"];
 	
-	M = Memory[ Plus @@ a["blocks_inp"], First[a["blocks_out"]], 
+	M = Memory[ Plus @@ config["blocks_inp"], First[config["blocks_out"]], 
 			Threshold -> Lookup[options, "T", Automatic]];
 	
 	f[blocks__List] := Module[{X, Y},
@@ -852,7 +852,7 @@ heteroencoder[a_Association] :=
 		
 		(* Generate new SHR encoding if retrieval fails. *)
 		If[Y === {}, 
-			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[a["blocks_out"]]];
+			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[config["blocks_out"]]];
 		
 		(* Always learn, broadening X as an attractor. *)
 		M[X -> Y];
@@ -873,13 +873,13 @@ Automatically learns the correct prediction in the following cycle.
 To do so, the node remembers its context from the previous cycle.
 *)
 
-predictor[a_Association] := 
+predictor[config_Association] := 
 		Module[ {f, options, M, X = {}, prediction = {}, 
 						itemconfig, contextconfig},
 
-	options = Lookup[a, "options", <||>];
-	itemconfig = First[a["blocks_inp"]];
-	contextconfig = Rest[a["blocks_inp"]]; (* Context may be partitioned *)
+	options = Lookup[config, "options", <||>];
+	itemconfig = First[config["blocks_inp"]];
+	contextconfig = Rest[config["blocks_inp"]]; (* Context may be partitioned *)
 	
 	M = Memory[Plus @@ contextconfig, itemconfig,
 		Threshold -> Lookup[options, "T", Automatic]]; 
@@ -909,15 +909,15 @@ predictor[a_Association] :=
 Embedded circuit component.
 *)
 	
-circuit[a_Association] := Module[ {f, args, subnet},
+circuit[config_Association] := Module[ {f, args, subnet},
 	
-	args = Lookup[a, "arguments", {}];
+	args = Lookup[config, "arguments", {}];
 	
 	If[ ! MatchQ[args, {_Symbol}], Message[Circuit::circuit, args]; None];
 	
 	subnet = args[[1]];
 		
-	If[ {a["blocks_inp"], a["blocks_out"]} =!= {subnet[In], subnet[Out]},
+	If[ {config["blocks_inp"], config["blocks_out"]} =!= {subnet[In], subnet[Out]},
 		Message[Circuit::embedded, {subnet[In], subnet[Out]}]];
 	
 	(* Skip encoding, decoding, preprocessing, and postprocessing *)
@@ -934,9 +934,10 @@ circuit[a_Association] := Module[ {f, args, subnet},
 Random noise generator
 *)
 	
-noise[a_Association] := Module[ {f},
+noise[config_Association] := Module[ {f},
 
-	f[blocks___] := Sort[RandomSample[Range[#1], #2]]& @@ First[a["blocks_out"]]; 
+	f[blocks___] := 
+		Sort[RandomSample[Range[#1], #2]]& @@ First[config["blocks_out"]]; 
 	
 	<| "function" -> f, "checks" -> {"input", "oneout"}, "label" -> "~",
 		"fill" -> 13, "size" -> 18 |>
@@ -1026,7 +1027,7 @@ Circuit[circuitspec_] := Module[
 	(* Compile a component. This triggers compilation of incoming pathways. *)
 	compile[node_Association] := Module[
 		{
-		a, callback, compilepathway, slotparams, fillparams
+		config, callback, compilepathway, slotparams, fillparams
 		}, 
 				
 		++ nodeid;
@@ -1101,11 +1102,11 @@ Circuit[circuitspec_] := Module[
 			];
 																			
 		(* Base configuration for each node. Includes per-node user settings. *)
-		a = Join[ node, 
+		config = Join[ node, 
 			<|  
 			"receivepaths" -> compilepathway /@ Lookup[node, "receive", {}],
 		
-			"id" -> nodeid,
+			"id" -> nodeid, (* Used for schematics visualization. *)
 			
 			(* Extract slot numbers, skip preprocessing and postprocessing
 			functions in input and output components. *)
@@ -1117,18 +1118,18 @@ Circuit[circuitspec_] := Module[
 			
 		
 		(* Instantiate the component, re-append user options. *)
-		a = Join[Lookup[node, "component"][a], a];
+		config = Join[Lookup[node, "component"][config], config];
 		
 		(* Prepend default visualization settings. *)
-		a = Join[<| "shape" -> "Circle", "label" -> "", "fill" -> 6, 
-			"color" -> 0, "size" -> Medium  |>, a];
+		config = Join[<| "shape" -> "Circle", "label" -> "", "fill" -> 6, 
+			"color" -> 0, "size" -> Medium  |>, config];
 
 		(* Prepend default functional settings. *)
-		a = Join[<| "checks" -> {}, "function" -> Null |>, a];
+		config = Join[<| "checks" -> {}, "function" -> Null |>, config];
 
 		(* Static error checking, based on component-supplied "checks". *)
-		If[ ! Circuit`check[#][a["blocks_inp"], a["blocks_out"]], 
-			Message[MessageName[Circuit, #], a]] & /@ a["checks"];
+		If[ ! Circuit`check[#][config["blocks_inp"], config["blocks_out"]], 
+			Message[MessageName[Circuit, #], config]] & /@ config["checks"];
 
 		(* Register input flow. *)
 		If[Lookup[node, "component"] === input,  
@@ -1138,12 +1139,12 @@ Circuit[circuitspec_] := Module[
 				First[node["receive"]], Identity]];
 
 			(* Register encoder. *)
-			AppendTo[encoding, a["encode"]];
+			AppendTo[encoding, config["encode"]];
 						
-			AppendTo[inputslots, First[a["sendslots"]]];
-			AppendTo[self[In], First[a["blocks_out"]]];
+			AppendTo[inputslots, First[config["sendslots"]]];
+			AppendTo[self[In], First[config["blocks_out"]]];
 
-			a["label"] //= StringReplace["#" -> 
+			config["label"] //= StringReplace["#" -> 
 					ToString[Length[inputslots]]]
 			];
 
@@ -1155,16 +1156,16 @@ Circuit[circuitspec_] := Module[
 				First[node["send"]], Identity]];
 	
 			(* Register decoder. *)
-			AppendTo[decoding, a["decode"]];
+			AppendTo[decoding, config["decode"]];
 			
-			AppendTo[outputedges, First[a["receivepaths"]]];
-			AppendTo[self[Out], First[a["blocks_inp"]]];
-			a["label"] //= StringReplace["#" -> 
+			AppendTo[outputedges, First[config["receivepaths"]]];
+			AppendTo[self[Out], First[config["blocks_inp"]]];
+			config["label"] //= StringReplace["#" -> 
 				ToString[Length[outputedges]]]
 			];
 				
 		(* Register this component. *)
-		nodes[nodeid] = a;
+		nodes[nodeid] = config;
 		];
 	
 	
@@ -1191,19 +1192,19 @@ Circuit[circuitspec_] := Module[
 	(* 
 	Component evaluation. Triggers incoming pathway evaluation.
 	*)
-	componenteval[a_Association] := Module[ {x, result},
+	componenteval[config_Association] := Module[ {x, result},
 
 		(* Input and output nodes (where function = Null) are not evaluated.*)		
-		If[a["function"] === Null, Return[]];
+		If[config["function"] === Null, Return[]];
 
 		(* Evaluate received pathways and latch inputs. *)
-		x = patheval /@ a["receivepaths"];
+		x = patheval /@ config["receivepaths"];
 			
 		(* This component's callback function. *)
-		result = a["function"][Sequence @@ x]; 
+		result = config["function"][Sequence @@ x]; 
 
 		(* Copy results to output slot. *)
-		MapThread[(nextstate[#1] = #2) &, {a["sendslots"], {result}}]
+		MapThread[(nextstate[#1] = #2) &, {config["sendslots"], {result}}]
 		];
 												
 	(* 
@@ -1658,7 +1659,7 @@ FromDFD[dataflow_List] := Module[
 			];
         
         tagmap = Association[Reverse /@ Normal[Circuit`TagMap]];
-        found = DeleteMissing[Lookup[tagmap, Characters[tags]]];
+		found = Values[KeyTake[tagmap, Characters[tags]]];
         If[Length[found] > 0, result["tags"] = found];
         
         result
