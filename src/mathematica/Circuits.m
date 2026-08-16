@@ -223,6 +223,22 @@ OverlapProbability[n_, p_, v_] :=
 	N[Binomial[p, v] * Binomial[n - p, p - v] / Binomial[n, p]]
 
 
+(* No encoding.  *)
+
+raw[{n_Integer, p_Integer}] := 
+	raw[{n, p}] = Module[ {self},
+
+	self = Unique[];
+	
+	self["label"] = "";
+
+	self["encode"] = Identity;
+	self["decode"] = Identity;
+				
+	self
+	]
+
+
 (* General-purpose SHR encoder/decoder for symbolic expressions. *)
 
 codec[{n_Integer, p_Integer}] := 
@@ -458,43 +474,39 @@ flyhash[{n_Integer, p_Integer}, sparsity_: 0.1] :=
 
 (* 
 At the beginning of each cycle, external input is pushed 
-into the input nodes' output slots.
+into the input's send slots.
 A network may contain multiple input nodes.
-Input nodes have no callback function and no input slots.
+Input nodes have no callback function and no "receive" slots.
 Input data can be excitatory or inhibitory, or a mix.
 *)
 	
-input[_Association, __] := 
-	<| "size" -> Small, "checks" -> {"input", "oneout"},
-		"encode" -> Identity |>;
+input[a_Association] := Module[ {args, c},
 
-input[enc_Symbol, opt_Association, send_, receive_] := 
-	input[enc[], opt, send, receive];
+	args = Lookup[a, "arguments", {raw}];
 
-input[enc_[args___], opt_Association, send_, receive_] := Module[ {c},
-	c = enc[First[send], args];
-	<| "label" -> c["label"], "encode" -> c["encode"], "clear" -> c, 
-		"size" -> Small, "checks" -> {"input", "oneout"} |> 
-	];
+	c = Prepend[Construct @@ args, First[a["blocks_out"]]];	
+	
+	<| "label" -> c["label"], "encode" -> c["encode"], 
+		"size" -> Small, "clear" -> c, "checks" -> {"input", "oneout"} |> 
+	]
 
 
 (* 
-At the end of each cycle, this node's input edges are read out.
+At the end of each cycle, the output's input edges are read out.
 A network may contain multiple output nodes.
-Output nodes have no callback function and no output slots.
+Output nodes have no callback function and no "send" slots.
 Output data can be excitatory or inhibitory, or a mix.
 *)
 
-output[_Association, __] :=  <| "size" -> Small,  
-	"checks" -> {"oneinp", "output"}, "decode" -> Identity |>;
+output[a_Association] := Module[ {args, c},
 
-output[dec_Symbol, opt_Association, send_, receive_] := 
-	output[dec[], opt, send, receive];
-		
-output[dec_[args___], opt_Association, send_, receive_] := Module[ {c},
-	c = dec[First[receive], args];
-	<|"label" -> c["label"], "decode" -> c["decode"], "clear" -> c, 
-		"size" -> Small, "checks" -> {"oneinp", "output"} |> ];
+	args = Lookup[a, "arguments", {raw}];
+
+	c = Prepend[Construct @@ args, First[a["blocks_inp"]]];	
+
+	<| "label" -> c["label"], "decode" -> c["decode"], 
+		"size" -> Small, "clear" -> c, "checks" -> {"oneinp", "output"} |> 
+	]
 
 
 (*
@@ -510,30 +522,32 @@ Multisets and inhibitory signals are handled transparently.
 Temporal integration resolves inhibition.
 *)
 
-delay[opt_Association, send_, receive_] := 
-	Module[ {f, n, p, dims1, dims2, decimation, 
+delay[a_Association] := 
+	Module[ {f, n, p, dims1, dims2, options, decimation, 
 			ratelimit, capacity, Y = {}, label = ""},
 
-	{n, p} = First[send]; 
+	{n, p} = First[a["blocks_out"]]; 
 
-	dims1 = First /@ receive;
-	dims2 = First /@ send;
+	dims1 = First /@ a["blocks_inp"];
+	dims2 = First /@ a["blocks_out"];
+
+	options = Lookup[a, "options", <||>];
 
 	(* Proportional stochastic subsampling for memory query. *)
-	decimation = Lookup[opt, "D", 1];
+	decimation = Lookup[options, "D", 1];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	ratelimit  = Lookup[opt, "R", Infinity];
+	ratelimit  = Lookup[options, "R", Infinity];
 	(* Temporal capacity, carry over from previous cycle. *)
-	capacity = Lookup[opt, "C", 0];				
+	capacity = Lookup[options, "C", 0];				
 
 	(* Visualization. *)
 	If[decimation < 1, label = "D"];	
 	If[ratelimit < Infinity, label = label <> "R"];	
 	If[capacity > 0, label = label <> ".."];	
 
-	f[inp__List] := Module[ {X},
+	f[blocks__List] := Module[ {X},
 		
-		X = MultisetBlockJoin[ {inp}, dims1];
+		X = MultisetBlockJoin[ {blocks}, dims1];
 		
 		(* X may be a mix of excitatory and inhibitory elements. 
 			We let both fade at the same rate. *)
@@ -546,7 +560,7 @@ delay[opt_Association, send_, receive_] :=
 		Y = RandomSample[Y, UpTo[capacity]]; 
 		X = Multiset[X, Y]; (* Temporal integration. *)
 		Y = X; (* Persist state. *)
-		
+
 		Sequence @@ MultisetBlockSplit[X, dims2]
 		];
 
@@ -561,18 +575,19 @@ Latches onto a signal if its population meets threshold T.
 Holds and broadcasts the state for up to W additional cycles.
 *)
 
-latch[opt_Association, send_, receive_] := 
-	Module[ {f, dims1, dims2, threshold, window, state, timer},
+latch[a_Association] := 
+	Module[ {f, dims1, dims2, options, threshold, window, state, timer},
 
-	dims1 = First /@ receive;
-	dims2 = First /@ send;
+	dims1 = First /@ a["blocks_inp"];
+	dims2 = First /@ a["blocks_out"];
+	options = Lookup[a, "options", <||>];
 
 	(* Hyperparameters *)
 	(* Must have at least 1 element to latch by default. *)
-	threshold = Lookup[opt, "T", 1]; 
+	threshold = Lookup[options, "T", 1]; 
 	
 	(* Default window is Infinity. *)
-	window = Lookup[opt, "W", Infinity];
+	window = Lookup[options, "W", Infinity];
 	
 	(* Internal state and age tracker *)
 	state = ConstantArray[{}, Length[dims2]];
@@ -582,9 +597,9 @@ latch[opt_Association, send_, receive_] :=
 	*)
 	timer = window + 1; 
 
-	f[inp__List] := Module[ {X},
+	f[blocks__List] := Module[ {X},
 		
-		X = MultisetBlockJoin[ {inp}, dims1];
+		X = MultisetBlockJoin[ {blocks}, dims1];
 		
 		(* Event-driven latch: Update state if threshold is met. *)
 		If[Length[X] >= threshold, 
@@ -617,29 +632,30 @@ Note about the source of multisets: A single input pathway may already carry
 a multiset ("+" modifier), or receive a multiset through pathway merging.
 *)
 	
-kwta[opt_Association, send_, receive_] := 
-	Module[ {f, dims1, dims2, k, cutoff, cycles, capacity, threshold, 
+kwta[a_Association] := 
+	Module[ {f, dims1, dims2, options, k, cutoff, cycles, capacity, threshold, 
 		window},
 
-	dims1 = First /@ receive;
-	dims2 = First /@ send;
+	dims1 = First /@ a["blocks_inp"];
+	dims2 = First /@ a["blocks_out"];
+	options = Lookup[a, "options", <||>];
 	
 	(* k is the population of the output channel. *)
-	k = send[[1,2]]; 
+	k = a["blocks_out"][[1, 2]]; 
 	
 	(* Temporal and space bounding parameters *)
-	cycles    = Lookup[opt, "W", 1];
-	capacity  = Lookup[opt, "C", Infinity];
-	threshold = Lookup[opt, "T", 0];
+	cycles    = Lookup[options, "W", 1];
+	capacity  = Lookup[options, "C", Infinity];
+	threshold = Lookup[options, "T", 0];
 	
 	(* Minimum number of occurrences. Acts as a high-pass filter. *)			
-	cutoff = Lookup[opt, "cutoff", 2];
+	cutoff = Lookup[options, "cutoff", 2];
 		
 	window = ConstantArray[{}, cycles];
 	
-	f[inp__List] := Module[ {X, U, tally, rankedmax, winners = {}}, 
+	f[blocks__List] := Module[ {X, U, tally, rankedmax, winners = {}}, 
 
-		X = MultisetBlockJoin[ {inp}, dims1];
+		X = MultisetBlockJoin[ {blocks}, dims1];
 
 		(* Sub-threshold input: do not advance window, emit empty sets. *)
 		If[Length[X] < threshold, 
@@ -653,6 +669,11 @@ kwta[opt_Association, send_, receive_] :=
 		U = Multiset[window]; 
 		
 		(* Capacity bounding: Unbiased subsampling if capacity is exceeded. *)
+
+		(* Note: A biologically more plausible approach would apply either 
+		   stochasitic exponential decay or linear  graded decay (multiset 
+		   substraction). Modify as needed. See also: kwta component. *)
+		  
 		If[Length[U] > capacity,  U = Sort[RandomSample[U, capacity]]];
 			
 		(* KWTA consensus on the surviving elements *)
@@ -691,12 +712,15 @@ and update rules for auto-associative memory. This prototype captures the
 geneneric cases. Modify as needed.
 *)
 
-auto[updaterule_: replacement, opt_Association, send_, receive_] := 
-	Module[ {f, dims, p, M, label, size, min, max, 
+auto[a_Association] := 
+	Module[ {f, updaterule, dims, options, p, M, label, size, min, max, 
 		 ratelimit, decimation},
 			
-	dims = First /@ receive;
-	p = Last[Plus @@ receive];
+	updaterule = Lookup[a, "arguments", {replacement}][[1]];
+			
+	dims = First /@ a["blocks_inp"];
+	options = Lookup[a, "options", <||>];
+	p = Last[Plus @@ a["blocks_inp"]];
 
 	{label, size} = 
 		Switch[ updaterule, 
@@ -710,19 +734,19 @@ auto[updaterule_: replacement, opt_Association, send_, receive_] :=
 		];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
-	ratelimit  = Lookup[opt, "R", Infinity];
+	ratelimit  = Lookup[options, "R", Infinity];
 	(* Proportional stochastic subsampling for memory query. *)
-	decimation = Lookup[opt, "D", 1];
+	decimation = Lookup[options, "D", 1];
 	
 	(* Learning thresholds. These apply to the total state, aggregated
 	from all blocks. Modify this logic as needed. *)
 	min = max = p; (* defaults *)
-	If[ IntegerQ[opt["L"]], min = max = opt["L"] ];
-	If[ MatchQ[opt["L"], {_Integer,_Integer}], {min, max} = opt["L"]];
+	If[ IntegerQ[options["L"]], min = max = options["L"] ];
+	If[ MatchQ[options["L"], {_Integer,_Integer}], {min, max} = options["L"]];
 	
 	(* Memory with identical input and output parameters. *)
-	M = Memory[#, #, 
-		Threshold -> Lookup[opt, "T", Automatic]]& [Plus @@ receive];
+	M = Memory[#, #, Threshold -> Lookup[options, "T", Automatic]]& 
+			[Plus @@ a["blocks_inp"]];
 		
 	f[blocks__List] := Module[ {A, X, Y, Xdec},
 
@@ -738,23 +762,23 @@ auto[updaterule_: replacement, opt_Association, send_, receive_] :=
 				
 
 		(* Always learn if "L"->True. Typically used for hyperassociations. *)
-		If[opt["L"], M[A -> A]];
+		If[options["L"], M[A -> A]];
 
 		(* Memory retrieval with decimated and rate-limited input state. *)
 		Y = M[Xdec];
 
 		(* Learn input A if retrieval fails *)
 		If[Y === {} && Length[A] >= min && Length[A] <= max,
-				If[opt["L"] =!= True, M[A -> A]]; Y = A];
+				If[options["L"] =!= True, M[A -> A]]; Y = A];
 
 		X = updaterule[Y, X]; 
 
 		Sequence @@ MultisetBlockSplit[X, dims] 
 		]; 
-	
+		
 	<| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
-		"label" :> label, "size" -> size, "clear" -> M,
-	    "shape" -> "Square", "fill" -> 8 |>
+		"label" :> label, "size" -> size,
+	    "shape" -> "Square", "fill" -> 8, "clear" -> M |>
 	]
 
 
@@ -765,24 +789,26 @@ A is given by the rest of the input arguments. Can be block-coded.
 Always learns if B =!= {}.
 *)
 
-associator[opt_Association, send_, receive_] := 
-	Module[ {f, Adims, M, decimation, oversampling},
+associator[a_Association] := 
+	Module[ {f, options, Adims, M, decimation, oversampling},
 
-	Adims = First /@ Rest[receive]; (* Dimensions of input blocks A *)
+	options = Lookup[a, "options", <||>];
+
+	Adims = First /@ Rest[a["blocks_inp"]]; (* Dimensions of input blocks A *)
 
 	(* Proportional stochastic subsampling for training.  *)
-	decimation = Lookup[opt, "D", 1];
+	decimation = Lookup[options, "D", 1];
 	(* Proportional stochastic oversampling for training.  *)
-	oversampling = Lookup[opt, "O", 1];
+	oversampling = Lookup[options, "O", 1];
 	
 	(* Memory instance: *)
-	M = Memory[Plus@@Rest[receive], First[send], 
-				Threshold -> Lookup[opt, "T", Automatic]];
+	M = Memory[Plus@@Rest[a["blocks_inp"]], First[a["blocks_out"]], 
+				Threshold -> Lookup[options, "T", Automatic]];
 
-	f[B_List, A__List] := Module[{X, Y},
+	f[B_List, blocks__List] := Module[{X, Y},
 		
 		(* Apply and drop inhibitory elements. *)
-		X = ResolveBlockJoinNormal[{A}, Adims];
+		X = ResolveBlockJoinNormal[{blocks}, Adims];
 		Y = ResolveNormal[B];
 		
 		If[Y === {}, Return[ M[X]]]; (* Test. *)
@@ -799,9 +825,10 @@ associator[opt_Association, send_, receive_] :=
 		{}	
 		];   
 		
-	<| "function" -> f, "checks" -> { "dimfirst", "oneout"}, "clear" -> M,
+		
+	<| "function" -> f, "checks" -> { "dimfirst", "oneout"},
 		"shape" -> "Square", "fill" -> 11, "size"-> (FontSize -> 18),
-		"label"-> "\[FilledRightTriangle]\[FilledCircle]" |>
+		"label"-> "\[FilledRightTriangle]\[FilledCircle]", "clear" -> M |>
 	]
 
 
@@ -809,32 +836,33 @@ associator[opt_Association, send_, receive_] :=
 Heteroencoder A -> B. A may be partitioned. Has no input for B.
 *)
 
-heteroencoder[opt_Association, send_, receive_] := 
-	Module[ {f, dims, M},
+heteroencoder[a_Association] := 
+	Module[ {f, options, dims, M},
 	
-	dims = First /@ receive;
+	options = Lookup[a, "options", <||>];
+	dims = First /@ a["blocks_inp"];
 	
-	M = Memory[ Plus @@ receive, First[send], 
-					Threshold -> Lookup[opt, "T", Automatic]];
+	M = Memory[ Plus @@ a["blocks_inp"], First[a["blocks_out"]], 
+			Threshold -> Lookup[options, "T", Automatic]];
 	
-	f[inp__List] := Module[{X, Y},
-		X = ResolveBlockJoinNormal[{inp}, dims];
+	f[blocks__List] := Module[{X, Y},
+		X = ResolveBlockJoinNormal[{blocks}, dims];
 		(* Retrieve. *)
 		Y = M[X];
 		
 		(* Generate new SHR encoding if retrieval fails. *)
 		If[Y === {}, 
-			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[send]];
+			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[a["blocks_out"]]];
 		
 		(* Always learn, broadening X as an attractor. *)
 		M[X -> Y];
 			
 		Y
 		]; 
-	
-	<| "function" -> f, "checks" -> {"arginp", "oneout"}, "clear" -> M,
+			
+	<| "function" -> f, "checks" -> {"arginp", "oneout"}, 
 		"shape" -> "Square",  "fill" -> 11,  "size"-> (FontSize -> 18),
-		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]" |>
+		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]", "clear" -> M |>
 	]
 
 
@@ -845,16 +873,18 @@ Automatically learns the correct prediction in the following cycle.
 To do so, the node remembers its context from the previous cycle.
 *)
 
-predictor[opt_Association, send_, receive_] := 
-		Module[ {f, M, X = {}, prediction = {}, itemconfig, contextconfig},
+predictor[a_Association] := 
+		Module[ {f, options, M, X = {}, prediction = {}, 
+						itemconfig, contextconfig},
 
-	itemconfig = First[receive];
-	contextconfig = Rest[receive]; (* Context may be partitioned *)
+	options = Lookup[a, "options", <||>];
+	itemconfig = First[a["blocks_inp"]];
+	contextconfig = Rest[a["blocks_inp"]]; (* Context may be partitioned *)
 	
 	M = Memory[Plus @@ contextconfig, itemconfig,
-		Threshold -> Lookup[opt, "T", Automatic]]; 
+		Threshold -> Lookup[options, "T", Automatic]]; 
 	
-	f[item_List, context__List] := Module[{Y},
+	f[item_List, blocks__List] := Module[{Y},
 	
 		Y = ResolveNormal[item];
 		
@@ -862,33 +892,40 @@ predictor[opt_Association, send_, receive_] :=
 		(* Always learn. Also when the prediction was correct. *)
 		M[X -> Y];
 		
-		X = ResolveBlockJoinNormal[ {context}, First /@ contextconfig];
+		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 
 		prediction = M[X]
 		]; 
 
-	<| "function" -> f, "checks" -> {"dimfirst", "oneout"}, "clear" -> M,
+
+	<| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
 		"shape" -> "Square", "fill" -> 11, "size"-> (FontSize -> 18),
-		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]"
+		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]", "clear" -> M
 		|>
 	]
 
 
 (* 
-Embedded circuit, encapsulated within a component.
+Embedded circuit component.
 *)
 	
-circuit[arg_, opt_Association, send_, receive_] := Module[ {f, subnet, label},
+circuit[a_Association] := Module[ {f, args, subnet},
 	
-	subnet = If[ Head[arg] === Symbol, arg, Circuit[arg]];
+	args = Lookup[a, "arguments", {}];
 	
-	If[ {receive, send}  =!= {subnet[In], subnet[Out]},
+	If[ ! MatchQ[args, {_Symbol}], Message[Circuit::circuit, args]; None];
+	
+	subnet = args[[1]];
+		
+	If[ {a["blocks_inp"], a["blocks_out"]} =!= {subnet[In], subnet[Out]},
 		Message[Circuit::embedded, {subnet[In], subnet[Out]}]];
 	
 	(* Skip encoding, decoding, preprocessing, and postprocessing *)
-	f[inp__] := Sequence @@ subnet[Function, {inp}]; 
+	f[blocks__] := Sequence @@ subnet[Function, {blocks}]; 
 	
-	<| "function" -> f, "checks" -> {"arginp", "argout"}, "clear" -> subnet,
+
+	<| "function" -> f, "checks" -> {"arginp", "argout"}, 
+		"clear" -> subnet,
 		"shape" -> "Square", "size" -> Small, "label" -> ToString[subnet] |>
 	]	
 
@@ -897,8 +934,9 @@ circuit[arg_, opt_Association, send_, receive_] := Module[ {f, subnet, label},
 Random noise generator
 *)
 	
-noise[opt_Association, send_, receive_] := Module[ {f},
-	f[inp___] := Sort[RandomSample[Range[#1], #2]]& @@ First[send]; 
+noise[a_Association] := Module[ {f},
+
+	f[blocks___] := Sort[RandomSample[Range[#1], #2]]& @@ First[a["blocks_out"]]; 
 	
 	<| "function" -> f, "checks" -> {"input", "oneout"}, "label" -> "~",
 		"fill" -> 13, "size" -> 18 |>
@@ -922,328 +960,354 @@ Circuit`TagMap = <|
 "barrier"         -> "=", (* clears = paths if any = path is empty *)
 "kwta_excitatory" -> "K", (* top-k of positives *)
 "kwta_absolute"   -> "k", (* top-k of all elements *)
-"log"             -> "?", (* runtime log of path contents *)
-"show_slot"       -> "#", (* visualization modifiers *)
-"show_dimension"  -> "$", (* N *)
-"show_population" -> "%"  (* P *)
+"log"             -> "?", (* print log of path contents *)
+"show_slot"       -> "#", (* render slot number *)
+"show_dimension"  -> "$", (* render N *)
+"show_population" -> "%"  (* render P *)
 
 |>;
 
 (* Note: temporal gating @... is handled separately. *)
 
 
-Circuit[dataflow_List] := Module[ 
+Circuit[circuitspec_] := Module[ 
 
-	{ self, evaluate,
-	permutations = <||>, 
-	inputslots = {}, encoders = {}, preprocess = {},
-	outputedges = {}, decoders = {}, postprocess = {},
-	circuitoptions, hyperparams,
-	nodes = <||>, tails = <||>, graphvertices = {},
-	edgebuffer = <||>, slotbuffer = <||>, pathtags = <||>,  
-	nodecount = 1, edgecount = 1, tick = 0,
-	makenode, patheval},
+		{ 
+		circuit, self, 
+	
+		(* Compiler. *)
+		compile, 
+				
+		(* Static compiled data. *)	
+		nodes = <||>,
+		pathways = <||>,
+		
+		preprocessing = {},   (* One entry per input node. *)
+		postprocessing = {},  (* One entry per output node. *)
+		
+		encoding = {},        (* One entry per input node. *)
+		decoding = {},        (* One entry per output node. *) 
+		
+		inputslots = {},
+		outputedges = {},
+		
+		permutations = <||>,
+
+		(* Runtime functions. *)
+		evaluate, patheval, componenteval,
+									
+		(* This circuit's clock. *)
+		tick = 0,
+
+		(* Slot state buffers. *)
+		nextstate = <||>,
+		currentstate = <||>,	
+	
+		nodeid = 0, edgeid = 0 
+		},
+		
+	circuit = Switch[ circuitspec,
+		_Association, circuitspec,
+		_List, FromDFD[circuitspec],
+		_String /; FileExistsQ[circuitspec] && StringEndsQ[circuitspec, ".json", IgnoreCase -> True],
+			Import[circuitspec, "Circuit"],
+		_String /; StringContainsQ[circuitspec, "circuit-v1"],
+			FromJSON[circuitspec],
+		_, Message[Circuit::circargs, circuitspec]; Return[Null];
+		];	
+		
 	
 	self = Unique["c"];
-	
+		
 	(* Expose this circuit's input and output configurations. Needed
 	 by an enclosing circuit to check interface validity. *)
 	self[In] = self[Out] = {};
-					
-	makenode[ component_Symbol[label_String: None, args___, useropts___Rule]
-					[send___][receive___] ] :=
-		Module[ {id = nodecount++, opt, 
-				callback, parseedge, parsefunction, fillparams, 
-				inpaths, inslots, outslots, settings, 
-				sendparams, receiveparams}, 
-		
-		(* Parse preprocessing (input receive) 
-			and postprocessing (output send) function. *) 
-		parsefunction[x___] := 
-			If[ Length[{x}] == 1 && MatchQ[x, _Symbol | _Function | 
-				_Association | _InterpolatingFunction | _CompiledFunction], 
-					First[{x}],
-				If[ Length[{x}] > 0, Message[Circuit::extfunc, 
-					component[x]]];  Identity];		
-
-		fillparams[rec : {___}] := Module[ {replace, result},
-			(* 
-			Replaces the "receive" sequence with  hyperparameters (N,P}
-			{a} is a list of integers or lists of integers. 
-			A list of integers denotes path merging.
-			*)
-			
-			replace[s_Integer] := hyperparams[s];
-
-			replace[s : {_Integer ..}] :=  Module[{params, dims},
-            
-				params = hyperparams /@ s;
-				dims = params[[All, 1]];
-            
-				(* Ensure all dimensions are identical. *)
-				If[SameQ @@ dims,
-					{dims[[1]], Min[params[[All, 2]]]},
-					(* Mismatched dimensions. *)
-				   Message[Circuit::dimbundle, component]; {}]
-				];
-
-			replace[___] := (Message[Circuit::routing, rec]; {});
-			
-			result = replace /@ rec;
-			
-			If[ ! MatchQ[ Flatten[result],  {___Integer}], 
-				Message[Circuit::routing, rec]; result = {} ];
-			
-			result
-			];
 				
-		settings = {useropts};
-		If[ StringQ[label], AppendTo[settings, "label" -> label]];
+	(* Compile a component. This triggers compilation of incoming pathways. *)
+	compile[node_Association] := Module[
+		{
+		a, callback, compilepathway, slotparams, fillparams
+		}, 
+				
+		++ nodeid;
 		
-		(* 
-		Append a counter (format "\[BeamedSixteenthNote]7") to each tag to make all edges unique.
-		This is necessary because edges are used as association keys.
-		These counters are not displayed.
-		The "\[BeamedSixteenthNote]" marker is unlikely to collide with user labels.
-		*)
-		parseedge[a_List] := parseedge /@ a;
-		parseedge[i_Integer] := parseedge[i * ""];
-		
-		(* 
-		Hack: integer times string
-		*)
-		parseedge[(i_Integer : 1) * str_String] := 
-			Module[{tags = str, mods, flags, edg, tempgates},
-		
-			(* Extract modifiers: everything after the first space *)
-			mods = If[StringContainsQ[tags, " "], 
-					Last[StringSplit[tags, " ", 2]], tags];
-							
-			(* Helpful compiler: If "-" but no "+", append "+" *)
-			If[StringMatchQ[mods, "*-*"] && !StringMatchQ[mods, "*+*"],
-				mods = mods <> "+"; tags = tags <> "+"];
-		
-			flags = AssociationMap[StringContainsQ[mods, #]&, 
-					Values[Circuit`TagMap]];		
-						
-			(* Tags of the form "@10010" indicate temporal gating. *)
-			tempgates = StringCases[mods, RegularExpression["@[01]+"], 1];
-			If[ Length[tempgates] == 1, 
-				flags["tempgates"] = 
-					(# === "1")& /@ Characters[StringDrop[mods,1]]];
-		
-			edg = DirectedEdge[i, id, 
-				StringReplace[tags, 
-					{   "#" -> ToString[i], (* slot *)
-						"$" -> ToString[hyperparams[i][[1]]], (* N *)
-						"%" -> ToString[hyperparams[i][[2]]]  (* P *)
-						}]
-				 <> "\[BeamedSixteenthNote]" <> ToString[edgecount++]];
+		compilepathway[receive_] := Module[{e, tag},
+			
+			(* List of pathways means merging.  *)
+			If[ ListQ[receive], Return[ compilepathway /@ receive]];
+
+			(* Special case: Input component preprocessing function. *)
+			If[MatchQ[receive, _Symbol], Return[Nothing]];
+
+			++edgeid;
+
+			tag[t_String] := MemberQ[ e["tags"], t]; 
+
+			e = <|
+				"to" -> nodeid, (* "from" added after all nodes are compiled *)
+				"label" -> "", (* default. *)
+				"tags" -> {} (* default. *)
+				|>;
+				
+			Switch[ receive,
+				_Integer, e["slot"] = receive,
+				_Association, e = Join[e, receive],
+				_, Message[Circuit::invedge,e]; <||>
+				];
+				
+			e["hyperparameters"] = slotparams[e["slot"]];
+
+			(* Helpful compiler: If "inhibit" make it also "multiset" *)
+			If[tag["inhibit"], 
+				e["tags"] = Union[e["tags"], {"multiset"}]];				
+			
+			(* Register this pathway and initialize buffer. *)
+			pathways[edgeid] = e;
+			currentstate[e["slot"]] = {};
 				 
-			pathtags[edg] = flags;	 
-			edg	 
+			(* Initialize permutation for any pathway, even if it's not used. *)
+			permutations[edgeid] = 
+				RandomSample[Range[e["hyperparameters"][[1]]]];
+					 
+			edgeid	 
 			];		
 		
-		inpaths = If[ component === input,
-			AppendTo[preprocess, parsefunction[receive]]; {},
-			parseedge[{receive}]
+		(* Per-slot hyperparameter settings. *)
+		slotparams[slot_Integer] := Module[{hyperparameters, default, np},
+			hyperparameters = Lookup[circuit, "hyperparameters", <||>];
+		
+			default = Lookup[hyperparameters, "default", None];
+			np = Lookup[hyperparameters, slot, default];
+		
+			If[ !MatchQ[np, {_Integer, _Integer}], 
+					Message[Circuit::noparam, slot]; {100, 3}, np]
+			(* Default to {100, 3} to silence downstream error messages. *)
 			];
 
-		inslots  = inpaths /. DirectedEdge[i_, __] :> i;
-		
-		outslots = If[ component === output,
-			AppendTo[postprocess, parsefunction[send]]; {},
-			Flatten[{send}]
+		fillparams[x_] := Switch[x, 
+			_List, 
+				Module[ {list, dims},
+					list = fillparams /@ x; (* Recursion *)
+					dims = list[[All,1]];
+					If[! SameQ @@ dims, Message[Circuit::dimbundle, x]];
+					(* Merge pathway dimensions. *)
+					{dims[[1]], Min[list[[All, 2]]]}
+					],
+			_Integer, 
+				slotparams[x],
+			_Association, 
+				slotparams[x["slot"]],
+			_, Nothing (* Catches preprocessing and postprocessing specs *)
 			];
+																			
+		(* Base configuration for each node. Includes per-node user settings. *)
+		a = Join[ node, 
+			<|  
+			"receivepaths" -> compilepathway /@ Lookup[node, "receive", {}],
 		
-		(* Initialize edgebuffer. *)
-		(edgebuffer[#] = {}) & /@ Flatten[inpaths];
+			"id" -> nodeid,
+			
+			(* Extract slot numbers, skip preprocessing and postprocessing
+			functions in input and output components. *)
+			"sendslots" -> Cases[Lookup[node, "send", {}], _Integer],
+
+			"blocks_out" -> fillparams /@ Lookup[node, "send", {}], 
+			"blocks_inp" -> fillparams /@ Lookup[node, "receive", {}]
+			|>];
+			
 		
-		(* Register vertices for graph visualization. *)
-		AppendTo[graphvertices, inpaths];
-	
-		(* Check for duplicate output slots. *)
-		If[ KeyExistsQ[tails, #], Message[Circuit::dupedge,#] ]& /@ outslots;			
-
-		(* Register backlinks from input slots to nodes. *)
-		(tails[#] = id)& /@ outslots;
-
-		(* Register and initialize slots. *)
-		(slotbuffer[#] = {})& /@ Union[inslots, outslots];
+		(* Instantiate the component, re-append user options. *)
+		a = Join[Lookup[node, "component"][a], a];
 		
-		(* Per-node evaluation *)
-		callback := Module[ {f, x, result},
-			(* Node-specific callback function *)
-			f = opt["function"];
-			(* Input and output nodes are not evaluated. *)		
-			If[f === Null, Return[]];
-			(* Latch inputs. *)
-			x = patheval /@ inpaths;
-			(* This component's callback function. *)
-			result = f[Sequence @@ x]; 
-			(* Copy results to output slot. *)
-			MapIndexed[(slotbuffer[#1] = {result}[[First[#2]]]) &, outslots];
-			];
-		
-		sendparams = fillparams[outslots];
-		receiveparams = fillparams[inslots];
-		
-		(* Base configuration for each node. 
-		 Includes per-node user settings. Cannot be overridden. *)
-		opt = <|  "eval" :> callback, "node" -> component, settings |>;
-
-		(* Instantiate the component. *)
-		opt = Join[component[args, opt, sendparams, receiveparams ], opt];
-
-		(* Static error checking. *)
-		If[ ! Circuit`check[#][receiveparams, sendparams], 
-			Message[MessageName[Circuit, #], 
-				component[args, settings][send][receive]]] & /@ opt["checks"];
-
 		(* Prepend default visualization settings. *)
-		opt = Join[<|  "shape" -> "Circle", "label" -> "", "fill" -> 6, 
-			"color" -> 0, "size" -> Medium  |>,   opt];
+		a = Join[<| "shape" -> "Circle", "label" -> "", "fill" -> 6, 
+			"color" -> 0, "size" -> Medium  |>, a];
 
 		(* Prepend default functional settings. *)
-		opt = Join[<| "checks" -> {}, "function" -> Null |>,   opt];
+		a = Join[<| "checks" -> {}, "function" -> Null |>, a];
 
-		(* Register input slots and output edges.
-			 Indexed in order of appearance in the dataflow spec.  *)
-		If[component === input,  
-			AppendTo[inputslots, First[outslots]];
-			AppendTo[encoders, opt["encode"]];
-			AppendTo[self[In], First[sendparams]];
-			opt["label"] //= StringReplace["#" -> ToString[Length[inputslots]]]
+		(* Static error checking, based on component-supplied "checks". *)
+		If[ ! Circuit`check[#][a["blocks_inp"], a["blocks_out"]], 
+			Message[MessageName[Circuit, #], a]] & /@ a["checks"];
+
+		(* Register input flow. *)
+		If[Lookup[node, "component"] === input,  
+			(* Register preprocessing function. *)
+			AppendTo[preprocessing, 
+				If[ MatchQ[node["receive"], {_Symbol} | {_Function}], 
+				First[node["receive"]], Identity]];
+
+			(* Register encoder. *)
+			AppendTo[encoding, a["encode"]];
+						
+			AppendTo[inputslots, First[a["sendslots"]]];
+			AppendTo[self[In], First[a["blocks_out"]]];
+
+			a["label"] //= StringReplace["#" -> 
+					ToString[Length[inputslots]]]
 			];
 
-		If[component === output, 
-			AppendTo[outputedges, First[inpaths]];
-			AppendTo[decoders, opt["decode"]];
-			AppendTo[self[Out], First[receiveparams]];
-			opt["label"] //= StringReplace["#" -> ToString[Length[outputedges]]]
+		(* Register output flow. *)
+		If[Lookup[node, "component"] === output, 
+			(* Register postprocessing function. *)
+			AppendTo[postprocessing, 
+				If[ MatchQ[node["send"], {_Symbol} | {_Function}], 
+				First[node["send"]], Identity]];
+	
+			(* Register decoder. *)
+			AppendTo[decoding, a["decode"]];
+			
+			AppendTo[outputedges, First[a["receivepaths"]]];
+			AppendTo[self[Out], First[a["blocks_inp"]]];
+			a["label"] //= StringReplace["#" -> 
+				ToString[Length[outputedges]]]
 			];
 				
-		nodes[id] = opt;
+		(* Register this component. *)
+		nodes[nodeid] = a;
 		];
 	
-	(* Parse per-slot hyperparameter settings. In the dataflow spec, these are
-	 given by rules. The default rule looks like "_ -> {1000,10}" *)
+	
+	(* Compile the nodes. The nodes compile their inbound pathways. *)
+	Scan[compile, Lookup[circuit, "dataflow", {}]]; 
 
-	circuitoptions = Association @ Select[dataflow, Head[#] === Rule &];
-	
-	(* 
-	Hyperparameters (N, P} for the slots are given as rules:
-	7 -> {1000, 10}   // parameters for slot 7
-	_ -> {1000, 10}   // default parameters
-	*)
-	
-	hyperparams[slot_Integer] := Module[{np},
-		np = Lookup[circuitoptions, slot, circuitoptions[_]];
-		If[ !MatchQ[np, {_Integer, _Integer}], 
-				Message[Circuit::noparam, slot]; {3, 3}, np]
-		(* Default to {3, 3} to silence downstream error messages. *)
+	(* Link the edges. Needed for graph rendering. *)
+	Module[ {slots, dupes, links = <||>, getlink},
+
+		(* Duplicate sendslots? *)
+		slots = Flatten[#["sendslots"] & /@ Values[nodes]];
+		dupes = Keys[Select[Counts[{slots}], # > 1 &]];
+		If[ Length[dupes] > 0, Message[Circuit::dupslots, dupes]];
+
+		(* Gather link table. *)
+		Scan[ Function[c, (links[#] = c["id"]) & /@ c["sendslots"]], 
+			nodes];
+
+		(* Add "from" value to each pathway. *)
+		pathways = Prepend[#, "from" -> Lookup[links, #["slot"], 
+			Message[Circuit::routing, #["slot"]]; 0]] & /@ pathways;		
 		];
-	
-	Scan[makenode, dataflow]; (* Construct association for each node. *)
-	
+
 	(* 
-	Apply permutation, rate limit, inhibition, etc.
-	
-	During each cycle, this is applied once per edge: 
-	Either when evaluating the callback function, or when collecting 
-	outputs (output nodes have no callback function). 
+	Component evaluation. Triggers incoming pathway evaluation.
 	*)
-	patheval[edge : DirectedEdge[a_, b_, tags_String]] := 
-		Module[ {perm, x, flags, tempgates, n, p},
+	componenteval[a_Association] := Module[ {x, result},
+
+		(* Input and output nodes (where function = Null) are not evaluated.*)		
+		If[a["function"] === Null, Return[]];
+
+		(* Evaluate received pathways and latch inputs. *)
+		x = patheval /@ a["receivepaths"];
+			
+		(* This component's callback function. *)
+		result = a["function"][Sequence @@ x]; 
+
+		(* Copy results to output slot. *)
+		MapThread[(nextstate[#1] = #2) &, {a["sendslots"], {result}}]
+		];
+												
+	(* 
+	Pathway evaluation.
+	During each cycle, this is applied once per pathway: 
+	Either when evaluating the component's callback function, 
+	or when collecting outputs (output nodes have no callback function). 
+	*)
+	
+	patheval[id_Integer] := 
+		Module[ {e, perm, x, tag, gating, n, p},
 		
-		{n, p} = hyperparams[a];
+		tag[t_String] := MemberQ[ e["tags"], t]; 
+
+		e = pathways[id];
 		
-		x = edgebuffer[edge];
+		{n, p} = e["hyperparameters"];
+		
+		x = currentstate[e["slot"]];
 		
 		(* Runtime check. *)
 		If[! VectorQ[x, IntegerQ] || MemberQ[x, 0], 
 			Message[Circuit::integer, x]; Return[{}]];
-		
-		flags = pathtags[edge];
-		
+				
 		(* Process temporal gating (tags of the form @10101). *)
-		tempgates = Lookup[flags, "tempgates", {True}];
-		If[ ! tempgates[[Mod[tick-1, Length[tempgates]] + 1]], Return[{}]];
+		gating = Lookup[e, "gating", {1}];
+		If[ gating[[Mod[tick - 1, Length[gating]] + 1]] == 0, Return[{}]];
 		
 		(* 
 		Inhibition transformer. Flips positives to negatives.
 		This is the ONLY source of inhibition. 
-		Normal pathways apply inhibitory elements and then
-		drop them. This enforces Dale's law. 
+		Normal pathways apply inhibitory elements and then drop them. 
+		This enforces Dale's law. 
 		*)
-		If[flags["-"], x = -Abs[x]];
+		If[tag["inhibit"], x = -Abs[x]];
 		
 		(*
 		Carrier: forward resolved multiset.
 		Boundary: untagged edges force resolution to a flat, excitatory set. 
 		*)
-		x = If[flags["+"], Multiset[x], ResolveNormal[x]];
+		x = If[tag["multiset"], Multiset[x], ResolveNormal[x]];
 
 		(* Permutation. *)
-		If[flags["P"],   
-			If[ Head[perm = permutations[edge]] === Missing, 
-				(* Lazy initialization. *)
-				permutations[edge] = perm = RandomSample[Range[n]]];
-			(* Extract absolute IDs, permute them, and restore the signs. *)			
-			x = Sort[Sign[x]*perm[[Abs[x]]]] ];
+		If[tag["permute"],   
+			x = Sort[Sign[x] * permutations[id][[Abs[x]]]] ];
 	
 		(* Rate limiting. *)
-		If[flags["R"], x = Sort[RandomSample[x, UpTo[p]]]];
+		If[tag["rate_limit"], x = Sort[RandomSample[x, UpTo[p]]]];
 
 		(* Thresholding. *)
-		If[flags["T"] && Length[x] < p, x = {}];
+		If[tag["threshold"] && Length[x] < p, x = {}];
 
 		(* Random noise if x = {}, else clear x *)
-		If[flags["~"], 
-			If[ x === {}, x = Sort[RandomSample[Range[n], p]], x = {}]];
+		If[tag["noise"], 
+			If[x === {}, x = Sort[RandomSample[Range[n], p]], x = {}]];
 
 		(* Print value to console. *)
-		If[flags["?"], Print["Slot ", a, ": ", x]];
-						
+		If[tag["log"], Print["Slot ", e["slot"], ": ", x]];
+			
 		x
 		];
 		
-	(* Process the "brace" notation, merging neural pathways. *)
-	patheval[edges : {__DirectedEdge}] := Module[ {x, tags, merged},
-		x = patheval /@ edges;
-				
-		tags = Function[t, Lookup[pathtags[#], t] & /@ edges];
 
+	(* 
+	Pathway evaluation applied to a list (merging pathways). 
+	*)
+	patheval[ids : {__Integer}] := Module[ {x, paths, tags, merged},
+
+		x = patheval /@ ids;
+		
+		paths = pathways /@ ids;
+		
+		(* List of Booleans with the same length as x. *)
+		tags = Function[t, MemberQ[Lookup[#, "tags", {}], t] & /@ paths];		
 		(* Logical gating. *)
 
-		If[MemberQ[Pick[x, tags["X"]], {__}], Return[{}]];
+		If[MemberQ[Pick[x, tags["veto"]], {__}], Return[{}]];
 
-		If[MemberQ[Pick[x, tags["*"]], {}], Return[{}]];
+		If[MemberQ[Pick[x, tags["mandatory"]], {}], Return[{}]];
 
-		If[MemberQ[Pick[x, tags["!"]], {__}], 
-			x = MapThread[If[#1, #2, {}] &, {tags["!"], x}] ];
+		If[MemberQ[Pick[x, tags["priority"]], {__}], 
+			x = MapThread[If[#1, #2, {}] &, {tags["priority"], x}] ];
 
-		If[MemberQ[Pick[x, Not /@ tags["&"]], {}], 
-			x = MapThread[If[#1, {}, #2] &, {tags["&"], x}] ];
+		If[MemberQ[Pick[x, Not /@ tags["dependency"]], {}], 
+			x = MapThread[If[#1, {}, #2] &, {tags["dependency"], x}] ];
 			
-		If[MemberQ[Pick[x, Not /@ tags["|"]], {__}], 
-			x = MapThread[If[#1, {}, #2] &, {tags["|"], x}] ];
+		If[MemberQ[Pick[x, Not /@ tags["fallback"]], {__}], 
+			x = MapThread[If[#1, {}, #2] &, {tags["fallback"], x}] ];
 
-		If[MemberQ[tags["="], True] && MemberQ[Pick[x, tags["="]], {}],
-             x = MapThread[If[#1, {}, #2]&, {tags["="], x}]];
+		If[Or @@ tags["barrier"] && MemberQ[Pick[x, tags["barrier"]], {}],
+             x = MapThread[If[#1, {}, #2]&, {tags["barrier"], x}]];
 
 		(* Aggregate the survivors. *)
 		merged = Multiset[x];
 	
-		(* Optional kWTA. *)
-		If[MemberQ[tags["k"], True] || MemberQ[tags["K"], True],
+		(* Optional kWTA. *) 
+		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
 			Module[{k, U, tally, rankedmax, excitQ, survivors},
 			
-				k = Min[ hyperparams[#[[1]]][[2]] & /@ edges ];
+				k = Min[#["hyperparameters"][[2]] & /@ paths ];
 			
 				(* "K" forces excitatory only. 
 					"k" evaluates absolute saliency. *)
-				excitQ = MemberQ[tags["K"], True];
+				excitQ = Or @@ tags["kwta_excitatory"];
 			
 				U = If[excitQ, Select[merged, # > 0 &], merged];
 			
@@ -1255,45 +1319,64 @@ Circuit[dataflow_List] := Module[
 					rankedmax = tally[[-k, 2]];
 					If[ rankedmax >= 2,
 						merged = Sort[Select[tally, 
-								Last[#] >= rankedmax &][[All, 1]]]];
+							Last[#] >= rankedmax &][[All, 1]]]];
 	   			]]
 			];	
 				
 		merged
 		];
-			
-	(* Raw evaluation cycle, operating on preprocessed and encoded data. *)
+		
+	(* Raw tick-tock evaluation cycle. *)
 	evaluate[x_List] := Module[ {},
-	
-		(* Advance this circuit unit's time. *)
+		(* Advance this circuit's time. Used for multiplexing. *)
 		tick ++;
-	
-		(* Push external inputs. *)
-		MapIndexed[(slotbuffer[#1] = x[[First[#2]]]) &, inputslots];
-
-		(* **Tick** *)
 		
-		(* Copy slot buffers into edge buffers. *)
-		(* Lookup with default {} in case the edge has no source. *)
-		edgebuffer = Association[
-			(# -> Lookup[slotbuffer, First[#], {}])& /@ Keys[edgebuffer]];
+		(* Clean-slate reset of nextstate, retaining all keys. Safeguard for
+		a scenario where a component fails to update nextstate. *)
+		nextstate = Map[{} &, currentstate];
+
+		(*  Push external inputs to both slot buffers:
+		      currentstate: for downstream pathway evaluation,
+		      nextstate: because input components do not evaluate.
+		 *)
+		MapThread[(currentstate[#1] = nextstate[#1] = #2) &, {inputslots, x}];
+
+		(* Evaluate nodes, reading from currentstate, updating nextstate. *)
+		componenteval /@ nodes;
+
+		(*  Snapshot state, preparing for output extraction and next cycle. *)
+		currentstate = nextstate;
 				
-		(* **Tock** *)
-		
-		(* Evaluate nodes, updating the slotbuffer. *)
-		#["eval"]& /@ nodes;
-		
-		(* Update output edges. *)
-		(edgebuffer[#] = Lookup[slotbuffer, First[#], {}])& /@ 
-						Flatten[outputedges];
-
-		(* Gather all outputs. *)
+		(* Gather outputs, reading from currentstate. *)
 		patheval /@ outputedges
 		];
 
 	(* 
-	The dataflow description generates this function. 
-	Each call, also with empty inputs, triggers one execution cycle. 
+	Raw evaluation with multiplexing.
+	Skips encoding, decoding, preprocessing, and postprocessing.
+	Exposed for use by embedded circuits.
+	*)	
+	self[Function, x_List] := Module[ {y = {}, multiplex},
+	
+		If[ Length[x] =!= Length[inputslots], 
+			Message[Circuit::sequence, inputslots]; Return[Sequence[]]];
+				
+		(* Multiplexed evaluation of already encoded and preprocessed data *)
+		multiplex = Lookup[Lookup[circuit, "options", <||>], "multiplex", {1}];
+		
+		If[ ! MatchQ[ multiplex, {(0 | 1) ..}],
+			Message[Circuit::multiplex, multiplex]; multiplex = {1}];
+		
+		Do[y = If[gate === 1, evaluate[x], 
+			evaluate[{} & /@ x]], {gate, multiplex}];
+			
+		y (* Can be empty if all gates are zero. *)
+		];			
+
+
+	(* 
+	The circuit specification generates this function. 
+	Each call, even with empty inputs, triggers one execution cycle. 
 	The function has a variable number of arguments which must match
 	the number of input nodes.
 	It returns a Sequence of expressions, each corresponding to an
@@ -1301,50 +1384,27 @@ Circuit[dataflow_List] := Module[
 	to the order in which input and output nodes appear in the dataflow
 	description. 	
 	*)	
-
-	self[Function, x_List] := Module[ {y, multiplex},
-
-		(* Number of external input slots must match number of input nodes. *)
-		If[ Length[x] =!= Length[inputslots], 
-			Message[Circuit::sequence, inputslots]; Return[{}]];
-		(* 
-		Evaluate according to the "multiplex" spec, for example "10010". 
-		1: evaluate with preprocessed and encoded x
-		0: evaluate with empty input
-		See also: temporal gating in path evaluation.
-		*)
-
-		multiplex = Lookup[ circuitoptions, "multiplex", "1"];
-		If[ ! StringMatchQ[ multiplex, RegularExpression["[01]+"]],
-			Message[Circuit::multiplex, multiplex]; multiplex = "1"];
-		
-		Do[y = If[gate === "1", evaluate[x], 
-			evaluate[{} & /@ x]], {gate, Characters[multiplex]}];
-		
-		y
-		];
-			
-	self[inp___] := Module[ {x, y, multiplex},
+	self[blocks___] := Module[ {x, y},
 	
 		(* Wrap input sequence into a list. *)
-		x = {inp};
+		x = {blocks};
 	
 		(* Number of external input slots must match number of input nodes. *)
 		If[ Length[x] =!= Length[inputslots], 
 			Message[Circuit::sequence, inputslots]; Return[{}]];
 				
 		(* Preprocess. *)
-		x = MapThread[Construct, {preprocess, x}];	
+		x = MapThread[Construct, {preprocessing, x}];	
 		(* Encode. *)
-		x = MapThread[Construct, {encoders, x}];
-		
+		x = MapThread[Construct, {encoding, x}];
+			
 		(* Multiplexed evaluation of encoded and preprocessed data *)
 		y = self[Function, x];		
 		
 		(* Decode. *)
-		y = MapThread[Construct, {decoders, y}];	
+		y = MapThread[Construct, {decoding, y}];	
 		(* Postprocess. *)
-		y = MapThread[Construct, {postprocess, y}];
+		y = MapThread[Construct, {postprocessing, y}];
 			
 		(* Strip list, return as sequence. *)
 		Sequence @@ y
@@ -1352,25 +1412,39 @@ Circuit[dataflow_List] := Module[
 		
 	(* Visualization. *)
 	self[Graph, opts___Rule] := Module[ 
-		{ graph, layout = {"LayeredDigraphEmbedding", "Orientation" -> Left},
-			coords = Automatic, radius = 0.4, colorscheme, 
-			font = "Inter Variable", cleantag},
+		{ 
+		graph, 
+		layout = {"LayeredDigraphEmbedding", "Orientation" -> Left},
+		coords = Automatic, radius = 0.4, colorscheme, 
+		font = "Inter Variable", edgetag, display
+		},
 			
 		(* Color palette lookup. *)
 		colorscheme[c_] := Lookup[ Circuit`color, c, c];
 		
-		(* Assign dummy slot if the user hasn't specified it. *)
-		graph = MapAt[ Lookup[tails, #, -99999]&, 
-			Union[Flatten[graphvertices]], {All, 1}];
+		(* Convert tag names to single-character display labels. *)
+		display = Reverse[Circuit`TagMap];
+		display["inhibitory"] = "";
+		display["multiset"]   = "";
+		display["mandatory"]  = "\:ff0a"; (* A larger asterisk *)		
+			
+		edgetag[a_Association] := Module[ {str, rules},
 
-		(* Remove hidden unique edge tag. *)
-		cleantag[DirectedEdge[a_,b_,t_String]] := 
-			Module[{tag},
-				tag = StringDelete[t, {"\[BeamedSixteenthNote]"~~___}];
-				If[tag === "", DirectedEdge[a, b], DirectedEdge[a, b, tag]]
-				];	
-
-		graph = cleantag /@ graph;
+			str = Lookup[a, "label", ""] <> 
+				StringJoin[Lookup[display, #, ""]& /@ Lookup[a, "tags", {}]];
+			
+			rules = 				{
+				display["show_slot"] -> ToString[a["slot"]],
+				display["show_dimension"] -> ToString[a["hyperparameters"][[1]]],
+				display["show_population"] -> ToString[a["hyperparameters"][[2]]]
+				};
+			
+			StringReplace[str, rules]
+			];
+		
+		(* Compile graph *)
+		graph = 
+			DirectedEdge[#["from"], #["to"], edgetag[#]]& /@ Values[pathways];
 		
 		(* Force path graphs to render on a single line. *)
 		If[PathGraphQ[SimpleGraph[graph]],
@@ -1414,6 +1488,7 @@ Circuit[dataflow_List] := Module[
 				]] & /@ graph
 				],
 
+
 			EdgeLabels -> Normal[
 				# -> If[Length[#] == 3,
 				With[{cleanTag = StringReplace[#[[3]], 
@@ -1434,8 +1509,11 @@ Circuit[dataflow_List] := Module[
 		];	
 		
 	self[Clear] :=  (* Don't remove the unique symbol "self". *)	
-		Scan[#[Clear]&, 
-			Flatten[Values[Map[Lookup[#, "clear", Nothing]&, nodes]]]];
+		Module[ {},
+		
+		Scan[#["clear"][Clear]&, nodes]
+		];
+		
 				
 	self
 	]
@@ -1452,10 +1530,12 @@ Circuit`color = AssociationThread[Range[0,Length[#]-1],#]& [RGBColor /@
 
 (* Plug-in mechanism for error messages. *)
 
+Circuit::circargs  = "Invalid circuit specification `1`.";
 Circuit::ident     = "`1`: Inputs must match outputs.";
 Circuit::identdim  = "`1`: Input and output dimensions must be identical.";
 Circuit::totaldim  = "`1`: Total input and output dimensions must match.";
-Circuit::dupedge   = "Duplicate edge specification `1`.";
+Circuit::invedge   = "Invalid edge specification `1`.";
+Circuit::dupslots  = "Duplicate output slots: `1`.";
 Circuit::sequence  = "`1`: Function arguments do not match input nodes.";
 Circuit::routing   = "Invalid routing specification `1`.";
 Circuit::dimbundle = "`1`: Cannot bundle sets with different dimensions.";
@@ -1468,7 +1548,7 @@ Circuit::oneout    = "`1`: Expecting one output slot.";
 Circuit::argout    = "`1`: Missing output.";
 Circuit::multinp   = "`1`: Expecting multiple input slots.";
 Circuit::integer   = "Invalid data: `1`";
-Circuit::extfunc   = "`1`: Invalid external function specification.";
+Circuit::circuit   = "`1`: Expecting embedded circuit.";
 Circuit::embedded  = "`1`: Hyperparameters of embedded circuit do not match.";
 Circuit::noparam   = "No hyperparameters specified for slot `1`.";
 Circuit::category  = "Category encoder requires dimension `1` or greater.";
@@ -1478,42 +1558,43 @@ Circuit::regress   = "Regression: output should match `1`.";
 Circuit::multiplex = "Malformed multiplex specification `1`.";
 
 
-(* Plug-in mechanism for checking dataflow errors. *)
-(* #1 is the "receive" and #2 is the "send" configuration of a component. *)
+(* 
+Plug-in mechanism for checking dataflow errors. 
+#1 is the "receive" and #2 is the "send" specification. 
+*)
 
 Circuit`check = <||>;
 
-Circuit`check["ident"]    = (#1[[All,1]] === #2[[All,1]] &);
-Circuit`check["identdim"] = (Union[#1[[All,1]]] === Union[#2[[All,1]]] &);
-Circuit`check["totaldim"] = (Total[#1[[All,1]]] === Total[#2[[All,1]]] &);
-Circuit`check["dimfirst"] = (#1[[1]] === #2[[1]] &);
-Circuit`check["input"]    = (Length[#1] === 0 &);
-Circuit`check["oneinp"]   = (Length[#1] === 1 &);
-Circuit`check["arginp"]   = (Length[#1] > 0 &);
-Circuit`check["output"]   = (Length[#2] === 0 &);
-Circuit`check["oneout"]   = (Length[#2] === 1 &);
-Circuit`check["argout"]   = (Length[#2] > 0 &);
+Circuit`check["ident"]    = #1[[All,1]] === #2[[All,1]] &;
+Circuit`check["identdim"] = Union[#1[[All,1]]] === Union[#2[[All,1]]] &;
+Circuit`check["totaldim"] = Total[#1[[All,1]]] === Total[#2[[All,1]]] &;
+Circuit`check["dimfirst"] = #1[[1]] === #2[[1]] &;
+Circuit`check["input"]    = Length[#1] === 0 &;
+Circuit`check["oneinp"]   = Length[#1] === 1 &;
+Circuit`check["arginp"]   = Length[#1] > 0 &;
+Circuit`check["output"]   = Length[#2] === 0 &;
+Circuit`check["oneout"]   = Length[#2] === 1 &;
+Circuit`check["argout"]   = Length[#2] > 0 &;
 
 
 (*
-Usage:
+Import and Export CircuitDFD dataflow description format:
 
-dataflow = Import["filename.json", "Circuit"];
-Export["filename.json", dataflow, "Circuit"];
+  circ = Import["filename.m", "CircuitDFD"];
+  Export["filename.m", circ, "CircuitDFD"];
 
-dataflow = ImportString[str, "Circuit"];
-str = ExportString[dataflow, "Circuit"];
-
+Also supports ImportString and ExportString.
 *)
 
 
 (* 
-Convert dataflow expression to JSON-style association.
+Import from  DFD as used in GettingStarted and experiments. 
+DFD is a native Mathematica expression and does not require parsing.
 *)
 
-ToCircuitJSON[dataflow_List] := 
-    Module[ {rules, hyperparams = <||>, rootopts = <||>, customopts = <||>, 
-         nodes, components, parsenode, parsepath, parsemerge},
+FromDFD[dataflow_List] := Module[
+    {rules, hyperparams = <||>, rootopts = <||>, customopts = <||>, 
+     nodes, components, parsenode, parsepath, parsemerge},
     
     (* Include schema reference at the root *)
     AppendTo[rootopts, "$schema" -> "https://creatingintelligence.org/schemas/circuit-v1.json"];
@@ -1523,23 +1604,26 @@ ToCircuitJSON[dataflow_List] :=
     
     (* Sort integers/blanks to hyperparameters, specific keys to root, and others to options. *)
     Scan[ Function[{rule}, Which[
-		rule[[1]] === _, 
-			AppendTo[hyperparams, "default" -> rule[[2]]],
+        rule[[1]] === _, 
+            AppendTo[hyperparams, "default" -> rule[[2]]],
+ 	
 		IntegerQ[rule[[1]]], 
-			AppendTo[hyperparams, ToString[rule[[1]]] -> rule[[2]]],
-        (* Core root-level schema properties *)
-        MemberQ[{"version", "metadata", "$schema"}, rule[[1]]],
+			AppendTo[hyperparams, rule[[1]] -> rule[[2]]],
+        
+		MemberQ[{"version", "metadata", "$schema"}, rule[[1]]],
             AppendTo[rootopts, rule[[1]] -> rule[[2]]],
-        (* Intercept and expand "multiplex" into an array of 0s and 1s inside custom options *)
+        
         rule[[1]] === "multiplex" && StringQ[rule[[2]]],
-            AppendTo[customopts, "multiplex" -> (If[# === "1", 1, 0] & /@ Characters[rule[[2]]])],
-        (* Group all remaining top-level string configurations into 'options' *)
-		StringQ[rule[[1]]], 
-			AppendTo[customopts, rule[[1]] -> rule[[2]]],
+            AppendTo[customopts, "multiplex" -> (If[# === "1", 1, 0] & /@ 
+					Characters[rule[[2]]])],
+        
+        StringQ[rule[[1]]], 
+            AppendTo[customopts, rule[[1]] -> rule[[2]]],
+
 		True, 
-			AppendTo[customopts, ToString[rule[[1]]] -> rule[[2]]]
+            AppendTo[customopts, ToString[rule[[1]]] -> rule[[2]]]
          ]], rules
-		];
+    ];
     
     (* Extract circuit components. *)
     nodes = Select[dataflow, Head[#] =!= Rule &];
@@ -1552,20 +1636,15 @@ ToCircuitJSON[dataflow_List] :=
         match = StringCases[s, StartOfString ~~ n:DigitCharacter.. ~~ Whitespace... ~~ t:___ ~~ EndOfString :> {ToExpression[n], t}];
         
         If[match === {}, 
-			(* Build the regex pattern dynamically from the TagMap *)
-            tagPattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | 
-				("@" ~~ DigitCharacter..))..;
-            
+            tagPattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | ("@" ~~ DigitCharacter..))..;
             If[StringMatchQ[s, tagPattern], match = {{1, s}}, Return[s]]
 			];
         
         {slot, tags} = match[[1]];
-        
         If[tags === "", Return[slot]];
         
         result["slot"] = slot;
         
-        (* Split user label from functional tags *)
         If[StringContainsQ[tags, " "],
             parts = StringSplit[tags, " ", 2];
             result["label"] = parts[[1]];
@@ -1575,209 +1654,321 @@ ToCircuitJSON[dataflow_List] :=
             If[Length[g] > 0,
                 result["gating"] = If[# === "1", 1, 0] & /@ Characters[g[[1]]];
                 tags = StringReplace[tags, "@" ~~ g[[1]] -> ""]; 
-            ]
-        ];
+				]
+			];
         
         tagmap = Association[Reverse /@ Normal[Circuit`TagMap]];
-        
         found = DeleteMissing[Lookup[tagmap, Characters[tags]]];
-        
         If[Length[found] > 0, result["tags"] = found];
         
         result
-    ];
+		];
 
     parsemerge[l_List] := parsepath /@ l;
     parsemerge[p_] := parsepath[p];
 
-    parsenode[compExpr_[send___][receive___]] := Module[
+	parsenode[compExpr_[send___][receive___]] := Module
+		[
         {comp, compName, argslist, label = Null, args = {}, opts = <||>},
         
         comp = Head[compExpr]; 
         compName = ToString[comp];
         argslist = List @@ compExpr; 
         
-        Do[ Which[
-           Head[arg] === Rule, AppendTo[opts, arg],
-           StringQ[arg] && label === Null && args === {}, label = arg,
-           True, AppendTo[args, ToString[arg, InputForm]]], {arg, argslist}
-           ];
+        Do[ Which
+			[
+			Head[arg] === Rule, AppendTo[opts, arg],
+			StringQ[arg] && label === Null && args === {}, label = arg,
+			True, AppendTo[args, arg]], {arg, argslist}
+			];
         
-        DeleteCases[ <|
-            "component" -> compName,
+        DeleteCases[ 
+			<|
+            "component" -> comp, 
             "label" -> label,
             "arguments" -> args,
             "options" -> opts,
-            "send" -> If[compName === "output", 
-                         Map[ToString[#, InputForm]&, Flatten[{send}, 1]], 
-                         Map[parsemerge, Flatten[{send}, 1]]],
-            "receive" -> If[compName === "input", 
-                            Map[ToString[#, InputForm]&, {receive}], 
-                            Map[parsemerge, {receive}]]
-            |>, Null | {} | <||> 
-             ]
-        ];
-
+            "send" -> If[comp === output, Flatten[{send}, 1], 
+				Map[parsemerge, Flatten[{send}, 1]]],
+            "receive" -> If[comp === input, {receive}, 
+				Map[parsemerge, {receive}]]
+            |>, 
+            Null | {} | <||> 
+        ]
+    ];
+        
     components = parsenode /@ nodes;
-    
-    (* If there are grouped custom options (including multiplex), attach them under options key *)
     If[Length[customopts] > 0, AppendTo[rootopts, "options" -> customopts]];
 
-    (* Assemble association with top-level options spread at the root. *)
-    Join[rootopts, 
-       <|"hyperparameters" -> hyperparams, "dataflow" -> components|>]
-    ]
+    Join[rootopts, <|"hyperparameters" -> hyperparams, "dataflow" -> components|>]
+	]
 
 
-(* 
-Convert JSON-style association to dataflow expression. 
-*)
+ToDFD[expr_Association] := Module[
 
-FromCircuitJSON[rawJSON_Association] := 
-	Module[ {hyperparams, hprules, topoptsrules, dataflow, buildpath, 
-	    buildmerge, parsenode, nodeExprs, rawOptions},
+    {hyperparams, hprules, topoptsrules, dataflow, buildpath, 
+     buildmerge, parsenode, nodeExprs, rawOptions},
 
-    (* Extract and merge root-level options and the inner "options" object *)
     rawOptions = Join[
-        KeyDrop[rawJSON, {"hyperparameters", "dataflow", "options"}],
-        Lookup[rawJSON, "options", <||>]
-    ];
+        KeyDrop[expr, {"hyperparameters", "dataflow", "options", "$schema"}],
+        Lookup[expr, "options", <||>]
+		];
 
-    (* Reconstruct top-level rules. Convert multiplex array back to string.*)
     topoptsrules = Normal @ KeyValueMap[
         Function[{k, v},
             Which[
                 k === "multiplex" && ListQ[v], "multiplex" -> StringJoin[ToString /@ v],
                 True, k -> v
-            ]
-        ],
-        rawOptions
-    ];
+            ]], rawOptions
+		];
 
-    (* Reconstruct hyperparameters. *)
-    hyperparams = Lookup[rawJSON, "hyperparameters", <||>];
-    hprules = KeyValueMap[
+	hyperparams = Lookup[expr, "hyperparameters", <||>];
+
+	hprules = KeyValueMap[
         Function[{k, v},
             Which[
                 k === "default", _ -> v,
-                StringMatchQ[k, NumberString], ToExpression[k] -> v, 
+                StringQ[k] && StringMatchQ[k, NumberString], ToExpression[k] -> v, 
                 True, k -> v 
             ]],
         hyperparams
 		];
     
-    buildpath[p_] := Module[{slot, tags = "", tagstr = "", 
-               gatingStr = "", userlabel = ""},
-        
+    buildpath[p_] := Module[{slot, tags = "", tagstr = "", gatingStr = "", userlabel = ""},
         If[IntegerQ[p] || StringQ[p], Return[p]];
-        
         slot = p["slot"];
-        
-        If[KeyExistsQ[p, "tags"],
-            tagstr = StringJoin[Lookup[Circuit`TagMap, p["tags"], ""]]];
-        
-        If[KeyExistsQ[p, "gating"],
-            gatingStr = "@" <> StringJoin[ToString /@ p["gating"]]];
-        
-        (* Prepend the label and a space if it exists *)
+        If[KeyExistsQ[p, "tags"], tagstr = StringJoin[Lookup[Circuit`TagMap, p["tags"], ""]]];
+        If[KeyExistsQ[p, "gating"], gatingStr = "@" <> StringJoin[ToString /@ p["gating"]]];
         If[KeyExistsQ[p, "label"], userlabel = p["label"] <> " "];
         
         tags = userlabel <> tagstr <> gatingStr;
-        
         If[tags === "", slot, slot * tags]
-    ];
+		];
 
     buildmerge[l_List] := buildpath /@ l;
     buildmerge[p_] := buildpath[p];
 
     parsenode[node_Association] := Module[
+        
         {comp, compName, label, args, opts, send, receive, compExpr},
         
-        compName = node["component"];
-        comp = Symbol[compName];
+        comp = node["component"]; 
+        compName = ToString[comp];
         label = Lookup[node, "label", Null];
-        args = ToExpression /@ Lookup[node, "arguments", {}];
+        args = Lookup[node, "arguments", {}];
         opts = Normal[Lookup[node, "options", <||>]];
         
-        compExpr = comp @@ DeleteCases[
-            Join[If[label =!= Null, {label}, {}], args, opts], Null];
+        compExpr = comp @@ DeleteCases[Join[If[label =!= Null, {label}, {}], args, opts], Null];
         
-        send = Sequence @@ If[compName === "output", 
-                              ToExpression /@ Lookup[node, "send", {}], 
+        send = Sequence @@ If[comp === output, 
+                              Lookup[node, "send", {}], 
                               Map[buildmerge, Lookup[node, "send", {}]]];
                               
-        receive = Sequence @@ If[compName === "input", 
-                                 ToExpression /@ Lookup[node, "receive", {}], 
+        receive = Sequence @@ If[comp === input, 
+                                 Lookup[node, "receive", {}], 
                                  Map[buildmerge, Lookup[node, "receive", {}]]];
         
         compExpr[send][receive]
 		];
 
-    dataflow = Lookup[rawJSON, "dataflow", {}];
+    dataflow = Lookup[expr, "dataflow", {}];
     nodeExprs = parsenode /@ dataflow;
 
-    (* Return unified dataflow list. *)
     Join[nodeExprs, hprules, topoptsrules]
 	]
 
 
-(* 
-JSON formatting 
+
+ImportExport`RegisterFormat["CircuitDFD", "DefaultExtension" -> "m"];
+
+ExportCircuitDFDHook[channel_, expr_Association, opts___] := Module[{str},
+    (* Export to string to preserve indentation, strip the comment, and write as raw text *)
+    str = ExportString[ToDFD[expr], "Package"];
+             
+	str = StringDelete[str, RegularExpression["\\(\\* Created.*?\\*\\)\\n"]];          
+    
+    Export[channel, str, "Text"]
+	]
+
+ImportCircuitDFDHook[channel_, opts___] := Module[{data, isString},
+    (* Heuristic: if it's a string but doesn't look like a file path, treat as raw text *)
+    isString = StringQ[channel] && !StringMatchQ[channel, "*.*"] && !FileExistsQ[channel];
+    
+    data = If[isString, 
+        ImportString[channel, "Package"], 
+        Import[channel, "Package"]
+    ];
+    
+    FromDFD[data]
+	]
+
+ImportExport`RegisterExport["CircuitDFD", ExportCircuitDFDHook];
+ImportExport`RegisterImport["CircuitDFD", ImportCircuitDFDHook];
+
+
+
+(*
+Import and Export JSON format:
+  circ = Import["filename.json", "Circuit"];
+  Export["filename.json", circ, "Circuit"];
+
+Also supports ImportString and ExportString.
 *)
 
-FormatCircuitJSON[dict_Association] := Module[
-    {decodeBytes, cleanString, formatrootelement, rootStrList, 
-       dfStrList, dfStr},
+
+ToJSON[expr_Association] := Module[
+
+    {decodeBytes, cleanString, formatrootelement, rootStrList, dfStrList, dfStr, prepareNode},
     
     decodeBytes[s_String] := 
-		If[Max[ToCharacterCode[s]] <= 255, 
-			FromCharacterCode[ToCharacterCode[s], "UTF8"], s
-		];
+        If[Max[ToCharacterCode[s]] <= 255, 
+            FromCharacterCode[ToCharacterCode[s], "UTF8"], s ];
     
-    (* Post-process the JSON string to add spaces and unescape forward slashes *)
-    cleanString[s_String] := StringReplace[s, {
-        "\":" -> "\": ", 
-        "," -> ", ", 
-        "\\/" -> "/"
-    }];
+    cleanString[s_String] := StringReplace[s, {"\":" -> "\": ", "," -> ", ", "\\/" -> "/"}];
     
-    (* Format every top-level key except "dataflow". *)
     formatrootelement[k_String] := 
         "\"" <> k <> "\": " <> cleanString @ decodeBytes @ 
-            ExportString[dict[k], "RawJSON", "Compact" -> True];
+            ExportString[
+                If[k === "hyperparameters", KeyMap[ToString, expr[k]], expr[k]], 
+                "RawJSON", "Compact" -> True
+            ];
+    
+    rootStrList = formatrootelement /@ Keys[KeyDrop[expr, {"dataflow"}]];
+    
+	prepareNode[node_Association] := Module[{n = node},
+        If[KeyExistsQ[n, "component"], 
+            n["component"] = ToString[n["component"]]];
+            
+        If[KeyExistsQ[n, "arguments"], 
+            n["arguments"] = ToString[#, InputForm] & /@ n["arguments"]];
+            
+        If[n["component"] === "input" && KeyExistsQ[n, "receive"],
+            n["receive"] = ToString[#, InputForm] & /@ n["receive"]];
+            
+        If[n["component"] === "output" && KeyExistsQ[n, "send"],
+            n["send"] = ToString[#, InputForm] & /@ n["send"]];
+        n
+		];
         
-    rootStrList = formatrootelement /@ Keys[KeyDrop[dict, {"dataflow"}]];
+    dfStrList = (cleanString @ decodeBytes @ 
+		ExportString[prepareNode[#], "RawJSON", "Compact" -> True] &) /@ 
+			expr["dataflow"];
     
-    (* Compress each individual dataflow node. *)
-    dfStrList = cleanString @ decodeBytes @ 
-       ExportString[#, "RawJSON", "Compact" -> True] & /@ dict["dataflow"];
+    dfStr = "\"dataflow\": [\n    " <> StringRiffle[dfStrList, ",\n\n    "] 
+			<> "\n  ]";
     
-    (* Assemble the dataflow array. *)
-    dfStr = "\"dataflow\": [\n    " <> 
-		StringRiffle[dfStrList, ",\n\n    "] <> "\n  ]";
+    "{\n  " <> StringRiffle[Append[rootStrList, dfStr], ",\n\n  "] <> "\n}"
+	]
+
+
+FromJSON[jsonString_String] := Module[
+    {expr},
+
+	expr = ImportString[jsonString, "RawJSON"];
     
-    (* Final assembly.  *)
-    "{\n  " <> StringRiffle[Append[rootStrList, dfStr], ",\n\n  "] 
-       <> "\n}"
+	If[KeyExistsQ[expr, "hyperparameters"],
+        expr["hyperparameters"] = KeyMap[
+            If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
+            expr["hyperparameters"]] ];
+    
+	If[KeyExistsQ[expr, "dataflow"],
+        expr["dataflow"] = Map[ Function[node,
+			Module[{n = node},
+			
+				If[KeyExistsQ[n, "component"] && StringQ[n["component"]],
+					n["component"] = ToExpression[n["component"]]];
+					
+				If[KeyExistsQ[n, "arguments"],
+					n["arguments"] = ToExpression /@ n["arguments"]];
+                    
+				If[n["component"] === input && KeyExistsQ[n, "receive"],
+					n["receive"] = ToExpression /@ n["receive"]];
+				
+				If[n["component"] === output && KeyExistsQ[n, "send"],
+					n["send"] = ToExpression /@ n["send"]];
+				n
+                ]
+            ],
+            expr["dataflow"]]
+		];
+    
+    expr
 	]
 
 
 (* 
-ImportExport framework registration and hooks                                 
+JSON format hooks ("Circuit") 
 *)
 
 ImportExport`RegisterFormat["Circuit", "DefaultExtension" -> "json"];
 
-ExportCircuitHook[channel_, data_, opts___] := 
-    Export[channel, 
-        FormatCircuitJSON[ToCircuitJSON[data]], "Text", 
-        CharacterEncoding -> "UTF8"];
+
+ExportCircuitHook[channel_, expr_Association, opts___] := 
+    Export[channel, ToJSON[expr], "Text", CharacterEncoding -> "UTF8"]
+
+
+ImportCircuitHook[channel_, opts___] := Module[
+    {isString, expr},
+    
+    isString = StringQ[channel] && StringMatchQ[StringTrim[channel], "{*" | "[*"];
+    
+    expr = If[isString,
+        ImportString[channel, "RawJSON"],
+        Import[channel, "RawJSON"]];
+    
+    If[KeyExistsQ[expr, "hyperparameters"],
+        expr["hyperparameters"] = KeyMap[
+            If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
+            expr["hyperparameters"]
+        ]];
+    
+    If[KeyExistsQ[expr, "dataflow"],
+        expr["dataflow"] = Map[
+            Function[node,
+                Module[{n = node},
+                
+                    If[KeyExistsQ[n, "component"] && StringQ[n["component"]],
+                        n["component"] = ToExpression[n["component"]]];
                         
-ImportCircuitHook[channel_, opts___] := 
-    FromCircuitJSON[Import[channel, "RawJSON"]];
+                    If[KeyExistsQ[n, "arguments"],
+                        n["arguments"] = ToExpression /@ n["arguments"]];
+                        
+                    If[n["component"] === input && KeyExistsQ[n, "receive"],
+                        n["receive"] = ToExpression /@ n["receive"]];
+                        
+                    If[n["component"] === output && KeyExistsQ[n, "send"],
+                        n["send"] = ToExpression /@ n["send"]];
+                        
+                    n
+                ]
+            ],
+            expr["dataflow"]]
+		];
+    
+    expr
+	]
 
 ImportExport`RegisterExport["Circuit", ExportCircuitHook];
 ImportExport`RegisterImport["Circuit", ImportCircuitHook];
+
+
+(* 
+A formatting-invariant hash of a JSON string, used for filename generation.
+*)
+
+JSONHash[data_String] := Module[{sorted, jsonString, hexHash},
+    sorted = Replace[data, a_Association :> KeySort[a], {0, Infinity}];
+    
+    jsonString = ExportString[sorted, "JSON", "Compact" -> True, 
+        CharacterEncoding -> "UTF-8"];
+    
+    jsonString = StringReplace[jsonString, "\\/" -> "/"];
+    jsonString = StringTrim[jsonString];
+    
+    hexHash = Hash[jsonString, "SHA256", "HexString"];
+    
+    StringTake[hexHash, 12]
+ ]
 
 
 (* -------------------------------------------------------------------------- *)
