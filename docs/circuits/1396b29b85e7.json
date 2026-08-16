@@ -1,0 +1,13 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [200, 5]},
+
+  "dataflow": [
+    {"component": "input", "send": [11]},
+
+    {"component": "circuit", "arguments": ["c53"], "send": [21], "receive": [11]},
+
+    {"component": "output", "receive": [21]}
+  ]
+}
