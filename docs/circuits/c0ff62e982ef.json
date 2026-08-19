@@ -1,0 +1,11 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [200, 5]},
+
+  "dataflow": [
+    {"component": "input", "send": [11]},
+
+    {"component": "output", "receive": [{"slot": 11, "tags": ["permute"]}]}
+  ]
+}

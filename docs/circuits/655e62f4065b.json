@@ -1,0 +1,13 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [1000, 5]},
+
+  "dataflow": [
+    {"component": "input", "send": [11]},
+
+    {"component": "delay", "options": {"rate_limit": 10}, "send": [21], "receive": [[11, 21]]},
+
+    {"component": "output", "receive": [21]}
+  ]
+}
