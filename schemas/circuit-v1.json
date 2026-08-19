@@ -148,18 +148,11 @@
           "type": "string",
           "description": "The type of node (e.g., input, output, delay, auto)."
         },
-        "id": {
-          "type": "string",
-          "description": "Optional unique identifier for the node."
-        },
         "label": {
           "type": "string"
         },
-        "arguments": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "plugin": {
+          "type": "string"
         },
         "options": {
           "type": "object"
