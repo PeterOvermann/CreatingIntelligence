@@ -148,14 +148,8 @@
           "type": "string",
           "description": "The type of node (e.g., input, output, delay, auto)."
         },
-        "label": {
-          "type": "string"
-        },
         "plugin": {
           "type": "string"
-        },
-        "options": {
-          "type": "object"
         },
         "send": {
           "type": "array",
@@ -173,7 +167,7 @@
       "required": [
         "component"
       ],
-      "additionalProperties": false
+      "additionalProperties": true
     }
   }
 }
