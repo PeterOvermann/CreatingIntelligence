@@ -496,9 +496,9 @@ input[config_Association] := Module[ {plugin, c, sub},
 
 	plugin = Lookup[config, "plugin", <| "function" -> Identity |>&];
 
-	sub = Append[ config, "hyperparameters" -> First[config["$send_parameters"]]];
+	sub = Append[ config, "hyperparameters" -> First[config["send_blocks"]]];
 
-	Join[ plugin[sub], <|"size" -> Small,  "$checks" -> {"input", "oneout"} |> ]	
+	Join[ plugin[sub], <|"size" -> 10,  "checks" -> {"input", "oneout"} |> ]	
 	]
 
 
@@ -514,9 +514,9 @@ output[config_Association] := Module[ {plugin, c, sub},
 
 	plugin = Lookup[config, "plugin", <| "function" -> Identity |>&];
 
-	sub = Append[ config, "hyperparameters" -> First[config["$receive_parameters"]]];
+	sub = Append[ config, "hyperparameters" -> First[config["receive_blocks"]]];
 
-	Join[ plugin[sub], <|"size" -> Small,  "$checks" -> {"output", "oneinp"} |> ]	
+	Join[ plugin[sub], <|"size" -> 10,  "checks" -> {"output", "oneinp"} |> ]	
 	]
 
 
@@ -537,10 +537,10 @@ delay[config_Association] :=
 	Module[ {f, n, p, dims1, dims2, decimation, 
 			ratelimit, capacity, Y = {}, label = ""},
 
-	{n, p} = First[config["$send_parameters"]]; 
+	{n, p} = First[config["send_blocks"]]; 
 
-	dims1 = First /@ config["$receive_parameters"];
-	dims2 = First /@ config["$send_parameters"];
+	dims1 = First /@ config["receive_blocks"];
+	dims2 = First /@ config["send_blocks"];
 
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
@@ -573,7 +573,7 @@ delay[config_Association] :=
 		Sequence @@ MultisetBlockSplit[X, dims2]
 		];
 
-	<| "function" -> f, "$checks" -> {"arginp", "argout", "totaldim"},
+	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
 		"fill" -> 13, "label" -> label |>	
 	]
 
@@ -587,8 +587,8 @@ Holds and broadcasts the state for the specified number of additional cycles.
 latch[config_Association] := 
 	Module[ {f, dims1, dims2, threshold, cycles, state, timer},
 
-	dims1 = First /@ config["$receive_parameters"];
-	dims2 = First /@ config["$send_parameters"];
+	dims1 = First /@ config["receive_blocks"];
+	dims2 = First /@ config["send_blocks"];
 
 	(* Hyperparameters *)
 	(* Must have at least 1 element to latch by default. *)
@@ -625,7 +625,7 @@ latch[config_Association] :=
 		Sequence @@ state
 		];
 
-	<| "function" -> f, "$checks" -> {"arginp", "argout", "totaldim"},
+	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
 		"fill" -> 13, "label" -> "\[FilledRectangle]", "size" -> 17 |>	
 	]
 
@@ -643,11 +643,11 @@ kwta[config_Association] :=
 	Module[ {f, dims1, dims2, k, cutoff, cycles, capacity, threshold, 
 		window},
 
-	dims1 = First /@ config["$receive_parameters"];
-	dims2 = First /@ config["$send_parameters"];
+	dims1 = First /@ config["receive_blocks"];
+	dims2 = First /@ config["send_blocks"];
 	
 	(* k is the population of the output channel. *)
-	k = config["$send_parameters"][[1, 2]]; 
+	k = config["send_blocks"][[1, 2]]; 
 	
 	(* Temporal and space bounding parameters *)
 	cycles    = Lookup[config, "cycles", 1];
@@ -694,7 +694,7 @@ kwta[config_Association] :=
 		Sequence @@ MultisetBlockSplit[winners, dims2]
 		];
 		
-	<| "function" -> f, "$checks" -> {"arginp", "argout", "totaldim"}, 
+	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"}, 
 		"label" -> "k", "fill" -> 13 |>
 	]
 
@@ -725,18 +725,18 @@ auto[config_Association] :=
 	(* Update rule *)			
 	plugin = Lookup[config, "plugin", replacement];
 			
-	dims = First /@ config["$receive_parameters"];
-	p = Last[Plus @@ config["$receive_parameters"]];
+	dims = First /@ config["receive_blocks"];
+	p = Last[Plus @@ config["receive_blocks"]];
 
 	{label, size} = 
 		Switch[ plugin, 
-			replacement,  {"\[FilledDownTriangle]", Large   },
-			residual,     {"\[FilledUpTriangle]", Large   },
-			complement,   {"\[EmptyDownTriangle]", Large   },
-			difference,   {"\[EmptyUpTriangle]", Large   },
-			augmentation, {"\[Union]", Medium  },
-			coincidence,  {"\[Intersection]", Medium  },
-			_,            {ToString[plugin],  Small   } (* User plug-in *)
+			replacement,  {"\[FilledDownTriangle]", 18 },
+			residual,     {"\[FilledUpTriangle]", 18 },
+			complement,   {"\[EmptyDownTriangle]", 20 },
+			difference,   {"\[EmptyUpTriangle]", 20 },
+			augmentation, {"\[Union]", 14 },
+			coincidence,  {"\[Intersection]", 14 },
+			_,            {ToString[plugin],  10 } (* User plug-in *)
 		];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
@@ -752,7 +752,7 @@ auto[config_Association] :=
 	
 	(* Memory with identical input and output parameters. *)
 	M = Memory[#, #, Threshold -> Lookup[config, "threshold", Automatic]]& 
-			[Plus @@ config["$receive_parameters"]];
+			[Plus @@ config["receive_blocks"]];
 		
 	f[blocks__List] := Module[ {A, X, Y, Xdec},
 
@@ -782,7 +782,7 @@ auto[config_Association] :=
 		Sequence @@ MultisetBlockSplit[X, dims] 
 		]; 
 		
-	<| "function" -> f, "$checks" -> {"arginp", "argout", "ident"}, 
+	<| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
 		"label" :> label, "size" -> size,
 	    "shape" -> "Square", "fill" -> 8, "clear" :> M[Clear] |>
 	]
@@ -798,7 +798,7 @@ Always learns if B =!= {}.
 associator[config_Association] := 
 	Module[ {f, Adims, M, decimation, oversampling},
 
-	Adims = First /@ Rest[config["$receive_parameters"]]; (* Dimensions of input blocks A *)
+	Adims = First /@ Rest[config["receive_blocks"]]; (* Dimensions of input blocks A *)
 
 	(* Proportional stochastic subsampling for training.  *)
 	decimation = Lookup[config, "decimate", 1];
@@ -806,7 +806,8 @@ associator[config_Association] :=
 	oversampling = Lookup[config, "oversampling", 1];
 	
 	(* Memory instance: *)
-	M = Memory[Plus@@Rest[config["$receive_parameters"]], First[config["$send_parameters"]], 
+	M = Memory[Plus@@Rest[config["receive_blocks"]], 
+			First[config["send_blocks"]], 
 				Threshold -> Lookup[config, "threshold", Automatic]];
 
 	f[B_List, blocks__List] := Module[{X, Y},
@@ -830,8 +831,8 @@ associator[config_Association] :=
 		];   
 		
 		
-	<| "function" -> f, "$checks" -> { "dimfirst", "oneout"},
-		"shape" -> "Square", "fill" -> 11, "size"-> (FontSize -> 18),
+	<| "function" -> f, "checks" -> { "dimfirst", "oneout"},
+		"shape" -> "Square", "fill" -> 11, "size" -> 18,
 		"label"-> "\[FilledRightTriangle]\[FilledCircle]", "clear" :> M[Clear] |>
 	]
 
@@ -843,9 +844,9 @@ Heteroencoder A -> B. A may be partitioned. Has no input for B.
 heteroencoder[config_Association] := 
 	Module[ {f, dims, M},
 	
-	dims = First /@ config["$receive_parameters"];
+	dims = First /@ config["receive_blocks"];
 	
-	M = Memory[ Plus @@ config["$receive_parameters"], First[config["$send_parameters"]], 
+	M = Memory[ Plus @@ config["receive_blocks"], First[config["send_blocks"]], 
 			Threshold -> Lookup[config, "threshold", Automatic]];
 	
 	f[blocks__List] := Module[{X, Y},
@@ -855,7 +856,7 @@ heteroencoder[config_Association] :=
 		
 		(* Generate new SHR encoding if retrieval fails. *)
 		If[Y === {}, 
-			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[config["$send_parameters"]]];
+			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[config["send_blocks"]]];
 		
 		(* Always learn, broadening X as an attractor. *)
 		M[X -> Y];
@@ -863,8 +864,8 @@ heteroencoder[config_Association] :=
 		Y
 		]; 
 			
-	<| "function" -> f, "$checks" -> {"arginp", "oneout"}, 
-		"shape" -> "Square",  "fill" -> 11,  "size"-> (FontSize -> 18),
+	<| "function" -> f, "checks" -> {"arginp", "oneout"}, 
+		"shape" -> "Square",  "fill" -> 11,  "size" -> 18,
 		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]", "clear" :> M[Clear] |>
 	]
 
@@ -880,8 +881,8 @@ predictor[config_Association] :=
 		Module[ {f, M, X = {}, prediction = {}, 
 						itemconfig, contextconfig},
 
-	itemconfig = First[config["$receive_parameters"]];
-	contextconfig = Rest[config["$receive_parameters"]]; (* Context may be partitioned *)
+	itemconfig = First[config["receive_blocks"]];
+	contextconfig = Rest[config["receive_blocks"]]; (* Context may be partitioned *)
 	
 	M = Memory[Plus @@ contextconfig, itemconfig,
 		Threshold -> Lookup[config, "threshold", Automatic]]; 
@@ -900,8 +901,8 @@ predictor[config_Association] :=
 		]; 
 
 
-	<| "function" -> f, "$checks" -> {"dimfirst", "oneout"}, 
-		"shape" -> "Square", "fill" -> 11, "size"-> (FontSize -> 18),
+	<| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
+		"shape" -> "Square", "fill" -> 11, "size" -> 18,
 		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]", "clear" :> M[Clear]
 		|>
 	]
@@ -914,9 +915,9 @@ Random noise generator
 noise[config_Association] := Module[ {f},
 
 	f[blocks___] := 
-		Sort[RandomSample[Range[#1], #2]]& @@ First[config["$send_parameters"]]; 
+		Sort[RandomSample[Range[#1], #2]]& @@ First[config["send_blocks"]]; 
 	
-	<| "function" -> f, "$checks" -> {"input", "oneout"}, "label" -> "~",
+	<| "function" -> f, "checks" -> {"input", "oneout"}, "label" -> "~",
 		"fill" -> 13, "size" -> 18 |>
 	]	
 
@@ -930,28 +931,27 @@ circuit[config_Association] :=
 	
 	(* Compiled circuit: 
 	  Delay instantiation to compilation of embedding circuit. *)
-	If[KeyExistsQ[config, "$reference"], Return[circuit[config["$reference"]]]];
+	If[KeyExistsQ[config, "reference"], Return[circuit[config["reference"]]]];
 	
 	plugin = Lookup[config, "plugin", Null];
 	
-	label = If[MatchQ[plugin, _Symbol], 
-		StringInsert[StringDelete[ToString[plugin], "circuit"], "\n", 4], ""];
+	label = If[MatchQ[plugin, _Symbol], StringTake[ToString[plugin],-3], ""];
 	
 	sub = Lookup[ Circuit`Registry, plugin, Circuit[plugin]];
 	
 	If[ sub === Null, Message[Circuit::circuit, plugin]];
 
-	params = {sub["$receive_parameters"], sub["$send_parameters"]};
+	params = {sub["receive_blocks"], sub["send_blocks"]};
 	
-	If[ {config["$receive_parameters"], config["$send_parameters"]} =!= params,
+	If[ {config["receive_blocks"], config["send_blocks"]} =!= params,
 			Message[Circuit::embedded, params]; sub = Null];
 		
 	(* Raw evaluation, bypassing encoding and decoding. *)
 	f[blocks__] := Sequence @@ sub["$function"][{blocks}];
 	
-	<| "function" -> f, "$checks" -> {"arginp", "argout"}, 
+	<| "function" -> f, "checks" -> {"arginp", "argout"}, 
 		"clear" :> sub["clear"], 
-		"shape" -> "Square", "face"->Plain, "label" -> label |>
+		"shape" -> "Square", "label" -> label |>
 	]					
 
 
@@ -1023,10 +1023,10 @@ Circuit[expr_] := Module[
 	assoc = Switch[ expr,
 	
 		(* Raw circuit spec, e.g. imported from JSON or DFD. *)
-		_Association /; KeyExistsQ[expr, "$schema"], expr,
+		_Association /; KeyExistsQ[expr, "dataflow"], expr,
 
 		(* Compiled circuit. Pass through. *)
-		_Association /; KeyExistsQ[expr, "function"], Return[expr],
+		_Association /; KeyExistsQ[expr, "$function"], Return[expr],
 
 		(* Convert from DFD (supported only in Mathematica). *)
 		_List, FromDFD[expr],
@@ -1036,7 +1036,7 @@ Circuit[expr_] := Module[
 			Import[expr, "Circuit"],
 
 		(* JSON string. *)
-		_String /; StringContainsQ[expr, "circuit-v1"],
+		_String /; StringContainsQ[expr, "dataflow"],
 			FromJSON[expr],
 
 		_, Message[Circuit::circargs, expr]; Return[Null];
@@ -1120,15 +1120,15 @@ Circuit[expr_] := Module[
 		(* Base configuration for each node. Includes per-node user settings. *)
 		config = Join[ node, 
 			<|  
-			"$receive_paths" -> compilepathway /@ Lookup[node, "receive", {}],
+			"receive_paths" -> compilepathway /@ Lookup[node, "receive", {}],
 		
-			"$id" -> nodeid, (* Used only for schematics visualization. *)
+			"id" -> nodeid, (* Used only for schematics visualization. *)
 			
 			(* Extract slot numbers *)
-			"$send_slots" -> Cases[Lookup[node, "send", {}], _Integer],
+			"send_slots" -> Cases[Lookup[node, "send", {}], _Integer],
 
-			"$send_parameters" -> fillparams /@ Lookup[node, "send", {}], 
-			"$receive_parameters" -> fillparams /@ Lookup[node, "receive", {}]
+			"send_blocks" -> fillparams /@ Lookup[node, "send", {}], 
+			"receive_blocks" -> fillparams /@ Lookup[node, "receive", {}]
 			|>];
 			
 		(* Instantiate the component, re-append config to ensure 
@@ -1137,21 +1137,21 @@ Circuit[expr_] := Module[
 
 		(* Prepend default visualization settings. *)
 		config = Join[<| "shape" -> "Circle", "label" -> "", "fill" -> 6, 
-			"color" -> 0, "size" -> Medium, "face" -> Bold  |>, config];
+			"color" -> 0, "size" -> 12 |>, config];
 
 		(* Prepend default functional settings. *)
-		config = Join[<| "$checks" -> {}, "function" -> Null |>, config];
+		config = Join[<| "checks" -> {}, "function" -> Null |>, config];
 
-		(* Static error checking, based on component-supplied "$checks". *)
-		If[ ! Circuit`check[#][config["$receive_parameters"], config["$send_parameters"]], 
-			Message[MessageName[Circuit, #], config]] & /@ config["$checks"];
+		(* Static error checking, based on component-supplied "checks". *)
+		If[ ! Circuit`check[#][config["receive_blocks"], config["send_blocks"]], 
+			Message[MessageName[Circuit, #], config]] & /@ config["checks"];
 
 		(* Register input flow. *)
 		If[Lookup[node, "component"] === input,  
 			(* Register encoder. *)
 			AppendTo[preprocess, config["function"]];
-			AppendTo[inputslots, First[config["$send_slots"]]];
-			AppendTo[receiveparams, First[config["$send_parameters"]]];
+			AppendTo[inputslots, First[config["send_slots"]]];
+			AppendTo[receiveparams, First[config["send_blocks"]]];
 
 			config["label"] //= StringReplace["#" -> 
 				ToString[Length[inputslots]]]
@@ -1161,8 +1161,8 @@ Circuit[expr_] := Module[
 		If[Lookup[node, "component"] === output, 
 			(* Register decoder. *)
 			AppendTo[postprocess, config["function"]];
-			AppendTo[outputedges, First[config["$receive_paths"]]];
-			AppendTo[sendparams, First[config["$receive_parameters"]]];
+			AppendTo[outputedges, First[config["receive_paths"]]];
+			AppendTo[sendparams, First[config["receive_blocks"]]];
 
 			config["label"] //= StringReplace["#" -> 
 				ToString[Length[outputedges]]]
@@ -1180,12 +1180,12 @@ Circuit[expr_] := Module[
 	Module[ {slots, dupes, links = <||>, getlink},
 
 		(* Duplicate sendslots? *)
-		slots = Flatten[#["$send_slots"] & /@ Values[nodes]];
+		slots = Flatten[#["send_slots"] & /@ Values[nodes]];
 		dupes = Keys[Select[Counts[{slots}], # > 1 &]];
 		If[ Length[dupes] > 0, Message[Circuit::dupslots, dupes]];
 
 		(* Gather link table. *)
-		Scan[ Function[c, (links[#] = c["$id"]) & /@ c["$send_slots"]], 
+		Scan[ Function[c, (links[#] = c["id"]) & /@ c["send_slots"]], 
 			nodes];
 
 		(* Add "from_node_id" value to each pathway. *)
@@ -1202,13 +1202,13 @@ Circuit[expr_] := Module[
 		If[ MatchQ[config["component"], input | output], Return[]];
 		
 		(* Evaluate received pathways and latch inputs. *)
-		x = patheval /@ config["$receive_paths"];
+		x = patheval /@ config["receive_paths"];
 			
 		(* This component's callback function. *)
 		result = config["function"][Sequence @@ x]; 
 
 		(* Copy results to output slot. *)
-		MapThread[(nextstate[#1] = #2) &, {config["$send_slots"], {result}}]
+		MapThread[(nextstate[#1] = #2) &, {config["send_slots"], {result}}]
 		];
 												
 	(* 
@@ -1304,15 +1304,14 @@ Circuit[expr_] := Module[
 	
 		(* Optional kWTA. *) 
 		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
-			Module[{k, U, tally, rankedmax, excitQ, survivors},
+			Module[{k, U, tally, rankedmax, survivors},
 			
 				k = Min[#["hyperparameters"][[2]] & /@ paths ];
 			
 				(* "K" forces excitatory only. 
 					"k" evaluates absolute saliency. *)
-				excitQ = Or @@ tags["kwta_excitatory"];
-			
-				U = If[excitQ, Select[merged, # > 0 &], merged];
+				U = If[Or @@ tags["kwta_excitatory"], 
+					Select[merged, # > 0 &], merged];
 			
 				tally = SortBy[Tally[U], Last];
 			
@@ -1464,7 +1463,7 @@ Circuit[expr_] := Module[
 
 			VertexLabels -> Normal[ Placed[Style[#["label"], 
 				colorscheme[#["color"]], 
-				#["size"], #["face"]], Center]& /@ nodes],
+				#["size"], Bold], Center]& /@ nodes],
 
 			VertexCoordinates -> coords,
 
@@ -1520,8 +1519,8 @@ Circuit[expr_] := Module[
 		
 		(* Private properties. *)
 		"$function" -> fraw, 
-		"$receive_parameters" -> receiveparams,
-		"$send_parameters" -> sendparams 
+		"receive_blocks" -> receiveparams,
+		"send_blocks" -> sendparams 
 		|>;
 		
 	(* 
@@ -1529,11 +1528,11 @@ Circuit[expr_] := Module[
 	rather than a string because embedded circuits specify the plugin as symbol
 	*)
 		
-	this = Symbol[ "circuit" <> 
-		ToUpperCase[StringTake[Hash[dispatch, "SHA512", "HexString"], 6]]];	
+	this = Symbol[ "x" <> 
+		ToUpperCase[StringTake[Hash[dispatch, "SHA512", "HexString"], 12]]];	
 	
 	(* Register this circuit. *)
-	dispatch["$reference"] = this;
+	dispatch["reference"] = this;
 	Circuit`Registry[this] = dispatch;
 	
 	dispatch
@@ -1618,15 +1617,16 @@ FromDFD[dataflow_List] := Module[
      nodes, components, parsenode, parsepath, parsemerge},
     
     (* Include schema reference at the root *)
-    AppendTo[rootopts, "$schema" -> "https://creatingintelligence.org/schemas/circuit-v1.json"];
+    AppendTo[rootopts, 
+		"$schema" -> "https://creatingintelligence.org/schemas/circuit-v1.json"];
 
     (* Extract all rules from the dataflow. *)
     rules = Select[dataflow, Head[#] === Rule &];
     
     (* Sort integers/blanks to hyperparameters, specific keys to root, and others to options. *)
     Scan[ Function[{rule}, Which[
-        rule[[1]] === _, 
-            AppendTo[hyperparams, "default" -> rule[[2]]],
+		rule[[1]] === _, 
+			AppendTo[hyperparams, "default" -> rule[[2]]],
  	
 		IntegerQ[rule[[1]]], 
 			AppendTo[hyperparams, rule[[1]] -> rule[[2]]],
@@ -1634,31 +1634,31 @@ FromDFD[dataflow_List] := Module[
 		MemberQ[{"version", "metadata", "$schema"}, rule[[1]]],
             AppendTo[rootopts, rule[[1]] -> rule[[2]]],
         
-        rule[[1]] === "multiplex" && StringQ[rule[[2]]],
-            AppendTo[customopts, "multiplex" -> (If[# === "1", 1, 0] & /@ 
+		rule[[1]] === "multiplex" && StringQ[rule[[2]]],
+			AppendTo[customopts, "multiplex" -> (If[# === "1", 1, 0] & /@ 
 					Characters[rule[[2]]])],
         
-        StringQ[rule[[1]]], 
-            AppendTo[customopts, rule[[1]] -> rule[[2]]],
+		StringQ[rule[[1]]], 
+			AppendTo[customopts, rule[[1]] -> rule[[2]]],
 
 		True, 
-            AppendTo[customopts, ToString[rule[[1]]] -> rule[[2]]]
-         ]], rules
-    ];
+			AppendTo[customopts, ToString[rule[[1]]] -> rule[[2]]]
+		]], rules
+	];
     
     (* Extract circuit components. *)
     nodes = Select[dataflow, Head[#] =!= Rule &];
     
-    (* Helper to parse individual path strings into structured JSON objects *)
+    (* Parse individual path strings into structured JSON objects. *)
     parsepath[p_] := Module[
         {s = ToString[p], match, slot, tags, tagmap, 
-            found, result = <||>, tagPattern, parts},
+            found, result = <||>, tagpattern},
         
         match = StringCases[s, StartOfString ~~ n:DigitCharacter.. ~~ Whitespace... ~~ t:___ ~~ EndOfString :> {ToExpression[n], t}];
         
         If[match === {}, 
-            tagPattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | ("@" ~~ DigitCharacter..))..;
-            If[StringMatchQ[s, tagPattern], match = {{1, s}}, Return[s]]
+            tagpattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | ("@" ~~ DigitCharacter..))..;
+            If[StringMatchQ[s, tagpattern], match = {{1, s}}, Return[s]]
 			];
         
         {slot, tags} = match[[1]];
@@ -1666,15 +1666,13 @@ FromDFD[dataflow_List] := Module[
         
         result["slot"] = slot;
         
-        If[StringContainsQ[tags, " "],
-            parts = StringSplit[tags, " ", 2];
-            result["label"] = parts[[1]];
-            tags = parts[[2]]];
+		If[StringContainsQ[tags, " "],
+			{result["label"], tags} = StringSplit[tags, " ", 2]];
         
-        With[{g = StringCases[tags, "@" ~~ val:(DigitCharacter..) :> val]},
-            If[Length[g] > 0,
-                result["gating"] = If[# === "1", 1, 0] & /@ Characters[g[[1]]];
-                tags = StringReplace[tags, "@" ~~ g[[1]] -> ""]; 
+		With[{g = StringCases[tags, "@" ~~ val:(DigitCharacter..) :> val]},
+			If[Length[g] > 0,
+				result["gating"] = If[# === "1", 1, 0] & /@ Characters[g[[1]]];
+				tags = StringReplace[tags, "@" ~~ g[[1]] -> ""]; 
 				]
 			];
         
@@ -1690,10 +1688,10 @@ FromDFD[dataflow_List] := Module[
 
 	parsenode[compExpr_[send___][receive___]] := Module
 		[
-        {comp, compName, argslist, plugin = Null, opts = <||>},
+        {comp, compname, argslist, plugin = Null, opts = <||>},
         
         comp = Head[compExpr]; 
-        compName = ToString[comp];
+        compname = ToString[comp];
         argslist = List @@ compExpr; 
         
         Do[ Which
@@ -1766,10 +1764,10 @@ ToDFD[expr_Association] := Module[
 
 	parsenode[node_Association] := Module[
         
-        {comp, compName,  plugin, opts, send, receive, compExpr},
+        {comp, compname,  plugin, opts, send, receive, compExpr},
         
         comp = node["component"]; 
-        compName = ToString[comp];
+        compname = ToString[comp];
         plugin = Lookup[node, "plugin", Null];
 		opts = Normal[KeyDrop[node, {"component", "plugin", "send", "receive"}]];        
         compExpr = comp @@ DeleteCases[Join[If[plugin =!= Null, {plugin}, {}], opts], Null];
