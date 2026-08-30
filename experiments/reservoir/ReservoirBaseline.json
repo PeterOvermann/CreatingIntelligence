@@ -4,12 +4,12 @@
   "hyperparameters": {"default": [2000, 10]},
 
   "dataflow": [
-    {"component": "input", "arguments": ["codec"], "send": [11]},
+	{"component": "input", "plugin": "codec", "send": [11]},
 
-    {"component": "delay", "options": {"R": 60}, "send": [51], "receive": [[11, {"slot": 51, "tags": ["permute"]}]]},
+	{"component": "delay", "send": [51], "receive": [[11, {"slot": 51, "tags": ["permute"]}]], "rate_limit": 6.0},
 
-    {"component": "predictor", "send": [101], "receive": [11, 51]},
+	{"component": "predictor", "send": [101], "receive": [11, 51]},
 
-    {"component": "output", "arguments": ["codec"], "receive": [101]}
+	{"component": "output", "plugin": "codec", "receive": [101]}
   ]
 }

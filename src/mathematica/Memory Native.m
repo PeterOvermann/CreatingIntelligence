@@ -17,31 +17,47 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 *)
 
 
-Options[Memory] = {Threshold -> Automatic};
 
+Memory[config_Association] :=
 
-Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] := 
-
-	Module[ {f, mem = <||>, T = 1, cap, zero},
-	
-		f = Unique["mem"];
-		
-		(* Memory capacity. *)
-		cap = If[NA == NB, 
-				Log[2.0] NA (NA - 1) (NA - 2) / (PA (PA - 1) (PA - 2)),
-				Log[2.0] NA (NA - 1) NB / (PA (PA - 1) PB)];
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
+		store, retrieve, clear, memorycount},
 			
-		(* Pattern matching threshold. *)
-		While[T < PA && cap^2 * Binomial[PA, T] * Binomial[NA - PA, PA - T] / 
+		{NA, PA} = config["A_parameters"];
+		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
+			Message[Memory::params, config]];	
+
+		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
+						config["B_parameters"], {NA, PA}];
+			
+		If[ ! MatchQ[{NB, PB}, {_Integer, _Integer}], 
+			Message[Memory::params, config]];	
+								
+		(* Memory capacity, needed for threshold calculation. *)
+		capacity = If[KeyExistsQ[config, "B_parameters"], 
+				(* Hetero-associative capacity if B is specified. *)
+				Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA*(PA-1)) ],
+				(* Auto-associative capacity. *)
+				Round[ Log[2] * (NB*(NA-1)*(NA-2)) / (PB*(PA-1)*(PA-2)) ]
+				];
+			
+		(* Calculate default pattern matching threshold. *)
+		While[T < PA && capacity^2 * Binomial[PA, T] * Binomial[NA - PA, PA - T] / 
 				Binomial[NA, PA]  >= 1, T++];
 
-		If[IntegerQ[ OptionValue[Threshold]], T = OptionValue[Threshold]];
+		(* User-defined (scaled) threshold . *)
+		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
+			T = Round[config["threshold"] * PA]];
+			
 		If[T < 2, T = 2];
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
+		(* Store hetero-association A -> B in memory. *)
+		store[A_List] := store[A, A];
+		
 		(* Store A -> B in memory. *)
-		f[A_List -> B_List] := Module[{v, sub2},
+		store[A_List, B_List] := Module[{v, sub2},
 			(* Step 1: Expansion coding. *)
 			sub2 = Subsets[A, {2}];
 		
@@ -51,7 +67,8 @@ Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] :=
 			];
 
 		(* Memory retrieval. *)
-		f[A_List] := Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff},
+		retrieve[A_List] := 
+			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff},
 			(* Step 1: Initialize. *)
 			X = A; 
 			
@@ -99,12 +116,23 @@ Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] :=
 				(* Step 10: Iterate.  *)
 				]
 			];
-
-		f["memorycount"] := Total[Values[mem], 2];		
-		
-		f[Clear] := (mem = <||>; ClearAll[Evaluate[f]]); 
-		f
+			
+		clear := (mem = <||>;);
+		memorycount := Total[Values[mem], 2];
+				
+		Join[ KeyTake[config, {"A_parameters", "B_parameters"}], 
+			<|
+			"T" -> T, (* Absolute pattern matching threshold. *)
+			"store" -> store,
+			"retrieve" -> retrieve,
+			"clear" :> clear,
+			"memorycount" :> memorycount,
+			"backend" -> "Mathematica"
+			|> ]
 		]
+
+
+Memory::params  = "Invalid hyperparameters: `1`";
 
 
 

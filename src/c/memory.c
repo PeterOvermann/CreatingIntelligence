@@ -361,14 +361,15 @@ static double overlap_probability(int n, int p, int v)
 	}
 
 // 	Pattern matching threshold T
-
+	
 static int matching_threshold (int NA, int PA, int NB, int PB)
 	{
 	double icap; // Inverse of the memory capacity.
 	
-	if (NA == NB)	// Auto-associative.
+	if (NB == 0 && PB == 0)	// Auto-associative.
 		icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)(PA-2) / (double)(NA-2) / M_LN2;
+
 	else			// Hetero-associative.
 		icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
@@ -380,6 +381,7 @@ static int matching_threshold (int NA, int PA, int NB, int PB)
 	// Use PA as threshold if PA too small to satisfy the inequality.
 	return PA;
 	}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -556,10 +558,16 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Adimension 	= na;						// A hyperparameters
 	self->Apopulation	= pa;
 
-	self->Bdimension 	= nb;						// B hyperparameters
-	self->Bpopulation	= pb;
+	self->Bdimension 	= nb;						// B hyperparameters, 0 if auto-associative
+	self->Bpopulation	= pb;						//
 	
 	self->T 			= matching_threshold(na, pa, nb, pb);
+
+	if (!self->Bdimension && !self->Bpopulation)
+		{
+		self->Bdimension  = self->Adimension;
+		self->Bpopulation = self->Apopulation;
+		}
 
 	self->M 			= (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
@@ -574,7 +582,12 @@ void 	Memory_set_threshold (Memory *self, int t)	// Override default threshold
 	self->T = t;
 	}
 	
-	
+int 	Memory_get_threshold (Memory *self)	// Recall threshold
+	{
+	return self->T;
+	}
+
+
 void Memory_free (Memory *self)
 	{
 	byte*** m = self->M;
@@ -709,7 +722,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	// An array with 8x the length of the memory bitvector
 	uint64_t *memx8 = (uint64_t*) malloc(size * sizeof(uint64_t));
 
-	// The main loop. Iterate to find a matching pattern X -> B.
+	// The main loop. Iterate to find a matching pattern X -> Y.
 	while (1)
 		{
 		Y->p = 0;

@@ -4,14 +4,14 @@
   "hyperparameters": {"11": [1000, 30], "12": [1000, 30], "21": [1000, 10], "101": [500, 5]},
 
   "dataflow": [
-    {"component": "noise", "send": [11]},
+	{"component": "noise", "send": [11]},
 
-    {"component": "noise", "send": [12]},
+	{"component": "noise", "send": [12]},
 
-    {"component": "input", "arguments": ["codec"], "send": [21]},
+	{"component": "input", "plugin": "codec", "send": [21]},
 
-    {"component": "heteroencoder", "send": [101], "receive": [[{"slot": 11, "tags": ["show_population"]}, {"slot": 12, "tags": ["inhibit", "show_population"]}, {"slot": 21, "tags": ["show_population"]}]]},
+	{"component": "heteroencoder", "send": [101], "receive": [[11, {"slot": 12, "tags": ["inhibit"]}, 21]]},
 
-    {"component": "output", "arguments": ["binning"], "receive": [{"slot": 101, "tags": ["show_population"]}]}
+	{"component": "output", "plugin": "binning", "receive": [101]}
   ]
 }

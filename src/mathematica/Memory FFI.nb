@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     21840,        527]
-NotebookOptionsPosition[     19618,        468]
-NotebookOutlinePosition[     20659,        502]
-CellTagsIndexPosition[     20616,        499]
+NotebookDataLength[     26265,        632]
+NotebookOptionsPosition[     23910,        570]
+NotebookOutlinePosition[     24951,        604]
+CellTagsIndexPosition[     24908,        601]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -58,7 +58,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[391]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+  "In[1382]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +100,7 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[392]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+  "In[1383]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
 
 Cell[CellGroupData[{
 
@@ -108,31 +108,18 @@ Cell["Memory", "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{
-   RowBox[{"Options", "[", "Memory", "]"}], " ", "=", " ", 
-   RowBox[{"{", 
-    RowBox[{"Threshold", " ", "->", " ", "Automatic"}], "}"}]}], 
-  ";"}]], "Code",
- CellLabel->
-  "In[393]:=",ExpressionUUID->"fc2509db-7d86-4ed2-9106-0c1c70a6c116"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"Memory", "[", 
-   RowBox[{
-    RowBox[{"{", 
-     RowBox[{"NA_Integer", ",", " ", "PA_Integer"}], "}"}], ",", " ", 
-    RowBox[{"{", 
-     RowBox[{"NB_Integer", ",", " ", "PB_Integer"}], "}"}], ",", " ", 
-    RowBox[{"OptionsPattern", "[", "]"}]}], "]"}], " ", ":=", " \t", "\n", 
+  RowBox[{"Memory", "[", "config_Association", "]"}], " ", ":=", "\n", 
   "\[IndentingNewLine]", "\t", 
   RowBox[{"Module", "[", " ", 
    RowBox[{
     RowBox[{"{", 
      RowBox[{
-     "f", ",", " ", "M", ",", " ", "new", ",", " ", "setthreshold", ",", " ", 
-      "setfullmatch", ",", " ", "memory", ",", " ", "\n", "\t\t\t\t", "write",
-       ",", " ", "read", ",", " ", "free"}], "}"}], ",", "\n", "\n", "\t\t", 
+     "M", ",", " ", "NA", ",", " ", "PA", ",", " ", "NB", ",", " ", "PB", ",",
+       " ", "T", ",", " ", "new", ",", " ", "setthreshold", ",", " ", 
+      "getthreshold", ",", "\n", "\t\t\t   ", "memory", ",", " ", "read", ",",
+       " ", "write", ",", " ", "store", ",", " ", "retrieve", ",", " ", 
+      "free", ",", " ", "clear", ",", " ", "memorycount"}], "}"}], ",", "\n", 
+    "\n", "\t\t", 
     RowBox[{
      RowBox[{"new", " ", "=", " ", 
       RowBox[{"ForeignFunctionLoad", "[", 
@@ -154,6 +141,13 @@ Cell[BoxData[
           RowBox[{"\"\<OpaqueRawPointer\>\"", ",", " ", "\"\<CInt\>\""}], 
           "}"}], " ", "->", " ", "\"\<Void\>\""}]}], "]"}]}], ";", "\t\t\t\t",
       "\n", "\n", "\t\t", 
+     RowBox[{"getthreshold", " ", "=", " ", 
+      RowBox[{"ForeignFunctionLoad", "[", 
+       RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMgetthreshold\>\"", ",", " ", 
+        "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"{", "\"\<OpaqueRawPointer\>\"", "}"}], " ", "->", 
+         " ", "\"\<CInt\>\""}]}], "]"}]}], ";", "\n", "\n", "\t\t", 
      RowBox[{"memory", " ", "=", " ", 
       RowBox[{"ForeignFunctionLoad", "[", 
        RowBox[{"\"\<TAM\>\"", ",", " ", "\"\<TAMmemory\>\"", ",", " ", "\n", 
@@ -194,30 +188,107 @@ Cell[BoxData[
         RowBox[{
          RowBox[{"{", "\"\<OpaqueRawPointer\>\"", "}"}], " ", "->", 
          " ", "\"\<Void\>\""}]}], "]"}]}], ";", "\n", "\t", "\n", "\t\t", 
-     RowBox[{"f", " ", "=", " ", 
-      RowBox[{"Unique", "[", "\"\<memffi\>\"", "]"}]}], ";", "\n", "\t\t", 
-     "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"NA", ",", " ", "PA"}], "}"}], " ", "=", " ", 
+      RowBox[{"config", "[", "\"\<A_parameters\>\"", "]"}]}], ";", "\n", "\n",
+      "\t\t", 
+     RowBox[{"If", "[", " ", 
+      RowBox[{
+       RowBox[{"!", " ", 
+        RowBox[{"MatchQ", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"NA", ",", " ", "PA"}], "}"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"_Integer", ",", " ", "_Integer"}], "}"}]}], "]"}]}], ",", 
+       " ", "\n", "\t\t\t", 
+       RowBox[{"Message", "[", 
+        RowBox[{
+         RowBox[{"Memory", "::", "params"}], ",", " ", "config"}], "]"}]}], 
+      "]"}], ";", "\t", "\n", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"NB", ",", " ", "PB"}], "}"}], " ", "=", " ", 
+      RowBox[{"If", "[", " ", 
+       RowBox[{
+        RowBox[{"KeyExistsQ", "[", 
+         RowBox[{"config", ",", " ", "\"\<B_parameters\>\""}], "]"}], ",", 
+        " ", "\n", "\t\t\t\t\t\t", 
+        RowBox[{"config", "[", "\"\<B_parameters\>\"", "]"}], ",", " ", 
+        RowBox[{"{", 
+         RowBox[{"NA", ",", " ", "PA"}], "}"}]}], "]"}]}], ";", "\n", 
+     "\t\t\t", "\n", "\t\t", 
+     RowBox[{"If", "[", " ", 
+      RowBox[{
+       RowBox[{"!", " ", 
+        RowBox[{"MatchQ", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"NB", ",", " ", "PB"}], "}"}], ",", " ", 
+          RowBox[{"{", 
+           RowBox[{"_Integer", ",", " ", "_Integer"}], "}"}]}], "]"}]}], ",", 
+       " ", "\n", "\t\t\t", 
+       RowBox[{"Message", "[", 
+        RowBox[{
+         RowBox[{"Memory", "::", "params"}], ",", " ", "config"}], "]"}]}], 
+      "]"}], ";", "\t", "\n", "\n", "\t\t", 
      RowBox[{"M", " ", "=", " ", 
       RowBox[{"new", "[", 
        RowBox[{"NA", ",", " ", "PA", ",", " ", "NB", ",", " ", "PB"}], 
        "]"}]}], ";", " ", 
      RowBox[{"(*", " ", 
       RowBox[{"Constructor", "."}], " ", "*)"}], "\n", "\n", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{"Push", " ", "user"}], "-", 
+       RowBox[{"defined", " ", 
+        RowBox[{"(", "scaled", ")"}], " ", 
+        RowBox[{"threshold", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
      RowBox[{"If", "[", 
       RowBox[{
-       RowBox[{"IntegerQ", "[", 
-        RowBox[{"OptionValue", "[", "Threshold", "]"}], "]"}], ",", " ", "\n",
-        "\t\t\t", 
+       RowBox[{
+        RowBox[{"KeyExistsQ", "[", 
+         RowBox[{"config", ",", " ", "\"\<threshold\>\""}], "]"}], " ", "&&", 
+        " ", 
+        RowBox[{"NumberQ", "[", 
+         RowBox[{"config", "[", "\"\<threshold\>\"", "]"}], "]"}]}], ",", 
+       "\n", "\t\t\t", 
        RowBox[{"setthreshold", "[", 
         RowBox[{"M", ",", " ", 
-         RowBox[{"OptionValue", "[", "Threshold", "]"}]}], "]"}]}], "]"}], ";",
-      "\n", "\t\t", "\n", "\t\t", 
+         RowBox[{"T", " ", "=", " ", 
+          RowBox[{"Round", "[", 
+           RowBox[{
+            RowBox[{"config", "[", "\"\<threshold\>\"", "]"}], " ", "*", " ", 
+            "PA"}], "]"}]}]}], "]"}]}], "]"}], ";", "\n", "\n", "\t\t", 
      RowBox[{"(*", " ", 
-      RowBox[{"Store", "."}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"Get", " ", "final", " ", 
+       RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t", 
+     RowBox[{"T", " ", "=", " ", 
+      RowBox[{"getthreshold", "[", "M", "]"}]}], ";", "\n", 
+     "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t", "\n", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Store", " ", "auto"}], "-", 
+        RowBox[{"association", " ", "A"}]}], " ", "->", " ", 
+       RowBox[{"A", " ", "in", " ", 
+        RowBox[{"memory", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
      RowBox[{
-      RowBox[{"f", "[", 
-       RowBox[{"A_List", " ", "->", " ", "B_List"}], "]"}], " ", ":=", " ", 
-      "\n", "\t\t\t", 
+      RowBox[{"store", "[", "A_List", "]"}], " ", ":=", " ", 
+      RowBox[{"store", "[", 
+       RowBox[{"A", ",", " ", "A"}], "]"}]}], ";", "\n", "\n", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Store", " ", "hetero"}], "-", 
+        RowBox[{"association", " ", "A"}]}], " ", "->", " ", 
+       RowBox[{"B", " ", "in", " ", 
+        RowBox[{"memory", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+     RowBox[{
+      RowBox[{"store", "[", 
+       RowBox[{"A_List", ",", " ", "B_List"}], "]"}], " ", ":=", " ", "\n", 
+      "\t\t\t", 
       RowBox[{"If", "[", 
        RowBox[{
         RowBox[{
@@ -225,7 +296,8 @@ Cell[BoxData[
           RowBox[{"Length", "[", "A", "]"}], " ", ">", " ", "0"}], " ", "&&", 
          " ", 
          RowBox[{
-          RowBox[{"Length", "[", "B", "]"}], " ", ">", " ", "0"}]}], ",", " ", 
+          RowBox[{"Length", "[", "B", "]"}], " ", ">", " ", "0"}]}], ",", " ",
+         "\n", "\t\t\t\t", 
         RowBox[{"write", "[", 
          RowBox[{"M", ",", " ", 
           RowBox[{"RawMemoryExport", "[", 
@@ -234,12 +306,12 @@ Cell[BoxData[
           RowBox[{"Length", "[", "A", "]"}], ",", " ", 
           RowBox[{"RawMemoryExport", "[", 
            RowBox[{"B", ",", " ", "\"\<CInt\>\""}], "]"}], ",", " ", 
-          RowBox[{"Length", "[", "B", "]"}]}], "]"}]}], "]"}]}], ";", 
-     "\[IndentingNewLine]", "\t\t", "\n", "\t\t", 
-     RowBox[{"(*", " ", "Retrieve", " ", "*)"}], "\[IndentingNewLine]", 
-     "\t\t", 
+          RowBox[{"Length", "[", "B", "]"}]}], "]"}]}], "]"}]}], ";", "\n", 
+     "\t\t", "\[IndentingNewLine]", "\t\t", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Retrieve", "."}], " ", "*)"}], "\[IndentingNewLine]", "\t\t", 
      RowBox[{
-      RowBox[{"f", "[", "A_List", "]"}], " ", ":=", " ", 
+      RowBox[{"retrieve", "[", "A_List", "]"}], " ", ":=", " ", 
       RowBox[{"Module", "[", " ", 
        RowBox[{
         RowBox[{"{", 
@@ -270,21 +342,50 @@ Cell[BoxData[
            RowBox[{"{", 
             RowBox[{"\"\<List\>\"", ",", " ", 
              RowBox[{"RawMemoryRead", "[", "Yn", "]"}]}], "}"}]}], "]"}]}]}], 
-       "\n", "\t\t\t", "]"}]}], ";", "\n", "\n", "\t\t", 
-     RowBox[{
-      RowBox[{"f", "[", "\"\<memorycount\>\"", "]"}], " ", ":=", " ", 
-      RowBox[{"memory", "[", "M", "]"}]}], ";", "\[IndentingNewLine]", "\t\t",
-      "\n", "\t\t", 
-     RowBox[{
-      RowBox[{"f", "[", "Clear", "]"}], " ", ":=", " ", 
-      RowBox[{"(", 
-       RowBox[{
-        RowBox[{"free", "[", "M", "]"}], ";", " ", 
-        RowBox[{"ClearAll", "[", 
-         RowBox[{"Evaluate", "[", "f", "]"}], "]"}]}], ")"}]}], ";", " ", 
-     "\n", "\t\t", "\n", "\t\t", "f"}]}], "\n", "\t\t", "]"}]}]], "Code",
+       "\n", "\t\t\t", "]"}]}], ";", "\n", "\t\t", "\n", "\t\t", 
+     RowBox[{"clear", " ", ":=", " ", 
+      RowBox[{"free", "[", "M", "]"}]}], ";", "\n", "\t\t", 
+     RowBox[{"memorycount", " ", ":=", " ", 
+      RowBox[{"memory", "[", "M", "]"}]}], ";", "\n", "\t\t", "\n", "\t\t", 
+     RowBox[{"Join", "[", " ", 
+      RowBox[{
+       RowBox[{"KeyTake", "[", 
+        RowBox[{"config", ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"\"\<A_parameters\>\"", ",", " ", "\"\<B_parameters\>\""}], 
+          "}"}]}], "]"}], ",", " ", "\n", "\t\t\t", 
+       RowBox[{"<|", "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"\"\<T\>\"", " ", "->", " ", "T"}], ",", " ", 
+         RowBox[{"(*", " ", 
+          RowBox[{"Absolute", " ", "pattern", " ", "matching", " ", 
+           RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t\t", 
+         RowBox[{"\"\<store\>\"", " ", "->", " ", "store"}], ",", "\n", 
+         "\t\t\t", 
+         RowBox[{"\"\<retrieve\>\"", " ", "->", " ", "retrieve"}], ",", "\n", 
+         "\t\t\t", 
+         RowBox[{"\"\<clear\>\"", " ", ":>", " ", "clear"}], ",", "\n", 
+         "\t\t\t", 
+         RowBox[{"\"\<memorycount\>\"", " ", ":>", " ", "memorycount"}], ",", 
+         "\n", "\t\t\t", 
+         RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<C_FFI\>\""}]}], "\n",
+         "\t\t\t", "|>"}]}], " ", "]"}]}]}], "\[IndentingNewLine]", "\t\t", 
+   "]"}]}]], "Code",
  CellLabel->
-  "In[394]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+  "In[1384]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Messages", "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Memory", "::", "params"}], "  ", "=", 
+   " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
+ CellLabel->
+  "In[1385]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -301,27 +402,29 @@ interface (FFI) for the memory library.\n// The functions named TAM.. are \
 linked into Mathematica. \n\nDLLEXPORT void* TAMnew(int Adim, int Apop, int \
 Bdim, int Bpop) \n\t{ return (void*) Memory_new (Adim, Apop, Bdim, Bpop);}\n\n\
 DLLEXPORT void TAMsetthreshold (void *m, int t)\n\t{ \
-Memory_set_threshold((Memory*) m, t); }\n\nDLLEXPORT int TAMmemory(void *m)\n\
-\t{ return Memory_count ( (Memory*) m); }\n\nDLLEXPORT void TAMfree(void *m) \
-\n\t{ Memory_free((Memory*) m); }\n\t\t\t\t\nDLLEXPORT void TAMwrite(void *m, \
-int *Abits, int Apop, int *Bbits, int Bpop)\n\t{\n\tMemory *M = (Memory*) m;\n\
-\t\n\tSet *A = Set_new(M->Adimension);\n\tSet *B = Set_new(M->Bdimension);\n\t\
-\n\t// Decrement to convert to zero-based numbering.\n\tA->p = Apop; for (int \
-i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;\n\tB->p = Bpop; for (int i = 0; \
-i < Bpop; i++) B->a[i] = Bbits[i] - 1;\n\n\tMemory_write(M, A, B);\n\n\t\
-Set_free(A);\n\tSet_free(B);\n\t}\n\nDLLEXPORT void TAMread(void *m, int \
-*Abits, int Apop, int *Bbits, int *Bpop)\n\t{\n\tMemory *M = (Memory*) m;\n\t\
-\n\tSet *A = Set_new(M->Adimension); \n\tSet *B = Set_new(M->Bdimension);\n\t\
-\n\t// Convert A to 0-based numbering.\n\tA->p = Apop; for (int i = 0; i < \
-Apop; i++) A->a[i] = Abits[i] - 1;\n\n\tMemory_read(M, A, B);\n\n\t// Convert \
-B to 1-based numbering. B can be a an empty list.\n\t*Bpop = B->p; for (int i \
-= 0; i < B->p; i++) Bbits[i] = B->a[i] + 1;\n\t\n\tSet_free(A);\n\t\
-Set_free(B);\n\t}\n\t\n\>\""}], ";"}]], "Code",
+Memory_set_threshold((Memory*) m, t); }\n\nDLLEXPORT int TAMgetthreshold(void \
+*m)\n\t{ return Memory_get_threshold( (Memory*) m); }\n\n\nDLLEXPORT int \
+TAMmemory(void *m)\n\t{ return Memory_count ( (Memory*) m); }\n\nDLLEXPORT \
+void TAMfree(void *m) \n\t{ Memory_free((Memory*) m); }\n\t\t\t\t\nDLLEXPORT \
+void TAMwrite(void *m, int *Abits, int Apop, int *Bbits, int Bpop)\n\t{\n\t\
+Memory *M = (Memory*) m;\n\t\n\tSet *A = Set_new(M->Adimension);\n\tSet *B = \
+Set_new(M->Bdimension);\n\t\n\t// Decrement to convert to zero-based \
+numbering.\n\tA->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] \
+- 1;\n\tB->p = Bpop; for (int i = 0; i < Bpop; i++) B->a[i] = Bbits[i] - 1;\n\
+\n\tMemory_write(M, A, B);\n\n\tSet_free(A);\n\tSet_free(B);\n\t}\n\n\
+DLLEXPORT void TAMread(void *m, int *Abits, int Apop, int *Bbits, int *Bpop)\n\
+\t{\n\tMemory *M = (Memory*) m;\n\t\n\tSet *A = Set_new(M->Adimension); \n\t\
+Set *B = Set_new(M->Bdimension);\n\t\n\t// Convert A to 0-based numbering.\n\t\
+A->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;\n\n\t\
+Memory_read(M, A, B);\n\n\t// Convert B to 1-based numbering. B can be a an \
+empty list.\n\t*Bpop = B->p; for (int i = 0; i < B->p; i++) Bbits[i] = \
+B->a[i] + 1;\n\t\n\tSet_free(A);\n\tSet_free(B);\n\t}\n\t\n\>\""}], 
+  ";"}]], "Code",
  InitializationCell->False,
  FontWeight->"Plain",
  FontColor->GrayLevel[0],
  CellLabel->
-  "In[395]:=",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51"]
+  "In[1386]:=",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -405,29 +508,28 @@ first.\>\"", "]"}], ";", "\n", "        ",
       "\t\t", "\n", "\n", "    ", "\n", "    ", 
      RowBox[{"(*", " ", 
       RowBox[{
-      "Force", " ", "the", " ", "AutoGenerate", " ", "setting", " ", "for", " ",
-        "this", " ", 
+      "Force", " ", "AutoGenerate", " ", "setting", " ", "for", " ", "this", " ", 
        RowBox[{"notebook", "."}]}], " ", "*)"}], "\n", "    ", 
      RowBox[{"SetOptions", "[", 
       RowBox[{"nb", ",", " ", 
        RowBox[{"AutoGeneratedPackage", " ", "->", " ", "Automatic"}]}], "]"}],
       ";", "\n", "    ", "\n", "    ", 
      RowBox[{"(*", " ", 
-      RowBox[{"Programmatically", " ", "save", " ", "to", " ", "trigger", " ", 
-       RowBox[{"the", " ", ".", "m"}], " ", "file", " ", 
+      RowBox[{"Programmatically", " ", "save", " ", "to", " ", 
+       RowBox[{"trigger", " ", ".", "m"}], " ", "file", " ", 
        RowBox[{"generation", "."}]}], " ", "*)"}], "\n", "    ", 
      RowBox[{"NotebookSave", "[", "nb", "]"}], ";", "\n", "    ", "\n", 
      "    ", 
      RowBox[{"(*", " ", 
       RowBox[{
       "Pause", " ", "to", " ", "ensure", " ", "the", " ", "OS", " ", 
-       "finishes", " ", "writing", " ", "the", " ", "file"}], " ", "*)"}], 
-     "\n", "    ", 
+       "finishes", " ", "writing", " ", "the", " ", 
+       RowBox[{"file", "."}]}], " ", "*)"}], "\n", "    ", 
      RowBox[{"Pause", "[", "0.5", "]"}], ";", "\n", "    ", "\n", "    ", 
      RowBox[{"(*", " ", 
       RowBox[{
-      "Define", " ", "paths", " ", "dynamically", " ", "based", " ", "on", " ",
-        "the", " ", "current", " ", 
+      "Define", " ", "paths", " ", "based", " ", "on", " ", "the", " ", 
+       "current", " ", 
        RowBox[{"notebook", "'"}], "s", " ", 
        RowBox[{"name", "."}]}], " ", "*)"}], "\n", "    ", 
      RowBox[{"source", " ", "=", " ", 
@@ -462,13 +564,13 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[396]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+  "In[1387]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
 }, Open  ]]
 }, Open  ]]
 },
 AutoGeneratedPackage->Automatic,
 WindowSize->{862, 1030},
-WindowMargins->{{Automatic, 293}, {Automatic, 0}},
+WindowMargins->{{Automatic, 190}, {8, Automatic}},
 DockedCells->{
   Cell[
    BoxData[
@@ -503,22 +605,25 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[422, 15, 120, 0, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574"],
-Cell[545, 17, 1829, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
-Cell[2377, 62, 1672, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
+Cell[545, 17, 1830, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+Cell[2378, 62, 1673, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[4074, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
-Cell[4160, 108, 278, 8, 63, "Code",ExpressionUUID->"fc2509db-7d86-4ed2-9106-0c1c70a6c116"],
-Cell[4441, 118, 7310, 168, 1265, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+Cell[4076, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+Cell[4162, 108, 11455, 266, 1902, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11788, 291, 103, 0, 66, "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
-Cell[11894, 293, 1884, 30, 1457, "Code",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51",
+Cell[15654, 379, 85, 0, 66, "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
+Cell[15742, 381, 235, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16014, 392, 103, 0, 66, "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
+Cell[16120, 394, 1984, 32, 1552, "Code",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51",
  InitializationCell->False]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13815, 328, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
-Cell[13912, 330, 5678, 134, 1128, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
+Cell[18141, 431, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
+Cell[18238, 433, 5644, 133, 1128, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]

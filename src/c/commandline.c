@@ -31,10 +31,13 @@ static void print_help(void)
 	{
 	printf("Associative Memory\n");
 	
-	printf("Command line arguments: dimensions n and populations p\n");
-	printf("memory <na> <pa> <na> <pa>\n\n");
+	printf("Auto-associative memory: \n");
+	printf("memory <na> <pa>\n\n");
 
-	printf("Command line pption: \n");
+	printf("Hetero-associative memory: \n");
+	printf("memory <na> <pa> <nb> <pb>\n\n");
+
+	printf("Command line option: \n");
 	printf("   -T <threshold>\n\n");
 
 	printf("Store A -> B:\n");
@@ -43,8 +46,11 @@ static void print_help(void)
 	printf("Retrieve B from input A:\n");
 	printf("1 2 3 4 5 6 7 8 9 10\n\n");
 
-	printf("Memory count in bits\n");
-	printf("   mem\n\n");
+	printf("Matching treshold\n");
+	printf("   threshold\n\n");
+
+	printf("Memory count (bits)\n");
+	printf("   memorycount\n\n");
 
 	printf("End process\n");
 	printf("   quit\n");
@@ -94,27 +100,39 @@ int main(int argc, char *argv[])
 		arguments = arguments - 2;
 		}
 
-	if (arguments != 5 )
+	if (arguments == 3) // auto-associative
+		{
+		sscanf( argv[++a], "%d", &nx);
+		sscanf( argv[++a], "%d", &px);
+		ny = py = 0; 
+		}
+	else if (arguments == 5) // hetero-associative
+		{
+		sscanf( argv[++a], "%d", &nx);
+		sscanf( argv[++a], "%d", &px);
+		sscanf( argv[++a], "%d", &ny);
+		sscanf( argv[++a], "%d", &py);
+		}
+	else
 		{ print_help(); exit(1); }
 		
-	sscanf( argv[++a], "%d", &nx);
-	sscanf( argv[++a], "%d", &px);
+	Memory *H 	= Memory_new(nx, px, ny, py);
 
-	sscanf( argv[++a], "%d", &ny);
-	sscanf( argv[++a], "%d", &py);
-	  
+	if (ny == 0) { ny = nx; py = px; }
+
 	Set 	*x	= Set_new(nx),
    			*y	= Set_new(ny);
     	
-	Memory *H 	= Memory_new(nx, px, ny, py);
-	
 	if (pmin > 0) Memory_set_threshold (H, pmin);
 	
 	while (	fgets(inputline, sizeof(inputline), stdin) != NULL)
 		{
-		if ( strcmp(inputline, "mem\n") == 0)
+		if ( strcmp(inputline, "memorycount\n") == 0)
 			{ printf("%lld\n", Memory_count(H)); fflush(stdout);}
-				
+
+		else if ( strcmp(inputline, "threshold\n") == 0)
+			{ printf("%d\n", Memory_get_threshold(H)); fflush(stdout);}
+
 		else if ( strcmp(inputline, "quit\n") == 0)
 			return 0;
 

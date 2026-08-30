@@ -4,12 +4,12 @@
   "hyperparameters": {"default": [2000, 10]},
 
   "dataflow": [
-    {"component": "input", "arguments": ["codec"], "send": [11]},
+	{"component": "input", "plugin": "codec", "send": [11]},
 
-    {"component": "delay", "send": [21], "receive": [[{"slot": 11, "tags": ["priority"]}, 21, {"slot": 31, "tags": ["inhibit"]}]]},
+	{"component": "delay", "send": [21], "receive": [[{"slot": 11, "tags": ["priority"]}, 21, {"slot": 31, "tags": ["inhibit"]}]]},
 
-    {"component": "auto", "options": {"D": 0.8}, "send": [31], "receive": [[21, {"slot": 31, "tags": ["inhibit"]}]]},
+	{"component": "auto", "send": [31], "receive": [[21, {"slot": 31, "tags": ["inhibit"]}]], "decimate": 0.8},
 
-    {"component": "output", "arguments": ["codec"], "receive": [31]}
+	{"component": "output", "plugin": "codec", "receive": [31]}
   ]
 }

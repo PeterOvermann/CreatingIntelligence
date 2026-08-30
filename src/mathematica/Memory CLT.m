@@ -17,41 +17,62 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 *)
 
 
-Options[Memory] = {Threshold -> Automatic};
+Memory[config_Association] :=
 
-
-Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] := 
-
-	Module[ {f, process, tostr, opt = Nothing, val = Nothing},
+	Module[ {process, NA, PA, NB, PB, tostr, opt = Nothing, T = Nothing, 
+		store, retrieve, clear, memorycount},
+			
+		{NA, PA} = config["A_parameters"];
+		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
+			Message[Memory::params, config]];	
 	
-		f = Unique["memclt"];
-		
-		If[ IntegerQ[OptionValue[Threshold]],
-			opt = "-a"; val = OptionValue[Threshold]];
+		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
+						config["B_parameters"], {0, 0}];
 
+		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
+			opt = "-T"; T = Round[config["threshold"] * PA]];	
+			
 		process = StartProcess[{FileNameJoin[ 
 			{$UserBaseDirectory, "SystemFiles", "LibraryResources", 
-			  $SystemID, "TAM_CLT"}], opt, val, NA, PA, NB, PB}];
-							
-		tostr[{x___Integer}] := StringRiffle[ToString/@{x}];
+			  $SystemID, "TAM_CLT"}], opt, T, NA, PA, NB, PB}];
+		
+		WriteLine[process, "threshold"]; 
+		T = ToExpression[ReadLine[process]];	
+											
+		tostr[ x: {___Integer}] := StringRiffle[ToString /@ x];
 
-		(* Store. *)
-		f[A_List -> B_List] := (WriteLine[process, tostr[A] <> " -> " <> tostr[B]];);
+		(* Store hetero-association A -> B in memory. *)
+		store[A_List] := store[A, A];
+		
+		(* Store A -> B in memory. *)
+		store[A_List, B_List] := 
+			(WriteLine[process, tostr[A] <> " -> " <> tostr[B]];);
 
 		(* Retrieve. *)
-		f[A_List] := Module[ {str},
+		retrieve[A_List] := Module[ {str},
 			WriteLine[process, tostr[A]];
 			str = ReadLine[process];
 			If[ str === "", Return[ {}]];
 			ToExpression /@ StringSplit[str]
 			];
 
-		f["memorycount"] := (WriteLine[process, "mem"]; ToExpression[ReadLine[process]]);
+		clear := KillProcess[process];
+		memorycount := (WriteLine[process, "memorycount"]; 
+								ToExpression[ReadLine[process]]);
 
-		f[Clear] := (KillProcess[process]; ClearAll[Evaluate[f]]); 
-
-		f
+		Join[ KeyTake[config, {"A_parameters", "B_parameters"}], 
+			<|
+			"T" -> T, (* Absolute pattern matching threshold. *)
+			"store" -> store,
+			"retrieve" -> retrieve,
+			"clear" :> clear,
+			"memorycount" :> memorycount,
+			"backend" -> "C_CLT"
+			|> ]
 		]
+
+
+Memory::params  = "Invalid hyperparameters: `1`";
 
 
 
