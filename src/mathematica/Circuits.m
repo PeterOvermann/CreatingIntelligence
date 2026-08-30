@@ -51,9 +51,9 @@ Multiset[u___List] := Module[{x, tally},
 	
 	(* Tally positives, tally negatives, and add them together *)
 	tally = Merge[{
-				Counts[Select[x, # > 0 &]], 
+				Counts[Select[Positive][x]], 
 				(* Shift to positive, but make counts negative. *)
-				-Counts[-Select[x, # < 0 &]] 
+				-Counts[-Select[Negative][x]] 
 				}, Total];
 	
 	(* Reconstruct the net multiset. *)
@@ -70,8 +70,8 @@ Multiset[u___List] := Module[{x, tally},
 
 ResolveNormal[x_List] := Module[{AE, AI, countsE, countsI},
 
-	AE =  Select[x, # > 0 &];
-	AI = -Select[x, # < 0 &]; 
+	AE =  Select[Positive][x];
+	AI = -Select[Negative][x]; 
 	
 	If[AI === {}, Return[Union[AE]]]; (* Fast path for pure boolean. *)
 	
@@ -86,8 +86,8 @@ ResolveNormal[x_List] := Module[{AE, AI, countsE, countsI},
 
 ResolveGraded[x_List] := Module[{AE, AI, countsE, countsI},
 
-	AE =  Select[x, # > 0 &];
-	AI = -Select[x, # < 0 &];
+	AE =  Select[Positive][x];
+	AI = -Select[Negative][x];
 	
 	If[AI === {}, Return[Sort[AE]]]; (* Fast path for pure multisets. *)
 	
@@ -152,8 +152,8 @@ MultisetBlockJoinNormal[blocks : {__List}, dims : {__Integer}] :=
 	signs = Sign /@ blocks;
 	
 	(* Extract and offset excitatory and inhibitory elements. *)
-	AE = join[ MapThread[  Pick[#1,#2, 1]&, {blocks, signs}]];
-	AI = join[ MapThread[ -Pick[#1,#2,-1]&, {blocks, signs}]];
+	AE = join[ MapThread[  Pick[#1, #2,  1]&, {blocks, signs}]];
+	AI = join[ MapThread[ -Pick[#1, #2, -1]&, {blocks, signs}]];
 
 	(* Count frequencies for graded subtraction. *)
 	countsE = Counts[AE];
@@ -184,8 +184,8 @@ ResolveBlockJoinNormal[blocks: {__List}, dims : {__Integer}] :=
 	signs = Sign /@ blocks;
 	
 	(* Extract and offset excitatory and inhibitory elements. *)
-	AE = join[MapThread[  Pick[#1,#2, 1]&, {blocks, signs}]];
-	AI = join[MapThread[ -Pick[#1,#2,-1]&, {blocks, signs}]];
+	AE = join[MapThread[  Pick[#1, #2,  1]&, {blocks, signs}]];
+	AI = join[MapThread[ -Pick[#1, #2, -1]&, {blocks, signs}]];
 
 	(* Count frequencies for graded evaluation *)
 	countsE = Counts[AE];
@@ -199,30 +199,25 @@ ResolveBlockJoinNormal[blocks: {__List}, dims : {__Integer}] :=
 
 
 MemoryCapacity[{NA_, PA_}, {NB_, PB_}] := 
-	If[NA == NB && PA == PB,
+	If[NB == 0 && PB == 0,
 		(* Auto-associative. *)
-		Round[ Log[2] * (NB * (NA-1) * (NA-2)) / (PB * (PA-1) * (PA-2) ) ],
+		Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ],
 		(* Hetero-associative. *)
-		Round[ Log[2] * (NB * NA * (NA-1)) / (PB * PA * (PA-1) ) ]
+		Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA *(PA-1) ) ]
 		]
 
 
 MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
 	Module[ {cap, T = 1},
-		If[ PA <= 2 || PB <= 2, Return[0]]; (* Prevent division by zero. *)
+		
 		cap = MemoryCapacity[{NA, PA}, {NB, PB}];
+		
+		If[ PA <= 2, Return[0]]; (* Prevent division by zero. *)
+
 		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
 			Binomial[NA, PA] >= 1, T++]; 
 		T
 		]																			
-
-
-OverlapProbability[n_, {p1_, p2_}, v_] := 
-	N[Binomial[p1, v] * Binomial[n - p1, p2 - v] / Binomial[n, p2]]
-
-
-OverlapProbability[n_, p_, v_] := 
-	N[Binomial[p, v] * Binomial[n - p, p - v] / Binomial[n, p]]
 
 
 (* General-purpose SHR encoder/decoder for symbolic expressions. *)
@@ -240,7 +235,7 @@ codec[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {n, p}]; 
+	T = MatchingThreshold[ {n, p}, {0, 0}]; 
 
 	
 	f[expr_] := Module[ {result, overlaps},
@@ -303,15 +298,14 @@ category[config_Association] := Module[ {f, n, p, K, partitionsize, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {n, p}]; 
+	T = MatchingThreshold[ {n, p}, {0, 0}]; 
 
-	
 	f[expr_] := Module[ {result, overlaps},
 	
 		(* Encoding *)
 		If[ config["component"] === input,
 
-			If[!IntegerQ[expr] || expr < 0 || expr >= K, Return[{}]]; 
+			If[!IntegerQ[expr] || Negative[expr] || expr >= K, Return[{}]]; 
 		
 			If[MissingQ[lex["Lookup", expr]], 
 				lex["Insert", expr -> partitionsize*expr + Range[partitionsize]]];
@@ -353,7 +347,7 @@ binning[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {n, p}]; 
+	T = MatchingThreshold[ {n, p}, {0, 0}]; 
 
 	(* Decoder only *)
 	If[config["component"] === input,
@@ -516,7 +510,7 @@ output[config_Association] := Module[ {plugin, c, sub},
 
 	sub = Append[ config, "hyperparameters" -> First[config["receive_blocks"]]];
 
-	Join[ plugin[sub], <|"size" -> 10,  "checks" -> {"output", "oneinp"} |> ]	
+	Join[ plugin[sub], <|"size" -> 10, "checks" -> {"output", "oneinp"} |> ]	
 	]
 
 
@@ -534,24 +528,25 @@ Temporal integration resolves inhibition.
 *)
 
 delay[config_Association] := 
-	Module[ {f, n, p, dims1, dims2, decimation, 
-			ratelimit, capacity, Y = {}, label = ""},
-
-	{n, p} = First[config["send_blocks"]]; 
+	Module[ {f, pop, dims1, dims2, decimation, 
+			absratelimit, capacity, Y = {}, label = ""},
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
 
+	pop = Plus @@ Last /@ config["receive_blocks"];
+	
+	
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	ratelimit  = Lookup[config, "rate_limit", Infinity];
+	absratelimit  = Round[ Lookup[config, "rate_limit", Infinity] * pop];
 	(* Temporal capacity, carry over from previous cycle. *)
 	capacity = Lookup[config, "capacity", 0];				
 
 	(* Visualization. *)
 	If[decimation < 1, label = "D"];	
-	If[ratelimit < Infinity, label = label <> "R"];	
+	If[absratelimit < Infinity, label = label <> "R"];	
 	If[capacity > 0, label = label <> ".."];	
 
 	f[blocks__List] := Module[ {X},
@@ -564,9 +559,10 @@ delay[config_Association] :=
 			X = Sort[RandomSample[X, Floor[decimation Length[X]]]]]; 
 
 		(* Rate limiting equally applies to positive and negative elements *)
-		If[Length[X] > ratelimit, X = Sort[RandomSample[X, ratelimit]]]; 
+		If[Length[X] > absratelimit, 
+			X = Sort[RandomSample[X, absratelimit]]]; 
 		
-		Y = RandomSample[Y, UpTo[capacity]]; 
+		Y = RandomSample[Y, UpTo[Round[capacity * pop]]]; 
 		X = Multiset[X, Y]; (* Temporal integration. *)
 		Y = X; (* Persist state. *)
 
@@ -585,13 +581,14 @@ Holds and broadcasts the state for the specified number of additional cycles.
 *)
 
 latch[config_Association] := 
-	Module[ {f, dims1, dims2, threshold, cycles, state, timer},
+	Module[ {f, dims1, dims2, pop, threshold, cycles, state, timer},
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
+	pop   = Plus @@ Last /@ config["receive_blocks"];
 
 	(* Hyperparameters *)
-	(* Must have at least 1 element to latch by default. *)
+	(* Must have at least pop element to latch by default. *)
 	threshold = Lookup[config, "threshold", 1]; 
 	
 	(* Default window is Infinity. *)
@@ -610,7 +607,7 @@ latch[config_Association] :=
 		X = MultisetBlockJoin[ {blocks}, dims1];
 		
 		(* Event-driven latch: Update state if threshold is met. *)
-		If[Length[X] >= threshold, 
+		If[Length[X] >= threshold * pop, 
 			state = MultisetBlockSplit[X, dims2];
 			timer = 0,
 			
@@ -640,11 +637,12 @@ a multiset ("+" modifier), or receive a multiset through pathway merging.
 *)
 	
 kwta[config_Association] := 
-	Module[ {f, dims1, dims2, k, cutoff, cycles, capacity, threshold, 
+	Module[ {f, dims1, dims2, pop, k, cutoff, cycles, capacity, threshold, 
 		window},
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
+	pop   = Plus @@ Last /@ config["receive_blocks"];
 	
 	(* k is the population of the output channel. *)
 	k = config["send_blocks"][[1, 2]]; 
@@ -680,10 +678,11 @@ kwta[config_Association] :=
 		   stochasitic exponential decay or linear  graded decay (multiset 
 		   substraction). Modify as needed. See also: kwta component. *)
 		  
-		If[Length[U] > capacity,  U = Sort[RandomSample[U, capacity]]];
+		If[Length[U] > capacity * pop,  
+			U = Sort[RandomSample[U, Round[capacity * pop]]]];
 			
 		(* KWTA consensus on the surviving elements *)
-		tally = SortBy[Tally[U], Last]; 
+		tally = SortBy[Last][Tally[U]]; 
 		
 		If[ Length[tally] >= k, 
 			rankedmax = tally[[-k, 2]];
@@ -719,14 +718,14 @@ geneneric cases. Modify as needed.
 *)
 
 auto[config_Association] := 
-	Module[ {f, plugin, dims, p, M, label, size, min, max, 
-		 ratelimit, decimation},
+	Module[ {f, plugin, dims, pop, M, label, size, min, max, 
+		 absratelimit, decimation},
 		
 	(* Update rule *)			
 	plugin = Lookup[config, "plugin", replacement];
 			
 	dims = First /@ config["receive_blocks"];
-	p = Last[Plus @@ config["receive_blocks"]];
+	pop  = Plus @@ Last /@ config["receive_blocks"];
 
 	{label, size} = 
 		Switch[ plugin, 
@@ -740,19 +739,22 @@ auto[config_Association] :=
 		];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
-	ratelimit  = Lookup[config, "rate_limit", Infinity];
+	absratelimit  = Round[Lookup[config, "rate_limit", Infinity] * pop];
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
 	
 	(* Learning thresholds. These apply to the total state, aggregated
-	from all blocks. Modify this logic as needed. *)
-	min = max = p; (* defaults *)
-	If[ IntegerQ[config["learn"]], min = max = config["learn"] ];
-	If[ MatchQ[config["learn"], {_Integer,_Integer}], {min, max} = config["learn"]];
+	from all blocks. Modify this logic as needed. The option values are
+	given as scaling factors. *)
+
+	min = max = pop; (* defaults *)
+	If[ NumberQ[config["learn"]], min = max = Round[config["learn"]*pop] ];
+	If[ MatchQ[config["learn"], {__?NumberQ,__?NumberQ}], 
+		{min, max} = Round[config["learn"] * pop]];
 	
 	(* Memory with identical input and output parameters. *)
-	M = Memory[#, #, Threshold -> Lookup[config, "threshold", Automatic]]& 
-			[Plus @@ config["receive_blocks"]];
+	M = Memory[Join[config, 
+		<| "A_parameters" -> Plus @@ config["receive_blocks"] |> ]];	
 		
 	f[blocks__List] := Module[ {A, X, Y, Xdec},
 
@@ -760,31 +762,32 @@ auto[config_Association] :=
 		A = X = ResolveBlockJoinNormal[{blocks}, dims];
 		
 		(* Limit the rate of incoming positives. *)
-		If[Length[X] > ratelimit, X = Sort[RandomSample[X, ratelimit]]];
+		If[Length[X] > absratelimit, 
+			X = Sort[RandomSample[X, absratelimit]]];
 
 		(* Note: Proportional decimation may result in an empty list. *)
 		Xdec = If[decimation < 1, 
 			Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
 				
-
 		(* Always learn if "learn"->True. Typically used for hyperassociations. *)
-		If[config["learn"], M[A -> A]];
+		If[config["learn"], M["store"][A]];
 
 		(* Memory retrieval with decimated and rate-limited input state. *)
-		Y = M[Xdec];
+		Y = M["retrieve"][Xdec];
 
 		(* Learn input A if retrieval fails *)
 		If[Y === {} && Length[A] >= min && Length[A] <= max,
-				If[config["learn"] =!= True, M[A -> A]]; Y = A];
+			If[config["learn"] =!= True, M["store"][A]]; Y = A];
 
 		X = plugin[Y, X]; 
 
 		Sequence @@ MultisetBlockSplit[X, dims] 
 		]; 
 		
-	<| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
+		
+	Join[ <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
 		"label" :> label, "size" -> size,
-	    "shape" -> "Square", "fill" -> 8, "clear" :> M[Clear] |>
+	    "shape" -> "Square", "fill" -> 8 |>, M]
 	]
 
 
@@ -806,17 +809,17 @@ associator[config_Association] :=
 	oversampling = Lookup[config, "oversampling", 1];
 	
 	(* Memory instance: *)
-	M = Memory[Plus@@Rest[config["receive_blocks"]], 
-			First[config["send_blocks"]], 
-				Threshold -> Lookup[config, "threshold", Automatic]];
-
+	M = Memory[Join[config, <|
+		"A_parameters" -> Plus@@Rest[config["receive_blocks"]], 
+		"B_parameters" -> First[config["receive_blocks"]] |> ]];
+	
 	f[B_List, blocks__List] := Module[{X, Y},
 		
 		(* Apply and drop inhibitory elements. *)
 		X = ResolveBlockJoinNormal[{blocks}, Adims];
 		Y = ResolveNormal[B];
 		
-		If[Y === {}, Return[ M[X]]]; (* Test. *)
+		If[Y === {}, Return[ M["retrieve"][X]]]; (* Test. *)
 		
 		(* Train. Optionally apply noise to avoid overfitting. *)
 		If[decimation < 1, 
@@ -826,14 +829,13 @@ associator[config_Association] :=
 			X = Union[X, RandomSample[Range[Length[X], Round[(oversampling-1)
 					 * Length[X]]]]]];
 
-		M[X -> Y]; 
+		M["store"][X, Y]; 
 		{}	
 		];   
 		
 		
-	<| "function" -> f, "checks" -> { "dimfirst", "oneout"},
-		"shape" -> "Square", "fill" -> 11, "size" -> 18,
-		"label"-> "\[FilledRightTriangle]\[FilledCircle]", "clear" :> M[Clear] |>
+	Join[ <| "function" -> f, "checks" -> { "dimfirst", "oneout"},
+		"shape" -> "Square", "fill" -> 11, "size" -> 18, "label"-> "\[FilledRightTriangle]\[FilledCircle]" |>, M]
 	]
 
 
@@ -846,27 +848,28 @@ heteroencoder[config_Association] :=
 	
 	dims = First /@ config["receive_blocks"];
 	
-	M = Memory[ Plus @@ config["receive_blocks"], First[config["send_blocks"]], 
-			Threshold -> Lookup[config, "threshold", Automatic]];
+	M = Memory[ Join[config, <|
+		"A_parameters" -> Plus @@ config["receive_blocks"],
+		"B_parameters" -> First[config["send_blocks"]] |>  ]];
 	
 	f[blocks__List] := Module[{X, Y},
 		X = ResolveBlockJoinNormal[{blocks}, dims];
-		(* Retrieve. *)
-		Y = M[X];
+		
+		Y = M["retrieve"][X];
 		
 		(* Generate new SHR encoding if retrieval fails. *)
 		If[Y === {}, 
 			Y = Sort[RandomSample[Range[#1], #2]]& @@ First[config["send_blocks"]]];
 		
 		(* Always learn, broadening X as an attractor. *)
-		M[X -> Y];
+		M["store"][X, Y];
 			
 		Y
 		]; 
 			
-	<| "function" -> f, "checks" -> {"arginp", "oneout"}, 
+	Join[ <| "function" -> f, "checks" -> {"arginp", "oneout"}, 
 		"shape" -> "Square",  "fill" -> 11,  "size" -> 18,
-		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]", "clear" :> M[Clear] |>
+		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]" |>, M]
 	]
 
 
@@ -878,14 +881,14 @@ To do so, the node remembers its context from the previous cycle.
 *)
 
 predictor[config_Association] := 
-		Module[ {f, M, X = {}, prediction = {}, 
-						itemconfig, contextconfig},
+		Module[ {f, M, X = {}, prediction = {}, itemconfig, contextconfig},
 
 	itemconfig = First[config["receive_blocks"]];
 	contextconfig = Rest[config["receive_blocks"]]; (* Context may be partitioned *)
 	
-	M = Memory[Plus @@ contextconfig, itemconfig,
-		Threshold -> Lookup[config, "threshold", Automatic]]; 
+	M = Memory[Join[config, <|
+		"A_parameters" -> Plus @@ contextconfig,
+		"B_parameters" -> itemconfig   |> ]]; 
 	
 	f[item_List, blocks__List] := Module[{Y},
 	
@@ -893,18 +896,17 @@ predictor[config_Association] :=
 		
 		(* State X and prediction from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
-		M[X -> Y];
+		M["store"][X, Y];
 		
 		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 
-		prediction = M[X]
+		prediction = M["retrieve"][X]
 		]; 
 
 
-	<| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
+	Join[ <| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
 		"shape" -> "Square", "fill" -> 11, "size" -> 18,
-		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]", "clear" :> M[Clear]
-		|>
+		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M]
 	]
 
 
@@ -923,24 +925,75 @@ noise[config_Association] := Module[ {f},
 
 
 (* 
+Embedded circuit helper functions (component plugins).
+*)
+				
+import[config_Association] := 
+	Module[ {file, circ, sub, rescale},
+	
+	file = config["file"];
+	If[ MissingQ[file], Message[Circuit::nofile, config]; Return[<||>]];
+	
+	(* File name extension may be omitted. *)
+	If[ !StringMatchQ[file, "*.json"], file = file <> ".json"];
+	
+	If[ FindFile[file] === $Failed,
+		Message[Circuit::findfile, file]; Return[<||>] ];
+		
+	circ = Import[file, "Circuit"];
+	
+	(* Rescale hyperparameters of embedded circuit. *)
+	If[ MatchQ[config["scale"], {_Integer, _Integer}] &&
+		MatchQ[circ["hyperparameters", "default"], {_Integer, _Integer}],
+			
+		(* Scaling factors, as a pair of integers or rationals. *)
+		rescale = config["scale"] / circ["hyperparameters", "default"];	
+
+		(* Rescale: *)
+		circ["hyperparameters"] //= Map[Round[# * rescale] &];
+		];
+			
+	sub = Circuit[circ];
+	
+	sub["label"] = FileBaseName[file];
+	
+	sub
+	];
+	
+
+shared[config_Association] := 
+	Module[ {name, sub},
+	
+	(* Circuit instance is registered under the "name" property. *)
+	name = config["name"];
+	If[ MissingQ[name], Message[Circuit::name, config]; Return[<||>]];
+	
+	sub = Lookup[ Circuit`Registry, name];
+	If[ MissingQ[sub], Message[Circuit::circuit, name]; Return[<||>]];
+
+	sub["label"] = name;
+
+	(* The embedded circuit is to be cleared by its creator. *)
+	KeyDrop[sub, "clear"] 
+	];
+	
+	
+
+
+(* 
 Embedded circuit component.
+Multiple circuit components can reference the same embedded instance.
 *)
 				
 circuit[config_Association] := 
-	Module[ {f, plugin, sub = Null, label, params},
+	Module[ {f, plugin, sub, params},
 	
-	(* Compiled circuit: 
-	  Delay instantiation to compilation of embedding circuit. *)
-	If[KeyExistsQ[config, "reference"], Return[circuit[config["reference"]]]];
+	plugin = Lookup[config, "plugin", shared];
 	
-	plugin = Lookup[config, "plugin", Null];
+	sub = plugin[config];
 	
-	label = If[MatchQ[plugin, _Symbol], StringTake[ToString[plugin],-3], ""];
+	If[ sub === <||>, Return[<||>]];
 	
-	sub = Lookup[ Circuit`Registry, plugin, Circuit[plugin]];
-	
-	If[ sub === Null, Message[Circuit::circuit, plugin]];
-
 	params = {sub["receive_blocks"], sub["send_blocks"]};
 	
 	If[ {config["receive_blocks"], config["send_blocks"]} =!= params,
@@ -949,9 +1002,8 @@ circuit[config_Association] :=
 	(* Raw evaluation, bypassing encoding and decoding. *)
 	f[blocks__] := Sequence @@ sub["$function"][{blocks}];
 	
-	<| "function" -> f, "checks" -> {"arginp", "argout"}, 
-		"clear" :> sub["clear"], 
-		"shape" -> "Square", "label" -> label |>
+	Join[sub, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
+							"shape" -> "Square", "size" -> 9|>]
 	]					
 
 
@@ -1008,7 +1060,7 @@ Circuit[expr_] := Module[
 		permutations = <||>,
 
 		(* Runtime functions. *)
-		evaluate, patheval, componenteval,
+		evaluate, patheval, pathmerge, componenteval,
 									
 		(* This circuit's clock. *)
 		tick = 0,
@@ -1024,22 +1076,14 @@ Circuit[expr_] := Module[
 	
 		(* Raw circuit spec, e.g. imported from JSON or DFD. *)
 		_Association /; KeyExistsQ[expr, "dataflow"], expr,
-
-		(* Compiled circuit. Pass through. *)
-		_Association /; KeyExistsQ[expr, "$function"], Return[expr],
-
+		
 		(* Convert from DFD (supported only in Mathematica). *)
 		_List, FromDFD[expr],
-		
-		(* JSON file import. *)
-		_String /; FileExistsQ[expr] && StringEndsQ[expr, ".json", IgnoreCase -> True],
-			Import[expr, "Circuit"],
-
+				
 		(* JSON string. *)
-		_String /; StringContainsQ[expr, "dataflow"],
-			FromJSON[expr],
+		_String /; StringContainsQ[expr, "dataflow"], FromJSON[expr],
 
-		_, Message[Circuit::circargs, expr]; Return[Null];
+		_, Message[Circuit::circargs, expr]; Return[<||>];
 		];	
 		
 				
@@ -1058,7 +1102,7 @@ Circuit[expr_] := Module[
 
 			++edgeid;
 
-			tag[t_String] := MemberQ[ e["tags"], t]; 
+			tag = MemberQ[e["tags"], #] &;
 
 			e = <|
 				"to_node_id" -> nodeid, (* "from_node_id" added after all nodes are compiled *)
@@ -1122,13 +1166,16 @@ Circuit[expr_] := Module[
 			<|  
 			"receive_paths" -> compilepathway /@ Lookup[node, "receive", {}],
 		
-			"id" -> nodeid, (* Used only for schematics visualization. *)
+			"node_id" -> nodeid, (* Used only for schematics visualization. *)
 			
 			(* Extract slot numbers *)
 			"send_slots" -> Cases[Lookup[node, "send", {}], _Integer],
+			
+			(* Reference parameters, used for rescaling embedded circuits. *)
+			"scale" -> assoc["hyperparameters", "default"],
 
-			"send_blocks" -> fillparams /@ Lookup[node, "send", {}], 
-			"receive_blocks" -> fillparams /@ Lookup[node, "receive", {}]
+			"receive_blocks" -> fillparams /@ Lookup[node, "receive", {}],
+			"send_blocks" -> fillparams /@ Lookup[node, "send", {}]
 			|>];
 			
 		(* Instantiate the component, re-append config to ensure 
@@ -1153,8 +1200,7 @@ Circuit[expr_] := Module[
 			AppendTo[inputslots, First[config["send_slots"]]];
 			AppendTo[receiveparams, First[config["send_blocks"]]];
 
-			config["label"] //= StringReplace["#" -> 
-				ToString[Length[inputslots]]]
+			config["label"] //= StringReplace["#" -> ToString[Length[inputslots]]]
 			];
 
 		(* Register output flow. *)
@@ -1164,8 +1210,8 @@ Circuit[expr_] := Module[
 			AppendTo[outputedges, First[config["receive_paths"]]];
 			AppendTo[sendparams, First[config["receive_blocks"]]];
 
-			config["label"] //= StringReplace["#" -> 
-				ToString[Length[outputedges]]]
+			config["label"] //= 
+				StringReplace["#" -> ToString[Length[outputedges]]]
 			];
 				
 		(* Register this component. *)
@@ -1182,10 +1228,10 @@ Circuit[expr_] := Module[
 		(* Duplicate sendslots? *)
 		slots = Flatten[#["send_slots"] & /@ Values[nodes]];
 		dupes = Keys[Select[Counts[{slots}], # > 1 &]];
-		If[ Length[dupes] > 0, Message[Circuit::dupslots, dupes]];
+		If[ Positive[Length[dupes]], Message[Circuit::dupslots, dupes]];
 
 		(* Gather link table. *)
-		Scan[ Function[c, (links[#] = c["id"]) & /@ c["send_slots"]], 
+		Scan[ Function[c, (links[#] = c["node_id"]) & /@ c["send_slots"]], 
 			nodes];
 
 		(* Add "from_node_id" value to each pathway. *)
@@ -1202,7 +1248,7 @@ Circuit[expr_] := Module[
 		If[ MatchQ[config["component"], input | output], Return[]];
 		
 		(* Evaluate received pathways and latch inputs. *)
-		x = patheval /@ config["receive_paths"];
+		x = pathmerge /@ config["receive_paths"];
 			
 		(* This component's callback function. *)
 		result = config["function"][Sequence @@ x]; 
@@ -1250,8 +1296,7 @@ Circuit[expr_] := Module[
 		x = If[tag["multiset"], Multiset[x], ResolveNormal[x]];
 
 		(* Permutation. *)
-		If[tag["permute"],   
-			x = Sort[Sign[x] * permutations[id][[Abs[x]]]] ];
+		If[tag["permute"], x = Sort[Sign[x] * permutations[id][[Abs[x]]]] ];
 	
 		(* Rate limiting. *)
 		If[tag["rate_limit"], x = Sort[RandomSample[x, UpTo[p]]]];
@@ -1260,8 +1305,7 @@ Circuit[expr_] := Module[
 		If[tag["threshold"] && Length[x] < p, x = {}];
 
 		(* Random noise if x = {}, else clear x *)
-		If[tag["noise"], 
-			If[x === {}, x = Sort[RandomSample[Range[n], p]], x = {}]];
+		If[tag["noise"], x = If[x === {}, Sort[RandomSample[Range[n], p]], {}]];
 
 		(* Print value to console. *)
 		If[tag["log"], Print["Slot ", e["slot"], ": ", x]];
@@ -1271,9 +1315,13 @@ Circuit[expr_] := Module[
 		
 
 	(* 
-	Pathway evaluation applied to a list (merging pathways). 
+	Merge pathways. 
 	*)
-	patheval[ids : {__Integer}] := Module[ {x, paths, tags, merged},
+	pathmerge[ids_ : _Integer | {__Integer}] := 
+		Module[ {x, paths, tags, merged},
+
+		(* Single path? Skip merge. *)
+		If[ IntegerQ[ids], Return[patheval[ids]]]; 
 
 		x = patheval /@ ids;
 		
@@ -1311,7 +1359,7 @@ Circuit[expr_] := Module[
 				(* "K" forces excitatory only. 
 					"k" evaluates absolute saliency. *)
 				U = If[Or @@ tags["kwta_excitatory"], 
-					Select[merged, # > 0 &], merged];
+					Select[Positive][merged], merged];
 			
 				tally = SortBy[Tally[U], Last];
 			
@@ -1319,8 +1367,7 @@ Circuit[expr_] := Module[
 				merged = {};
 				If[Length[tally] >= k, rankedmax = tally[[-k, 2]];
 					If[ rankedmax >= 2, merged = Sort[Select[tally, 
-						Last[#] >= rankedmax &][[All, 1]]]]
-	   			]
+						Last[#] >= rankedmax &][[All, 1]]]]]
 	   		]
 			];	
 				
@@ -1350,13 +1397,13 @@ Circuit[expr_] := Module[
 		currentstate = nextstate;
 				
 		(* Gather outputs, reading from currentstate. *)
-		patheval /@ outputedges
+		pathmerge /@ outputedges
 		];
 
 	(* 
-	Raw evaluation with multiplexing.
-	Skips preprocessing (encoding) and postprocessing (decoding).
-	Exposed for use by embedded circuits.
+	Raw evaluation with optional multiplexing.
+	Operates on preprocessed (encoded) data.
+	Used directly by embedded circuits.
 	*)	
 	fraw[x_List] := Module[ {y = {}, multiplex},
 	
@@ -1398,7 +1445,7 @@ Circuit[expr_] := Module[
 		(* Preprocess (encode). *)
 		x = MapThread[Construct, {preprocess, x}];
 			
-		(* Multiplexed evaluation of encoded data *)
+		(* Main circuit function. *)
 		y = fraw[x];		
 		
 		(* Postprocess (decode). *)
@@ -1422,10 +1469,7 @@ Circuit[expr_] := Module[
 		
 		(* Convert tag names to single-character display labels. *)
 		display = Reverse[Circuit`TagMap];
-		display["inhibitory"] = "";
-		display["multiset"]   = "";
-		display["mandatory"]  = "\:ff0a"; (* A larger asterisk *)		
-			
+					
 		edgetag[a_Association] := Module[ {str, rules},
 
 			str = Lookup[a, "label", ""] <> 
@@ -1472,14 +1516,14 @@ Circuit[expr_] := Module[
 
 				Which[
  
-				(* Multiset inhibitory (tag "-"): thick red *)
+ 				(* Multiset inhibitory (tag "-"): thick red *)
 				StringMatchQ[tags, "*-*"],
 				Directive[colorscheme[11], Opacity[1], AbsoluteThickness[3.5]], 
                        
-				(* Multiset excitation (tag "+"): thick blue *)
+ 				(* Multiset excitation (tag "+"): thick blue *)
 				StringMatchQ[tags, "*+*"],
 				Directive[colorscheme[8], Opacity[1], AbsoluteThickness[3.5]], 
-            
+
 				(* Default: dark gray and thin *)
 				True,
 				Directive[colorscheme[0], Opacity[1], AbsoluteThickness[0.5]]
@@ -1491,13 +1535,12 @@ Circuit[expr_] := Module[
 				With[{cleanTag = StringReplace[#[[3]], 
 					{"-" -> "", "+" -> "", "*" -> "\:ff0a"}]},
 				If[cleanTag === "", 
-				(* If the tag only contained hidden characters, hide it. *)
 					None, 
 					Placed[Framed[cleanTag, Background -> White, 
-					FrameStyle -> None, 
-					BaseStyle -> Directive[12, Bold, colorscheme[0]],
-					RoundingRadius -> 30, FrameMargins -> 0], Center]]
-				], None (* Hide labels for untagged edges. *)
+						FrameStyle -> None, 
+						BaseStyle -> Directive[12, Bold, colorscheme[0]],
+						RoundingRadius -> 30, FrameMargins -> 0], Center]]
+					], None (* Hide labels for untagged edges. *)
 				] & /@ graph],
 
 			opts,
@@ -1505,35 +1548,29 @@ Circuit[expr_] := Module[
 			]
 		];	
 
-	clear[] := Module[ {},
-		Clear[f, fraw, schematics]; 
-		Scan[#["clear"]&, nodes]
-		];	
+	clear := (Clear[f, fraw, schematics]; Scan[#["clear"]&, nodes];);
 			
 	(* Register and dispatch association. *)
 	
 	dispatch = <|
 		"function" -> f, 
 		"schematics" -> schematics,
-		"clear" :> clear[],
+		"clear" :> clear,
 		
 		(* Private properties. *)
 		"$function" -> fraw, 
 		"receive_blocks" -> receiveparams,
-		"send_blocks" -> sendparams 
+		"send_blocks" -> sendparams,
+		"nodes" :> nodes
 		|>;
-		
-	(* 
-	Create a symbol representing this circuit instance. It must be a symbol
-	rather than a string because embedded circuits specify the plugin as symbol
-	*)
-		
-	this = Symbol[ "x" <> 
-		ToUpperCase[StringTake[Hash[dispatch, "SHA512", "HexString"], 12]]];	
 	
-	(* Register this circuit. *)
-	dispatch["reference"] = this;
-	Circuit`Registry[this] = dispatch;
+		
+	(* Add to registry if "name" property is specified. *)
+	Module[ {key},
+		key = assoc["options", "name"];
+		If[ ! MissingQ[key],
+			dispatch["name"] = key; Circuit`Registry[key] = dispatch]
+		];
 	
 	dispatch
 	]
@@ -1541,7 +1578,7 @@ Circuit[expr_] := Module[
 
 (* Plug-in mechanism for color palette. *)
 
-Circuit`color = AssociationThread[Range[0,Length[#]-1],#]& [RGBColor /@ 
+Circuit`color = AssociationThread[Range[0, Length[#] - 1],#]& [RGBColor /@ 
 	{"#2E3440","#3B4252","#434C5E","#4C566A",
 	"#D8DEE9","#E5E9F0","#ECEFF4","#8FBCBB",
 	"#88C0D0","#81A1C1","#5E81AC","#BF616A",
@@ -1568,7 +1605,10 @@ Circuit::oneout    = "`1`: Expecting one output slot.";
 Circuit::argout    = "`1`: Missing output.";
 Circuit::multinp   = "`1`: Expecting multiple input slots.";
 Circuit::integer   = "Invalid data: `1`";
-Circuit::circuit   = "`1`: Expecting embedded circuit.";
+Circuit::noname    = "Missing \"name\" property in shared circuit `1`.";
+Circuit::nofile    = "Missing \"file\" property in `1`.";
+Circuit::findfile  = "File \"`1`\" not found.";
+Circuit::circuit   = "Unknown circuit \"`1`\".";
 Circuit::embedded  = "`1`: Hyperparameters of embedded circuit do not match.";
 Circuit::noparam   = "No hyperparameters specified for slot `1`.";
 Circuit::category  = "Category encoder requires dimension `1` or greater.";
@@ -1589,12 +1629,12 @@ Circuit`check["ident"]    = #1[[All,1]] === #2[[All,1]] &;
 Circuit`check["identdim"] = Union[#1[[All,1]]] === Union[#2[[All,1]]] &;
 Circuit`check["totaldim"] = Total[#1[[All,1]]] === Total[#2[[All,1]]] &;
 Circuit`check["dimfirst"] = #1[[1]] === #2[[1]] &;
-Circuit`check["input"]    = Length[#1] === 0 &;
+Circuit`check["input"]    = #1 === {} &;
 Circuit`check["oneinp"]   = Length[#1] === 1 &;
-Circuit`check["arginp"]   = Length[#1] > 0 &;
-Circuit`check["output"]   = Length[#2] === 0 &;
+Circuit`check["arginp"]   = Positive[Length[#1]] &;
+Circuit`check["output"]   = #2 === {} &;
 Circuit`check["oneout"]   = Length[#2] === 1 &;
-Circuit`check["argout"]   = Length[#2] > 0 &;
+Circuit`check["argout"]   = Positive[Length[#2]] &;
 
 
 (*
@@ -1613,31 +1653,31 @@ DFD is a native Mathematica expression and does not require parsing.
 *)
 
 FromDFD[dataflow_List] := Module[
-    {rules, hyperparams = <||>, rootopts = <||>, customopts = <||>, 
-     nodes, components, parsenode, parsepath, parsemerge},
-    
-    (* Include schema reference at the root *)
-    AppendTo[rootopts, 
+	{rules, hyperparams = <||>, rootopts = <||>, customopts = <||>, 
+	 nodes, components, parsenode, parsepath, parsemerge},
+	
+	(* Include schema reference at the root *)
+	AppendTo[rootopts, 
 		"$schema" -> "https://creatingintelligence.org/schemas/circuit-v1.json"];
 
-    (* Extract all rules from the dataflow. *)
-    rules = Select[dataflow, Head[#] === Rule &];
-    
-    (* Sort integers/blanks to hyperparameters, specific keys to root, and others to options. *)
-    Scan[ Function[{rule}, Which[
+	(* Extract all rules from the dataflow. *)
+	rules = Select[dataflow, Head[#] === Rule &];
+	
+	(* Sort integers/blanks to hyperparameters, specific keys to root, and others to options. *)
+	Scan[ Function[{rule}, Which[
 		rule[[1]] === _, 
 			AppendTo[hyperparams, "default" -> rule[[2]]],
  	
 		IntegerQ[rule[[1]]], 
 			AppendTo[hyperparams, rule[[1]] -> rule[[2]]],
-        
+		
 		MemberQ[{"version", "metadata", "$schema"}, rule[[1]]],
-            AppendTo[rootopts, rule[[1]] -> rule[[2]]],
-        
+			AppendTo[rootopts, rule[[1]] -> rule[[2]]],
+		
 		rule[[1]] === "multiplex" && StringQ[rule[[2]]],
 			AppendTo[customopts, "multiplex" -> (If[# === "1", 1, 0] & /@ 
 					Characters[rule[[2]]])],
-        
+		
 		StringQ[rule[[1]]], 
 			AppendTo[customopts, rule[[1]] -> rule[[2]]],
 
@@ -1645,62 +1685,62 @@ FromDFD[dataflow_List] := Module[
 			AppendTo[customopts, ToString[rule[[1]]] -> rule[[2]]]
 		]], rules
 	];
-    
-    (* Extract circuit components. *)
-    nodes = Select[dataflow, Head[#] =!= Rule &];
-    
-    (* Parse individual path strings into structured JSON objects. *)
-    parsepath[p_] := Module[
-        {s = ToString[p], match, slot, tags, tagmap, 
-            found, result = <||>, tagpattern},
-        
-        match = StringCases[s, StartOfString ~~ n:DigitCharacter.. ~~ Whitespace... ~~ t:___ ~~ EndOfString :> {ToExpression[n], t}];
-        
-        If[match === {}, 
-            tagpattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | ("@" ~~ DigitCharacter..))..;
-            If[StringMatchQ[s, tagpattern], match = {{1, s}}, Return[s]]
+	
+	(* Extract circuit components. *)
+	nodes = Select[dataflow, Head[#] =!= Rule &];
+	
+	(* Parse individual path strings into structured JSON objects. *)
+	parsepath[p_] := Module[
+		{s = ToString[p], match, slot, tags, tagmap, 
+			found, result = <||>, tagpattern},
+		
+		match = StringCases[s, StartOfString ~~ n:DigitCharacter.. ~~ Whitespace... ~~ t:___ ~~ EndOfString :> {ToExpression[n], t}];
+		
+		If[match === {}, 
+			tagpattern = (Alternatives @@ Join[Values[Circuit`TagMap], {" "}] | ("@" ~~ DigitCharacter..))..;
+			If[StringMatchQ[s, tagpattern], match = {{1, s}}, Return[s]]
 			];
-        
-        {slot, tags} = match[[1]];
-        If[tags === "", Return[slot]];
-        
-        result["slot"] = slot;
-        
+		
+		{slot, tags} = match[[1]];
+		If[tags === "", Return[slot]];
+		
+		result["slot"] = slot;
+		
 		If[StringContainsQ[tags, " "],
 			{result["label"], tags} = StringSplit[tags, " ", 2]];
-        
+		
 		With[{g = StringCases[tags, "@" ~~ val:(DigitCharacter..) :> val]},
-			If[Length[g] > 0,
+			If[Positive[Length[g]],
 				result["gating"] = If[# === "1", 1, 0] & /@ Characters[g[[1]]];
 				tags = StringReplace[tags, "@" ~~ g[[1]] -> ""]; 
 				]
 			];
-        
-        tagmap = Association[Reverse /@ Normal[Circuit`TagMap]];
+		
+		tagmap = Association[Reverse /@ Normal[Circuit`TagMap]];
 		found = Values[KeyTake[tagmap, Characters[tags]]];
-        If[Length[found] > 0, result["tags"] = found];
-        
-        result
+		If[Positive[Length[found]], result["tags"] = found];
+		
+		result
 		];
 
-    parsemerge[l_List] := parsepath /@ l;
-    parsemerge[p_] := parsepath[p];
+	parsemerge[l_List] := parsepath /@ l;
+	parsemerge[p_] := parsepath[p];
 
 	parsenode[compExpr_[send___][receive___]] := Module
 		[
-        {comp, compname, argslist, plugin = Null, opts = <||>},
-        
-        comp = Head[compExpr]; 
-        compname = ToString[comp];
-        argslist = List @@ compExpr; 
-        
-        Do[ Which
+		{comp, compname, argslist, plugin = Null, opts = <||>},
+		
+		comp = Head[compExpr]; 
+		compname = ToString[comp];
+		argslist = List @@ compExpr; 
+		
+		Do[ Which
 			[
 			Head[arg] === Rule, AppendTo[opts, arg],
 			True, plugin = arg], {arg, argslist}
 			];
-        
-        DeleteCases[ 
+		
+		DeleteCases[ 
 			Join[<|
 			"component" -> comp, 
 			"plugin" -> plugin,
@@ -1709,110 +1749,106 @@ FromDFD[dataflow_List] := Module[
 				|>, opts], 
 			Null | {} | <||> 
 			]
-    ];
-        
-    components = parsenode /@ nodes;
-    If[Length[customopts] > 0, AppendTo[rootopts, "options" -> customopts]];
+	];
+		
+	components = parsenode /@ nodes;
+	If[Positive[Length[customopts]], AppendTo[rootopts, "options" -> customopts]];
 
-    Join[rootopts, <|"hyperparameters" -> hyperparams, "dataflow" -> components|>]
+	Join[rootopts, <|"hyperparameters" -> hyperparams, "dataflow" -> components|>]
 	]
 
 
 ToDFD[expr_Association] := Module[
+	{hyperparams, hprules, topoptsrules, dataflow, buildpath, 
+	 buildmerge, parsenode, nodeExprs, rawOptions},
 
-    {hyperparams, hprules, topoptsrules, dataflow, buildpath, 
-     buildmerge, parsenode, nodeExprs, rawOptions},
-
-    rawOptions = Join[
-        KeyDrop[expr, {"hyperparameters", "dataflow", "options", "$schema"}],
-        Lookup[expr, "options", <||>]
+	rawOptions = Join[
+		KeyDrop[expr, {"hyperparameters", "dataflow", "options", "$schema"}],
+		Lookup[expr, "options", <||>]
 		];
 
-    topoptsrules = Normal @ KeyValueMap[
-        Function[{k, v},
-            Which[
-                k === "multiplex" && ListQ[v], "multiplex" -> StringJoin[ToString /@ v],
-                True, k -> v
-            ]], rawOptions
+	topoptsrules = Normal @ KeyValueMap[
+		Function[{k, v},
+			Which[
+				k === "multiplex" && ListQ[v], "multiplex" -> StringJoin[ToString /@ v],
+				True, k -> v
+			]], rawOptions
 		];
 
 	hyperparams = Lookup[expr, "hyperparameters", <||>];
 
 	hprules = KeyValueMap[
-        Function[{k, v},
-            Which[
-                k === "default", _ -> v,
-                StringQ[k] && StringMatchQ[k, NumberString], ToExpression[k] -> v, 
-                True, k -> v 
-            ]],
-        hyperparams
+		Function[{k, v},
+			Which[
+				k === "default", _ -> v,
+				StringQ[k] && StringMatchQ[k, NumberString], ToExpression[k] -> v, 
+				True, k -> v 
+			]],
+		hyperparams
 		];
-    
-    buildpath[p_] := Module[{slot, tags = "", tagstr = "", gatingStr = "", userlabel = ""},
-        If[IntegerQ[p] || StringQ[p], Return[p]];
-        slot = p["slot"];
-        If[KeyExistsQ[p, "tags"], tagstr = StringJoin[Lookup[Circuit`TagMap, p["tags"], ""]]];
-        If[KeyExistsQ[p, "gating"], gatingStr = "@" <> StringJoin[ToString /@ p["gating"]]];
-        If[KeyExistsQ[p, "label"], userlabel = p["label"] <> " "];
-        
-        tags = userlabel <> tagstr <> gatingStr;
-        If[tags === "", slot, slot * tags]
+	
+	buildpath[p_] := 
+		Module[{slot, tags = "", tagstr = "", gatingstr = "", userlabel = ""},
+		If[IntegerQ[p] || StringQ[p], Return[p]];
+		slot = p["slot"];
+		If[KeyExistsQ[p, "tags"], tagstr = StringJoin[Lookup[Circuit`TagMap, p["tags"], ""]]];
+		If[KeyExistsQ[p, "gating"], gatingstr = "@" <> StringJoin[ToString /@ p["gating"]]];
+		If[KeyExistsQ[p, "label"], userlabel = p["label"] <> " "];
+		
+		tags = userlabel <> tagstr <> gatingstr;
+		If[tags === "", slot, slot * tags]
 		];
 
-    buildmerge[l_List] := buildpath /@ l;
-    buildmerge[p_] := buildpath[p];
+	buildmerge[l_List] := buildpath /@ l;
+	buildmerge[p_] := buildpath[p];
 
 	parsenode[node_Association] := Module[
-        
-        {comp, compname,  plugin, opts, send, receive, compExpr},
-        
-        comp = node["component"]; 
-        compname = ToString[comp];
-        plugin = Lookup[node, "plugin", Null];
-		opts = Normal[KeyDrop[node, {"component", "plugin", "send", "receive"}]];        
-        compExpr = comp @@ DeleteCases[Join[If[plugin =!= Null, {plugin}, {}], opts], Null];
-        
-        send = Sequence @@ Map[buildmerge, Lookup[node, "send", {}]];
-                              
-        receive = Sequence @@ Map[buildmerge, Lookup[node, "receive", {}]];
-        
-        compExpr[send][receive]
+
+		{comp, compname,  plugin, opts, send, receive, compExpr},
+
+		comp = node["component"]; 
+		compname = ToString[comp];
+		plugin = Lookup[node, "plugin", Null];
+		opts = Normal[KeyDrop[node, {"component", "plugin", "send", "receive"}]];		
+		compExpr = comp @@ DeleteCases[Join[If[plugin =!= Null, {plugin}, {}], opts], Null];
+
+		send = Sequence @@ Map[buildmerge, Lookup[node, "send", {}]];
+
+		receive = Sequence @@ Map[buildmerge, Lookup[node, "receive", {}]];
+
+		compExpr[send][receive]
 		];
-		
-    dataflow = Lookup[expr, "dataflow", {}];
-    nodeExprs = parsenode /@ dataflow;
 
-    Join[nodeExprs, hprules, topoptsrules]
+	dataflow = Lookup[expr, "dataflow", {}];
+	nodeExprs = parsenode /@ dataflow;
+
+	Join[nodeExprs, hprules, topoptsrules]
 	]
-
 
 
 ImportExport`RegisterFormat["CircuitDFD", "DefaultExtension" -> "m"];
 
 ExportCircuitDFDHook[channel_, expr_Association, opts___] := Module[{str},
-    (* Export to string to preserve indentation, strip the comment, and write as raw text *)
-    str = ExportString[ToDFD[expr], "Package"];
-             
-	str = StringDelete[str, RegularExpression["\\(\\* Created.*?\\*\\)\\n"]];          
-    
-    Export[channel, str, "Text"]
+	(* Export to string to preserve indentation, strip the comment, and write as raw text *)
+	str = ExportString[ToDFD[expr], "Package"];
+
+	(* Remove the Mathematica watermark. *)
+	str = StringDelete[str, RegularExpression["\\(\\* Created.*?\\*\\)\\n"]];		  
+	Export[channel, str, "Text"]
 	]
 
 ImportCircuitDFDHook[channel_, opts___] := Module[{data, isString},
-    (* Heuristic: if it's a string but doesn't look like a file path, treat as raw text *)
-    isString = StringQ[channel] && !StringMatchQ[channel, "*.*"] && !FileExistsQ[channel];
-    
-    data = If[isString, 
-        ImportString[channel, "Package"], 
-        Import[channel, "Package"]
-    ];
-    
-    FromDFD[data]
+	(* Heuristic: if it's a string but doesn't look like a file path, treat as raw text *)
+	isString = StringQ[channel] && !StringMatchQ[channel, "*.*"] && !FileExistsQ[channel];
+	
+	data = If[isString, 
+		ImportString[channel, "Package"], Import[channel, "Package"]];
+
+	FromDFD[data]
 	]
 
 ImportExport`RegisterExport["CircuitDFD", ExportCircuitDFDHook];
 ImportExport`RegisterImport["CircuitDFD", ImportCircuitDFDHook];
-
 
 
 (*
@@ -1826,70 +1862,69 @@ Also supports ImportString and ExportString.
 
 ToJSON[expr_Association] := Module[
 
-    {decodeBytes, cleanString, formatrootelement, rootStrList, dfStrList, dfStr, prepareNode},
-    
-    decodeBytes[s_String] := 
-        If[Max[ToCharacterCode[s]] <= 255, 
-            FromCharacterCode[ToCharacterCode[s], "UTF8"], s ];
-    
-    cleanString[s_String] := StringReplace[s, {"\":" -> "\": ", "," -> ", ", "\\/" -> "/"}];
-    
-    formatrootelement[k_String] := 
-        "\"" <> k <> "\": " <> cleanString @ decodeBytes @ 
-            ExportString[
-                If[k === "hyperparameters", KeyMap[ToString, expr[k]], expr[k]], 
-                "RawJSON", "Compact" -> True
-            ];
-    
-    rootStrList = formatrootelement /@ Keys[KeyDrop[expr, {"dataflow"}]];
-    
+	{decodeBytes, cleanString, formatrootelement, rootStrList, dfStrList, dfStr, prepareNode},
+	
+	decodeBytes[s_String] := 
+		If[Max[ToCharacterCode[s]] <= 255, 
+			FromCharacterCode[ToCharacterCode[s], "UTF8"], s ];
+	
+	cleanString[s_String] := StringReplace[s, {"\":" -> "\": ", "," -> ", ", "\\/" -> "/"}];
+	
+	formatrootelement[k_String] := 
+		"\"" <> k <> "\": " <> cleanString @ decodeBytes @ 
+			ExportString[
+				If[k === "hyperparameters", KeyMap[ToString, expr[k]], expr[k]], 
+				"RawJSON", "Compact" -> True
+			];
+	
+	rootStrList = formatrootelement /@ Keys[KeyDrop[expr, {"dataflow"}]];
+
 	prepareNode[node_Association] := Module[{n = node},
-        If[KeyExistsQ[n, "component"], 
-            n["component"] = ToString[n["component"]]];
-            
-        If[KeyExistsQ[n, "plugin"], 
-            n["plugin"] = ToString[n["plugin"], InputForm]];
-            
-        n
+		If[KeyExistsQ[n, "component"], 
+			n["component"] = ToString[n["component"]]];
+			
+		If[KeyExistsQ[n, "plugin"], 
+			n["plugin"] = ToString[n["plugin"], InputForm]];
+	
+		n
 		];  
-		      
-    dfStrList = (cleanString @ decodeBytes @ 
+	  
+	dfStrList = (cleanString @ decodeBytes @ 
 		ExportString[prepareNode[#], "RawJSON", "Compact" -> True] &) /@ 
 			expr["dataflow"];
-    
-    dfStr = "\"dataflow\": [\n    " <> StringRiffle[dfStrList, ",\n\n    "] 
+
+	dfStr = "\"dataflow\": [\n	" <> StringRiffle[dfStrList, ",\n\n	"] 
 			<> "\n  ]";
-    
-    "{\n  " <> StringRiffle[Append[rootStrList, dfStr], ",\n\n  "] <> "\n}"
+
+	"{\n  " <> StringRiffle[Append[rootStrList, dfStr], ",\n\n  "] <> "\n}"
 	]
 
 
 FromJSON[jsonString_String] := Module[
-    {expr},
-
+	{expr},
+	
 	expr = ImportString[jsonString, "RawJSON"];
-    
+
 	If[KeyExistsQ[expr, "hyperparameters"],
-        expr["hyperparameters"] = KeyMap[
-            If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
-            expr["hyperparameters"]] ];
-    
+		expr["hyperparameters"] = KeyMap[
+			If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
+			expr["hyperparameters"]] ];
+
 	If[KeyExistsQ[expr, "dataflow"],
-        expr["dataflow"] = Map[ Function[node,
+		expr["dataflow"] = Map[ Function[node,
 			Module[{n = node},
-			
 				If[KeyExistsQ[n, "component"] && StringQ[n["component"]],
 					n["component"] = ToExpression[n["component"]]];
 					
 				If[KeyExistsQ[n, "plugin"],
 					n["plugin"] = ToExpression[n["plugin"]]];
 				n
-                ]
-            ],
-            expr["dataflow"]]
+				]
+			],
+			expr["dataflow"]]
 		];
-		    
-    expr
+
+	expr
 	]
 
 
@@ -1901,48 +1936,48 @@ ImportExport`RegisterFormat["Circuit", "DefaultExtension" -> "json"];
 
 
 ExportCircuitHook[channel_, expr_Association, opts___] := 
-    Export[channel, ToJSON[expr], "Text", CharacterEncoding -> "UTF8"]
+	Export[channel, ToJSON[expr], "Text", CharacterEncoding -> "UTF8"]
 
 
 ImportCircuitHook[channel_, opts___] := Module[
-    {isString, expr},
-    
-    isString = StringQ[channel] && StringMatchQ[StringTrim[channel], "{*" | "[*"];
-    
-    expr = If[isString,
-        ImportString[channel, "RawJSON"],
-        Import[channel, "RawJSON"]];
-    
-    If[KeyExistsQ[expr, "hyperparameters"],
-        expr["hyperparameters"] = KeyMap[
-            If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
-            expr["hyperparameters"]
-        ]];
-    
-    If[KeyExistsQ[expr, "dataflow"],
-        expr["dataflow"] = Map[
-            Function[node,
-                Module[{n = node},
-                
-                    If[KeyExistsQ[n, "component"] && StringQ[n["component"]],
-                        n["component"] = ToExpression[n["component"]]];
-                        
-                    If[KeyExistsQ[n, "plugin"],
-                        n["plugin"] = ToExpression[n["plugin"]]];
-                        
-                    If[n["component"] === input && KeyExistsQ[n, "receive"],
-                        n["receive"] = ToExpression /@ n["receive"]];
-                        
-                    If[n["component"] === output && KeyExistsQ[n, "send"],
-                        n["send"] = ToExpression /@ n["send"]];
-                        
-                    n
-                ]
-            ],
-            expr["dataflow"]]
+	{isString, expr},
+	
+	isString = StringQ[channel] && StringMatchQ[StringTrim[channel], "{*" | "[*"];
+	
+	expr = If[isString,
+		ImportString[channel, "RawJSON"],
+		Import[channel, "RawJSON"]];
+	
+	If[KeyExistsQ[expr, "hyperparameters"],
+		expr["hyperparameters"] = KeyMap[
+			If[StringMatchQ[#, NumberString], ToExpression[#], #] &, 
+			expr["hyperparameters"]
+		]];
+	
+	If[KeyExistsQ[expr, "dataflow"],
+		expr["dataflow"] = Map[
+			Function[node,
+				Module[{n = node},
+				
+					If[KeyExistsQ[n, "component"] && StringQ[n["component"]],
+						n["component"] = ToExpression[n["component"]]];
+						
+					If[KeyExistsQ[n, "plugin"],
+						n["plugin"] = ToExpression[n["plugin"]]];
+						
+					If[n["component"] === input && KeyExistsQ[n, "receive"],
+						n["receive"] = ToExpression /@ n["receive"]];
+						
+					If[n["component"] === output && KeyExistsQ[n, "send"],
+						n["send"] = ToExpression /@ n["send"]];
+						
+					n
+				]
+			],
+			expr["dataflow"]]
 		];
-    
-    expr
+	
+	expr
 	]
 
 ImportExport`RegisterExport["Circuit", ExportCircuitHook];
@@ -1954,17 +1989,17 @@ A formatting-invariant hash of a JSON string, used for filename generation.
 *)
 
 JSONHash[data_String] := Module[{sorted, jsonString, hexHash},
-    sorted = Replace[data, a_Association :> KeySort[a], {0, Infinity}];
-    
-    jsonString = ExportString[sorted, "JSON", "Compact" -> True, 
-        CharacterEncoding -> "UTF-8"];
-    
-    jsonString = StringReplace[jsonString, "\\/" -> "/"];
-    jsonString = StringTrim[jsonString];
-    
-    hexHash = Hash[jsonString, "SHA256", "HexString"];
-    
-    StringTake[hexHash, 12]
+	sorted = Replace[data, a_Association :> KeySort[a], {0, Infinity}];
+
+	jsonString = ExportString[sorted, "JSON", "Compact" -> True, 
+		CharacterEncoding -> "UTF-8"];
+
+	jsonString = StringReplace[jsonString, "\\/" -> "/"];
+	jsonString = StringTrim[jsonString];
+
+	hexHash = Hash[jsonString, "SHA256", "HexString"];
+
+	StringTake[hexHash, 12]
  ]
 
 

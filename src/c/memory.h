@@ -70,7 +70,7 @@ typedef struct
 	int Adimension;						//	A hyperparameters
 	int Apopulation;
 
-	int Bdimension;						//	B hyperparameters
+	int Bdimension;						//	B hyperparameters (zero if auto-associative)
 	int Bpopulation;
 	
 	int T;								//	Pattern patching threshold
@@ -82,8 +82,9 @@ typedef struct
 //	Constructor
 Memory *Memory_new (int na, int pa, int nb, int pb);
 
-//	User-defined pattern matching threshold
+//	Pattern matching threshold
 void Memory_set_threshold (Memory*, int);
+int  Memory_get_threshold (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);

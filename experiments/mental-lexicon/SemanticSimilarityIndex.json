@@ -4,12 +4,12 @@
   "hyperparameters": {"default": [5000, 10]},
 
   "dataflow": [
-    {"component": "input", "arguments": ["codec"], "send": [1]},
+	{"component": "input", "plugin": "codec", "send": [1]},
 
-    {"component": "input", "arguments": ["codec"], "send": [2]},
+	{"component": "input", "plugin": "codec", "send": [2]},
 
-    {"component": "associator", "send": [11], "receive": [2, 1]},
+	{"component": "associator", "send": [11], "receive": [2, 1]},
 
-    {"component": "output", "receive": [11]}
+	{"component": "output", "receive": [11]}
   ]
 }

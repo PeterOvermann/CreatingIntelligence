@@ -17,19 +17,19 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 *)
 
 
-Options[Memory] = {Threshold -> Automatic};
+Memory[config_Association] :=
 
-
-Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] := 	
-
-	Module[ {f, M, new, setthreshold, setfullmatch, memory, 
-				write, read, free},
+	Module[ {M, NA, PA, NB, PB, T, new, setthreshold, getthreshold,
+			   memory, read, write, store, retrieve, free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
 			{"CInt", "CInt", "CInt", "CInt"} -> "OpaqueRawPointer"];
 
 		setthreshold = ForeignFunctionLoad["TAM", "TAMsetthreshold", 
 			{"OpaqueRawPointer", "CInt"} -> "Void"];				
+
+		getthreshold = ForeignFunctionLoad["TAM", "TAMgetthreshold", 
+			{"OpaqueRawPointer"} -> "CInt"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
 			{"OpaqueRawPointer"} -> "CInt"];
@@ -45,33 +45,60 @@ Memory[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}, OptionsPattern[]] :=
 		free = ForeignFunctionLoad["TAM", "TAMfree", 
 			{"OpaqueRawPointer"} -> "Void"];
 	
-		f = Unique["memffi"];
-		
+		{NA, PA} = config["A_parameters"];
+
+		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
+			Message[Memory::params, config]];	
+
+		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
+						config["B_parameters"], {NA, PA}];
+			
+		If[ ! MatchQ[{NB, PB}, {_Integer, _Integer}], 
+			Message[Memory::params, config]];	
+
 		M = new[NA, PA, NB, PB]; (* Constructor. *)
 
-		If[IntegerQ[OptionValue[Threshold]], 
-			setthreshold[M, OptionValue[Threshold]]];
-		
-		(* Store. *)
-		f[A_List -> B_List] := 
-			If[Length[A] > 0 && Length[B] > 0, write[M, RawMemoryExport[A, "CInt"], 
+		(* Push user-defined (scaled) threshold. *)
+		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
+			setthreshold[M, T = Round[config["threshold"] * PA]]];
+
+		(* Get final threshold. *)
+		T = getthreshold[M];
+																
+		(* Store auto-association A -> A in memory. *)
+		store[A_List] := store[A, A];
+
+		(* Store hetero-association A -> B in memory. *)
+		store[A_List, B_List] := 
+			If[Length[A] > 0 && Length[B] > 0, 
+				write[M, RawMemoryExport[A, "CInt"], 
 				Length[A], RawMemoryExport[B, "CInt"], Length[B]]];
 		
-		(* Retrieve *)
-		f[A_List] := Module[ {Y, Yn},
+		(* Retrieve. *)
+		retrieve[A_List] := Module[ {Y, Yn},
 			If[Length[A] === 0, Return[{}]];
 			Y = RawMemoryAllocate["CInt", NB];
 			Yn = RawMemoryAllocate["CInt"];
 			read[M, RawMemoryExport[A, "CInt"], Length[A], Y, Yn];
 			RawMemoryImport[Y, {"List", RawMemoryRead[Yn]}]
 			];
-
-		f["memorycount"] := memory[M];
 		
-		f[Clear] := (free[M]; ClearAll[Evaluate[f]]); 
+		clear := free[M];
+		memorycount := memory[M];
 		
-		f
+		Join[ KeyTake[config, {"A_parameters", "B_parameters"}], 
+			<|
+			"T" -> T, (* Absolute pattern matching threshold. *)
+			"store" -> store,
+			"retrieve" -> retrieve,
+			"clear" :> clear,
+			"memorycount" :> memorycount,
+			"backend" -> "C_FFI"
+			|> ]
 		]
+
+
+Memory::params  = "Invalid hyperparameters: `1`";
 
 
 

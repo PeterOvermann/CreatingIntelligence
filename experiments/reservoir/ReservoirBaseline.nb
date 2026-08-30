@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[     45189,       1104]
-NotebookOptionsPosition[     38657,        967]
-NotebookOutlinePosition[     42376,       1061]
-CellTagsIndexPosition[     42333,       1058]
+NotebookDataLength[     47630,       1154]
+NotebookOptionsPosition[     40762,       1011]
+NotebookOutlinePosition[     44796,       1110]
+CellTagsIndexPosition[     44753,       1107]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -30,44 +30,45 @@ Cell[TextData[{
 }], "Text",
  FontSize->10,ExpressionUUID->"68cf67fa-7141-40b7-a6f9-e072dbef9b14"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
-  RowBox[{"Module", "[", 
-   RowBox[{
-    RowBox[{"{", 
-     RowBox[{
-      RowBox[{"LEFTMARGIN", "=", "62"}], ",", 
-      RowBox[{"FONT", "=", "\"\<Inter Variable\>\""}], ",", 
-      RowBox[{"TITLECOLOR", "=", 
-       RowBox[{"RGBColor", "[", "\"\<#BF616A\>\"", "]"}]}], ",", 
-      RowBox[{"TEXTCOLOR", "=", 
-       RowBox[{"RGBColor", "[", "\"\<#2E3440\>\"", "]"}]}]}], "}"}], ",", 
-    RowBox[{"(*", 
-     RowBox[{"Change", " ", "LEFTMARGIN", " ", "to", " ", "whatever", " ", 
-      RowBox[{"pixel", "/", "point"}], " ", "value", " ", "centers", " ", 
-      "the", " ", "600", "px", " ", "content"}], "*)"}], 
-    RowBox[{"SetOptions", "[", 
-     RowBox[{
-      RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
-      RowBox[{"DockedCells", "->", 
-       RowBox[{"{", 
-        RowBox[{"Cell", "[", 
-         RowBox[{
-          RowBox[{"BoxData", "[", 
-           RowBox[{"ToBoxes", "[", 
-            RowBox[{"Row", "[", 
-             RowBox[{"{", 
-              RowBox[{"Button", "[", 
-               RowBox[{"\"\<Export\>\"", ",", 
-                RowBox[{"Module", "[", 
-                 RowBox[{
-                  RowBox[{"{", 
-                   RowBox[{
+  RowBox[{
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"LEFTMARGIN", "=", "62"}], ",", 
+       RowBox[{"FONT", "=", "\"\<Inter Variable\>\""}], ",", 
+       RowBox[{"TITLECOLOR", "=", 
+        RowBox[{"RGBColor", "[", "\"\<#BF616A\>\"", "]"}]}], ",", 
+       RowBox[{"TEXTCOLOR", "=", 
+        RowBox[{"RGBColor", "[", "\"\<#2E3440\>\"", "]"}]}]}], "}"}], ",", 
+     RowBox[{"(*", 
+      RowBox[{"Change", " ", "LEFTMARGIN", " ", "to", " ", "whatever", " ", 
+       RowBox[{"pixel", "/", "point"}], " ", "value", " ", "centers", " ", 
+       "the", " ", "600", "px", " ", "content"}], "*)"}], 
+     RowBox[{"SetOptions", "[", 
+      RowBox[{
+       RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
+       RowBox[{"DockedCells", "->", 
+        RowBox[{"{", 
+         RowBox[{"Cell", "[", 
+          RowBox[{
+           RowBox[{"BoxData", "[", 
+            RowBox[{"ToBoxes", "[", 
+             RowBox[{"Row", "[", 
+              RowBox[{"{", 
+               RowBox[{"Button", "[", 
+                RowBox[{"\"\<Export\>\"", ",", 
+                 RowBox[{"Module", "[", 
+                  RowBox[{
+                   RowBox[{"{", 
+                    RowBox[{
                     RowBox[{"nb", "=", 
                     RowBox[{"EvaluationNotebook", "[", "]"}]}], ",", 
                     "cleanPath"}], "}"}], ",", 
-                  RowBox[{
-                   RowBox[{"cleanPath", "=", 
+                   RowBox[{
+                    RowBox[{"cleanPath", "=", 
                     RowBox[{"FileNameJoin", "[", 
                     RowBox[{"{", 
                     RowBox[{
@@ -75,365 +76,407 @@ Cell[BoxData[
                     RowBox[{"FileBaseName", "[", 
                     RowBox[{"NotebookFileName", "[", "nb", "]"}], "]"}]}], 
                     "}"}], "]"}]}], ";", "\[IndentingNewLine]", 
-                   RowBox[{"Export", "[", 
+                    RowBox[{"Export", "[", 
                     RowBox[{
                     RowBox[{"cleanPath", "<>", "\"\<.pdf\>\""}], ",", "nb"}], 
                     "]"}], ";", "\[IndentingNewLine]", 
-                   RowBox[{"Export", "[", 
+                    RowBox[{"Export", "[", 
                     RowBox[{
                     RowBox[{"cleanPath", "<>", "\"\<.json\>\""}], ",", 
-                    RowBox[{"FromDFD", "[", "dataflow", "]"}], ",", 
-                    " ", "\"\<Circuit\>\""}], "]"}]}]}], "]"}], ",", 
-                RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], "}"}], 
-             "]"}], "]"}], "]"}], ",", "\"\<DockedCell\>\"", ",", 
-          RowBox[{"Background", "->", 
-           RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", 
-          RowBox[{"CellMargins", "->", 
+                    "DATAFLOW", ",", " ", "\"\<Circuit\>\""}], "]"}]}]}], 
+                  "]"}], ",", 
+                 RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], "}"}], 
+              "]"}], "]"}], "]"}], ",", "\"\<DockedCell\>\"", ",", 
+           RowBox[{"Background", "->", 
+            RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", 
+           RowBox[{"CellMargins", "->", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{"0", ",", "0"}], "}"}], ",", 
+              RowBox[{"{", 
+               RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], "}"}]}], ",", 
+       RowBox[{"(*", 
+        RowBox[{"Headers", " ", "and", " ", "Footers"}], "*)"}], 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"PageHeaders", "->", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}]}], 
+         "}"}]}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"PageFooters", "->", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", 
+            RowBox[{"Cell", "[", 
+             RowBox[{"TextData", "[", 
+              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+            ",", "\"\<\>\""}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", 
+            RowBox[{"Cell", "[", 
+             RowBox[{"TextData", "[", 
+              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+            ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"PageFooters", "->", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", 
+            RowBox[{"Cell", "[", 
+             RowBox[{"TextData", "[", 
+              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+            ",", "\"\<\>\""}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"\"\<\>\"", ",", 
+            RowBox[{"Cell", "[", 
+             RowBox[{"TextData", "[", 
+              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+            ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"PrintingOptions", "->", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"\"\<PaperSize\>\"", "->", 
+           RowBox[{"{", 
+            RowBox[{"510", ",", "680"}], "}"}]}], ",", 
+          RowBox[{"(*", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"width", ",", "height"}], "}"}], " ", "for", " ", 
+            "Portrait"}], "*)"}], 
+          RowBox[{"\"\<PrintingMargins\>\"", "->", 
            RowBox[{"{", 
             RowBox[{
              RowBox[{"{", 
               RowBox[{"0", ",", "0"}], "}"}], ",", 
              RowBox[{"{", 
-              RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], "}"}]}], ",", 
-      RowBox[{"(*", 
-       RowBox[{"Headers", " ", "and", " ", "Footers"}], "*)"}], 
-      "\[IndentingNewLine]", "\[IndentingNewLine]", 
-      RowBox[{"PageHeaders", "->", 
-       RowBox[{"{", 
-        RowBox[{
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}], ",", 
-         
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}]}], 
-        "}"}]}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
-      RowBox[{"PageFooters", "->", 
-       RowBox[{"{", 
-        RowBox[{
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{"TextData", "[", 
-             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-           ",", "\"\<\>\""}], "}"}], ",", 
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{"TextData", "[", 
-             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-           ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
-      "\[IndentingNewLine]", 
-      RowBox[{"PageFooters", "->", 
-       RowBox[{"{", 
-        RowBox[{
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{"TextData", "[", 
-             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-           ",", "\"\<\>\""}], "}"}], ",", 
-         RowBox[{"{", 
-          RowBox[{"\"\<\>\"", ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{"TextData", "[", 
-             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-           ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
-      "\[IndentingNewLine]", "\[IndentingNewLine]", 
-      RowBox[{"PrintingOptions", "->", 
-       RowBox[{"{", 
-        RowBox[{
-         RowBox[{"\"\<PaperSize\>\"", "->", 
-          RowBox[{"{", 
-           RowBox[{"510", ",", "680"}], "}"}]}], ",", 
+              RowBox[{"30", ",", "30"}], "}"}]}], "}"}]}]}], " ", 
          RowBox[{"(*", 
           RowBox[{
-           RowBox[{"{", 
-            RowBox[{"width", ",", "height"}], "}"}], " ", "for", " ", 
-           "Portrait"}], "*)"}], 
-         RowBox[{"\"\<PrintingMargins\>\"", "->", 
-          RowBox[{"{", 
+           RowBox[{"left", "/", "right"}], ",", 
            RowBox[{
-            RowBox[{"{", 
-             RowBox[{"0", ",", "0"}], "}"}], ",", 
-            RowBox[{"{", 
-             RowBox[{"30", ",", "30"}], "}"}]}], "}"}]}]}], " ", 
-        RowBox[{"(*", 
-         RowBox[{
-          RowBox[{"left", "/", "right"}], ",", 
+            RowBox[{"bottom", "/", "top"}], " ", "margins"}]}], "*)"}], 
+         "}"}]}], ",", 
+       RowBox[{"(*", 
+        RowBox[{"Stylesheet", " ", "overrides"}], "*)"}], 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"StyleDefinitions", "->", 
+        RowBox[{"Notebook", "[", 
+         RowBox[{"{", 
           RowBox[{
-           RowBox[{"bottom", "/", "top"}], " ", "margins"}]}], "*)"}], 
-        "}"}]}], ",", 
-      RowBox[{"(*", 
-       RowBox[{"Stylesheet", " ", "overrides"}], "*)"}], 
-      "\[IndentingNewLine]", "\[IndentingNewLine]", 
-      RowBox[{"StyleDefinitions", "->", 
-       RowBox[{"Notebook", "[", 
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"Cell", "[", 
-           RowBox[{"StyleData", "[", 
-            RowBox[{"StyleDefinitions", "->", "\"\<Default.nb\>\""}], "]"}], 
-           "]"}], ",", 
-          RowBox[{"(*", 
-           RowBox[{"No", " ", 
-            RowBox[{"header", "/", "footer"}], " ", "lines"}], "*)"}], 
-          RowBox[{"Cell", "[", 
-           RowBox[{
+           RowBox[{"Cell", "[", 
             RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Header\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            
-            RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Footer\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            
-            RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Title\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"10", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          "\[IndentingNewLine]", "\[IndentingNewLine]", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Subtitle\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-            RowBox[{"FontSize", "->", "20"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"20", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          "\[IndentingNewLine]", "\[IndentingNewLine]", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Section\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellFrame", "->", "False"}], ",", 
-            RowBox[{"PageBreakAbove", "->", "True"}], ",", 
-            RowBox[{"GroupPageBreakWithin", "->", "True"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"20", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Subsection\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Subsubsection\>\"", ",", "\"\<Printout\>\""}], 
-             "]"}], ",", 
-            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Text\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"Hyphenation", "->", "True"}], ",", "\[IndentingNewLine]", 
-            RowBox[{"LineSpacing", " ", "->", " ", 
-             RowBox[{"{", 
-              RowBox[{"1.4", ",", "0"}], "}"}]}], ",", 
-            RowBox[{"FontColor", "->", "TEXTCOLOR"}], ",", 
-            RowBox[{"FontFamily", "->", "FONT"}], ",", 
-            RowBox[{"CellFrame", "->", "False"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "60"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"7", ",", "7"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Code\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"CellFrameMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"20", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"8", ",", "8"}], "}"}]}], "}"}]}], ",", 
-            RowBox[{"PageWidth", "->", "670"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "30"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"7", ",", "15"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Output\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            
-            RowBox[{"PageWidth", "->", "660"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{
-                 RowBox[{"LEFTMARGIN", "+", "20"}], ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-          RowBox[{"(*", 
-           RowBox[{
-           "Hide", " ", "Input", " ", "cells", " ", "in", " ", "Printout"}], 
-           "*)"}], 
-          RowBox[{"Cell", "[", 
-           RowBox[{
-            RowBox[{"StyleData", "[", 
-             RowBox[{"\"\<Input\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-            RowBox[{"CellOpen", "->", "False"}], ",", 
-            RowBox[{"ShowCellBracket", "->", "False"}], ",", 
-            RowBox[{"CellMargins", "->", 
-             RowBox[{"{", 
-              RowBox[{
-               RowBox[{"{", 
-                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-               RowBox[{"{", 
-                RowBox[{
-                 RowBox[{"-", "2"}], ",", 
-                 RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", 
-            RowBox[{"CellElementSpacings", "->", 
-             RowBox[{"{", 
-              RowBox[{"\"\<ClosedCellHeight\>\"", "->", "0"}], "}"}]}]}], 
-           "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}]], "Input",
+             RowBox[{"StyleDefinitions", "->", "\"\<Default.nb\>\""}], "]"}], 
+            "]"}], ",", 
+           RowBox[{"(*", 
+            RowBox[{"No", " ", 
+             RowBox[{"header", "/", "footer"}], " ", "lines"}], "*)"}], 
+           "\[IndentingNewLine]", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Header\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Footer\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Title\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             
+             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"10", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Subtitle\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+             RowBox[{"FontSize", "->", "20"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"20", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Section\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellFrame", "->", "False"}], ",", 
+             RowBox[{"PageBreakAbove", "->", "True"}], ",", 
+             RowBox[{"GroupPageBreakWithin", "->", "True"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"20", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Subsection\>\"", ",", "\"\<Printout\>\""}], "]"}], 
+             ",", 
+             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Subsubsection\>\"", ",", "\"\<Printout\>\""}], 
+              "]"}], ",", 
+             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Text\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"Hyphenation", "->", "True"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{"LineSpacing", " ", "->", " ", 
+              RowBox[{"{", 
+               RowBox[{"1.4", ",", "0"}], "}"}]}], ",", 
+             RowBox[{"FontColor", "->", "TEXTCOLOR"}], ",", 
+             RowBox[{"FontFamily", "->", "FONT"}], ",", 
+             RowBox[{"CellFrame", "->", "False"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "60"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"7", ",", "7"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Code\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"CellFrameMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"20", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"8", ",", "8"}], "}"}]}], "}"}]}], ",", 
+             RowBox[{"PageWidth", "->", "670"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "30"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"7", ",", "15"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           "\[IndentingNewLine]", "    ", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", "\"\<Program\>\"", "]"}], ",", " ", 
+             "\n", "\t\t\t", 
+             RowBox[{"CellOpen", " ", "->", " ", "True"}], ",", " ", "\n", 
+             "\t\t\t", 
+             RowBox[{"FontFamily", " ", "->", " ", "\"\<JetBrains Mono\>\""}],
+              ",", "\n", "\t\t\t", 
+             RowBox[{"FontSize", "->", " ", "10"}], ",", 
+             RowBox[{"FontColor", " ", "->", " ", "Black"}], ",", "\n", 
+             "\t\t\t", 
+             RowBox[{"ShowCellBracket", " ", "->", " ", "False"}], ",", " ", 
+             "\n", "\t\t\t", 
+             RowBox[{"CellMargins", " ", "->", " ", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", " ", "0"}], "}"}], ",", " ", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"-", "2"}], ",", " ", 
+                  RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", "\n", "\t\t\t", 
+             RowBox[{"CellElementSpacings", " ", "->", " ", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"\"\<CellMinHeight\>\"", " ", "->", " ", "0"}], ",", 
+                " ", 
+                RowBox[{"\"\<ClosedCellHeight\>\"", " ", "->", " ", "0"}]}], 
+               "}"}]}], ",", "\n", "\t\t\t", 
+             RowBox[{"CellFrame", " ", "->", " ", "0"}], ",", 
+             RowBox[{"CellFrameMargins", " ", "->", " ", "0"}], ",", 
+             RowBox[{"Background", " ", "->", " ", "None"}]}], "\n", "\t\t\t",
+             "]"}], ",", "\n", "\[IndentingNewLine]", 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Output\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             RowBox[{"PageWidth", "->", "660"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"LEFTMARGIN", "+", "20"}], ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+           RowBox[{"(*", 
+            RowBox[{
+            "Hide", " ", "Input", " ", "cells", " ", "in", " ", "Printout"}], 
+            "*)"}], 
+           RowBox[{"Cell", "[", 
+            RowBox[{
+             RowBox[{"StyleData", "[", 
+              RowBox[{"\"\<Input\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+             
+             RowBox[{"CellOpen", "->", "False"}], ",", 
+             RowBox[{"ShowCellBracket", "->", "False"}], ",", 
+             RowBox[{"CellMargins", "->", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"-", "2"}], ",", 
+                  RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", 
+             RowBox[{"CellElementSpacings", "->", 
+              RowBox[{"{", 
+               RowBox[{"\"\<ClosedCellHeight\>\"", "->", "0"}], "}"}]}]}], 
+            "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"json", " ", ":=", " ", 
+  RowBox[{"DATAFLOW", " ", "=", " ", 
+   RowBox[{"ImportString", "[", " ", 
+    RowBox[{
+     RowBox[{"First", "[", 
+      RowBox[{"FrontEndExecute", "[", 
+       RowBox[{"FrontEnd`ExportPacket", "[", "\n", "\t", 
+        RowBox[{
+         RowBox[{"NotebookRead", "[", 
+          RowBox[{"PreviousCell", "[", "]"}], "]"}], 
+         ",", "\"\<PlainText\>\""}], "]"}], "]"}], "]"}], ",", 
+     " ", "\"\<Circuit\>\""}], "]"}]}]}]}], "Input",
  CellOpen->False,
- CellLabel->"In[44]:=",ExpressionUUID->"28ba789a-5525-4fc0-9f23-713f78ebc2e7"],
+ CellLabel->"In[76]:=",ExpressionUUID->"fa7526ba-4a29-4f89-95de-c2c3e2c0add7"],
 
 Cell[CellGroupData[{
 
 Cell["Reservoir Architecture", "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
 
-Cell["Baseline temporal memory", "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
+Cell["Online sequence learning", "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
 
 Cell["\<\
 A temporal memory, consisting of a simple recurrent delay node and a \
-hetero-associative predictor node. This model learns sequences and next-token \
-prediction on the fly. \
+hetero-associative predictor node. This model learns higher-order sequences \
+and next-token prediction on the fly. \
 \>", "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
 
 Cell[CellGroupData[{
 
-Cell["Configuration", "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
+Cell["Requirements", "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
 
 Cell[BoxData[
  RowBox[{"<<", " ", "\"\<Circuits.m\>\""}]], "Code",
- CellLabel->"In[30]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"dataflow", " ", "=", " ", 
-   RowBox[{"{", " ", "\[IndentingNewLine]", "\t\t", 
-    RowBox[{
-     RowBox[{
-      RowBox[{
-       RowBox[{"input", "[", "codec", "]"}], " ", "[", "11", "]"}], " ", "[", 
-      "]"}], ",", " ", "\n", "\t\t", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"delay", "[", 
-        RowBox[{"\"\<R\>\"", "->", "60"}], "]"}], " ", "[", "51", "]"}], " ", 
-      "[", 
-      RowBox[{"{", 
-       RowBox[{"11", ",", 
-        RowBox[{"51", "\"\<P\>\""}]}], "}"}], "]"}], ",", " ", "\n", "\t\t", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"predictor", "[", "]"}], " ", "[", "101", "]"}], " ", "[", 
-      RowBox[{"11", ",", " ", "51"}], "]"}], ",", "\n", "\t\t", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"output", "[", "codec", "]"}], " ", "[", "]"}], " ", "[", 
-      "101", "]"}], ",", "\n", "\t\t", 
-     RowBox[{"_", " ", "->", " ", 
-      RowBox[{"{", 
-       RowBox[{"2000", ",", " ", "10"}], "}"}]}]}], "\n", "\t", "}"}]}], 
-  ";"}]], "Code",
- CellLabel->"In[45]:=",ExpressionUUID->"53a02fbd-b118-4db9-bce1-841bbd1b20a4"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"c", "[", "Clear", "]"}], ";"}]], "Input",
- CellOpen->False,
- CellLabel->"In[32]:=",ExpressionUUID->"d9be64b3-8901-4a41-b671-606d097a5c58"],
+ CellLabel->"In[78]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell[BoxData[
+Cell["Circuit", "Subsection",ExpressionUUID->"ff6f1c84-5833-4243-b9f6-8ced7d48a5ae"],
+
+Cell["\<\
+
+
+{
+  \"$schema\": \"https://creatingintelligence.org/schemas/circuit-v1.json\",
+
+  \"hyperparameters\": {\"default\": [2000, 10]},
+
+  \"dataflow\": [
+\t{\"component\": \"input\", \"plugin\": \"codec\", \"send\": [11]},
+
+\t{\"component\": \"delay\", \"send\": [51], \"receive\": [[11, {\"slot\": \
+51, \"tags\": [\"permute\"]}]], \"rate_limit\": 6.0},
+
+\t{\"component\": \"predictor\", \"send\": [101], \"receive\": [11, 51]},
+
+\t{\"component\": \"output\", \"plugin\": \"codec\", \"receive\": [101]}
+  ]
+}
+\
+\>", "Program",ExpressionUUID->"49a42a6d-5c2a-4241-860c-777a8d36858c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"circuit", " ", "=", " ", 
+    RowBox[{"Circuit", "[", "json", "]"}]}], ";"}], " "}], "\n", 
  RowBox[{
   RowBox[{"c", " ", "=", " ", 
-   RowBox[{"Circuit", "[", "dataflow", "]"}]}], ";", " ", 
-  RowBox[{"c", "[", 
-   RowBox[{"Graph", ",", " ", 
-    RowBox[{"ImageSize", "->", " ", "300"}]}], "]"}]}]], "Code",
- CellLabel->"In[33]:=",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
+   RowBox[{"circuit", "[", "\"\<function\>\"", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"circuit", "[", "\"\<schematics\>\"", "]"}], "[", 
+  RowBox[{"ImageSize", "->", "270"}], "]"}]}], "Code",
+ CellLabel->
+  "In[102]:=",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
 
 Cell[BoxData[
  GraphicsBox[
   NamespaceBox["NetworkGraphics",
    DynamicModuleBox[{Typeset`graph = HoldComplete[
      Graph[{1, 2, 3, 
-      4}, {{{1, 2}, {1, 3}, {2, 2}, {2, 3}, {3, 4}}, Null, {
-       Null, Null, "P", Null, Null}}, {
-      BaseStyle -> {FontFamily -> "Inter Variable", 
+      4}, {{{1, 2}, {2, 2}, {1, 3}, {2, 3}, {3, 4}}, Null, {
+       "", "P", "", "", ""}}, {BaseStyle -> {FontFamily -> "Inter Variable", 
          Opacity[1]}, 
        EdgeLabels -> {
-        DirectedEdge[1, 3] -> None, DirectedEdge[2, 2, "P"] -> Placed[
+        DirectedEdge[3, 4, ""] -> None, DirectedEdge[2, 2, "P"] -> Placed[
            Framed[
            "P", Background -> GrayLevel[1], FrameStyle -> None, BaseStyle -> 
             Directive[12, Bold, 
               RGBColor[
               0.1803921568627451, 0.20392156862745098`, 
                0.25098039215686274`]], RoundingRadius -> 30, FrameMargins -> 
-            0], Center], DirectedEdge[1, 2] -> None, DirectedEdge[2, 3] -> 
-         None, DirectedEdge[3, 4] -> None}, 
-       EdgeStyle -> {DirectedEdge[2, 3] -> Directive[
+            0], Center], DirectedEdge[1, 3, ""] -> None, 
+         DirectedEdge[2, 3, ""] -> None, DirectedEdge[1, 2, ""] -> None}, 
+       EdgeStyle -> {DirectedEdge[2, 3, ""] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
-           AbsoluteThickness[0.5]], DirectedEdge[1, 3] -> Directive[
+           AbsoluteThickness[0.5]], DirectedEdge[1, 2, ""] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
-           AbsoluteThickness[0.5]], DirectedEdge[3, 4] -> Directive[
+           AbsoluteThickness[0.5]], DirectedEdge[3, 4, ""] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
@@ -441,30 +484,30 @@ Cell[BoxData[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
-           AbsoluteThickness[0.5]], DirectedEdge[1, 2] -> Directive[
+           AbsoluteThickness[0.5]], DirectedEdge[1, 3, ""] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
            AbsoluteThickness[0.5]]}, 
        GraphLayout -> {"LayeredDigraphEmbedding", "Orientation" -> Left}, 
-       ImageSize -> 300, PlotTheme -> "Classic", 
+       ImageSize -> 270, PlotTheme -> "Classic", 
        VertexLabels -> {4 -> Placed[
            Style["SYM", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            Small, Bold], Center], 2 -> Placed[
+            10, Bold], Center], 2 -> Placed[
            Style["R", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            Medium, Bold], Center], 1 -> Placed[
+            12, Bold], Center], 1 -> Placed[
            Style["SYM", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            Small, Bold], Center], 3 -> Placed[
+            10, Bold], Center], 3 -> Placed[
            Style["\[FilledRightTriangle]\[FilledRightTriangle]", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            FontSize -> 18, Bold], Center]}, 
+            18, Bold], Center]}, 
        VertexShapeFunction -> {
         4 -> "Circle", 2 -> "Circle", 3 -> "Square", 1 -> "Circle"}, 
        VertexSize -> {0.4}, VertexStyle -> {3 -> Directive[
@@ -616,7 +659,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->Small,
+               FontSize->10,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -662,7 +705,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->Medium,
+               FontSize->12,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -756,7 +799,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->Small,
+               FontSize->10,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -780,14 +823,15 @@ Cell[BoxData[
   DefaultBaseStyle->"NetworkGraphics",
   FormatType->TraditionalForm,
   FrameTicks->None,
-  ImageSize->300]], "Output",
- CellLabel->"Out[33]=",ExpressionUUID->"77ba4e26-9a2a-45ed-9e36-e091fac17a18"]
+  ImageSize->270]], "Output",
+ CellLabel->
+  "Out[104]=",ExpressionUUID->"66e02280-6960-49c3-b6ef-fa12633a7975"]
 }, Open  ]]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["Synthetic training data", "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
+Cell["Dataset", "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
 
 Cell["Generate a 2000 character random string.", "Text",ExpressionUUID->"ad453c0d-aa19-4af7-92ec-65374d74dbbb"],
 
@@ -797,7 +841,7 @@ Cell[BoxData[
  RowBox[{"chars", " ", "=", " ", 
   RowBox[{"CharacterRange", "[", 
    RowBox[{"\"\<A\>\"", ",", " ", "\"\<Z\>\""}], "]"}]}]], "Code",
- CellLabel->"In[34]:=",ExpressionUUID->"32ac3f74-e565-4d04-9999-879741f3ac4c"],
+ CellLabel->"In[82]:=",ExpressionUUID->"32ac3f74-e565-4d04-9999-879741f3ac4c"],
 
 Cell[BoxData[
  RowBox[{"{", 
@@ -808,7 +852,7 @@ Cell[BoxData[
    ",", "\<\"Q\"\>", ",", "\<\"R\"\>", ",", "\<\"S\"\>", ",", "\<\"T\"\>", 
    ",", "\<\"U\"\>", ",", "\<\"V\"\>", ",", "\<\"W\"\>", ",", "\<\"X\"\>", 
    ",", "\<\"Y\"\>", ",", "\<\"Z\"\>"}], "}"}]], "Output",
- CellLabel->"Out[34]=",ExpressionUUID->"26b44192-a0cc-4123-8cfb-1fa363b3fa99"]
+ CellLabel->"Out[82]=",ExpressionUUID->"cf134bae-1144-4dd4-a3e5-68910fb07b46"]
 }, Open  ]],
 
 Cell[BoxData[
@@ -816,12 +860,12 @@ Cell[BoxData[
   RowBox[{"dataset", " ", "=", " ", 
    RowBox[{"RandomChoice", "[", " ", 
     RowBox[{"chars", ",", " ", "2000"}], "]"}]}], ";"}]], "Code",
- CellLabel->"In[35]:=",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
+ CellLabel->"In[83]:=",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["Analyze prediction score", "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
+Cell["Prediction score", "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
 
 Cell[CellGroupData[{
 
@@ -847,7 +891,7 @@ Cell[BoxData[
     RowBox[{"{", 
      RowBox[{"i", ",", " ", "1", ",", " ", "10"}], "}"}]}], "]"}], 
   ";"}]], "Code",
- CellLabel->"In[36]:=",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
+ CellLabel->"In[84]:=",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
 
 Cell[CellGroupData[{
 
@@ -855,45 +899,45 @@ Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "1", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.0255`"}],
-  SequenceForm["    iteration = ", 1, ", prediction score = ", 0.0255],
+   "0.027`"}],
+  SequenceForm["    iteration = ", 1, ", prediction score = ", 0.027],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"76fe791e-d466-4a76-b36b-1b94d1cdb86f"],
+In[84]:=",ExpressionUUID->"36dfc6ec-3118-42bf-ad67-f6ece5e31ce4"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "2", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.8475`"}],
-  SequenceForm["    iteration = ", 2, ", prediction score = ", 0.8475],
+   "0.7965`"}],
+  SequenceForm["    iteration = ", 2, ", prediction score = ", 0.7965],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"7644b693-0828-4781-9ae1-643605f41049"],
+In[84]:=",ExpressionUUID->"e11c6b26-2a6a-4e50-bd91-fd5af2d35474"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "3", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.981`"}],
-  SequenceForm["    iteration = ", 3, ", prediction score = ", 0.981],
+   "0.9575`"}],
+  SequenceForm["    iteration = ", 3, ", prediction score = ", 0.9575],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"8adf8e13-4308-4325-bd75-fce51cab4e84"],
+In[84]:=",ExpressionUUID->"770f30b6-f38e-4d83-a7c5-2aab38a182b7"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "4", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.996`"}],
-  SequenceForm["    iteration = ", 4, ", prediction score = ", 0.996],
+   "0.9925`"}],
+  SequenceForm["    iteration = ", 4, ", prediction score = ", 0.9925],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"0902c7af-fedf-4feb-86a7-3ca0b29727f1"],
+In[84]:=",ExpressionUUID->"51a12043-2577-45c3-acc1-517e83e7cf6d"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -904,29 +948,29 @@ Cell[BoxData[
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"0cf849f8-562c-430a-8f2c-88f026887a87"],
+In[84]:=",ExpressionUUID->"b4203446-28ba-4405-bdc5-3dbb06ce2fe1"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "6", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.9985`"}],
-  SequenceForm["    iteration = ", 6, ", prediction score = ", 0.9985],
+   "0.999`"}],
+  SequenceForm["    iteration = ", 6, ", prediction score = ", 0.999],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"d638aed1-7e79-4072-aa4d-da1519f86bcf"],
+In[84]:=",ExpressionUUID->"3cb9c388-a3a2-43ec-a34a-22d18189f4b7"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "7", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "0.998`"}],
-  SequenceForm["    iteration = ", 7, ", prediction score = ", 0.998],
+   "0.9985`"}],
+  SequenceForm["    iteration = ", 7, ", prediction score = ", 0.9985],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"2c300ecb-c06d-4052-8a00-a6bae528768f"],
+In[84]:=",ExpressionUUID->"9aec1c3d-ffcb-46ab-bae4-35cfb9384f99"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -937,18 +981,18 @@ Cell[BoxData[
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"1297e0e1-6525-4443-8e44-98fffc83c306"],
+In[84]:=",ExpressionUUID->"65f0856d-f2c4-4eac-b151-e460cada19e9"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"    iteration = \"\>", "\[InvisibleSpace]", "9", 
    "\[InvisibleSpace]", "\<\", prediction score = \"\>", "\[InvisibleSpace]", 
-   "1.`"}],
-  SequenceForm["    iteration = ", 9, ", prediction score = ", 1.],
+   "0.999`"}],
+  SequenceForm["    iteration = ", 9, ", prediction score = ", 0.999],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"e9efa4a7-e273-4e52-9c03-c739452164bf"],
+In[84]:=",ExpressionUUID->"bc7b64d2-4207-459e-9534-046669c3bd43"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -959,7 +1003,7 @@ Cell[BoxData[
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[36]:=",ExpressionUUID->"a08fef40-a09e-4e26-8058-dacb7a7df990"]
+In[84]:=",ExpressionUUID->"6ba0ee07-33fd-419c-a8d5-33e7941f283d"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
@@ -980,10 +1024,9 @@ $CellContext`cleanPath = FileNameJoin[{
              FileBaseName[
               NotebookFileName[$CellContext`nb]]}]; 
          Export[$CellContext`cleanPath <> ".pdf", $CellContext`nb]; 
-         Export[$CellContext`cleanPath <> ".json", 
-           $CellContext`FromDFD[$CellContext`dataflow], "Circuit"]], Method -> 
-       "Queued", Appearance -> Automatic, Evaluator -> Automatic]}, 
-     "RowDefault"]], "DockedCell", Background -> 
+         Export[$CellContext`cleanPath <> ".json", $CellContext`DATAFLOW, 
+           "Circuit"]], Method -> "Queued", Appearance -> Automatic, 
+       Evaluator -> Automatic]}, "RowDefault"]], "DockedCell", Background -> 
    RGBColor[0.9215686274509803, 0.796078431372549, 0.5450980392156862], 
    CellMargins -> {{0, 0}, {0, 0}}]},
 PrintingCopies->1,
@@ -1038,6 +1081,12 @@ StyleDefinitions->Notebook[{
     CellMargins -> {{62, 30}, {7, 15}}, 
     CellFrameMargins -> {{20, 0}, {8, 8}}], 
    Cell[
+    StyleData["Program"], CellFrame -> 0, ShowCellBracket -> False, 
+    CellMargins -> {{62, 0}, {-2, -2}}, 
+    CellElementSpacings -> {"CellMinHeight" -> 0, "ClosedCellHeight" -> 0}, 
+    CellOpen -> True, CellFrameMargins -> 0, FontFamily -> "JetBrains Mono", 
+    FontSize -> 10, FontColor -> GrayLevel[0], Background -> None], 
+   Cell[
     StyleData["Output", "Printout"], PageWidth -> 660, 
     CellMargins -> {{82, 0}, {10, 10}}], 
    Cell[
@@ -1061,47 +1110,48 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[554, 20, 392, 10, 34, "Text",ExpressionUUID->"68cf67fa-7141-40b7-a6f9-e072dbef9b14"],
-Cell[949, 32, 13020, 306, 23, "Input",ExpressionUUID->"28ba789a-5525-4fc0-9f23-713f78ebc2e7",
+Cell[949, 32, 15542, 355, 23, "Input",ExpressionUUID->"fa7526ba-4a29-4f89-95de-c2c3e2c0add7",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[13994, 342, 94, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
-Cell[14091, 344, 99, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
-Cell[14193, 346, 253, 4, 96, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
+Cell[16516, 391, 94, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
+Cell[16613, 393, 99, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
+Cell[16715, 395, 266, 4, 96, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
 Cell[CellGroupData[{
-Cell[14471, 354, 90, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
-Cell[14564, 356, 145, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"],
-Cell[14712, 360, 1086, 29, 205, "Code",ExpressionUUID->"53a02fbd-b118-4db9-bce1-841bbd1b20a4"],
-Cell[15801, 391, 173, 4, 23, "Input",ExpressionUUID->"d9be64b3-8901-4a41-b671-606d097a5c58",
- CellOpen->False],
+Cell[17006, 403, 89, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
+Cell[17098, 405, 145, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+}, Open  ]],
 Cell[CellGroupData[{
-Cell[15999, 399, 309, 7, 63, "Code",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
-Cell[16311, 408, 15769, 375, 304, "Output",ExpressionUUID->"77ba4e26-9a2a-45ed-9e36-e091fac17a18"]
+Cell[17280, 412, 84, 0, 66, "Subsection",ExpressionUUID->"ff6f1c84-5833-4243-b9f6-8ced7d48a5ae"],
+Cell[17367, 414, 589, 20, 333, "Program",ExpressionUUID->"49a42a6d-5c2a-4241-860c-777a8d36858c"],
+Cell[CellGroupData[{
+Cell[17981, 438, 459, 12, 110, "Code",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
+Cell[18443, 452, 15758, 375, 276, "Output",ExpressionUUID->"66e02280-6960-49c3-b6ef-fa12633a7975"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[32129, 789, 100, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
-Cell[32232, 791, 111, 0, 42, "Text",ExpressionUUID->"ad453c0d-aa19-4af7-92ec-65374d74dbbb"],
+Cell[34250, 833, 84, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
+Cell[34337, 835, 111, 0, 42, "Text",ExpressionUUID->"ad453c0d-aa19-4af7-92ec-65374d74dbbb"],
 Cell[CellGroupData[{
-Cell[32368, 795, 227, 4, 63, "Code",ExpressionUUID->"32ac3f74-e565-4d04-9999-879741f3ac4c"],
-Cell[32598, 801, 624, 9, 67, "Output",ExpressionUUID->"26b44192-a0cc-4123-8cfb-1fa363b3fa99"]
+Cell[34473, 839, 227, 4, 63, "Code",ExpressionUUID->"32ac3f74-e565-4d04-9999-879741f3ac4c"],
+Cell[34703, 845, 624, 9, 67, "Output",ExpressionUUID->"cf134bae-1144-4dd4-a3e5-68910fb07b46"]
 }, Open  ]],
-Cell[33237, 813, 243, 5, 63, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
+Cell[35342, 857, 243, 5, 63, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[33517, 823, 101, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
+Cell[35622, 867, 93, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
 Cell[CellGroupData[{
-Cell[33643, 827, 932, 22, 181, "Code",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
+Cell[35740, 871, 932, 22, 181, "Code",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
 Cell[CellGroupData[{
-Cell[34600, 853, 400, 9, 28, "Print",ExpressionUUID->"76fe791e-d466-4a76-b36b-1b94d1cdb86f"],
-Cell[35003, 864, 400, 9, 28, "Print",ExpressionUUID->"7644b693-0828-4781-9ae1-643605f41049"],
-Cell[35406, 875, 398, 9, 28, "Print",ExpressionUUID->"8adf8e13-4308-4325-bd75-fce51cab4e84"],
-Cell[35807, 886, 398, 9, 28, "Print",ExpressionUUID->"0902c7af-fedf-4feb-86a7-3ca0b29727f1"],
-Cell[36208, 897, 400, 9, 28, "Print",ExpressionUUID->"0cf849f8-562c-430a-8f2c-88f026887a87"],
-Cell[36611, 908, 400, 9, 28, "Print",ExpressionUUID->"d638aed1-7e79-4072-aa4d-da1519f86bcf"],
-Cell[37014, 919, 398, 9, 28, "Print",ExpressionUUID->"2c300ecb-c06d-4052-8a00-a6bae528768f"],
-Cell[37415, 930, 398, 9, 28, "Print",ExpressionUUID->"1297e0e1-6525-4443-8e44-98fffc83c306"],
-Cell[37816, 941, 392, 9, 28, "Print",ExpressionUUID->"e9efa4a7-e273-4e52-9c03-c739452164bf"],
-Cell[38211, 952, 394, 9, 28, "Print",ExpressionUUID->"a08fef40-a09e-4e26-8058-dacb7a7df990"]
+Cell[36697, 897, 398, 9, 28, "Print",ExpressionUUID->"36dfc6ec-3118-42bf-ad67-f6ece5e31ce4"],
+Cell[37098, 908, 400, 9, 28, "Print",ExpressionUUID->"e11c6b26-2a6a-4e50-bd91-fd5af2d35474"],
+Cell[37501, 919, 400, 9, 28, "Print",ExpressionUUID->"770f30b6-f38e-4d83-a7c5-2aab38a182b7"],
+Cell[37904, 930, 400, 9, 28, "Print",ExpressionUUID->"51a12043-2577-45c3-acc1-517e83e7cf6d"],
+Cell[38307, 941, 400, 9, 28, "Print",ExpressionUUID->"b4203446-28ba-4405-bdc5-3dbb06ce2fe1"],
+Cell[38710, 952, 398, 9, 28, "Print",ExpressionUUID->"3cb9c388-a3a2-43ec-a34a-22d18189f4b7"],
+Cell[39111, 963, 400, 9, 28, "Print",ExpressionUUID->"9aec1c3d-ffcb-46ab-bae4-35cfb9384f99"],
+Cell[39514, 974, 398, 9, 28, "Print",ExpressionUUID->"65f0856d-f2c4-4eac-b151-e460cada19e9"],
+Cell[39915, 985, 398, 9, 28, "Print",ExpressionUUID->"bc7b64d2-4207-459e-9534-046669c3bd43"],
+Cell[40316, 996, 394, 9, 28, "Print",ExpressionUUID->"6ba0ee07-33fd-419c-a8d5-33e7941f283d"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
