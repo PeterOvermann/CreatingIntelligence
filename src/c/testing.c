@@ -31,6 +31,9 @@
 
 int main(int argc, char *argv[])
 	{
+	(void) argc;
+	(void) argv;
+	
 	//	 Begin test configuration
 	int unknowninputs = 0;	// 0: Test against training data
 							// 1: Test against unknown inputs
