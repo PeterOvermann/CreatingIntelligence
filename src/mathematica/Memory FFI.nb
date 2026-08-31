@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     25455,        611]
-NotebookOptionsPosition[     23100,        549]
-NotebookOutlinePosition[     24141,        583]
-CellTagsIndexPosition[     24098,        580]
+NotebookDataLength[     22906,        563]
+NotebookOptionsPosition[     20806,        506]
+NotebookOutlinePosition[     21849,        540]
+CellTagsIndexPosition[     21806,        537]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -58,7 +58,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[1384]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+  "In[655]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +100,7 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[1385]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+  "In[656]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
 
 Cell[CellGroupData[{
 
@@ -351,7 +351,7 @@ Cell[BoxData[
          "\t\t\t", "|>"}]}], " ", "]"}]}]}], "\[IndentingNewLine]", "\t\t", 
    "]"}]}]], "Code",
  CellLabel->
-  "In[1386]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+  "In[657]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -364,46 +364,7 @@ Cell[BoxData[
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
  CellLabel->
-  "In[1387]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell["Foreign Function Interface", "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{
-  "FFISource", " ", "=", 
-   " ", "\"\<\n\n// Standard C\n\n#include \\\"WolframLibrary.h\\\"\n#include \
-<stdlib.h>\n\n#include \\\"memory.h\\\"\n\n// Mathematica foreign-function \
-interface (FFI) for the memory library.\n// The functions named TAM.. are \
-linked into Mathematica. \n\nDLLEXPORT void* TAMnew(int Adim, int Apop, int \
-Bdim, int Bpop) \n\t{ return (void*) Memory_new (Adim, Apop, Bdim, Bpop);}\n\n\
-DLLEXPORT void TAMsetthreshold (void *m, int t)\n\t{ \
-Memory_set_threshold((Memory*) m, t); }\n\nDLLEXPORT int TAMgetthreshold(void \
-*m)\n\t{ return Memory_get_threshold( (Memory*) m); }\n\n\nDLLEXPORT int \
-TAMmemory(void *m)\n\t{ return Memory_count ( (Memory*) m); }\n\nDLLEXPORT \
-void TAMfree(void *m) \n\t{ Memory_free((Memory*) m); }\n\t\t\t\t\nDLLEXPORT \
-void TAMwrite(void *m, int *Abits, int Apop, int *Bbits, int Bpop)\n\t{\n\t\
-Memory *M = (Memory*) m;\n\t\n\tSet *A = Set_new(M->Adimension);\n\tSet *B = \
-Set_new(M->Bdimension);\n\t\n\t// Decrement to convert to zero-based \
-numbering.\n\tA->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] \
-- 1;\n\tB->p = Bpop; for (int i = 0; i < Bpop; i++) B->a[i] = Bbits[i] - 1;\n\
-\n\tMemory_write(M, A, B);\n\n\tSet_free(A);\n\tSet_free(B);\n\t}\n\n\
-DLLEXPORT void TAMread(void *m, int *Abits, int Apop, int *Bbits, int *Bpop)\n\
-\t{\n\tMemory *M = (Memory*) m;\n\t\n\tSet *A = Set_new(M->Adimension); \n\t\
-Set *B = Set_new(M->Bdimension);\n\t\n\t// Convert A to 0-based numbering.\n\t\
-A->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;\n\n\t\
-Memory_read(M, A, B);\n\n\t// Convert B to 1-based numbering. B can be a an \
-empty list.\n\t*Bpop = B->p; for (int i = 0; i < B->p; i++) Bbits[i] = \
-B->a[i] + 1;\n\t\n\tSet_free(A);\n\tSet_free(B);\n\t}\n\t\n\>\""}], 
-  ";"}]], "Code",
- InitializationCell->False,
- FontWeight->"Plain",
- FontColor->GrayLevel[0],
- CellLabel->
-  "In[1388]:=",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51"]
+  "In[658]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -450,7 +411,7 @@ first.\>\"", "]"}], ";", "\n", "        ",
         RowBox[{
          RowBox[{"ParentDirectory", "[", 
           RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
-         " ", "\"\<c\>\""}], "}"}], "]"}]}], ";", "\n", "\t", 
+         " ", "\"\<c\>\""}], "}"}], "]"}]}], ";", "\n", "    ", "\n", "\t", 
      RowBox[{"Needs", "[", "\"\<CCompilerDriver`\>\"", "]"}], ";", "\n", 
      "\t\t", "\n", "\t", 
      RowBox[{"Export", "[", " ", 
@@ -466,8 +427,9 @@ first.\>\"", "]"}], ";", "\n", "        ",
         RowBox[{
          RowBox[{"FileNameJoin", "[", 
           RowBox[{"{", 
-           RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], ",", 
-         "\n", "\t\t", 
+           RowBox[{
+            RowBox[{"NotebookDirectory", "[", "]"}], ",", 
+            " ", "\"\<FFI.c\>\""}], "}"}], "]"}], ",", "\n", "\t\t", 
          RowBox[{"FileNameJoin", "[", 
           RowBox[{"{", 
            RowBox[{"srcdir", ",", " ", "\"\<memory.c\>\""}], "}"}], "]"}]}], 
@@ -479,12 +441,7 @@ first.\>\"", "]"}], ";", "\n", "        ",
         " ", "\"\<-O3 -ffast-math\>\""}], ",", "\n", "\t\t\t", 
        RowBox[{"\"\<IncludeDirectories\>\"", " ", "->", " ", 
         RowBox[{"{", "srcdir", "}"}]}]}], "]"}], ";", "\n", "\t\t\t\t", "\n", 
-     "\t", 
-     RowBox[{"DeleteFile", "[", " ", 
-      RowBox[{"FileNameJoin", "[", 
-       RowBox[{"{", 
-        RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], "]"}], ";",
-      "\t\t", "\n", "\n", "    ", "\n", "    ", 
+     "    ", 
      RowBox[{"(*", " ", 
       RowBox[{
       "Force", " ", "AutoGenerate", " ", "setting", " ", "for", " ", "this", " ", 
@@ -543,13 +500,13 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[1389]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+  "In[659]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
 }, Open  ]]
 }, Open  ]]
 },
 AutoGeneratedPackage->Automatic,
 WindowSize->{862, 1030},
-WindowMargins->{{Automatic, 190}, {8, Automatic}},
+WindowMargins->{{284, Automatic}, {-34, Automatic}},
 DockedCells->{
   Cell[
    BoxData[
@@ -584,25 +541,20 @@ CellTagsIndex->{}
 Notebook[{
 Cell[CellGroupData[{
 Cell[422, 15, 120, 0, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574"],
-Cell[545, 17, 1830, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
-Cell[2378, 62, 1673, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
+Cell[545, 17, 1829, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+Cell[2377, 62, 1672, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[4076, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
-Cell[4162, 108, 10645, 245, 1784, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+Cell[4074, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+Cell[4160, 108, 10644, 245, 1784, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[14844, 358, 85, 0, 66, "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
-Cell[14932, 360, 235, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+Cell[14841, 358, 85, 0, 66, "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
+Cell[14929, 360, 234, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[15204, 371, 103, 0, 66, "Subsection",ExpressionUUID->"8eede849-4e1f-40fa-9f35-a2338cff26ed"],
-Cell[15310, 373, 1984, 32, 1552, "Code",ExpressionUUID->"cfadebb9-1200-4dc7-9c0f-6770b1d19f51",
- InitializationCell->False]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[17331, 410, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
-Cell[17428, 412, 5644, 133, 1128, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
+Cell[15200, 371, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
+Cell[15297, 373, 5481, 129, 1080, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]
