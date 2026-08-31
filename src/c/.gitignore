@@ -4,6 +4,7 @@ xcuserdata/
 # Local build artifacts
 build/
 DerivedData/
+lib/
 
 # Compiled C object files and libraries
 *.o
