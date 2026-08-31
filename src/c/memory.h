@@ -70,7 +70,7 @@ typedef struct
 	int Adimension;						//	A hyperparameters
 	int Apopulation;
 
-	int Bdimension;						//	B hyperparameters (zero if auto-associative)
+	int Bdimension;						//	B hyperparameters (same as A if auto-associative)
 	int Bpopulation;
 	
 	int T;								//	Pattern patching threshold

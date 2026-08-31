@@ -46,21 +46,16 @@ Memory[config_Association] :=
 			{"OpaqueRawPointer"} -> "Void"];
 	
 		{NA, PA} = config["A_parameters"];
+		{NB, PB} = config["B_parameters"];
+		
+		If[ ! MatchQ[{NA, PA, NB, PB}, {__Integer}], 
+					Message[Memory::params, config]];	
 
-		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
-			Message[Memory::params, config]];	
-
-		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
-						config["B_parameters"], {NA, PA}];
-			
-		If[ ! MatchQ[{NB, PB}, {_Integer, _Integer}], 
-			Message[Memory::params, config]];	
-
-		M = new[NA, PA, NB, PB]; (* Constructor. *)
+		M = new[NA, PA, NB, PB]; (* Memory constructor. *)
 
 		(* Push user-defined (scaled) threshold. *)
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
-			setthreshold[M, T = Round[config["threshold"] * PA]]];
+			setthreshold[M, Round[config["threshold"] * PA]]];
 
 		(* Get final threshold. *)
 		T = getthreshold[M];

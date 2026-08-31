@@ -23,11 +23,10 @@ Memory[config_Association] :=
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
-		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
-			Message[Memory::params, config]];	
-	
-		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
-						config["B_parameters"], {0, 0}];
+		{NB, PB} = config["B_parameters"];
+		
+		If[ ! MatchQ[{NA, PA, NB, PB}, {__Integer}], 
+					Message[Memory::params, config]];	
 
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
 			opt = "-T"; T = Round[config["threshold"] * PA]];	
@@ -36,6 +35,7 @@ Memory[config_Association] :=
 			{$UserBaseDirectory, "SystemFiles", "LibraryResources", 
 			  $SystemID, "TAM_CLT"}], opt, T, NA, PA, NB, PB}];
 		
+		(* Retrieve the absolute threshold from the CLT. *)
 		WriteLine[process, "threshold"]; 
 		T = ToExpression[ReadLine[process]];	
 											
