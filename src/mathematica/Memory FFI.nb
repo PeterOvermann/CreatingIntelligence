@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     22906,        563]
-NotebookOptionsPosition[     20806,        506]
-NotebookOutlinePosition[     21849,        540]
-CellTagsIndexPosition[     21806,        537]
+NotebookDataLength[     22900,        563]
+NotebookOptionsPosition[     20800,        506]
+NotebookOutlinePosition[     21843,        540]
+CellTagsIndexPosition[     21800,        537]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -58,7 +58,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[660]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+  "In[981]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +100,7 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[661]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+  "In[982]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
 
 Cell[CellGroupData[{
 
@@ -351,7 +351,7 @@ Cell[BoxData[
          "\t\t\t", "|>"}]}], " ", "]"}]}]}], "\[IndentingNewLine]", "\t\t", 
    "]"}]}]], "Code",
  CellLabel->
-  "In[662]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+  "In[983]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -364,7 +364,7 @@ Cell[BoxData[
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
  CellLabel->
-  "In[663]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+  "In[984]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -429,7 +429,7 @@ first.\>\"", "]"}], ";", "\n", "        ",
           RowBox[{"{", 
            RowBox[{
             RowBox[{"NotebookDirectory", "[", "]"}], ",", 
-            " ", "\"\<FFI.c\>\""}], "}"}], "]"}], ",", "\n", "\t\t", 
+            " ", "\"\<Memory FFI.c\>\""}], "}"}], "]"}], ",", "\n", "\t\t", 
          RowBox[{"FileNameJoin", "[", 
           RowBox[{"{", 
            RowBox[{"srcdir", ",", " ", "\"\<memory.c\>\""}], "}"}], "]"}]}], 
@@ -437,8 +437,8 @@ first.\>\"", "]"}], ";", "\n", "        ",
        "\t\t\t", 
        RowBox[{"\"\<CompilerName\>\"", " ", "->", " ", "\"\<cc\>\""}], ",", 
        " ", "\n", "\t\t\t", 
-       RowBox[{"\"\<CompileOptions\>\"", " ", "->", 
-        " ", "\"\<-O3 -ffast-math\>\""}], ",", "\n", "\t\t\t", 
+       RowBox[{"\"\<CompileOptions\>\"", " ", "->", " ", "\"\<-O3\>\""}], ",",
+        "\n", "\t\t\t", 
        RowBox[{"\"\<IncludeDirectories\>\"", " ", "->", " ", 
         RowBox[{"{", "srcdir", "}"}]}]}], "]"}], ";", "\n", "\t\t\t\t", "\n", 
      "    ", 
@@ -500,7 +500,7 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[664]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+  "In[985]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
 }, Open  ]]
 }, Open  ]]
 },
@@ -554,7 +554,7 @@ Cell[14929, 360, 234, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[15200, 371, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
-Cell[15297, 373, 5481, 129, 1080, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
+Cell[15297, 373, 5475, 129, 1080, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]
