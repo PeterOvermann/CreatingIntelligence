@@ -18,7 +18,7 @@ endif
 
 REPO_ROOT = ../..
 BIN_DIR = $(REPO_ROOT)/bin
-LIB_DIR = $(REPO_ROOT)/lib
+LIB_DIR = lib
 
 LIB_TARGET = $(LIB_DIR)/libmemory.$(EXT)
 CLI_TARGET = $(BIN_DIR)/memory
