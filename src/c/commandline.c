@@ -31,10 +31,7 @@ static void print_help(void)
 	{
 	printf("Associative Memory\n");
 	
-	printf("Auto-associative memory: \n");
-	printf("memory <na> <pa>\n\n");
-
-	printf("Hetero-associative memory: \n");
+	printf("Associative memory: \n");
 	printf("memory <na> <pa> <nb> <pb>\n\n");
 
 	printf("Command line option: \n");
@@ -92,7 +89,7 @@ int main(int argc, char *argv[])
 
 	int arguments = argc, a = 0;
 	
-	// User-defined activation threshold
+	// User-defined absolute activation threshold
 	int pmin = 0;
 	if (arguments == 7 && strcmp(argv[1], "-T") == 0)
 		{
@@ -100,13 +97,7 @@ int main(int argc, char *argv[])
 		arguments = arguments - 2;
 		}
 
-	if (arguments == 3) // auto-associative
-		{
-		sscanf( argv[++a], "%d", &nx);
-		sscanf( argv[++a], "%d", &px);
-		ny = py = 0; 
-		}
-	else if (arguments == 5) // hetero-associative
+	if (arguments == 5)
 		{
 		sscanf( argv[++a], "%d", &nx);
 		sscanf( argv[++a], "%d", &px);
@@ -117,8 +108,6 @@ int main(int argc, char *argv[])
 		{ print_help(); exit(1); }
 		
 	Memory *H 	= Memory_new(nx, px, ny, py);
-
-	if (ny == 0) { ny = nx; py = px; }
 
 	Set 	*x	= Set_new(nx),
    			*y	= Set_new(ny);

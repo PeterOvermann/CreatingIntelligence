@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
 	
  	clock_t start;
- 	int autoassociative = Bdim == 0;
+ 	int autoassociative = Adim == Bdim;
  	
 	if (autoassociative)
 		printf("\n\nAuto-associative memory A->A at %d/%d, ", Adim, Apop);
@@ -69,8 +69,6 @@ int main(int argc, char *argv[])
 		
 	Memory *M = Memory_new(Adim, Apop, Bdim, Bpop);
 	
-	if (Bdim == 0) { Bdim = Adim; Bpop = Apop; }
-
 	Set **x = malloc(items * sizeof(Set*)),
 		**y = malloc(items * sizeof(Set*)),
 		**Y = malloc(items * sizeof(Set*));

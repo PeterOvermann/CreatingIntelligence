@@ -24,24 +24,15 @@ Memory[config_Association] :=
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
-		If[ ! MatchQ[{NA, PA}, {_Integer, _Integer}], 
-			Message[Memory::params, config]];	
+		{NB, PB} = config["B_parameters"];
+		
+		If[ ! MatchQ[{NA, PA, NB, PB}, {__Integer}], 
+					Message[Memory::params, config]];	
 
-		{NB, PB} = If[ KeyExistsQ[config, "B_parameters"], 
-						config["B_parameters"], {NA, PA}];
+		(* Auto-associative memory capacity, needed for default threshold. *)
+		capacity = Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ];
 			
-		If[ ! MatchQ[{NB, PB}, {_Integer, _Integer}], 
-			Message[Memory::params, config]];	
-								
-		(* Memory capacity, needed for threshold calculation. *)
-		capacity = If[KeyExistsQ[config, "B_parameters"], 
-				(* Hetero-associative capacity if B is specified. *)
-				Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA*(PA-1)) ],
-				(* Auto-associative capacity. *)
-				Round[ Log[2] * (NB*(NA-1)*(NA-2)) / (PB*(PA-1)*(PA-2)) ]
-				];
-			
-		(* Calculate default pattern matching threshold. *)
+		(* Default pattern matching threshold. *)
 		While[T < PA && capacity^2 * Binomial[PA, T] * Binomial[NA - PA, PA - T] / 
 				Binomial[NA, PA]  >= 1, T++];
 

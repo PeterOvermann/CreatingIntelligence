@@ -362,17 +362,28 @@ static double overlap_probability(int n, int p, int v)
 
 // 	Pattern matching threshold T
 	
-static int matching_threshold (int NA, int PA, int NB, int PB)
+static int matching_threshold_hetero (int NA, int PA, int NB, int PB)
 	{
-	double icap; // Inverse of the memory capacity.
+	double icap; // Inverse of the hetero-associative memory capacity.
 	
-	if (NB == 0 && PB == 0)	// Auto-associative.
-		icap = (double)PA / (double)NA * (double)(PA-1) /
+	icap = (double)PA / (double)NA * (double)(PA-1) /
+			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
+		
+	for (int v = 4; v <= PA; v++)
+		if (overlap_probability(NA, PA, v) < icap*icap)
+			return v;
+	
+	// Use PA as threshold if PA too small to satisfy the inequality.
+	return PA;
+	}
+
+static int matching_threshold_auto (int NA, int PA)
+	{
+	double icap; // Inverse of the auto-associative memory capacity.
+	
+	icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)(PA-2) / (double)(NA-2) / M_LN2;
 
-	else			// Hetero-associative.
-		icap = (double)PA / (double)NA * (double)(PA-1) /
-			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
 		
 	for (int v = 4; v <= PA; v++)
 		if (overlap_probability(NA, PA, v) < icap*icap)
@@ -558,23 +569,22 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Adimension 	= na;						// A hyperparameters
 	self->Apopulation	= pa;
 
-	self->Bdimension 	= nb;						// B hyperparameters, 0 if auto-associative
-	self->Bpopulation	= pb;						//
+	self->Bdimension 	= nb;						// B hyperparameters
+	self->Bpopulation	= pb;
 	
-	self->T 			= matching_threshold(na, pa, nb, pb);
+	self->T = matching_threshold_auto(na, pa);		// Absolute pattern matching threshold
 
-	if (!self->Bdimension && !self->Bpopulation)
-		{
-		self->Bdimension  = self->Adimension;
-		self->Bpopulation = self->Apopulation;
-		}
-
-	self->M 			= (byte***) calloc(PAGE_COUNT, sizeof( byte**));
+	self->M = (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
-	self->X 			= Set_new(na);				// Matching elements in memory retrieval
+	self->X = Set_new(na);							// Matching elements in memory retrieval
 	
 	return self;
 	}
+	
+// Pattern matching threshold note: We always use the auto-associative value (based on the capacity
+// of an auto-associative memory). For most hyperparameter configurations it is identical to the
+// hetero-associative threshold, and in rare cases larger by one. It's always safe to use the larger
+// threshold. Furthermore, for SDR-processing heteroassociations often the threshold is user-defined.
 	
 	
 void 	Memory_set_threshold (Memory *self, int t)	// Override default threshold

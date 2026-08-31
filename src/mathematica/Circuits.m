@@ -198,19 +198,32 @@ ResolveBlockJoinNormal[blocks: {__List}, dims : {__Integer}] :=
 	]
 
 
-MemoryCapacity[{NA_, PA_}, {NB_, PB_}] := 
-	If[NB == 0 && PB == 0,
-		(* Auto-associative. *)
-		Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ],
-		(* Hetero-associative. *)
-		Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA *(PA-1) ) ]
-		]
+MemoryCapacityAuto[{NA_, PA_}] := 
+		Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ]
 
 
-MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
+MemoryCapacityHetero[{NA_, PA_}, {NB_, PB_}] := 
+		Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA*(PA-1) ) ]
+
+
+
+MatchingThresholdAuto[{NA_Integer, PA_Integer}] :=		
 	Module[ {cap, T = 1},
 		
-		cap = MemoryCapacity[{NA, PA}, {NB, PB}];
+		cap = MemoryCapacityAuto[{NA, PA}];
+		
+		If[ PA <= 2, Return[0]]; (* Prevent division by zero. *)
+
+		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
+			Binomial[NA, PA] >= 1, T++]; 
+		T
+		]																			
+
+
+MatchingThresholdHetero[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
+	Module[ {cap, T = 1},
+		
+		cap = MemoryCapacityHetero[{NA, PA}, {NB, PB}];
 		
 		If[ PA <= 2, Return[0]]; (* Prevent division by zero. *)
 
@@ -235,7 +248,7 @@ codec[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {0, 0}]; 
+	T = MatchingThresholdAuto[ {n, p}]; 
 
 	
 	f[expr_] := Module[ {result, overlaps},
@@ -298,7 +311,7 @@ category[config_Association] := Module[ {f, n, p, K, partitionsize, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {0, 0}]; 
+	T = MatchingThresholdAuto[ {n, p}]; 
 
 	f[expr_] := Module[ {result, overlaps},
 	
@@ -347,7 +360,7 @@ binning[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThreshold[ {n, p}, {0, 0}]; 
+	T = MatchingThresholdAuto[ {n, p}]; 
 
 	(* Decoder only *)
 	If[config["component"] === input,
@@ -718,14 +731,15 @@ geneneric cases. Modify as needed.
 *)
 
 auto[config_Association] := 
-	Module[ {f, plugin, dims, pop, M, label, size, min, max, 
+	Module[ {f, plugin, dims, pop, params, M, label, size, min, max, 
 		 absratelimit, decimation},
 		
 	(* Update rule *)			
 	plugin = Lookup[config, "plugin", replacement];
 			
 	dims = First /@ config["receive_blocks"];
-	pop  = Plus @@ Last /@ config["receive_blocks"];
+	params = Plus @@ config["receive_blocks"];
+	pop  = Last[params];
 
 	{label, size} = 
 		Switch[ plugin, 
@@ -754,7 +768,7 @@ auto[config_Association] :=
 	
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
-		<| "A_parameters" -> Plus @@ config["receive_blocks"] |> ]];	
+		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
 		
 	f[blocks__List] := Module[ {A, X, Y, Xdec},
 
@@ -991,7 +1005,7 @@ circuit[config_Association] :=
 	plugin = Lookup[config, "plugin", shared];
 	
 	sub = plugin[config];
-	
+
 	If[ sub === <||>, Return[<||>]];
 	
 	params = {sub["receive_blocks"], sub["send_blocks"]};

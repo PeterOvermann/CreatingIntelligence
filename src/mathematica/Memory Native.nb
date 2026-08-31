@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     31487,        768]
-NotebookOptionsPosition[     29335,        709]
-NotebookOutlinePosition[     30377,        743]
-CellTagsIndexPosition[     30334,        740]
+NotebookDataLength[     29481,        721]
+NotebookOptionsPosition[     27331,        662]
+NotebookOutlinePosition[     28371,        696]
+CellTagsIndexPosition[     28328,        693]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -60,7 +60,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[1377]:=",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+  "In[346]:=",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
 
 Cell[BoxData[
  RowBox[{
@@ -102,7 +102,7 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[1378]:=",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e"],
+  "In[347]:=",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e"],
 
 Cell[CellGroupData[{
 
@@ -132,98 +132,52 @@ Cell[BoxData[
         RowBox[{"NA", ",", " ", "PA"}], "}"}], " ", "=", " ", 
        RowBox[{"config", "[", "\"\<A_parameters\>\"", "]"}]}], ";", "\n", 
       "\t\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"NB", ",", " ", "PB"}], "}"}], " ", "=", " ", 
+       RowBox[{"config", "[", "\"\<B_parameters\>\"", "]"}]}], ";", "\n", 
+      "\t\t", "\n", "\t\t", 
       RowBox[{"If", "[", " ", 
        RowBox[{
         RowBox[{"!", " ", 
          RowBox[{"MatchQ", "[", 
           RowBox[{
            RowBox[{"{", 
-            RowBox[{"NA", ",", " ", "PA"}], "}"}], ",", " ", 
-           RowBox[{"{", 
-            RowBox[{"_Integer", ",", " ", "_Integer"}], "}"}]}], "]"}]}], ",",
-         " ", "\n", "\t\t\t", 
+            RowBox[{"NA", ",", " ", "PA", ",", " ", "NB", ",", " ", "PB"}], 
+            "}"}], ",", " ", 
+           RowBox[{"{", "__Integer", "}"}]}], "]"}]}], ",", " ", "\n", 
+        "\t\t\t\t\t", 
         RowBox[{"Message", "[", 
          RowBox[{
           RowBox[{"Memory", "::", "params"}], ",", " ", "config"}], "]"}]}], 
        "]"}], ";", "\t", "\n", "\n", "\t\t", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"NB", ",", " ", "PB"}], "}"}], " ", "=", " ", 
-       RowBox[{"If", "[", " ", 
-        RowBox[{
-         RowBox[{"KeyExistsQ", "[", 
-          RowBox[{"config", ",", " ", "\"\<B_parameters\>\""}], "]"}], ",", 
-         " ", "\n", "\t\t\t\t\t\t", 
-         RowBox[{"config", "[", "\"\<B_parameters\>\"", "]"}], ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"NA", ",", " ", "PA"}], "}"}]}], "]"}]}], ";", "\n", 
-      "\t\t\t", "\n", "\t\t", 
-      RowBox[{"If", "[", " ", 
-       RowBox[{
-        RowBox[{"!", " ", 
-         RowBox[{"MatchQ", "[", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{"NB", ",", " ", "PB"}], "}"}], ",", " ", 
-           RowBox[{"{", 
-            RowBox[{"_Integer", ",", " ", "_Integer"}], "}"}]}], "]"}]}], ",",
-         " ", "\n", "\t\t\t", 
-        RowBox[{"Message", "[", 
-         RowBox[{
-          RowBox[{"Memory", "::", "params"}], ",", " ", "config"}], "]"}]}], 
-       "]"}], ";", "\t", "\n", "\t\t\t\t\t\t\t\t", "\n", "\t\t", 
       RowBox[{"(*", " ", 
        RowBox[{
-        RowBox[{"Memory", " ", "capacity"}], ",", " ", 
-        RowBox[{"needed", " ", "for", " ", "threshold", " ", 
-         RowBox[{"calculation", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+        RowBox[{"Auto", "-", 
+         RowBox[{"associative", " ", "memory", " ", "capacity"}]}], ",", " ", 
+        
+        RowBox[{"needed", " ", "for", " ", "default", " ", 
+         RowBox[{"threshold", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
       RowBox[{"capacity", " ", "=", " ", 
-       RowBox[{"If", "[", 
+       RowBox[{"Round", "[", " ", 
         RowBox[{
-         RowBox[{"KeyExistsQ", "[", 
-          RowBox[{"config", ",", " ", "\"\<B_parameters\>\""}], "]"}], ",", 
-         " ", "\n", "\t\t\t\t", 
-         RowBox[{"(*", " ", 
-          RowBox[{"Hetero", "-", 
-           RowBox[{
-           "associative", " ", "capacity", " ", "if", " ", "B", " ", "is", " ", 
-            RowBox[{"specified", "."}]}]}], " ", "*)"}], "\n", "\t\t\t\t", 
-         RowBox[{"Round", "[", " ", 
-          RowBox[{
-           RowBox[{"Log", "[", "2", "]"}], " ", "*", " ", 
-           RowBox[{
+         RowBox[{"Log", "[", "2", "]"}], " ", "*", " ", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"NA", "*", 
             RowBox[{"(", 
-             RowBox[{"NB", "*", "NA", "*", 
-              RowBox[{"(", 
-               RowBox[{"NA", "-", "1"}], ")"}]}], ")"}], " ", "/", " ", 
+             RowBox[{"NA", "-", "1"}], ")"}], "*", 
             RowBox[{"(", 
-             RowBox[{"PB", "*", "PA", "*", 
-              RowBox[{"(", 
-               RowBox[{"PA", "-", "1"}], ")"}]}], ")"}]}]}], " ", "]"}], ",", 
-         "\n", "\t\t\t\t", 
-         RowBox[{"(*", " ", 
-          RowBox[{"Auto", "-", 
-           RowBox[{"associative", " ", 
-            RowBox[{"capacity", "."}]}]}], " ", "*)"}], "\n", "\t\t\t\t", 
-         RowBox[{"Round", "[", " ", 
-          RowBox[{
-           RowBox[{"Log", "[", "2", "]"}], " ", "*", " ", 
-           RowBox[{
+             RowBox[{"NA", "-", "2"}], ")"}]}], ")"}], " ", "/", " ", 
+          RowBox[{"(", 
+           RowBox[{"PA", "*", 
             RowBox[{"(", 
-             RowBox[{"NB", "*", 
-              RowBox[{"(", 
-               RowBox[{"NA", "-", "1"}], ")"}], "*", 
-              RowBox[{"(", 
-               RowBox[{"NA", "-", "2"}], ")"}]}], ")"}], " ", "/", " ", 
+             RowBox[{"PA", "-", "1"}], ")"}], "*", 
             RowBox[{"(", 
-             RowBox[{"PB", "*", 
-              RowBox[{"(", 
-               RowBox[{"PA", "-", "1"}], ")"}], "*", 
-              RowBox[{"(", 
-               RowBox[{"PA", "-", "2"}], ")"}]}], ")"}]}]}], " ", "]"}]}], 
-        "\n", "\t\t\t\t", "]"}]}], ";", "\n", "\t\t\t", "\n", "\t\t", 
+             RowBox[{"PA", "-", "2"}], ")"}]}], ")"}]}]}], " ", "]"}]}], ";", 
+      "\n", "\t\t\t", "\n", "\t\t", 
       RowBox[{"(*", " ", 
-       RowBox[{"Calculate", " ", "default", " ", "pattern", " ", "matching", " ", 
+       RowBox[{"Default", " ", "pattern", " ", "matching", " ", 
         RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t", 
       RowBox[{"While", "[", 
        RowBox[{
@@ -592,9 +546,8 @@ Cell[BoxData[
           
           RowBox[{"\"\<backend\>\"", " ", "->", 
            " ", "\"\<Mathematica\>\""}]}], "\n", "\t\t\t", "|>"}]}], " ", 
-       "]"}]}]}], "\[IndentingNewLine]", "\t\t", "]"}]}]}]], "Code",
- CellLabel->
-  "In[1379]:=",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+       "]"}]}]}], "\[IndentingNewLine]", "\t\t", "]"}]}]}]], "Code",Expression\
+UUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -607,7 +560,7 @@ Cell[BoxData[
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
  CellLabel->
-  "In[1380]:=",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+  "In[349]:=",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -703,13 +656,13 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[1381]:=",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170"]
+  "In[350]:=",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170"]
 }, Open  ]]
 }, Open  ]]
 },
 AutoGeneratedPackage->Automatic,
 WindowSize->{853, 940},
-WindowMargins->{{Automatic, 421}, {-72, Automatic}},
+WindowMargins->{{63, Automatic}, {20, Automatic}},
 DockedCells->{
   Cell[
    BoxData[
@@ -745,21 +698,21 @@ Notebook[{
 Cell[CellGroupData[{
 Cell[422, 15, 134, 2, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574",
  InitializationCell->True],
-Cell[559, 19, 1830, 43, 271, "Code",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
-Cell[2392, 64, 1673, 40, 23, "Input",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e",
+Cell[559, 19, 1829, 43, 271, "Code",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+Cell[2391, 64, 1672, 40, 23, "Input",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[4090, 108, 113, 2, 66, "Subsection",ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b",
+Cell[4088, 108, 113, 2, 66, "Subsection",ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b",
  InitializationCell->True],
-Cell[4206, 112, 20888, 484, 2703, "Code",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+Cell[4204, 112, 18888, 437, 2491, "Code",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[25131, 601, 85, 0, 66, "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
-Cell[25219, 603, 235, 6, 63, "Code",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+Cell[23129, 554, 85, 0, 66, "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
+Cell[23217, 556, 234, 6, 63, "Code",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[25491, 614, 86, 0, 66, "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
-Cell[25580, 616, 3727, 89, 680, "Code",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170",
+Cell[23488, 567, 86, 0, 66, "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
+Cell[23577, 569, 3726, 89, 680, "Code",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]
