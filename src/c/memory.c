@@ -362,20 +362,6 @@ static double overlap_probability(int n, int p, int v)
 
 // 	Pattern matching threshold T
 	
-static int matching_threshold_hetero (int NA, int PA, int NB, int PB)
-	{
-	double icap; // Inverse of the hetero-associative memory capacity.
-	
-	icap = (double)PA / (double)NA * (double)(PA-1) /
-			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
-		
-	for (int v = 4; v <= PA; v++)
-		if (overlap_probability(NA, PA, v) < icap*icap)
-			return v;
-	
-	// Use PA as threshold if PA too small to satisfy the inequality.
-	return PA;
-	}
 
 static int matching_threshold_auto (int NA, int PA)
 	{
@@ -393,6 +379,25 @@ static int matching_threshold_auto (int NA, int PA)
 	return PA;
 	}
 
+/*
+
+// Unused:
+
+static int matching_threshold_hetero (int NA, int PA, int NB, int PB)
+	{
+	double icap; // Inverse of the hetero-associative memory capacity.
+	
+	icap = (double)PA / (double)NA * (double)(PA-1) /
+			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
+		
+	for (int v = 4; v <= PA; v++)
+		if (overlap_probability(NA, PA, v) < icap*icap)
+			return v;
+	
+	// Use PA as threshold if PA too small to satisfy the inequality.
+	return PA;
+	}
+*/
 
 
 // -------------------------------------------------------------------------- //
@@ -523,7 +528,7 @@ static byte *bitpair_alloc (byte ***M, int nb, int address)
 
 //	Bitpair addressing used for retrieval
 
-static byte *bitpair_address (byte ***M, int nb, int address)
+static byte *bitpair_address (byte ***M, int address)
 	{
 	// Designed to wrap around for very large memory spaces.
 	int pg = (address / PAGE_SIZE) % PAGE_COUNT;
@@ -661,7 +666,7 @@ void Memory_write (Memory *self, Set *A, Set *B)
 //	Uses an O(N) percentile algorithm
 // 	This is faster than quicksort or quickselect
 
-static void kwta (int k, int ny, unsigned int *r, int threshold, Set *y)
+static void kwta (int k, int ny, int *r, int threshold, Set *y)
 	{
 	// Max response value
 	int max = 0;
@@ -716,16 +721,16 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	// 	R and Ri must be re-initialized to zero in each iteration.
 
 	// Response per input element
-	unsigned int *Ri = (unsigned int *) malloc(A->p * ny * sizeof(unsigned int));
+	int *Ri = (int *) malloc(A->p * ny * sizeof(int));
 
 	// Total response vector
-	unsigned int *R = (unsigned int *) malloc(ny * sizeof(unsigned int));
+	int *R = (int *) malloc(ny * sizeof(int));
 
 	// Each bit's contribution to B
-	unsigned int *W  = (unsigned int *) malloc(A->p * sizeof(unsigned int));
+	int *W  = (int *) malloc(A->p * sizeof(int));
 	
 	// Sorted version of the above
-	unsigned int *Ws = (unsigned int *) malloc(A->p * sizeof(unsigned int));
+	int *Ws = (int *) malloc(A->p * sizeof(int));
 
 	// Memory bitvector size in bytes
 	int size = (ny + 7) / 8;
@@ -755,17 +760,17 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 			for (int j = 0; j < i; j++)
 				{
 				unsigned int addr = X->a[j] + X->a[i]*(X->a[i]-1) / 2;
-				byte* L = bitpair_address(self->M, ny, addr);
+				byte* L = bitpair_address(self->M, addr);
 			
 				if (L) // Null pointer if this address has not been written to
 					{
-					for (unsigned int k = 0; k < size; k++)
+					for (int k = 0; k < size; k++)
 					memx8[k] = bits_to_bytes[L[k]];
 	
 					// Step 4: Aggregate.
 					// Add  byte vectors to the weight vectors of both bits.
 					// Separate loops is faster than one combined loop.
-					unsigned int *w;
+					int *w;
 								
 					w = Ri + ny * j;
 					for (int k = 0; k < ny; k++) w[k] += bytevector[k];
@@ -777,7 +782,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		// Overall response vector.
 		for (int i = 0; i < P; i++)
 			{
-			unsigned int *q = Ri + ny * i;
+			int *q = Ri + ny * i;
 			for (int k = 0; k < ny; k++) R[k] += q[k];
 			}
 	

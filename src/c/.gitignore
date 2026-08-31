@@ -1,0 +1,15 @@
+# Xcode user-specific files
+xcuserdata/
+
+# Local build artifacts
+build/
+DerivedData/
+
+# Compiled C object files and libraries
+*.o
+*.so
+*.dylib
+*.a
+
+# macOS system files
+.DS_Store
