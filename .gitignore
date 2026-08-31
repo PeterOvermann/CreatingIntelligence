@@ -4,3 +4,5 @@ Development/
 Notes/
 .venv/
 __pycache__/
+/bin/
+/lib/
