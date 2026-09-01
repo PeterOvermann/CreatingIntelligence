@@ -5,3 +5,4 @@ Notes/
 .venv/
 __pycache__/
 /bin/
+.env
