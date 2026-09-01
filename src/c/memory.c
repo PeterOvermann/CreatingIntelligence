@@ -361,33 +361,16 @@ static double overlap_probability(int n, int p, int v)
 	}
 
 // 	Pattern matching threshold T
-	
 
-static int matching_threshold_auto (int NA, int PA)
+static int matching_threshold (int NA, int PA, int NB, int PB)
 	{
-	double icap; // Inverse of the auto-associative memory capacity.
+	double icap; // Inverse of the memory capacity.
 	
-	icap = (double)PA / (double)NA * (double)(PA-1) /
+	if (NA == NB && PA == PB)	// Auto-associative.
+		icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)(PA-2) / (double)(NA-2) / M_LN2;
-
-		
-	for (int v = 4; v <= PA; v++)
-		if (overlap_probability(NA, PA, v) < icap*icap)
-			return v;
-	
-	// Use PA as threshold if PA too small to satisfy the inequality.
-	return PA;
-	}
-
-/*
-
-// Unused:
-
-static int matching_threshold_hetero (int NA, int PA, int NB, int PB)
-	{
-	double icap; // Inverse of the hetero-associative memory capacity.
-	
-	icap = (double)PA / (double)NA * (double)(PA-1) /
+	else			// Hetero-associative.
+		icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
 		
 	for (int v = 4; v <= PA; v++)
@@ -397,7 +380,6 @@ static int matching_threshold_hetero (int NA, int PA, int NB, int PB)
 	// Use PA as threshold if PA too small to satisfy the inequality.
 	return PA;
 	}
-*/
 
 
 // -------------------------------------------------------------------------- //
@@ -577,7 +559,7 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Bdimension 	= nb;						// B hyperparameters
 	self->Bpopulation	= pb;
 	
-	self->T = matching_threshold_auto(na, pa);		// Absolute pattern matching threshold
+	self->T = matching_threshold(na, pa, nb, pb);	// Absolute pattern matching threshold
 
 	self->M = (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
