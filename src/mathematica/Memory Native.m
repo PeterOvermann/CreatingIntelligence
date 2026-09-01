@@ -29,12 +29,14 @@ Memory[config_Association] :=
 		If[ ! MatchQ[{NA, PA, NB, PB}, {__Integer}], 
 					Message[Memory::params, config]];	
 
-		(* Auto-associative memory capacity, needed for default threshold. *)
-		capacity = Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ];
+		(* Memory capacity, needed for default threshold calculation. *)
+		capacity = If[NA == NB && PA == PB, 
+				Log[2.0] NA (NA - 1) (NA - 2) / (PA (PA - 1) (PA - 2)),
+				Log[2.0] NA (NA - 1) NB / (PA (PA - 1) PB)];
 			
 		(* Default pattern matching threshold. *)
-		While[T < PA && capacity^2 * Binomial[PA, T] * Binomial[NA - PA, PA - T] / 
-				Binomial[NA, PA]  >= 1, T++];
+		While[T < PA && capacity^2 * Binomial[PA, T] * Binomial[NA-PA, PA-T] / 
+				Binomial[NA, PA] >= 1, T++];
 
 		(* User-defined (scaled) threshold . *)
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],

@@ -198,35 +198,19 @@ ResolveBlockJoinNormal[blocks: {__List}, dims : {__Integer}] :=
 	]
 
 
-MemoryCapacityAuto[{NA_, PA_}] := 
-		Round[ Log[2] * (NA*(NA-1)*(NA-2)) / (PA*(PA-1)*(PA-2)) ]
+MemoryCapacity[{NA_, PA_}, {NB_, PB_}] := 
+	If[NA == NB && PA == PB,
+		(* Auto-associative. *)
+		Round[ Log[2] * (NB * (NA-1) * (NA-2)) / (PB * (PA-1) * (PA-2) ) ],
+		(* Hetero-associative. *)
+		Round[ Log[2] * (NB * NA * (NA-1)) / (PB * PA * (PA-1) ) ]
+		]
 
 
-MemoryCapacityHetero[{NA_, PA_}, {NB_, PB_}] := 
-		Round[ Log[2] * (NB*NA*(NA-1)) / (PB*PA*(PA-1) ) ]
-
-
-
-MatchingThresholdAuto[{NA_Integer, PA_Integer}] :=		
+MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
 	Module[ {cap, T = 1},
-		
-		cap = MemoryCapacityAuto[{NA, PA}];
-		
-		If[ PA <= 2, Return[0]]; (* Prevent division by zero. *)
-
-		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
-			Binomial[NA, PA] >= 1, T++]; 
-		T
-		]																			
-
-
-MatchingThresholdHetero[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
-	Module[ {cap, T = 1},
-		
-		cap = MemoryCapacityHetero[{NA, PA}, {NB, PB}];
-		
-		If[ PA <= 2, Return[0]]; (* Prevent division by zero. *)
-
+		If[ PA <= 2 || PB <= 2, Return[0]]; (* Prevent division by zero. *)
+		cap = MemoryCapacity[{NA, PA}, {NB, PB}];
 		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
 			Binomial[NA, PA] >= 1, T++]; 
 		T
@@ -248,7 +232,7 @@ codec[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThresholdAuto[ {n, p}]; 
+	T = MatchingThreshold[{n, p}, {n, p}]; 
 
 	
 	f[expr_] := Module[ {result, overlaps},
@@ -311,7 +295,7 @@ category[config_Association] := Module[ {f, n, p, K, partitionsize, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThresholdAuto[ {n, p}]; 
+	T = MatchingThreshold[{n, p}, {n, p}]; 
 
 	f[expr_] := Module[ {result, overlaps},
 	
@@ -360,7 +344,7 @@ binning[config_Association] := Module[ {f, n, p, lex, T},
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)
-	T = MatchingThresholdAuto[ {n, p}]; 
+	T = MatchingThreshold[{n, p}, {n, p}]; 
 
 	(* Decoder only *)
 	If[config["component"] === input,
