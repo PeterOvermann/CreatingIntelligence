@@ -60,15 +60,16 @@ Memory[config_Association] :=
 		memorycount := (WriteLine[process, "memorycount"]; 
 								ToExpression[ReadLine[process]]);
 
-		Join[ KeyTake[config, {"A_parameters", "B_parameters"}], 
-			<|
+		<|
+			"A_parameters" -> {NA, PA},
+			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "C_CLT"
-			|> ]
+		|> 
 		]
 
 

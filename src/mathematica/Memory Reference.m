@@ -18,9 +18,9 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 
 (*
-This native Mathematica implementation of topological associative memory
-is optimized for speed. 
-See "Memory Reference.nb" for a plain reference implementation.
+This is the native Mathematica reference implementation 
+of topological associative memory.
+See "Memory Native.nb" for a performance-optimized version.
 *)
 
 
@@ -28,7 +28,7 @@ See "Memory Reference.nb" for a plain reference implementation.
 Memory[config_Association] :=
 
 	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
-		store, retrieve, clear, memorycount, accumulate},
+		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -53,76 +53,70 @@ Memory[config_Association] :=
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
-		(* Store auto-association A -> A in memory. *)
+		(* Store hetero-association A -> B in memory. *)
 		store[A_List] := store[A, A];
 		
-		(* Store hetero-association A -> B in memory. *)
-		store[A_List, B_List] := Module[{keys, existing},
-			If[Length[A] < 2, Return[]];
-			
+		(* Store A -> B in memory. *)
+		store[A_List, B_List] := Module[{v, sub2},
 			(* Step 1: Expansion coding. *)
-			keys = Subsets[A, {2}];
-			
-			(* Step 2: Bulk memory retrieval. *)
-			existing = Lookup[mem, keys, zero];
-			
-			(* Step 3: Vectorized memory update. *)
-			existing[[All, B]] = 1;
-			
-			(* Step 4: Bulk memory commit. *)
-			AssociateTo[mem, AssociationThread[keys, existing]];
-		];
+			sub2 = Subsets[A, {2}];
 		
-		(* Helper function. *)
-		accumulate = Compile[{{P, _Integer}, {valsY, _Integer, 1}},
-			Module[{w = Table[0, {P}], k = 1},
-				Do[
-					w[[i]] += valsY[[k]];
-					w[[j]] += valsY[[k]];
-					k++,
-				{i, 1, P - 1}, {j, i + 1, P} ];
-				w], RuntimeOptions -> "Speed"
+			(* Step 2: Memory update. *)
+			v = zero; v[[B]] = 1; 
+			(mem[#] = BitOr[Lookup[mem, Key[#], zero], v])& /@ sub2; 
 			];
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[{X = A, P, Y, R, vals, valsY, t, w, ws, h, cutoff},
+			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff},
+			(* Step 1: Initialize. *)
+			X = A; 
 			
-			While[True,
+			While[ True,
+				(* Step 2: Threshold check.  *)
+				If[ (P = Length[X]) < T, Return[{}]]; 
 			
-				P = Length[X];
-				If[P < T, Return[{}]];
-
-				(* Bulk native lookup returning a 2D packed C-array *)
-				vals = Lookup[mem, Subsets[X, {2}], zero];
-
-				(* Vectorized column accumulation *)
-				R = Total[vals];
-
+				(* Step 3: Expansion coding. *)
+				sub2 = Subsets[Range[P], {2}];
+			
+				(* Step 4: Aggregate. *)
+				Ri = ConstantArray[0, {P, NB}];
+				(v = Lookup[mem, Key[{X[[#1]], X[[#2]]}], zero]; 
+						Ri[[#1]] += v; Ri[[#2]] += v) & @@@ sub2;
+				R = (Plus @@ Ri) / 2; 
+			
+				(* Step 5: Select (kWTA with threshold T(T-1)/2) *)
+				(* The first element of a negative Ordering is the index 
+					of the k-th largest value. Use this for the threshold check. *)
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
-				If[t < T (T - 1) / 2, Return[{}]];
-
-				Y = Pick[Range[NB], UnitStep[R - t], 1];
-
-				(* Slice array to columns Y and row-reduce to scalar pair weights *)
-				valsY = Total[vals[[All, Y]], {2}];
-
-				(* 1D compiled distribution to element weights *)
-				w = accumulate[P, valsY];
-
-				ws = Sort[w];
+				
+				(* Step 6: Threshold check. *)
+				If[ t < T (T - 1) / 2, Return[{}]]; 
+				Y = Sort[Pick[Range[NB], UnitStep[R - t], 1]];
+			
+				(* Step 7: Per-element weights. *)
+				w = Total /@ Ri[[All, Y]];
+				
+				(* Step 8: Convergence test.  *)
+				ws = Sort[w]; 
 				h = P;
-				While[(cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
+				While[ (cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[h < T, Return[{}]];
+				If[ h < T, Return[{}]]; 		
+				
+				(* Step 9: Refine. *)
+				X = Pick[X, # >= cutoff & /@ w];
+				
+				(* Handle edge case. *)
+				If[h === T &&  h < Length[X], X = {}; Return[{}]];
+				
+				(* Finished if X has converged. *)
+				If[Length[X] == P, Return[Y]]; 
 
-				X = Pick[X, UnitStep[w - cutoff], 1];
-
-				If[h === T && h < Length[X], Return[{}]];
-				If[Length[X] == P, Return[Y]];
+				(* Step 10: Iterate.  *)
 				]
-			];	
-  		
+			];
+			
 		clear := (mem = <||>;);
 		memorycount := Total[Values[mem], 2];
 				
@@ -134,7 +128,7 @@ Memory[config_Association] :=
 			"retrieve" -> retrieve,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
-			"backend" -> "Mathematica"
+			"backend" -> "Reference"
 		|>
 		]
 

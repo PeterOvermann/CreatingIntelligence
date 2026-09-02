@@ -1037,7 +1037,7 @@ Circuit`Registry = <||>; (* To keep track of embedded (nested) circuits. *)
 
 Circuit[expr_] := Module[ 
 		{ 
-		assoc, this, dispatch,
+		assoc, this, dispatch, 
 		
 		(* Exposed in dispatch association. *)
 		f, fraw, schematics, clear, receiveparams = {}, sendparams = {}, 
@@ -1087,9 +1087,7 @@ Circuit[expr_] := Module[
 				
 	(* Compile a component. This triggers compilation of incoming pathways. *)
 	compile[node_Association] := Module[
-		{
-		config, callback, compilepathway, slotparams, fillparams
-		}, 
+		{ config, callback, compilepathway, slotparams, fillparams}, 
 				
 		++ nodeid;
 		
@@ -1178,6 +1176,9 @@ Circuit[expr_] := Module[
 			
 		(* Instantiate the component, re-append config to ensure 
 			user settings survive *)
+		If[ ! MatchQ[Lookup[node, "component"], _Symbol], 
+			Message[Circuit::component, Lookup[node, "component"]]; Return[]];	
+			
 		config = Join[Lookup[node, "component"][config], config];		
 
 		(* Prepend default visualization settings. *)
@@ -1585,6 +1586,7 @@ Circuit`color = AssociationThread[Range[0, Length[#] - 1],#]& [RGBColor /@
 
 (* Plug-in mechanism for error messages. *)
 
+Circuit::component = "Invalid circuit component `1`.";
 Circuit::circargs  = "Invalid circuit specification `1`.";
 Circuit::ident     = "`1`: Inputs must match outputs.";
 Circuit::identdim  = "`1`: Input and output dimensions must be identical.";

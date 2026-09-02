@@ -17,6 +17,11 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 *)
 
 
+(*
+Uses the Standard C backend implementation of topological associative memory.
+*)
+
+
 Memory[config_Association] :=
 
 	Module[ {M, NA, PA, NB, PB, T, new, setthreshold, getthreshold,
@@ -81,15 +86,16 @@ Memory[config_Association] :=
 		clear := free[M];
 		memorycount := memory[M];
 		
-		Join[ KeyTake[config, {"A_parameters", "B_parameters"}], 
-			<|
+		<|
+			"A_parameters" -> {NA, PA},
+			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "C_FFI"
-			|> ]
+		|>
 		]
 
 
