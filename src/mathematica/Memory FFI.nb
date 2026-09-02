@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     22905,        563]
-NotebookOptionsPosition[     20805,        506]
-NotebookOutlinePosition[     21848,        540]
-CellTagsIndexPosition[     21805,        537]
+NotebookDataLength[     23026,        564]
+NotebookOptionsPosition[     20834,        506]
+NotebookOutlinePosition[     21876,        540]
+CellTagsIndexPosition[     21833,        537]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -58,7 +58,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[1313]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+  "In[1874]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +100,16 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[1314]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+  "In[1875]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+
+Cell[BoxData[
+ RowBox[{"(*", "\n", 
+  RowBox[{
+  "Uses", " ", "the", " ", "Standard", " ", "C", " ", "backend", " ", 
+   "implementation", " ", "of", " ", "topological", " ", "associative", " ", 
+   RowBox[{"memory", "."}]}], "\n", "*)"}]], "Code",
+ CellLabel->
+  "In[1876]:=",ExpressionUUID->"6248123b-2253-4939-99ae-046b1a4a31b9"],
 
 Cell[CellGroupData[{
 
@@ -326,32 +335,30 @@ Cell[BoxData[
       RowBox[{"free", "[", "M", "]"}]}], ";", "\n", "\t\t", 
      RowBox[{"memorycount", " ", ":=", " ", 
       RowBox[{"memory", "[", "M", "]"}]}], ";", "\n", "\t\t", "\n", "\t\t", 
-     RowBox[{"Join", "[", " ", 
+     RowBox[{"<|", "\n", "\t\t\t", 
       RowBox[{
-       RowBox[{"KeyTake", "[", 
-        RowBox[{"config", ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"\"\<A_parameters\>\"", ",", " ", "\"\<B_parameters\>\""}], 
-          "}"}]}], "]"}], ",", " ", "\n", "\t\t\t", 
-       RowBox[{"<|", "\n", "\t\t\t", 
-        RowBox[{
-         RowBox[{"\"\<T\>\"", " ", "->", " ", "T"}], ",", " ", 
-         RowBox[{"(*", " ", 
-          RowBox[{"Absolute", " ", "pattern", " ", "matching", " ", 
-           RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t\t", 
-         RowBox[{"\"\<store\>\"", " ", "->", " ", "store"}], ",", "\n", 
-         "\t\t\t", 
-         RowBox[{"\"\<retrieve\>\"", " ", "->", " ", "retrieve"}], ",", "\n", 
-         "\t\t\t", 
-         RowBox[{"\"\<clear\>\"", " ", ":>", " ", "clear"}], ",", "\n", 
-         "\t\t\t", 
-         RowBox[{"\"\<memorycount\>\"", " ", ":>", " ", "memorycount"}], ",", 
-         "\n", "\t\t\t", 
-         RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<C_FFI\>\""}]}], "\n",
-         "\t\t\t", "|>"}]}], " ", "]"}]}]}], "\[IndentingNewLine]", "\t\t", 
-   "]"}]}]], "Code",
+       RowBox[{"\"\<A_parameters\>\"", " ", "->", " ", 
+        RowBox[{"{", 
+         RowBox[{"NA", ",", " ", "PA"}], "}"}]}], ",", "\n", "\t\t\t", 
+       RowBox[{"\"\<B_parameters\>\"", " ", "->", " ", 
+        RowBox[{"{", 
+         RowBox[{"NB", ",", " ", "PB"}], "}"}]}], ",", "\n", "\t\t\t", 
+       RowBox[{"\"\<T\>\"", " ", "->", " ", "T"}], ",", " ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Absolute", " ", "pattern", " ", "matching", " ", 
+         RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t\t", 
+       RowBox[{"\"\<store\>\"", " ", "->", " ", "store"}], ",", "\n", 
+       "\t\t\t", 
+       RowBox[{"\"\<retrieve\>\"", " ", "->", " ", "retrieve"}], ",", "\n", 
+       "\t\t\t", 
+       RowBox[{"\"\<clear\>\"", " ", ":>", " ", "clear"}], ",", "\n", 
+       "\t\t\t", 
+       RowBox[{"\"\<memorycount\>\"", " ", ":>", " ", "memorycount"}], ",", 
+       "\n", "\t\t\t", 
+       RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<C_FFI\>\""}]}], "\n", 
+      "\t\t", "|>"}]}]}], "\[IndentingNewLine]", "\t\t", "]"}]}]], "Code",
  CellLabel->
-  "In[1315]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+  "In[1877]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -364,7 +371,7 @@ Cell[BoxData[
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
  CellLabel->
-  "In[1316]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+  "In[1878]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -413,13 +420,6 @@ first.\>\"", "]"}], ";", "\n", "        ",
           RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
          " ", "\"\<c\>\""}], "}"}], "]"}]}], ";", "\n", "    ", "\n", "\t", 
      RowBox[{"Needs", "[", "\"\<CCompilerDriver`\>\"", "]"}], ";", "\n", 
-     "\t\t", "\n", "\t", 
-     RowBox[{"Export", "[", " ", 
-      RowBox[{
-       RowBox[{"FileNameJoin", "[", 
-        RowBox[{"{", 
-         RowBox[{"srcdir", ",", " ", "\"\<ffi.c\>\""}], "}"}], "]"}], ",", 
-       " ", "FFISource", ",", " ", "\"\<Lines\>\""}], "]"}], ";", "\n", 
      "\t\t", "\n", "\t", 
      RowBox[{"CCompilerDriver`CreateLibrary", "[", "\n", "\t\t", 
       RowBox[{
@@ -500,13 +500,13 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[1317]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+  "In[1879]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
 }, Open  ]]
 }, Open  ]]
 },
 AutoGeneratedPackage->Automatic,
 WindowSize->{862, 1030},
-WindowMargins->{{284, Automatic}, {-34, Automatic}},
+WindowMargins->{{Automatic, 235}, {-3, Automatic}},
 DockedCells->{
   Cell[
    BoxData[
@@ -544,17 +544,18 @@ Cell[422, 15, 120, 0, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939
 Cell[545, 17, 1830, 43, 271, "Code",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 Cell[2378, 62, 1673, 40, 23, "Input",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d",
  CellOpen->False],
+Cell[4054, 104, 332, 7, 110, "Code",ExpressionUUID->"6248123b-2253-4939-99ae-046b1a4a31b9"],
 Cell[CellGroupData[{
-Cell[4076, 106, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
-Cell[4162, 108, 10645, 245, 1784, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+Cell[4411, 115, 83, 0, 66, "Subsection",ExpressionUUID->"a9e48b17-d870-4ef3-9788-998d484a5f1e"],
+Cell[4497, 117, 10622, 243, 1807, "Code",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[14844, 358, 85, 0, 66, "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
-Cell[14932, 360, 235, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+Cell[15156, 365, 85, 0, 66, "Subsection",ExpressionUUID->"3ef309ed-6a83-47e5-9a86-9671f0d439d0"],
+Cell[15244, 367, 235, 6, 63, "Code",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[15204, 371, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
-Cell[15301, 373, 5476, 129, 1080, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
+Cell[15516, 378, 94, 0, 66, "Subsection",ExpressionUUID->"15091181-693d-41e8-b858-99f3e452b20e"],
+Cell[15613, 380, 5193, 122, 1033, "Code",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]
