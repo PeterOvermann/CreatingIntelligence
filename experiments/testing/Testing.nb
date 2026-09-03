@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[    106283,       3002]
-NotebookOptionsPosition[     95981,       2827]
-NotebookOutlinePosition[     99920,       2925]
-CellTagsIndexPosition[     99877,       2922]
+NotebookDataLength[    107269,       2998]
+NotebookOptionsPosition[     97154,       2825]
+NotebookOutlinePosition[    101094,       2923]
+CellTagsIndexPosition[    101051,       2920]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -368,8 +368,7 @@ Cell[BoxData[
             "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}], 
   "\[IndentingNewLine]"}]], "Input",
  CellOpen->False,
- CellLabel->
-  "In[562]:=",ExpressionUUID->"3bebd05a-0ed9-4c63-9a1a-a9eeee852281"],
+ CellLabel->"In[27]:=",ExpressionUUID->"3bebd05a-0ed9-4c63-9a1a-a9eeee852281"],
 
 Cell[CellGroupData[{
 
@@ -389,11 +388,7 @@ added to inputs A, testing the retrieval accuracy in the presence of additive \
 or subtractive noise.
 
 We use this setup to verify that different memory backends (C, Mathematica, \
-Python, ...)   behave exactly the same.
-
-Note that the native Mathematica implementation of topological associative \
-memory is much slower than the performance-optimized C backend.
-\
+Python, ...)   behave exactly the same.\
 \>", "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
 
 Cell[CellGroupData[{
@@ -402,8 +397,7 @@ Cell["Requirements", "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da5
 
 Cell[BoxData[
  RowBox[{"<<", " ", "\"\<Memory.m\>\""}]], "Code",
- CellLabel->
-  "In[563]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+ CellLabel->"In[28]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -412,33 +406,21 @@ Cell["Configuration", "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"config", " ", "=", " ", 
-   RowBox[{"<|", " ", 
+  RowBox[{"testconfig", " ", "=", " ", 
+   RowBox[{"<|", " ", "\n", "\t", 
     RowBox[{
      RowBox[{"\"\<A_parameters\>\"", " ", "->", " ", 
       RowBox[{"{", 
-       RowBox[{"1000", ",", " ", "10"}], "}"}]}], ",", " ", 
+       RowBox[{"1000", ",", " ", "10"}], "}"}]}], ",", " ", "\n", "\t", 
      RowBox[{"\"\<B_parameters\>\"", " ", "->", " ", 
       RowBox[{"{", 
-       RowBox[{"1001", ",", "10"}], "}"}]}]}], " ", "|>"}]}], ";"}]], "Code",
- CellLabel->
-  "In[564]:=",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"],
-
-Cell[BoxData[{
- RowBox[{
-  RowBox[{"batchsize", " ", "=", " ", "50000"}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"iterations", " ", "=", " ", "40"}], ";"}], "\n", 
- RowBox[{
-  RowBox[{
-   RowBox[{"randomnoise", " ", "=", " ", "0"}], ";"}], " ", 
-  RowBox[{"(*", " ", 
-   RowBox[{"Additive", " ", 
-    RowBox[{"(", "positive", ")"}], " ", "or", " ", "subtractive", " ", 
-    RowBox[{"(", "negative", ")"}], " ", 
-    RowBox[{"noise", "."}]}], " ", "*)"}]}]}], "Code",
- CellLabel->
-  "In[565]:=",ExpressionUUID->"d11f8af9-40ad-4f1c-be49-223f01c109ff"]
+       RowBox[{"1001", ",", "10"}], "}"}]}], ",", "\n", "\t", 
+     RowBox[{"\"\<batchsize\>\"", " ", "->", " ", "50000"}], ",", "\n", "\t", 
+     
+     RowBox[{"\"\<iterations\>\"", " ", "->", " ", "40"}], ",", "\n", "\t", 
+     RowBox[{"\"\<noise\>\"", " ", "->", " ", "0"}]}], "\n", "\t", "|>"}]}], 
+  ";"}]], "Code",
+ CellLabel->"In[29]:=",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -456,8 +438,7 @@ Cell[BoxData[
     RowBox[{
      RowBox[{"Range", "[", "n", "]"}], ",", " ", "p"}], "]"}], 
    "]"}]}]], "Code",
- CellLabel->
-  "In[568]:=",ExpressionUUID->"390c3628-40ec-406d-a45a-8fb6f93e74b0"],
+ CellLabel->"In[30]:=",ExpressionUUID->"390c3628-40ec-406d-a45a-8fb6f93e74b0"],
 
 Cell[BoxData[
  RowBox[{
@@ -470,8 +451,7 @@ Cell[BoxData[
     RowBox[{"RandomSet", "[", 
      RowBox[{"config", "[", "\"\<B_parameters\>\"", "]"}], "]"}]}], 
    "}"}]}]], "Code",
- CellLabel->
-  "In[569]:=",ExpressionUUID->"924db14f-66c7-4293-bdcc-46a13cc43ac5"],
+ CellLabel->"In[31]:=",ExpressionUUID->"924db14f-66c7-4293-bdcc-46a13cc43ac5"],
 
 Cell[BoxData[
  RowBox[{
@@ -501,8 +481,7 @@ Cell[BoxData[
        RowBox[{
         RowBox[{"Length", "[", "A", "]"}], " ", "+", " ", "noise"}]}], "]"}], 
      "]"}]}], "\[IndentingNewLine]", "\t\t", "]"}]}]], "Code",
- CellLabel->
-  "In[570]:=",ExpressionUUID->"b361dd53-8a15-4db0-94f8-e51800c7a299"],
+ CellLabel->"In[32]:=",ExpressionUUID->"b361dd53-8a15-4db0-94f8-e51800c7a299"],
 
 Cell[BoxData[
  RowBox[{
@@ -516,8 +495,7 @@ Cell[BoxData[
   RowBox[{"Length", "[", 
    RowBox[{"Intersection", "[", 
     RowBox[{"A", ",", " ", "B"}], "]"}], "]"}]}]], "Code",
- CellLabel->
-  "In[571]:=",ExpressionUUID->"0243c416-3338-4b71-b2b6-925696180b82"],
+ CellLabel->"In[33]:=",ExpressionUUID->"0243c416-3338-4b71-b2b6-925696180b82"],
 
 Cell[BoxData[
  RowBox[{
@@ -535,28 +513,27 @@ Cell[BoxData[
    RowBox[{"Length", "[", 
     RowBox[{"Complement", "[", 
      RowBox[{"B", ",", " ", "A"}], "]"}], "]"}]}]}]], "Code",
- CellLabel->
-  "In[572]:=",ExpressionUUID->"96b5e22c-625f-4a05-9231-684bc5a9104a"],
+ CellLabel->"In[34]:=",ExpressionUUID->"96b5e22c-625f-4a05-9231-684bc5a9104a"],
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{"Test", "[", 
-   RowBox[{
-   "mem_Association", ",", " ", "iter_Integer", ",", " ", "datasize_Integer", 
-    ",", " ", "noise_Integer"}], "]"}], " ", ":=", "\n", "\t", 
+  RowBox[{"Test", "[", "config_Association", "]"}], " ", ":=", "\n", "\t", 
   RowBox[{"Module", "[", " ", 
    RowBox[{
     RowBox[{"{", 
      RowBox[{
-     "data", ",", " ", "inp", ",", " ", "out", ",", " ", "storetime", ",", 
-      " ", "retrievetime", ",", "  ", "distance", ",", " ", "overlap", ",", 
-      " ", "memsize"}], "}"}], ",", " ", "\[IndentingNewLine]", "\n", "\t", 
+     "mem", ",", " ", "size", ",", " ", "data", ",", " ", "inp", ",", " ", 
+      "out", ",", " ", "storetime", ",", " ", "retrievetime", ",", "  ", "\n",
+       "\t\t", "distance", ",", " ", "overlap", ",", " ", "memsize", ",", " ",
+       "cols"}], "}"}], ",", " ", "\[IndentingNewLine]", "\n", "\t\t", 
     RowBox[{
+     RowBox[{"mem", " ", "=", " ", 
+      RowBox[{"Memory", "[", "config", "]"}]}], ";", "\n", "\n", "\t\t", 
      RowBox[{"memsize", " ", "=", " ", 
       RowBox[{
        RowBox[{
         RowBox[{"mem", "[", "\"\<B_parameters\>\"", "]"}], "[", 
-        RowBox[{"[", "1", "]"}], "]"}], " ", "*", " ", "\n", "\t\t", 
+        RowBox[{"[", "1", "]"}], "]"}], " ", "*", " ", "\n", "\t\t\t", 
        RowBox[{
         RowBox[{"mem", "[", "\"\<A_parameters\>\"", "]"}], "[", 
         RowBox[{"[", "1", "]"}], "]"}], " ", 
@@ -566,160 +543,167 @@ Cell[BoxData[
           RowBox[{
            RowBox[{"mem", "[", "\"\<A_parameters\>\"", "]"}], "[", 
            RowBox[{"[", "1", "]"}], "]"}], " ", "-", " ", "1"}], ")"}], " ", "/",
-         " ", "2"}]}]}], ";", "\n", "\t", "\n", "\t", 
-     RowBox[{"data", " ", "=", " ", 
-      RowBox[{"Table", "[", " ", 
-       RowBox[{
-        RowBox[{"RandomAssociation", "[", "mem", "]"}], ",", " ", 
-        "batchsize"}], "]"}]}], ";", " ", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", "\t", 
-     RowBox[{"storetime", " ", "=", " ", 
-      RowBox[{"First", "[", 
-       RowBox[{"AbsoluteTiming", "[", " ", 
+         " ", "2"}]}]}], ";", "\n", "\t", "\n", "\t\t", 
+     RowBox[{"size", " ", "=", " ", 
+      RowBox[{"config", "[", "\"\<batchsize\>\"", "]"}]}], ";", "\n", "\n", 
+     "\t\t", 
+     RowBox[{"Print", "[", " ", 
+      RowBox[{"\"\<Configuration: \>\"", ",", " ", "config"}], "]"}], ";", 
+     "\[IndentingNewLine]", "\t\t", 
+     RowBox[{"Print", "[", " ", 
+      RowBox[{"\"\<Memory: \>\"", ",", " ", "mem"}], "]"}], ";", "\n", "\t\t", 
+     RowBox[{"Print", "[", "]"}], ";", "\n", "\t\t", "\n", "\t\t", 
+     RowBox[{"cols", " ", "=", " ", 
+      RowBox[{"{", 
+       RowBox[{"\"\<items\>\"", ",", " ", "\"\<writes/s\>\"", ",", 
+        " ", "\"\<density\>\"", ",", " ", "\"\<reads/s\>\"", ",", 
+        " ", "\"\<distance\>\"", ",", " ", "\"\<overlap\>\""}], "}"}]}], ";", 
+     "\n", "\n", "\t\t", 
+     RowBox[{"Print", "[", 
+      RowBox[{"\"\<|\>\"", " ", "<>", " ", 
+       RowBox[{"StringJoin", "[", 
         RowBox[{
-         RowBox[{"mem", "[", "\"\<store\>\"", "]"}], " ", "@@@", " ", 
-         "data"}], "]"}], "]"}]}], ";", " ", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", "\t", 
-     RowBox[{"inp", " ", "=", " ", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"StringPadLeft", "[", 
+            RowBox[{
+             RowBox[{"#", " ", "<>", " ", "\"\< \>\""}], ",", " ", "12"}], 
+            "]"}], " ", "<>", " ", "\"\<|\>\""}], " ", "&"}], " ", "/@", " ", 
+         "cols"}], "]"}]}], "]"}], ";", "\n", "\t\t", 
+     RowBox[{"Print", "[", 
+      RowBox[{"\"\<|\>\"", " ", "<>", " ", 
+       RowBox[{"StringRepeat", "[", 
+        RowBox[{"\"\<------------|\>\"", ",", " ", 
+         RowBox[{"Length", "[", "cols", "]"}]}], "]"}]}], "]"}], ";", 
+     "\t\t\t\t", "\n", "\n", "\t\t", 
+     RowBox[{"Do", "[", " ", "\n", "\n", "\t\t", 
       RowBox[{
        RowBox[{
-        RowBox[{"AddNoise", "[", 
-         RowBox[{"#", " ", ",", " ", 
-          RowBox[{"mem", "[", "\"\<A_parameters\>\"", "]"}], ",", " ", 
-          "randomnoise"}], "]"}], " ", "&"}], " ", "/@", " ", 
-       RowBox[{"data", "[", 
-        RowBox[{"[", 
-         RowBox[{"All", ",", " ", "1"}], "]"}], "]"}]}]}], ";", 
-     "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
-     RowBox[{"retrievetime", " ", "=", " ", 
-      RowBox[{"First", "[", 
-       RowBox[{"AbsoluteTiming", "[", " ", 
-        RowBox[{"out", " ", "=", " ", 
+        RowBox[{"data", " ", "=", " ", 
+         RowBox[{"Table", "[", " ", 
+          RowBox[{
+           RowBox[{"RandomAssociation", "[", "mem", "]"}], ",", " ", "size"}],
+           "]"}]}], ";", " ", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        "\t\t", 
+        RowBox[{"storetime", " ", "=", " ", 
+         RowBox[{"First", "[", 
+          RowBox[{"AbsoluteTiming", "[", " ", 
+           RowBox[{
+            RowBox[{"mem", "[", "\"\<store\>\"", "]"}], " ", "@@@", " ", 
+            "data"}], "]"}], "]"}]}], ";", " ", "\[IndentingNewLine]", 
+        "\[IndentingNewLine]", "\t\t", 
+        RowBox[{"inp", " ", "=", " ", 
          RowBox[{
-          RowBox[{"mem", "[", "\"\<retrieve\>\"", "]"}], " ", "/@", " ", 
-          "inp"}]}], " ", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
-     "\[IndentingNewLine]", "\t", 
-     RowBox[{"distance", " ", "=", " ", 
-      RowBox[{"Total", "[", 
-       RowBox[{"Table", "[", " ", 
-        RowBox[{
-         RowBox[{"Distance", "[", 
           RowBox[{
-           RowBox[{"out", "[", 
-            RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
-           RowBox[{"data", "[", 
-            RowBox[{"[", 
-             RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"i", ",", " ", "1", ",", " ", "batchsize"}], "}"}]}], "]"}],
-        "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
-     RowBox[{"overlap", " ", "=", " ", 
-      RowBox[{"Total", "[", 
-       RowBox[{"Table", "[", " ", 
-        RowBox[{
-         RowBox[{"Overlap", "[", 
-          RowBox[{
-           RowBox[{"out", "[", 
-            RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
-           RowBox[{"data", "[", 
-            RowBox[{"[", 
-             RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"i", ",", " ", "1", ",", " ", "batchsize"}], "}"}]}], "]"}],
-        "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t", 
-     RowBox[{"Print", "[", " ", 
-      RowBox[{"\"\<|\>\"", ",", "\[IndentingNewLine]", "\t\t", 
-       RowBox[{"PaddedForm", "[", " ", 
-        RowBox[{
-         RowBox[{"iter", "*", "batchsize"}], ",", " ", "10"}], "]"}], ",", 
-       " ", "\"\< |\>\"", ",", " ", "\[IndentingNewLine]", "\t\t", 
-       RowBox[{"PaddedForm", "[", " ", 
-        RowBox[{
-         RowBox[{"Round", "[", 
-          RowBox[{"batchsize", "/", "storetime"}], "]"}], ",", "10"}], "]"}], 
-       ",", " ", "\"\< |\>\"", ",", " ", "\n", "\t\t", 
-       RowBox[{"StringPadLeft", "[", 
-        RowBox[{
-         RowBox[{"ToString", "[", 
-          RowBox[{"DecimalForm", "[", " ", 
+           RowBox[{"AddNoise", "[", 
+            RowBox[{"#", " ", ",", " ", 
+             RowBox[{"mem", "[", "\"\<A_parameters\>\"", "]"}], ",", " ", 
+             RowBox[{"config", "[", "\"\<noise\>\"", "]"}]}], "]"}], " ", 
+           "&"}], " ", "/@", " ", 
+          RowBox[{"data", "[", 
+           RowBox[{"[", 
+            RowBox[{"All", ",", " ", "1"}], "]"}], "]"}]}]}], ";", 
+        "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
+        RowBox[{"retrievetime", " ", "=", " ", 
+         RowBox[{"First", "[", 
+          RowBox[{"AbsoluteTiming", "[", " ", 
+           RowBox[{"out", " ", "=", " ", 
+            RowBox[{
+             RowBox[{"mem", "[", "\"\<retrieve\>\"", "]"}], " ", "/@", " ", 
+             "inp"}]}], " ", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+        "\[IndentingNewLine]", "\t\t", 
+        RowBox[{"distance", " ", "=", " ", 
+         RowBox[{"Total", "[", 
+          RowBox[{"Table", "[", " ", 
+           RowBox[{
+            RowBox[{"Distance", "[", 
+             RowBox[{
+              RowBox[{"out", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+              RowBox[{"data", "[", 
+               RowBox[{"[", 
+                RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", " ", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", " ", "1", ",", " ", "size"}], "}"}]}], "]"}], 
+          "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
+        
+        RowBox[{"overlap", " ", "=", " ", 
+         RowBox[{"Total", "[", 
+          RowBox[{"Table", "[", " ", 
+           RowBox[{
+            RowBox[{"Overlap", "[", 
+             RowBox[{
+              RowBox[{"out", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], ",", " ", 
+              RowBox[{"data", "[", 
+               RowBox[{"[", 
+                RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", " ", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", " ", "1", ",", " ", "size"}], "}"}]}], "]"}], 
+          "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", "\t\t", 
+        
+        RowBox[{"Print", "[", " ", 
+         RowBox[{"\"\<|\>\"", ",", "\[IndentingNewLine]", "\t\t\t", 
+          RowBox[{"PaddedForm", "[", " ", 
+           RowBox[{
+            RowBox[{"iter", "*", "size"}], ",", " ", "10"}], "]"}], ",", 
+          " ", "\"\< |\>\"", ",", " ", "\[IndentingNewLine]", "\t\t\t", 
+          RowBox[{"PaddedForm", "[", " ", 
+           RowBox[{
+            RowBox[{"Round", "[", 
+             RowBox[{"size", "/", "storetime"}], "]"}], ",", "10"}], "]"}], ",",
+           " ", "\"\< |\>\"", ",", " ", "\n", "\t\t\t", 
+          RowBox[{"StringPadLeft", "[", 
+           RowBox[{
+            RowBox[{"ToString", "[", 
+             RowBox[{"DecimalForm", "[", " ", 
+              RowBox[{
+               RowBox[{"N", "[", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"mem", "[", "\"\<memorycount\>\"", "]"}], "/", 
+                  "memsize"}], ",", " ", "6"}], "]"}], ",", " ", 
+               RowBox[{"{", 
+                RowBox[{"10", ",", "6"}], "}"}]}], "]"}], "]"}], ",", " ", 
+            "11"}], "]"}], ",", " ", "\"\< |\>\"", ",", " ", "\n", "\t\t\t", 
+          RowBox[{"PaddedForm", "[", " ", 
+           RowBox[{
+            RowBox[{"Round", "[", " ", 
+             RowBox[{"size", "/", "retrievetime"}], "]"}], ",", " ", "10"}], 
+           "]"}], ",", " ", "\"\< |\>\"", ",", " ", "\[IndentingNewLine]", 
+          "\t\t\t", 
+          RowBox[{"PaddedForm", "[", " ", 
            RowBox[{
             RowBox[{"N", "[", 
-             RowBox[{
-              RowBox[{
-               RowBox[{"mem", "[", "\"\<memorycount\>\"", "]"}], "/", 
-               "memsize"}], ",", " ", "6"}], "]"}], ",", " ", 
+             RowBox[{"distance", "/", "size"}], "]"}], ",", " ", 
             RowBox[{"{", 
-             RowBox[{"10", ",", "6"}], "}"}]}], "]"}], "]"}], ",", " ", 
-         "11"}], "]"}], ",", " ", "\"\< |\>\"", ",", " ", "\n", "\t\t", 
-       RowBox[{"PaddedForm", "[", " ", 
-        RowBox[{
-         RowBox[{"Round", "[", " ", 
-          RowBox[{"batchsize", "/", "retrievetime"}], "]"}], ",", " ", "10"}],
-         "]"}], ",", " ", "\"\< |\>\"", ",", " ", "\[IndentingNewLine]", 
-       "\t\t", 
-       RowBox[{"PaddedForm", "[", " ", 
-        RowBox[{
-         RowBox[{"N", "[", 
-          RowBox[{"distance", "/", "batchsize"}], "]"}], ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"9", ",", "6"}], "}"}]}], "]"}], ",", " ", "\"\< |\>\"", ",",
-        " ", "\[IndentingNewLine]", "\t\t", 
-       RowBox[{"PaddedForm", "[", " ", 
-        RowBox[{
-         RowBox[{"N", "[", 
-          RowBox[{"overlap", "/", "batchsize"}], "]"}], ",", " ", 
-         RowBox[{"{", 
-          RowBox[{"9", ",", "6"}], "}"}]}], "]"}], " ", ",", 
-       " ", "\"\< |\>\""}], " ", "]"}], ";"}]}], "\[IndentingNewLine]", "\t", 
-   "]"}]}]], "Code",
- CellLabel->
-  "In[573]:=",ExpressionUUID->"2e04bfe7-16c9-47be-b520-32f8da39271f"]
+             RowBox[{"9", ",", "6"}], "}"}]}], "]"}], ",", " ", "\"\< |\>\"", 
+          ",", " ", "\[IndentingNewLine]", "\t\t\t", 
+          RowBox[{"PaddedForm", "[", " ", 
+           RowBox[{
+            RowBox[{"N", "[", 
+             RowBox[{"overlap", "/", "size"}], "]"}], ",", " ", 
+            RowBox[{"{", 
+             RowBox[{"9", ",", "6"}], "}"}]}], "]"}], " ", ",", 
+          " ", "\"\< |\>\""}], " ", "\n", "\t\t\t\t", "]"}]}], ",", "\n", 
+       "\t\t\t", "\n", "\t\t\t", 
+       RowBox[{"{", 
+        RowBox[{"iter", ",", " ", "1", ",", " ", 
+         RowBox[{"config", "[", "\"\<iterations\>\"", "]"}]}], "}"}]}], "\n", 
+      "\t\t\t", "]"}]}]}], "\[IndentingNewLine]", "\t", "]"}]}]], "Code",
+ CellLabel->"In[35]:=",ExpressionUUID->"2e04bfe7-16c9-47be-b520-32f8da39271f"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Run test ", "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
 
-Cell[BoxData[
- RowBox[{
-  RowBox[{"memory", " ", "=", " ", 
-   RowBox[{"Memory", "[", "config", "]"}]}], ";"}]], "Code",
- CellLabel->
-  "In[574]:=",ExpressionUUID->"0ade8776-dba5-44c0-80c9-c76307d15b21"],
-
 Cell[CellGroupData[{
 
-Cell[BoxData[{
- RowBox[{"Print", "[", " ", 
-  RowBox[{"\"\<Configuration: \>\"", ",", " ", "memory"}], "]"}], "\n", 
+Cell[BoxData[
  RowBox[{
-  RowBox[{"Print", "[", " ", 
-   RowBox[{"\"\<Additive noise: \>\"", ",", " ", "randomnoise"}], "]"}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"Print", "[", "]"}], ";"}], "\n"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-  "Print", "[", "\"\<|      items |   writes/s |    density |    reads/s |   \
-distance |    overlap |\>\"", "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{
-   "Print", "[", \
-"\"\<|------------|------------|------------|------------|------------|-------\
------|\>\"", "]"}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
- RowBox[{"Do", "[", " ", 
-  RowBox[{
-   RowBox[{"Test", "[", 
-    RowBox[{
-    "memory", ",", " ", "i", ",", " ", "batchsize", ",", " ", "randomnoise"}],
-     "]"}], ",", " ", 
-   RowBox[{"{", 
-    RowBox[{"i", ",", " ", "1", ",", " ", "iterations"}], "}"}]}], 
-  "]"}]}], "Code",
- CellLabel->
-  "In[575]:=",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"],
+  RowBox[{"Test", "[", "testconfig", "]"}], ";"}]], "Code",
+ CellLabel->"In[36]:=",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"],
 
 Cell[CellGroupData[{
 
@@ -734,52 +718,66 @@ Cell[BoxData[
      RowBox[{"\<\"B_parameters\"\>", "\[Rule]", 
       RowBox[{"{", 
        RowBox[{"1001", ",", "10"}], "}"}]}], ",", 
+     RowBox[{"\<\"batchsize\"\>", "\[Rule]", "50000"}], ",", 
+     RowBox[{"\<\"iterations\"\>", "\[Rule]", "40"}], ",", 
+     RowBox[{"\<\"noise\"\>", "\[Rule]", "0"}]}], "\[RightAssociation]"}]}],
+  SequenceForm[
+  "Configuration: ", <|
+   "A_parameters" -> {1000, 10}, "B_parameters" -> {1001, 10}, "batchsize" -> 
+    50000, "iterations" -> 40, "noise" -> 0|>],
+  Editable->False]], "Print",
+ CellLabel->
+  "During evaluation of \
+In[36]:=",ExpressionUUID->"7954b5a6-fee4-4c2d-bdfc-6d421f6b8715"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Memory: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"\[LeftAssociation]", 
+    RowBox[{
+     RowBox[{"\<\"A_parameters\"\>", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"1000", ",", "10"}], "}"}]}], ",", 
+     RowBox[{"\<\"B_parameters\"\>", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"1001", ",", "10"}], "}"}]}], ",", 
      RowBox[{"\<\"T\"\>", "\[Rule]", "7"}], ",", 
-     RowBox[{"\<\"store\"\>", "\[Rule]", "store$1577380"}], ",", 
-     RowBox[{"\<\"retrieve\"\>", "\[Rule]", "retrieve$1577380"}], ",", 
-     RowBox[{"\<\"clear\"\>", "\[RuleDelayed]", "clear$1577380"}], ",", 
-     RowBox[{"\<\"memorycount\"\>", "\[RuleDelayed]", "memorycount$1577380"}],
+     RowBox[{"\<\"store\"\>", "\[Rule]", "store$2007018"}], ",", 
+     RowBox[{"\<\"retrieve\"\>", "\[Rule]", "retrieve$2007018"}], ",", 
+     RowBox[{"\<\"clear\"\>", "\[RuleDelayed]", "clear$2007018"}], ",", 
+     RowBox[{"\<\"memorycount\"\>", "\[RuleDelayed]", "memorycount$2007018"}],
       ",", 
      RowBox[{"\<\"backend\"\>", "\[Rule]", "\<\"Mathematica\"\>"}]}], 
     "\[RightAssociation]"}]}],
   SequenceForm[
-  "Configuration: ", <|
+  "Memory: ", <|
    "A_parameters" -> {1000, 10}, "B_parameters" -> {1001, 10}, "T" -> 7, 
-    "store" -> $CellContext`store$1577380, 
-    "retrieve" -> $CellContext`retrieve$1577380, 
-    "clear" :> $CellContext`clear$1577380, 
-    "memorycount" :> $CellContext`memorycount$1577380, "backend" -> 
+    "store" -> $CellContext`store$2007018, 
+    "retrieve" -> $CellContext`retrieve$2007018, 
+    "clear" :> $CellContext`clear$2007018, 
+    "memorycount" :> $CellContext`memorycount$2007018, "backend" -> 
     "Mathematica"|>],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"d2cbf868-9412-478b-85b0-61bce074cc51"],
-
-Cell[BoxData[
- InterpretationBox[
-  RowBox[{"\<\"Additive noise: \"\>", "\[InvisibleSpace]", "0"}],
-  SequenceForm["Additive noise: ", 0],
-  Editable->False]], "Print",
- CellLabel->
-  "During evaluation of \
-In[575]:=",ExpressionUUID->"4f41b3da-d991-4741-9c2b-db1e7cfa1823"],
+In[36]:=",ExpressionUUID->"d928712d-28df-452a-aa75-f442ee20a7bd"],
 
 Cell[BoxData["\<\"\"\>"], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"cf9cfbc0-81cd-4cd4-9bdf-de222fde3272"],
+In[36]:=",ExpressionUUID->"5fc4c1d8-d6e6-49dd-b454-f88718da19f4"],
 
 Cell[BoxData["\<\"|      items |   writes/s |    density |    reads/s |   \
 distance |    overlap |\"\>"], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"db40acba-99e5-4710-8a6f-3c187a6fba1a"],
+In[36]:=",ExpressionUUID->"e40a539b-cd19-4fe1-b9e8-e3f0f31d6615"],
 
 Cell[BoxData["\<\"|------------|------------|------------|------------|-------\
 -----|------------|\"\>"], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"ba834310-9a1e-4748-9775-7373cde7c0f2"],
+In[36]:=",ExpressionUUID->"7b548d91-021b-4681-b688-b6fa7ada7da6"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -793,18 +791,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      11616\"\>",
+     StyleBox["\<\"      12169\"\>",
       ShowStringCharacters->False],
-     11616,
+     12169,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.044002\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.044004\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       9272\"\>",
+     StyleBox["\<\"       9327\"\>",
       ShowStringCharacters->False],
-     9272,
+     9327,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -823,14 +821,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[50000, 10], " |", 
-   PaddedForm[11616, 10], " |", "   0.044002", " |", 
-   PaddedForm[9272, 10], " |", 
+   PaddedForm[12169, 10], " |", "   0.044004", " |", 
+   PaddedForm[9327, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"3b34f72d-aad3-417a-a8d3-3f252ad1389f"],
+In[36]:=",ExpressionUUID->"dc2d4296-be8e-47de-9682-90ff9f26b16f"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -844,18 +842,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      11544\"\>",
+     StyleBox["\<\"      11252\"\>",
       ShowStringCharacters->False],
-     11544,
+     11252,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.086070\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.086073\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8906\"\>",
+     StyleBox["\<\"       9017\"\>",
       ShowStringCharacters->False],
-     8906,
+     9017,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -874,14 +872,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[100000, 10], " |", 
-   PaddedForm[11544, 10], " |", "   0.086070", " |", 
-   PaddedForm[8906, 10], " |", 
+   PaddedForm[11252, 10], " |", "   0.086073", " |", 
+   PaddedForm[9017, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"3e37c70a-6188-4f47-a01a-9911379cefba"],
+In[36]:=",ExpressionUUID->"cf9d1d10-f3bb-4797-8a92-86e0c7b35851"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -895,18 +893,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10808\"\>",
+     StyleBox["\<\"      11229\"\>",
       ShowStringCharacters->False],
-     10808,
+     11229,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.126279\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.126288\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8335\"\>",
+     StyleBox["\<\"       8851\"\>",
       ShowStringCharacters->False],
-     8335,
+     8851,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -925,14 +923,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[150000, 10], " |", 
-   PaddedForm[10808, 10], " |", "   0.126279", " |", 
-   PaddedForm[8335, 10], " |", 
+   PaddedForm[11229, 10], " |", "   0.126288", " |", 
+   PaddedForm[8851, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"a4dad10c-e7b4-4616-8c4e-a838a7abf60a"],
+In[36]:=",ExpressionUUID->"9a82aca2-68ba-49f3-ab0b-eb57b69c01ca"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -946,18 +944,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10788\"\>",
+     StyleBox["\<\"      11212\"\>",
       ShowStringCharacters->False],
-     10788,
+     11212,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.164729\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.164731\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8086\"\>",
+     StyleBox["\<\"       8663\"\>",
       ShowStringCharacters->False],
-     8086,
+     8663,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -976,14 +974,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[200000, 10], " |", 
-   PaddedForm[10788, 10], " |", "   0.164729", " |", 
-   PaddedForm[8086, 10], " |", 
+   PaddedForm[11212, 10], " |", "   0.164731", " |", 
+   PaddedForm[8663, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"db26f4de-69c6-4e82-9969-aaa984b72d4c"],
+In[36]:=",ExpressionUUID->"d3875aa1-f59a-473e-bff9-d47da2b8ba43"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -997,18 +995,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      11217\"\>",
+     StyleBox["\<\"      11077\"\>",
       ShowStringCharacters->False],
-     11217,
+     11077,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.201479\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.201481\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8352\"\>",
+     StyleBox["\<\"       8801\"\>",
       ShowStringCharacters->False],
-     8352,
+     8801,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1027,14 +1025,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[250000, 10], " |", 
-   PaddedForm[11217, 10], " |", "   0.201479", " |", 
-   PaddedForm[8352, 10], " |", 
+   PaddedForm[11077, 10], " |", "   0.201481", " |", 
+   PaddedForm[8801, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"5b485fc7-3e1e-4c2f-abd6-eb9730995463"],
+In[36]:=",ExpressionUUID->"0f77055a-c4a6-492d-a268-02a669823f93"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1048,18 +1046,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       9964\"\>",
+     StyleBox["\<\"      11098\"\>",
       ShowStringCharacters->False],
-     9964,
+     11098,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.236615\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.236622\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8146\"\>",
+     StyleBox["\<\"       8942\"\>",
       ShowStringCharacters->False],
-     8146,
+     8942,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1078,14 +1076,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[300000, 10], " |", 
-   PaddedForm[9964, 10], " |", "   0.236615", " |", 
-   PaddedForm[8146, 10], " |", 
+   PaddedForm[11098, 10], " |", "   0.236622", " |", 
+   PaddedForm[8942, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"09e243c9-5419-45c8-accf-889e81071844"],
+In[36]:=",ExpressionUUID->"940efcee-95da-4db8-9f52-33867ec11dbe"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1099,18 +1097,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10490\"\>",
+     StyleBox["\<\"      11130\"\>",
       ShowStringCharacters->False],
-     10490,
+     11130,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.270205\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.270217\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8475\"\>",
+     StyleBox["\<\"       9017\"\>",
       ShowStringCharacters->False],
-     8475,
+     9017,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1129,14 +1127,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[350000, 10], " |", 
-   PaddedForm[10490, 10], " |", "   0.270205", " |", 
-   PaddedForm[8475, 10], " |", 
+   PaddedForm[11130, 10], " |", "   0.270217", " |", 
+   PaddedForm[9017, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"055bf5f8-a4f9-4574-a2b1-5894cb39b426"],
+In[36]:=",ExpressionUUID->"1865d3cd-8644-4e14-bd2d-a24c17d17bc5"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1150,18 +1148,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10655\"\>",
+     StyleBox["\<\"      11122\"\>",
       ShowStringCharacters->False],
-     10655,
+     11122,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.302312\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.302326\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8538\"\>",
+     StyleBox["\<\"       9011\"\>",
       ShowStringCharacters->False],
-     8538,
+     9011,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1180,14 +1178,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[400000, 10], " |", 
-   PaddedForm[10655, 10], " |", "   0.302312", " |", 
-   PaddedForm[8538, 10], " |", 
+   PaddedForm[11122, 10], " |", "   0.302326", " |", 
+   PaddedForm[9011, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"88521100-f90e-41e1-912d-9d134eaa741b"],
+In[36]:=",ExpressionUUID->"d7cfc2e5-7511-4016-9f04-36618c46c57b"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1201,18 +1199,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10477\"\>",
+     StyleBox["\<\"      11096\"\>",
       ShowStringCharacters->False],
-     10477,
+     11096,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.333011\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.333026\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8318\"\>",
+     StyleBox["\<\"       9016\"\>",
       ShowStringCharacters->False],
-     8318,
+     9016,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1231,14 +1229,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[450000, 10], " |", 
-   PaddedForm[10477, 10], " |", "   0.333011", " |", 
-   PaddedForm[8318, 10], " |", 
+   PaddedForm[11096, 10], " |", "   0.333026", " |", 
+   PaddedForm[9016, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"56453e8e-6aa9-4b31-a3bd-43295d3f76a7"],
+In[36]:=",ExpressionUUID->"caff0571-9de5-4658-830b-9141e5d6c8c3"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1252,18 +1250,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10375\"\>",
+     StyleBox["\<\"      11102\"\>",
       ShowStringCharacters->False],
-     10375,
+     11102,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.362364\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.362370\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8436\"\>",
+     StyleBox["\<\"       8929\"\>",
       ShowStringCharacters->False],
-     8436,
+     8929,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1282,14 +1280,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[500000, 10], " |", 
-   PaddedForm[10375, 10], " |", "   0.362364", " |", 
-   PaddedForm[8436, 10], " |", 
+   PaddedForm[11102, 10], " |", "   0.362370", " |", 
+   PaddedForm[8929, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"bfac9d92-8033-426c-ba07-d86b312b98f5"],
+In[36]:=",ExpressionUUID->"d363c57e-b558-4334-bf3d-c102fdf2e288"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1303,18 +1301,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10479\"\>",
+     StyleBox["\<\"      11098\"\>",
       ShowStringCharacters->False],
-     10479,
+     11098,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.390419\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.390426\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8529\"\>",
+     StyleBox["\<\"       8982\"\>",
       ShowStringCharacters->False],
-     8529,
+     8982,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1333,14 +1331,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[550000, 10], " |", 
-   PaddedForm[10479, 10], " |", "   0.390419", " |", 
-   PaddedForm[8529, 10], " |", 
+   PaddedForm[11098, 10], " |", "   0.390426", " |", 
+   PaddedForm[8982, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"5c907c0e-d4df-4302-87d8-fe11f883dc11"],
+In[36]:=",ExpressionUUID->"3ade9e77-413b-41f8-8c60-571367f69e0b"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1354,18 +1352,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10457\"\>",
+     StyleBox["\<\"      11133\"\>",
       ShowStringCharacters->False],
-     10457,
+     11133,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.417250\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.417253\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8518\"\>",
+     StyleBox["\<\"       8866\"\>",
       ShowStringCharacters->False],
-     8518,
+     8866,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1384,14 +1382,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[600000, 10], " |", 
-   PaddedForm[10457, 10], " |", "   0.417250", " |", 
-   PaddedForm[8518, 10], " |", 
+   PaddedForm[11133, 10], " |", "   0.417253", " |", 
+   PaddedForm[8866, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"a680da71-e3fb-40c6-8f54-21c48c1ccf78"],
+In[36]:=",ExpressionUUID->"e8bfc454-1ac4-42de-9b5b-ddf9ab53fc7a"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1405,18 +1403,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10492\"\>",
+     StyleBox["\<\"      11053\"\>",
       ShowStringCharacters->False],
-     10492,
+     11053,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.442899\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.442895\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8522\"\>",
+     StyleBox["\<\"       8899\"\>",
       ShowStringCharacters->False],
-     8522,
+     8899,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1435,14 +1433,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[650000, 10], " |", 
-   PaddedForm[10492, 10], " |", "   0.442899", " |", 
-   PaddedForm[8522, 10], " |", 
+   PaddedForm[11053, 10], " |", "   0.442895", " |", 
+   PaddedForm[8899, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"ac48670e-d8b8-431a-aa96-92dc178e5639"],
+In[36]:=",ExpressionUUID->"711aec50-6f65-45d1-8da7-24278ccd288c"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1456,18 +1454,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10460\"\>",
+     StyleBox["\<\"      11045\"\>",
       ShowStringCharacters->False],
-     10460,
+     11045,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.467413\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.467417\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8508\"\>",
+     StyleBox["\<\"       8892\"\>",
       ShowStringCharacters->False],
-     8508,
+     8892,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1486,14 +1484,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[700000, 10], " |", 
-   PaddedForm[10460, 10], " |", "   0.467413", " |", 
-   PaddedForm[8508, 10], " |", 
+   PaddedForm[11045, 10], " |", "   0.467417", " |", 
+   PaddedForm[8892, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"d8943251-8ef6-48f3-beed-f53da25de80e"],
+In[36]:=",ExpressionUUID->"83b766a3-05b0-4fe4-8c69-5e72f20071f5"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1507,18 +1505,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10500\"\>",
+     StyleBox["\<\"      11072\"\>",
       ShowStringCharacters->False],
-     10500,
+     11072,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.490849\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.490851\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8449\"\>",
+     StyleBox["\<\"       8925\"\>",
       ShowStringCharacters->False],
-     8449,
+     8925,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1537,14 +1535,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[750000, 10], " |", 
-   PaddedForm[10500, 10], " |", "   0.490849", " |", 
-   PaddedForm[8449, 10], " |", 
+   PaddedForm[11072, 10], " |", "   0.490851", " |", 
+   PaddedForm[8925, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"afd8ffa6-e29f-4a71-b088-21c3c21c77ba"],
+In[36]:=",ExpressionUUID->"f2e866ae-49be-4527-9bff-a746bd38a214"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1558,18 +1556,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10358\"\>",
+     StyleBox["\<\"      11036\"\>",
       ShowStringCharacters->False],
-     10358,
+     11036,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.513256\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.513247\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8425\"\>",
+     StyleBox["\<\"       8978\"\>",
       ShowStringCharacters->False],
-     8425,
+     8978,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1588,14 +1586,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[800000, 10], " |", 
-   PaddedForm[10358, 10], " |", "   0.513256", " |", 
-   PaddedForm[8425, 10], " |", 
+   PaddedForm[11036, 10], " |", "   0.513247", " |", 
+   PaddedForm[8978, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"06918da3-2fb0-41ce-a5f8-fba6b0287d03"],
+In[36]:=",ExpressionUUID->"377e2940-4001-4ed6-a2e9-ca1eb79d1176"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1609,18 +1607,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10588\"\>",
+     StyleBox["\<\"      11068\"\>",
       ShowStringCharacters->False],
-     10588,
+     11068,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.534680\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.534667\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8501\"\>",
+     StyleBox["\<\"       9006\"\>",
       ShowStringCharacters->False],
-     8501,
+     9006,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1639,14 +1637,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[850000, 10], " |", 
-   PaddedForm[10588, 10], " |", "   0.534680", " |", 
-   PaddedForm[8501, 10], " |", 
+   PaddedForm[11068, 10], " |", "   0.534667", " |", 
+   PaddedForm[9006, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"0ba8f580-7ed3-4cf8-bd7c-b05801d0688d"],
+In[36]:=",ExpressionUUID->"72be7767-212d-450f-9645-862cc2885b85"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1660,18 +1658,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10473\"\>",
+     StyleBox["\<\"      10988\"\>",
       ShowStringCharacters->False],
-     10473,
+     10988,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.555160\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.555143\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       7886\"\>",
+     StyleBox["\<\"       8941\"\>",
       ShowStringCharacters->False],
-     7886,
+     8941,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1690,14 +1688,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[900000, 10], " |", 
-   PaddedForm[10473, 10], " |", "   0.555160", " |", 
-   PaddedForm[7886, 10], " |", 
+   PaddedForm[10988, 10], " |", "   0.555143", " |", 
+   PaddedForm[8941, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"afbc6558-aa8e-4d24-afa8-51e7ee884a8d"],
+In[36]:=",ExpressionUUID->"7fc3ce85-3031-4b0d-8701-ad4af107cd33"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1711,18 +1709,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10186\"\>",
+     StyleBox["\<\"      10993\"\>",
       ShowStringCharacters->False],
-     10186,
+     10993,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.574726\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.574721\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8393\"\>",
+     StyleBox["\<\"       8975\"\>",
       ShowStringCharacters->False],
-     8393,
+     8975,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1741,14 +1739,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[950000, 10], " |", 
-   PaddedForm[10186, 10], " |", "   0.574726", " |", 
-   PaddedForm[8393, 10], " |", 
+   PaddedForm[10993, 10], " |", "   0.574721", " |", 
+   PaddedForm[8975, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"f9ec394c-6ba6-4345-b88d-d0acc8703055"],
+In[36]:=",ExpressionUUID->"14073ca3-1692-418b-b074-e1accc100fdf"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1762,18 +1760,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       9884\"\>",
+     StyleBox["\<\"      10954\"\>",
       ShowStringCharacters->False],
-     9884,
+     10954,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.593442\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.593435\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8174\"\>",
+     StyleBox["\<\"       8988\"\>",
       ShowStringCharacters->False],
-     8174,
+     8988,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1792,14 +1790,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1000000, 10], " |", 
-   PaddedForm[9884, 10], " |", "   0.593442", " |", 
-   PaddedForm[8174, 10], " |", 
+   PaddedForm[10954, 10], " |", "   0.593435", " |", 
+   PaddedForm[8988, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"338fab18-e154-496a-84fd-5abc7736fa85"],
+In[36]:=",ExpressionUUID->"abc92d6b-e80f-479b-be32-4598fb6ebe51"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1813,18 +1811,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10498\"\>",
+     StyleBox["\<\"      11088\"\>",
       ShowStringCharacters->False],
-     10498,
+     11088,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.611331\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.611329\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8436\"\>",
+     StyleBox["\<\"       8898\"\>",
       ShowStringCharacters->False],
-     8436,
+     8898,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1843,14 +1841,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1050000, 10], " |", 
-   PaddedForm[10498, 10], " |", "   0.611331", " |", 
-   PaddedForm[8436, 10], " |", 
+   PaddedForm[11088, 10], " |", "   0.611329", " |", 
+   PaddedForm[8898, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"0e29e335-03c2-49a4-b728-d501748aa4bd"],
+In[36]:=",ExpressionUUID->"097b0e95-36c1-4c4d-a4bf-c5e46d39f7a6"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1864,18 +1862,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10337\"\>",
+     StyleBox["\<\"      10799\"\>",
       ShowStringCharacters->False],
-     10337,
+     10799,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.628437\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.628431\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8510\"\>",
+     StyleBox["\<\"       8765\"\>",
       ShowStringCharacters->False],
-     8510,
+     8765,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1894,14 +1892,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1100000, 10], " |", 
-   PaddedForm[10337, 10], " |", "   0.628437", " |", 
-   PaddedForm[8510, 10], " |", 
+   PaddedForm[10799, 10], " |", "   0.628431", " |", 
+   PaddedForm[8765, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"c4a0e3bd-9371-48ae-9830-ccbe4eb03247"],
+In[36]:=",ExpressionUUID->"8d194a99-11f9-47fb-b7fa-d945dc26c42b"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1915,18 +1913,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10633\"\>",
+     StyleBox["\<\"      10963\"\>",
       ShowStringCharacters->False],
-     10633,
+     10963,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.644797\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.644776\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8503\"\>",
+     StyleBox["\<\"       8623\"\>",
       ShowStringCharacters->False],
-     8503,
+     8623,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1945,14 +1943,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1150000, 10], " |", 
-   PaddedForm[10633, 10], " |", "   0.644797", " |", 
-   PaddedForm[8503, 10], " |", 
+   PaddedForm[10963, 10], " |", "   0.644776", " |", 
+   PaddedForm[8623, 10], " |", 
    PaddedForm[0., {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"1a5fe133-62e5-4dbc-af30-038270bd6bac"],
+In[36]:=",ExpressionUUID->"fcc2cd91-694f-4af5-a4f3-848220824cb1"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -1966,18 +1964,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10655\"\>",
+     StyleBox["\<\"      10974\"\>",
       ShowStringCharacters->False],
-     10655,
+     10974,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.660429\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.660409\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8514\"\>",
+     StyleBox["\<\"       8528\"\>",
       ShowStringCharacters->False],
-     8514,
+     8528,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -1996,14 +1994,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1200000, 10], " |", 
-   PaddedForm[10655, 10], " |", "   0.660429", " |", 
-   PaddedForm[8514, 10], " |", 
+   PaddedForm[10974, 10], " |", "   0.660409", " |", 
+   PaddedForm[8528, 10], " |", 
    PaddedForm[0.00002, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"f4a13790-f942-4fd2-b45d-4314e9cd93cc"],
+In[36]:=",ExpressionUUID->"2b14331f-7a4c-4030-b58b-7c15d5188479"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2017,18 +2015,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10600\"\>",
+     StyleBox["\<\"      10754\"\>",
       ShowStringCharacters->False],
-     10600,
+     10754,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.675367\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.675358\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8449\"\>",
+     StyleBox["\<\"       8866\"\>",
       ShowStringCharacters->False],
-     8449,
+     8866,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2047,14 +2045,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1250000, 10], " |", 
-   PaddedForm[10600, 10], " |", "   0.675367", " |", 
-   PaddedForm[8449, 10], " |", 
+   PaddedForm[10754, 10], " |", "   0.675358", " |", 
+   PaddedForm[8866, 10], " |", 
    PaddedForm[0.00004, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"9600b51b-56be-418f-a8d8-c1093c598f78"],
+In[36]:=",ExpressionUUID->"cf1c4e9f-5dc5-4f38-bfa6-a07c818e86b4"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2068,25 +2066,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10564\"\>",
+     StyleBox["\<\"      10525\"\>",
       ShowStringCharacters->False],
-     10564,
+     10525,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.689657\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.689641\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8474\"\>",
+     StyleBox["\<\"       8908\"\>",
       ShowStringCharacters->False],
-     8474,
+     8908,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.000100\"\>",
+     StyleBox["\<\"   0.000060\"\>",
       ShowStringCharacters->False],
-     0.0001,
+     0.00006,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2098,14 +2096,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1300000, 10], " |", 
-   PaddedForm[10564, 10], " |", "   0.689657", " |", 
-   PaddedForm[8474, 10], " |", 
-   PaddedForm[0.0001, {9, 6}], " |", 
+   PaddedForm[10525, 10], " |", "   0.689641", " |", 
+   PaddedForm[8908, 10], " |", 
+   PaddedForm[0.00006, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"dc77564e-5b23-4fba-b232-6ff06de3cda8"],
+In[36]:=",ExpressionUUID->"73699bb6-9084-487d-9618-053515049b04"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2119,25 +2117,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10551\"\>",
+     StyleBox["\<\"      10681\"\>",
       ShowStringCharacters->False],
-     10551,
+     10681,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.703310\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.703298\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8516\"\>",
+     StyleBox["\<\"       8900\"\>",
       ShowStringCharacters->False],
-     8516,
+     8900,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.000320\"\>",
+     StyleBox["\<\"   0.000220\"\>",
       ShowStringCharacters->False],
-     0.00032,
+     0.00022,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2149,14 +2147,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1350000, 10], " |", 
-   PaddedForm[10551, 10], " |", "   0.703310", " |", 
-   PaddedForm[8516, 10], " |", 
-   PaddedForm[0.00032, {9, 6}], " |", 
+   PaddedForm[10681, 10], " |", "   0.703298", " |", 
+   PaddedForm[8900, 10], " |", 
+   PaddedForm[0.00022, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"642a16f8-f554-4641-8f33-002ec5c9bdb3"],
+In[36]:=",ExpressionUUID->"b37446d4-5d91-4f15-8902-9639e7533407"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2170,25 +2168,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10444\"\>",
+     StyleBox["\<\"      10639\"\>",
       ShowStringCharacters->False],
-     10444,
+     10639,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.716372\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.716345\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8511\"\>",
+     StyleBox["\<\"       8699\"\>",
       ShowStringCharacters->False],
-     8511,
+     8699,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.000500\"\>",
+     StyleBox["\<\"   0.000520\"\>",
       ShowStringCharacters->False],
-     0.0005,
+     0.00052,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2200,14 +2198,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1400000, 10], " |", 
-   PaddedForm[10444, 10], " |", "   0.716372", " |", 
-   PaddedForm[8511, 10], " |", 
-   PaddedForm[0.0005, {9, 6}], " |", 
+   PaddedForm[10639, 10], " |", "   0.716345", " |", 
+   PaddedForm[8699, 10], " |", 
+   PaddedForm[0.00052, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"a9d4d0c4-a114-4ade-9fdd-53291cebc07a"],
+In[36]:=",ExpressionUUID->"c205604c-3857-4021-b312-6d91670de80d"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2221,25 +2219,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10515\"\>",
+     StyleBox["\<\"      10778\"\>",
       ShowStringCharacters->False],
-     10515,
+     10778,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.728858\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.728830\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8552\"\>",
+     StyleBox["\<\"       8836\"\>",
       ShowStringCharacters->False],
-     8552,
+     8836,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.001040\"\>",
+     StyleBox["\<\"   0.000940\"\>",
       ShowStringCharacters->False],
-     0.00104,
+     0.00094,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2251,14 +2249,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1450000, 10], " |", 
-   PaddedForm[10515, 10], " |", "   0.728858", " |", 
-   PaddedForm[8552, 10], " |", 
-   PaddedForm[0.00104, {9, 6}], " |", 
+   PaddedForm[10778, 10], " |", "   0.728830", " |", 
+   PaddedForm[8836, 10], " |", 
+   PaddedForm[0.00094, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"ae4e0f2f-7ac5-437b-a494-21962851ece9"],
+In[36]:=",ExpressionUUID->"c2b2d228-f70a-4484-8f3a-91360630cccf"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2272,25 +2270,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10499\"\>",
+     StyleBox["\<\"      10931\"\>",
       ShowStringCharacters->False],
-     10499,
+     10931,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.740795\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.740761\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8547\"\>",
+     StyleBox["\<\"       8952\"\>",
       ShowStringCharacters->False],
-     8547,
+     8952,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.002300\"\>",
+     StyleBox["\<\"   0.002280\"\>",
       ShowStringCharacters->False],
-     0.0023,
+     0.00228,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2302,14 +2300,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1500000, 10], " |", 
-   PaddedForm[10499, 10], " |", "   0.740795", " |", 
-   PaddedForm[8547, 10], " |", 
-   PaddedForm[0.0023, {9, 6}], " |", 
+   PaddedForm[10931, 10], " |", "   0.740761", " |", 
+   PaddedForm[8952, 10], " |", 
+   PaddedForm[0.00228, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"ca9cb9a1-c8a4-42ca-b22d-4df5aa326bdb"],
+In[36]:=",ExpressionUUID->"062b0b64-b55f-48f1-b27d-5c1f9ab2ac33"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2323,18 +2321,18 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10440\"\>",
+     StyleBox["\<\"      10817\"\>",
       ShowStringCharacters->False],
-     10440,
+     10817,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.752200\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.752166\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8512\"\>",
+     StyleBox["\<\"       8966\"\>",
       ShowStringCharacters->False],
-     8512,
+     8966,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2353,14 +2351,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1550000, 10], " |", 
-   PaddedForm[10440, 10], " |", "   0.752200", " |", 
-   PaddedForm[8512, 10], " |", 
+   PaddedForm[10817, 10], " |", "   0.752166", " |", 
+   PaddedForm[8966, 10], " |", 
    PaddedForm[0.004, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"56a64346-3f08-496b-a7ee-93f1d9a431b9"],
+In[36]:=",ExpressionUUID->"6849b12a-6d52-4a98-a850-4184b65f7dd5"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2374,25 +2372,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10470\"\>",
+     StyleBox["\<\"      10774\"\>",
       ShowStringCharacters->False],
-     10470,
+     10774,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.763110\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.763071\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8556\"\>",
+     StyleBox["\<\"       8941\"\>",
       ShowStringCharacters->False],
-     8556,
+     8941,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.008280\"\>",
+     StyleBox["\<\"   0.008200\"\>",
       ShowStringCharacters->False],
-     0.00828,
+     0.0082,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2404,14 +2402,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1600000, 10], " |", 
-   PaddedForm[10470, 10], " |", "   0.763110", " |", 
-   PaddedForm[8556, 10], " |", 
-   PaddedForm[0.00828, {9, 6}], " |", 
+   PaddedForm[10774, 10], " |", "   0.763071", " |", 
+   PaddedForm[8941, 10], " |", 
+   PaddedForm[0.0082, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"4d476c7e-4875-48ed-bdca-efe700b45ea0"],
+In[36]:=",ExpressionUUID->"d6822921-6bb3-4692-b96e-2e769250d0e2"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2425,25 +2423,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10482\"\>",
+     StyleBox["\<\"      10997\"\>",
       ShowStringCharacters->False],
-     10482,
+     10997,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.773536\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.773496\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8567\"\>",
+     StyleBox["\<\"       8872\"\>",
       ShowStringCharacters->False],
-     8567,
+     8872,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.015140\"\>",
+     StyleBox["\<\"   0.013460\"\>",
       ShowStringCharacters->False],
-     0.01514,
+     0.01346,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2455,14 +2453,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1650000, 10], " |", 
-   PaddedForm[10482, 10], " |", "   0.773536", " |", 
-   PaddedForm[8567, 10], " |", 
-   PaddedForm[0.01514, {9, 6}], " |", 
+   PaddedForm[10997, 10], " |", "   0.773496", " |", 
+   PaddedForm[8872, 10], " |", 
+   PaddedForm[0.01346, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"80e95980-af62-4b1f-998d-055cbd18e300"],
+In[36]:=",ExpressionUUID->"cafa4703-869b-446a-b8d2-6ffb067e9046"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2476,25 +2474,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10451\"\>",
+     StyleBox["\<\"      10888\"\>",
       ShowStringCharacters->False],
-     10451,
+     10888,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.783503\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.783464\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8586\"\>",
+     StyleBox["\<\"       8855\"\>",
       ShowStringCharacters->False],
-     8586,
+     8855,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.024180\"\>",
+     StyleBox["\<\"   0.024520\"\>",
       ShowStringCharacters->False],
-     0.02418,
+     0.02452,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2506,14 +2504,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1700000, 10], " |", 
-   PaddedForm[10451, 10], " |", "   0.783503", " |", 
-   PaddedForm[8586, 10], " |", 
-   PaddedForm[0.02418, {9, 6}], " |", 
+   PaddedForm[10888, 10], " |", "   0.783464", " |", 
+   PaddedForm[8855, 10], " |", 
+   PaddedForm[0.02452, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"2ff886e4-b596-4f0c-a58b-428850c43f1c"],
+In[36]:=",ExpressionUUID->"0b1f1124-7943-4c1d-9293-f43024c91e88"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2527,25 +2525,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10506\"\>",
+     StyleBox["\<\"      11105\"\>",
       ShowStringCharacters->False],
-     10506,
+     11105,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.793035\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.792995\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8559\"\>",
+     StyleBox["\<\"       8847\"\>",
       ShowStringCharacters->False],
-     8559,
+     8847,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.039240\"\>",
+     StyleBox["\<\"   0.039500\"\>",
       ShowStringCharacters->False],
-     0.03924,
+     0.0395,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2557,14 +2555,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1750000, 10], " |", 
-   PaddedForm[10506, 10], " |", "   0.793035", " |", 
-   PaddedForm[8559, 10], " |", 
-   PaddedForm[0.03924, {9, 6}], " |", 
+   PaddedForm[11105, 10], " |", "   0.792995", " |", 
+   PaddedForm[8847, 10], " |", 
+   PaddedForm[0.0395, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"0887e335-0d5f-4575-9aa5-f2de7d26ab88"],
+In[36]:=",ExpressionUUID->"8cceb84e-4a63-4226-8c11-2edf0e3de405"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2578,25 +2576,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10088\"\>",
+     StyleBox["\<\"      10939\"\>",
       ShowStringCharacters->False],
-     10088,
+     10939,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.802140\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.802098\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8460\"\>",
+     StyleBox["\<\"       8875\"\>",
       ShowStringCharacters->False],
-     8460,
+     8875,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.066700\"\>",
+     StyleBox["\<\"   0.067940\"\>",
       ShowStringCharacters->False],
-     0.0667,
+     0.06794,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2608,14 +2606,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1800000, 10], " |", 
-   PaddedForm[10088, 10], " |", "   0.802140", " |", 
-   PaddedForm[8460, 10], " |", 
-   PaddedForm[0.0667, {9, 6}], " |", 
+   PaddedForm[10939, 10], " |", "   0.802098", " |", 
+   PaddedForm[8875, 10], " |", 
+   PaddedForm[0.06794, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"22f602df-b4b3-4d2e-9326-cb7d4308d5bb"],
+In[36]:=",ExpressionUUID->"da662f96-0a64-4212-9633-6265f4caf51e"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2629,25 +2627,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10535\"\>",
+     StyleBox["\<\"      11006\"\>",
       ShowStringCharacters->False],
-     10535,
+     11006,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.810845\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.810806\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8466\"\>",
+     StyleBox["\<\"       8852\"\>",
       ShowStringCharacters->False],
-     8466,
+     8852,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.102980\"\>",
+     StyleBox["\<\"   0.105820\"\>",
       ShowStringCharacters->False],
-     0.10298,
+     0.10582,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2659,14 +2657,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1850000, 10], " |", 
-   PaddedForm[10535, 10], " |", "   0.810845", " |", 
-   PaddedForm[8466, 10], " |", 
-   PaddedForm[0.10298, {9, 6}], " |", 
+   PaddedForm[11006, 10], " |", "   0.810806", " |", 
+   PaddedForm[8852, 10], " |", 
+   PaddedForm[0.10582, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"7708422f-8c1f-49bb-8730-b47484631e00"],
+In[36]:=",ExpressionUUID->"fad17eab-b9fe-46b4-98f7-5cc8734e4ef7"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2680,25 +2678,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10616\"\>",
+     StyleBox["\<\"      10897\"\>",
       ShowStringCharacters->False],
-     10616,
+     10897,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.819172\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.819137\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8502\"\>",
+     StyleBox["\<\"       8873\"\>",
       ShowStringCharacters->False],
-     8502,
+     8873,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.160340\"\>",
+     StyleBox["\<\"   0.160400\"\>",
       ShowStringCharacters->False],
-     0.16034,
+     0.1604,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2710,14 +2708,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1900000, 10], " |", 
-   PaddedForm[10616, 10], " |", "   0.819172", " |", 
-   PaddedForm[8502, 10], " |", 
-   PaddedForm[0.16034, {9, 6}], " |", 
+   PaddedForm[10897, 10], " |", "   0.819137", " |", 
+   PaddedForm[8873, 10], " |", 
+   PaddedForm[0.1604, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"556e7b53-4e22-45a4-8fed-6c44cae760ed"],
+In[36]:=",ExpressionUUID->"1cc92116-2564-4403-997e-86a3093b425a"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2731,25 +2729,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10600\"\>",
+     StyleBox["\<\"      10945\"\>",
       ShowStringCharacters->False],
-     10600,
+     10945,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.827125\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.827097\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8447\"\>",
+     StyleBox["\<\"       8843\"\>",
       ShowStringCharacters->False],
-     8447,
+     8843,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.245940\"\>",
+     StyleBox["\<\"   0.243580\"\>",
       ShowStringCharacters->False],
-     0.24594,
+     0.24358,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2761,14 +2759,14 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[1950000, 10], " |", 
-   PaddedForm[10600, 10], " |", "   0.827125", " |", 
-   PaddedForm[8447, 10], " |", 
-   PaddedForm[0.24594, {9, 6}], " |", 
+   PaddedForm[10945, 10], " |", "   0.827097", " |", 
+   PaddedForm[8843, 10], " |", 
+   PaddedForm[0.24358, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"0c6dc2b8-a468-444a-a47b-b40892371997"],
+In[36]:=",ExpressionUUID->"02ca647c-26c4-4b94-9f2d-dd54c51d34ba"],
 
 Cell[BoxData[
  InterpretationBox[
@@ -2782,25 +2780,25 @@ Cell[BoxData[
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"      10532\"\>",
+     StyleBox["\<\"      10964\"\>",
       ShowStringCharacters->False],
-     10532,
+     10964,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", 
-   "\[InvisibleSpace]", "\<\"   0.834727\"\>", 
+   "\[InvisibleSpace]", "\<\"   0.834703\"\>", 
    "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"       8468\"\>",
+     StyleBox["\<\"       8873\"\>",
       ShowStringCharacters->False],
-     8468,
+     8873,
      Editable->False],
     PaddedForm[#, 10]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
     InterpretationBox[
-     StyleBox["\<\"   0.354100\"\>",
+     StyleBox["\<\"   0.364720\"\>",
       ShowStringCharacters->False],
-     0.3541,
+     0.36472,
      AutoDelete->True],
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>", "\[InvisibleSpace]", 
    TagBox[
@@ -2812,21 +2810,21 @@ Cell[BoxData[
     PaddedForm[#, {9, 6}]& ], "\[InvisibleSpace]", "\<\" |\"\>"}],
   SequenceForm["|", 
    PaddedForm[2000000, 10], " |", 
-   PaddedForm[10532, 10], " |", "   0.834727", " |", 
-   PaddedForm[8468, 10], " |", 
-   PaddedForm[0.3541, {9, 6}], " |", 
+   PaddedForm[10964, 10], " |", "   0.834703", " |", 
+   PaddedForm[8873, 10], " |", 
+   PaddedForm[0.36472, {9, 6}], " |", 
    PaddedForm[10., {9, 6}], " |"],
   Editable->False]], "Print",
  CellLabel->
   "During evaluation of \
-In[575]:=",ExpressionUUID->"961291c7-868b-4d89-88fc-78e8888c1025"]
+In[36]:=",ExpressionUUID->"b071b82b-8a50-443b-ae99-3a6c89b3d056"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
 WindowSize->{957, 888},
-WindowMargins->{{Automatic, 70}, {Automatic, 0}},
+WindowMargins->{{Automatic, 206}, {Automatic, 0}},
 DockedCells->{
   Cell[
    BoxData[
@@ -2925,81 +2923,79 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[554, 20, 392, 10, 34, "Text",ExpressionUUID->"68cf67fa-7141-40b7-a6f9-e072dbef9b14"],
-Cell[949, 32, 14793, 339, 23, "Input",ExpressionUUID->"3bebd05a-0ed9-4c63-9a1a-a9eeee852281",
+Cell[949, 32, 14789, 338, 23, "Input",ExpressionUUID->"3bebd05a-0ed9-4c63-9a1a-a9eeee852281",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[15767, 375, 98, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
-Cell[15868, 377, 128, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
-Cell[15999, 379, 777, 17, 370, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
+Cell[15763, 374, 98, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
+Cell[15864, 376, 128, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
+Cell[15995, 378, 634, 13, 260, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
 Cell[CellGroupData[{
-Cell[16801, 400, 89, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
-Cell[16893, 402, 147, 3, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+Cell[16654, 395, 89, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
+Cell[16746, 397, 143, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[17077, 410, 90, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
-Cell[17170, 412, 465, 12, 63, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"],
-Cell[17638, 426, 544, 14, 110, "Code",ExpressionUUID->"d11f8af9-40ad-4f1c-be49-223f01c109ff"]
+Cell[16926, 404, 90, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
+Cell[17019, 406, 732, 16, 205, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18219, 445, 88, 0, 66, "Subsection",ExpressionUUID->"06800296-de7d-4981-bf8b-b198eb65d12f"],
-Cell[18310, 447, 391, 12, 63, "Code",ExpressionUUID->"390c3628-40ec-406d-a45a-8fb6f93e74b0"],
-Cell[18704, 461, 460, 12, 87, "Code",ExpressionUUID->"924db14f-66c7-4293-bdcc-46a13cc43ac5"],
-Cell[19167, 475, 1182, 29, 181, "Code",ExpressionUUID->"b361dd53-8a15-4db0-94f8-e51800c7a299"],
-Cell[20352, 506, 473, 13, 87, "Code",ExpressionUUID->"0243c416-3338-4b71-b2b6-925696180b82"],
-Cell[20828, 521, 612, 17, 87, "Code",ExpressionUUID->"96b5e22c-625f-4a05-9231-684bc5a9104a"],
-Cell[21443, 540, 5680, 135, 653, "Code",ExpressionUUID->"2e04bfe7-16c9-47be-b520-32f8da39271f"]
+Cell[17788, 427, 88, 0, 66, "Subsection",ExpressionUUID->"06800296-de7d-4981-bf8b-b198eb65d12f"],
+Cell[17879, 429, 387, 11, 63, "Code",ExpressionUUID->"390c3628-40ec-406d-a45a-8fb6f93e74b0"],
+Cell[18269, 442, 456, 11, 87, "Code",ExpressionUUID->"924db14f-66c7-4293-bdcc-46a13cc43ac5"],
+Cell[18728, 455, 1178, 28, 181, "Code",ExpressionUUID->"b361dd53-8a15-4db0-94f8-e51800c7a299"],
+Cell[19909, 485, 469, 12, 87, "Code",ExpressionUUID->"0243c416-3338-4b71-b2b6-925696180b82"],
+Cell[20381, 499, 608, 16, 87, "Code",ExpressionUUID->"96b5e22c-625f-4a05-9231-684bc5a9104a"],
+Cell[20992, 517, 7887, 176, 1124, "Code",ExpressionUUID->"2e04bfe7-16c9-47be-b520-32f8da39271f"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[27160, 680, 86, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
-Cell[27249, 682, 203, 5, 63, "Code",ExpressionUUID->"0ade8776-dba5-44c0-80c9-c76307d15b21"],
+Cell[28916, 698, 86, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
 Cell[CellGroupData[{
-Cell[27477, 691, 1095, 30, 228, "Code",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"],
+Cell[29027, 702, 162, 3, 63, "Code",ExpressionUUID->"190fd230-9e01-40f3-8c54-507978bb841f"],
 Cell[CellGroupData[{
-Cell[28597, 725, 1312, 30, 79, "Print",ExpressionUUID->"d2cbf868-9412-478b-85b0-61bce074cc51"],
-Cell[29912, 757, 274, 7, 28, "Print",ExpressionUUID->"4f41b3da-d991-4741-9c2b-db1e7cfa1823"],
-Cell[30189, 766, 140, 3, 28, "Print",ExpressionUUID->"cf9cfbc0-81cd-4cd4-9bdf-de222fde3272"],
-Cell[30332, 771, 221, 4, 28, "Print",ExpressionUUID->"db40acba-99e5-4710-8a6f-3c187a6fba1a"],
-Cell[30556, 777, 221, 4, 28, "Print",ExpressionUUID->"ba834310-9a1e-4748-9775-7373cde7c0f2"],
-Cell[30780, 783, 1619, 49, 28, "Print",ExpressionUUID->"3b34f72d-aad3-417a-a8d3-3f252ad1389f"],
-Cell[32402, 834, 1621, 49, 28, "Print",ExpressionUUID->"3e37c70a-6188-4f47-a01a-9911379cefba"],
-Cell[34026, 885, 1621, 49, 28, "Print",ExpressionUUID->"a4dad10c-e7b4-4616-8c4e-a838a7abf60a"],
-Cell[35650, 936, 1621, 49, 28, "Print",ExpressionUUID->"db26f4de-69c6-4e82-9969-aaa984b72d4c"],
-Cell[37274, 987, 1621, 49, 28, "Print",ExpressionUUID->"5b485fc7-3e1e-4c2f-abd6-eb9730995463"],
-Cell[38898, 1038, 1619, 49, 28, "Print",ExpressionUUID->"09e243c9-5419-45c8-accf-889e81071844"],
-Cell[40520, 1089, 1621, 49, 28, "Print",ExpressionUUID->"055bf5f8-a4f9-4574-a2b1-5894cb39b426"],
-Cell[42144, 1140, 1621, 49, 28, "Print",ExpressionUUID->"88521100-f90e-41e1-912d-9d134eaa741b"],
-Cell[43768, 1191, 1621, 49, 28, "Print",ExpressionUUID->"56453e8e-6aa9-4b31-a3bd-43295d3f76a7"],
-Cell[45392, 1242, 1621, 49, 28, "Print",ExpressionUUID->"bfac9d92-8033-426c-ba07-d86b312b98f5"],
-Cell[47016, 1293, 1621, 49, 28, "Print",ExpressionUUID->"5c907c0e-d4df-4302-87d8-fe11f883dc11"],
-Cell[48640, 1344, 1621, 49, 28, "Print",ExpressionUUID->"a680da71-e3fb-40c6-8f54-21c48c1ccf78"],
-Cell[50264, 1395, 1621, 49, 28, "Print",ExpressionUUID->"ac48670e-d8b8-431a-aa96-92dc178e5639"],
-Cell[51888, 1446, 1621, 49, 28, "Print",ExpressionUUID->"d8943251-8ef6-48f3-beed-f53da25de80e"],
-Cell[53512, 1497, 1621, 49, 28, "Print",ExpressionUUID->"afd8ffa6-e29f-4a71-b088-21c3c21c77ba"],
-Cell[55136, 1548, 1621, 49, 28, "Print",ExpressionUUID->"06918da3-2fb0-41ce-a5f8-fba6b0287d03"],
-Cell[56760, 1599, 1621, 49, 28, "Print",ExpressionUUID->"0ba8f580-7ed3-4cf8-bd7c-b05801d0688d"],
-Cell[58384, 1650, 1621, 49, 28, "Print",ExpressionUUID->"afbc6558-aa8e-4d24-afa8-51e7ee884a8d"],
-Cell[60008, 1701, 1621, 49, 28, "Print",ExpressionUUID->"f9ec394c-6ba6-4345-b88d-d0acc8703055"],
-Cell[61632, 1752, 1621, 49, 28, "Print",ExpressionUUID->"338fab18-e154-496a-84fd-5abc7736fa85"],
-Cell[63256, 1803, 1623, 49, 28, "Print",ExpressionUUID->"0e29e335-03c2-49a4-b728-d501748aa4bd"],
-Cell[64882, 1854, 1623, 49, 28, "Print",ExpressionUUID->"c4a0e3bd-9371-48ae-9830-ccbe4eb03247"],
-Cell[66508, 1905, 1623, 49, 28, "Print",ExpressionUUID->"1a5fe133-62e5-4dbc-af30-038270bd6bac"],
-Cell[68134, 1956, 1633, 49, 28, "Print",ExpressionUUID->"f4a13790-f942-4fd2-b45d-4314e9cd93cc"],
-Cell[69770, 2007, 1633, 49, 28, "Print",ExpressionUUID->"9600b51b-56be-418f-a8d8-c1093c598f78"],
-Cell[71406, 2058, 1631, 49, 28, "Print",ExpressionUUID->"dc77564e-5b23-4fba-b232-6ff06de3cda8"],
-Cell[73040, 2109, 1633, 49, 28, "Print",ExpressionUUID->"642a16f8-f554-4641-8f33-002ec5c9bdb3"],
-Cell[74676, 2160, 1631, 49, 28, "Print",ExpressionUUID->"a9d4d0c4-a114-4ade-9fdd-53291cebc07a"],
-Cell[76310, 2211, 1633, 49, 28, "Print",ExpressionUUID->"ae4e0f2f-7ac5-437b-a494-21962851ece9"],
-Cell[77946, 2262, 1631, 49, 28, "Print",ExpressionUUID->"ca9cb9a1-c8a4-42ca-b22d-4df5aa326bdb"],
-Cell[79580, 2313, 1629, 49, 28, "Print",ExpressionUUID->"56a64346-3f08-496b-a7ee-93f1d9a431b9"],
-Cell[81212, 2364, 1633, 49, 28, "Print",ExpressionUUID->"4d476c7e-4875-48ed-bdca-efe700b45ea0"],
-Cell[82848, 2415, 1633, 49, 28, "Print",ExpressionUUID->"80e95980-af62-4b1f-998d-055cbd18e300"],
-Cell[84484, 2466, 1633, 49, 28, "Print",ExpressionUUID->"2ff886e4-b596-4f0c-a58b-428850c43f1c"],
-Cell[86120, 2517, 1633, 49, 28, "Print",ExpressionUUID->"0887e335-0d5f-4575-9aa5-f2de7d26ab88"],
-Cell[87756, 2568, 1631, 49, 28, "Print",ExpressionUUID->"22f602df-b4b3-4d2e-9326-cb7d4308d5bb"],
-Cell[89390, 2619, 1633, 49, 28, "Print",ExpressionUUID->"7708422f-8c1f-49bb-8730-b47484631e00"],
-Cell[91026, 2670, 1633, 49, 28, "Print",ExpressionUUID->"556e7b53-4e22-45a4-8fed-6c44cae760ed"],
-Cell[92662, 2721, 1633, 49, 28, "Print",ExpressionUUID->"0c6dc2b8-a468-444a-a47b-b40892371997"],
-Cell[94298, 2772, 1631, 49, 28, "Print",ExpressionUUID->"961291c7-868b-4d89-88fc-78e8888c1025"]
+Cell[29214, 709, 880, 21, 52, "Print",ExpressionUUID->"7954b5a6-fee4-4c2d-bdfc-6d421f6b8715"],
+Cell[30097, 732, 1297, 30, 79, "Print",ExpressionUUID->"d928712d-28df-452a-aa75-f442ee20a7bd"],
+Cell[31397, 764, 139, 3, 28, "Print",ExpressionUUID->"5fc4c1d8-d6e6-49dd-b454-f88718da19f4"],
+Cell[31539, 769, 220, 4, 28, "Print",ExpressionUUID->"e40a539b-cd19-4fe1-b9e8-e3f0f31d6615"],
+Cell[31762, 775, 220, 4, 28, "Print",ExpressionUUID->"7b548d91-021b-4681-b688-b6fa7ada7da6"],
+Cell[31985, 781, 1618, 49, 28, "Print",ExpressionUUID->"dc2d4296-be8e-47de-9682-90ff9f26b16f"],
+Cell[33606, 832, 1620, 49, 28, "Print",ExpressionUUID->"cf9d1d10-f3bb-4797-8a92-86e0c7b35851"],
+Cell[35229, 883, 1620, 49, 28, "Print",ExpressionUUID->"9a82aca2-68ba-49f3-ab0b-eb57b69c01ca"],
+Cell[36852, 934, 1620, 49, 28, "Print",ExpressionUUID->"d3875aa1-f59a-473e-bff9-d47da2b8ba43"],
+Cell[38475, 985, 1620, 49, 28, "Print",ExpressionUUID->"0f77055a-c4a6-492d-a268-02a669823f93"],
+Cell[40098, 1036, 1620, 49, 28, "Print",ExpressionUUID->"940efcee-95da-4db8-9f52-33867ec11dbe"],
+Cell[41721, 1087, 1620, 49, 28, "Print",ExpressionUUID->"1865d3cd-8644-4e14-bd2d-a24c17d17bc5"],
+Cell[43344, 1138, 1620, 49, 28, "Print",ExpressionUUID->"d7cfc2e5-7511-4016-9f04-36618c46c57b"],
+Cell[44967, 1189, 1620, 49, 28, "Print",ExpressionUUID->"caff0571-9de5-4658-830b-9141e5d6c8c3"],
+Cell[46590, 1240, 1620, 49, 28, "Print",ExpressionUUID->"d363c57e-b558-4334-bf3d-c102fdf2e288"],
+Cell[48213, 1291, 1620, 49, 28, "Print",ExpressionUUID->"3ade9e77-413b-41f8-8c60-571367f69e0b"],
+Cell[49836, 1342, 1620, 49, 28, "Print",ExpressionUUID->"e8bfc454-1ac4-42de-9b5b-ddf9ab53fc7a"],
+Cell[51459, 1393, 1620, 49, 28, "Print",ExpressionUUID->"711aec50-6f65-45d1-8da7-24278ccd288c"],
+Cell[53082, 1444, 1620, 49, 28, "Print",ExpressionUUID->"83b766a3-05b0-4fe4-8c69-5e72f20071f5"],
+Cell[54705, 1495, 1620, 49, 28, "Print",ExpressionUUID->"f2e866ae-49be-4527-9bff-a746bd38a214"],
+Cell[56328, 1546, 1620, 49, 28, "Print",ExpressionUUID->"377e2940-4001-4ed6-a2e9-ca1eb79d1176"],
+Cell[57951, 1597, 1620, 49, 28, "Print",ExpressionUUID->"72be7767-212d-450f-9645-862cc2885b85"],
+Cell[59574, 1648, 1620, 49, 28, "Print",ExpressionUUID->"7fc3ce85-3031-4b0d-8701-ad4af107cd33"],
+Cell[61197, 1699, 1620, 49, 28, "Print",ExpressionUUID->"14073ca3-1692-418b-b074-e1accc100fdf"],
+Cell[62820, 1750, 1622, 49, 28, "Print",ExpressionUUID->"abc92d6b-e80f-479b-be32-4598fb6ebe51"],
+Cell[64445, 1801, 1622, 49, 28, "Print",ExpressionUUID->"097b0e95-36c1-4c4d-a4bf-c5e46d39f7a6"],
+Cell[66070, 1852, 1622, 49, 28, "Print",ExpressionUUID->"8d194a99-11f9-47fb-b7fa-d945dc26c42b"],
+Cell[67695, 1903, 1622, 49, 28, "Print",ExpressionUUID->"fcc2cd91-694f-4af5-a4f3-848220824cb1"],
+Cell[69320, 1954, 1632, 49, 28, "Print",ExpressionUUID->"2b14331f-7a4c-4030-b58b-7c15d5188479"],
+Cell[70955, 2005, 1632, 49, 28, "Print",ExpressionUUID->"cf1c4e9f-5dc5-4f38-bfa6-a07c818e86b4"],
+Cell[72590, 2056, 1632, 49, 28, "Print",ExpressionUUID->"73699bb6-9084-487d-9618-053515049b04"],
+Cell[74225, 2107, 1632, 49, 28, "Print",ExpressionUUID->"b37446d4-5d91-4f15-8902-9639e7533407"],
+Cell[75860, 2158, 1632, 49, 28, "Print",ExpressionUUID->"c205604c-3857-4021-b312-6d91670de80d"],
+Cell[77495, 2209, 1632, 49, 28, "Print",ExpressionUUID->"c2b2d228-f70a-4484-8f3a-91360630cccf"],
+Cell[79130, 2260, 1632, 49, 28, "Print",ExpressionUUID->"062b0b64-b55f-48f1-b27d-5c1f9ab2ac33"],
+Cell[80765, 2311, 1628, 49, 28, "Print",ExpressionUUID->"6849b12a-6d52-4a98-a850-4184b65f7dd5"],
+Cell[82396, 2362, 1630, 49, 28, "Print",ExpressionUUID->"d6822921-6bb3-4692-b96e-2e769250d0e2"],
+Cell[84029, 2413, 1632, 49, 28, "Print",ExpressionUUID->"cafa4703-869b-446a-b8d2-6ffb067e9046"],
+Cell[85664, 2464, 1632, 49, 28, "Print",ExpressionUUID->"0b1f1124-7943-4c1d-9293-f43024c91e88"],
+Cell[87299, 2515, 1630, 49, 28, "Print",ExpressionUUID->"8cceb84e-4a63-4226-8c11-2edf0e3de405"],
+Cell[88932, 2566, 1632, 49, 28, "Print",ExpressionUUID->"da662f96-0a64-4212-9633-6265f4caf51e"],
+Cell[90567, 2617, 1632, 49, 28, "Print",ExpressionUUID->"fad17eab-b9fe-46b4-98f7-5cc8734e4ef7"],
+Cell[92202, 2668, 1630, 49, 28, "Print",ExpressionUUID->"1cc92116-2564-4403-997e-86a3093b425a"],
+Cell[93835, 2719, 1632, 49, 28, "Print",ExpressionUUID->"02ca647c-26c4-4b94-9f2d-dd54c51d34ba"],
+Cell[95470, 2770, 1632, 49, 28, "Print",ExpressionUUID->"b071b82b-8a50-443b-ae99-3a6c89b3d056"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
