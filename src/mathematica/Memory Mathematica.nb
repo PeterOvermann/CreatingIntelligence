@@ -1,0 +1,715 @@
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[         0,          0]
+NotebookDataLength[     29359,        714]
+NotebookOptionsPosition[     27113,        654]
+NotebookOutlinePosition[     28155,        688]
+CellTagsIndexPosition[     28112,        685]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Memory - Optimized Mathematica Implementation", "Section",
+ InitializationCell->
+  True,ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574"],
+
+Cell[BoxData[
+ StyleBox[
+  RowBox[{"(*", "\n", 
+   StyleBox[
+    RowBox[{
+     RowBox[{"Copyright", " ", 
+      RowBox[{"(", "c", ")"}], " ", "2026", " ", "Peter", " ", "Overmann"}], 
+     "\n", " ", "\n", 
+     RowBox[{"SPDX", "-", "License", "-", 
+      RowBox[{"Identifier", ":", " ", "MIT"}]}], "\n", " ", "\n", 
+     RowBox[{
+     "This", " ", "file", " ", "is", " ", "part", " ", "of", " ", "the", 
+      " ", "\"\<Creating Intelligence\>\"", " ", 
+      RowBox[{"project", ".", " ", "It"}], " ", "is", " ", "licensed"}], " ", 
+     "\n", 
+     RowBox[{"under", " ", "the", " ", "MIT", " ", 
+      RowBox[{"License", ".", " ", "You"}], " ", "may", " ", "obtain", " ", 
+      "a", " ", "copy", " ", "of", " ", "the", " ", "License", " ", "in", " ",
+       "the", " ", "LICENSE"}], " ", "\n", 
+     RowBox[{
+      RowBox[{
+      "file", " ", "in", " ", "the", " ", "root", " ", "directory", " ", "of",
+        " ", "this", " ", 
+       RowBox[{"repository", ".", "\n", " ", "\n", "THE"}], " ", "SOFTWARE", " ",
+        "IS", " ", "PROVIDED", " ", "\"\<AS IS\>\""}], ",", " ", 
+      RowBox[{
+      "WITHOUT", " ", "WARRANTY", " ", "OF", " ", "ANY", " ", "KIND"}], ",", 
+      " ", 
+      RowBox[{"EXPRESS", " ", "OR"}]}], " ", "\n", 
+     RowBox[{"IMPLIED", ",", " ", 
+      RowBox[{
+      "INCLUDING", " ", "BUT", " ", "NOT", " ", "LIMITED", " ", "TO", " ", 
+       "THE", " ", "WARRANTIES", " ", "OF", " ", "MERCHANTABILITY"}], ",", 
+      " ", "\n", 
+      RowBox[{
+      "FITNESS", " ", "FOR", " ", "A", " ", "PARTICULAR", " ", "PURPOSE", " ",
+        "AND", " ", 
+       RowBox[{"NONINFRINGEMENT", "."}]}]}]}],
+    FontFamily->"Courier New",
+    FontWeight->"Regular",
+    FontColor->GrayLevel[0]], "\n", "*)"}],
+  FontSize->9]], "Code",
+ CellLabel->"In[37]:=",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{
+    RowBox[{"EvaluationNotebook", "[", "]"}], ",", "\n", " ", 
+    RowBox[{"DockedCells", " ", "->", " ", 
+     RowBox[{"{", "\n", "    ", 
+      RowBox[{"Cell", "[", 
+       RowBox[{
+        RowBox[{"BoxData", "[", 
+         RowBox[{"ToBoxes", "[", "\n", "      ", 
+          RowBox[{"Row", "[", 
+           RowBox[{"{", "  ", "\n", "        ", 
+            RowBox[{"Button", "[", 
+             
+             RowBox[{"\"\<Install \
+$UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ", 
+              RowBox[{"FrontEndExecute", "[", 
+               RowBox[{"FrontEndToken", "[", 
+                RowBox[{
+                 RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
+                 " ", "\"\<EvaluateNotebook\>\""}], "]"}], "]"}], ",", "\n", 
+              "          ", 
+              RowBox[{"Method", " ", "->", " ", "\"\<Queued\>\""}]}], "\n", 
+             "        ", "]"}], "\n", "      ", "}"}], "]"}], "\n", "    ", 
+          "]"}], "]"}], ",", " ", "\"\<DockedCell\>\"", ",", " ", "\n", 
+        "    ", 
+        RowBox[{"Background", " ", "->", " ", 
+         RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", " ", "\n", 
+        "    ", 
+        RowBox[{"CellMargins", " ", "->", " ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"0", ",", " ", "0"}], "}"}]}], "}"}]}]}], "]"}], "\n", 
+      "  ", "}"}]}]}], "]"}], ";"}]], "Input",
+ CellOpen->False,
+ CellLabel->"In[38]:=",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e"],
+
+Cell[BoxData[
+ RowBox[{"(*", "\n", 
+  RowBox[{
+  "This", " ", "native", " ", "Mathematica", " ", "implementation", " ", "of",
+    " ", "topological", " ", "associative", " ", "memory", "\n", "is", " ", 
+   "optimized", " ", "for", " ", 
+   RowBox[{"speed", ".", " ", "\n", "See"}], 
+   " ", "\"\<Memory Reference.nb\>\"", " ", "for", " ", "a", " ", "plain", " ",
+    "reference", " ", 
+   RowBox[{"implementation", "."}]}], "\n", "*)"}]], "Code",
+ CellLabel->"In[39]:=",ExpressionUUID->"dbd4e409-ddbe-4a97-b4aa-9983f4013a43"],
+
+Cell[CellGroupData[{
+
+Cell["Memory", "Subsection",
+ InitializationCell->
+  True,ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b"],
+
+Cell[BoxData[
+ RowBox[{"\n", 
+  RowBox[{
+   RowBox[{"Memory", "[", "config_Association", "]"}], " ", ":=", "\n", 
+   "\[IndentingNewLine]", "\t", 
+   RowBox[{"Module", "[", " ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"mem", " ", "=", " ", 
+        RowBox[{"<|", "|>"}]}], ",", " ", "NA", ",", " ", "PA", ",", " ", 
+       "NB", ",", " ", "PB", ",", " ", 
+       RowBox[{"T", " ", "=", " ", "1"}], ",", " ", "capacity", ",", " ", 
+       "zero", ",", "\n", "\t\t", "store", ",", " ", "retrieve", ",", " ", 
+       "clear", ",", " ", "memorycount", ",", " ", "accumulate"}], "}"}], ",",
+      "\n", "\t\t\t", "\n", "\t\t", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"NA", ",", " ", "PA"}], "}"}], " ", "=", " ", 
+       RowBox[{"config", "[", "\"\<A_parameters\>\"", "]"}]}], ";", "\n", 
+      "\t\t", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"NB", ",", " ", "PB"}], "}"}], " ", "=", " ", 
+       RowBox[{"config", "[", "\"\<B_parameters\>\"", "]"}]}], ";", "\n", 
+      "\t\t", "\n", "\t\t", 
+      RowBox[{"If", "[", " ", 
+       RowBox[{
+        RowBox[{"!", " ", 
+         RowBox[{"MatchQ", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"NA", ",", " ", "PA", ",", " ", "NB", ",", " ", "PB"}], 
+            "}"}], ",", " ", 
+           RowBox[{"{", "__Integer", "}"}]}], "]"}]}], ",", " ", "\n", 
+        "\t\t\t\t\t", 
+        RowBox[{"Message", "[", 
+         RowBox[{
+          RowBox[{"Memory", "::", "params"}], ",", " ", "config"}], "]"}]}], 
+       "]"}], ";", "\t", "\n", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{"Memory", " ", "capacity"}], ",", " ", 
+        RowBox[{"needed", " ", "for", " ", "default", " ", "threshold", " ", 
+         RowBox[{"calculation", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"capacity", " ", "=", " ", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"NA", " ", "==", " ", "NB"}], " ", "&&", " ", 
+          RowBox[{"PA", " ", "==", " ", "PB"}]}], ",", " ", "\n", "\t\t\t\t", 
+         
+         RowBox[{
+          RowBox[{"Log", "[", "2.0", "]"}], " ", "NA", " ", 
+          RowBox[{"(", 
+           RowBox[{"NA", " ", "-", " ", "1"}], ")"}], " ", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"NA", " ", "-", " ", "2"}], ")"}], " ", "/", " ", 
+           RowBox[{"(", 
+            RowBox[{"PA", " ", 
+             RowBox[{"(", 
+              RowBox[{"PA", " ", "-", " ", "1"}], ")"}], " ", 
+             RowBox[{"(", 
+              RowBox[{"PA", " ", "-", " ", "2"}], ")"}]}], ")"}]}]}], ",", 
+         "\n", "\t\t\t\t", 
+         RowBox[{
+          RowBox[{"Log", "[", "2.0", "]"}], " ", "NA", " ", 
+          RowBox[{"(", 
+           RowBox[{"NA", " ", "-", " ", "1"}], ")"}], " ", 
+          RowBox[{"NB", " ", "/", " ", 
+           RowBox[{"(", 
+            RowBox[{"PA", " ", 
+             RowBox[{"(", 
+              RowBox[{"PA", " ", "-", " ", "1"}], ")"}], " ", "PB"}], 
+            ")"}]}]}]}], "]"}]}], ";", "\n", "\t\t\t", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Default", " ", "pattern", " ", "matching", " ", 
+        RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"While", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"T", " ", "<", " ", "PA"}], " ", "&&", " ", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"capacity", "^", "2"}], " ", "*", " ", 
+           RowBox[{"Binomial", "[", 
+            RowBox[{"PA", ",", " ", "T"}], "]"}], " ", "*", " ", 
+           RowBox[{
+            RowBox[{"Binomial", "[", 
+             RowBox[{
+              RowBox[{"NA", "-", "PA"}], ",", " ", 
+              RowBox[{"PA", "-", "T"}]}], "]"}], " ", "/", " ", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"Binomial", "[", 
+             RowBox[{"NA", ",", " ", "PA"}], "]"}]}]}], " ", ">=", " ", 
+          "1"}]}], ",", " ", 
+        RowBox[{"T", "++"}]}], "]"}], ";", "\n", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{"User", "-", 
+        RowBox[{"defined", " ", 
+         RowBox[{"(", "scaled", ")"}], " ", 
+         RowBox[{"threshold", " ", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"KeyExistsQ", "[", 
+          RowBox[{"config", ",", " ", "\"\<threshold\>\""}], "]"}], " ", "&&",
+          " ", 
+         RowBox[{"NumberQ", "[", 
+          RowBox[{"config", "[", "\"\<threshold\>\"", "]"}], "]"}]}], ",", 
+        "\n", "\t\t\t", 
+        RowBox[{"T", " ", "=", " ", 
+         RowBox[{"Round", "[", 
+          RowBox[{
+           RowBox[{"config", "[", "\"\<threshold\>\"", "]"}], " ", "*", " ", 
+           "PA"}], "]"}]}]}], "]"}], ";", "\n", "\t\t\t", "\n", "\t\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"T", " ", "<", " ", "2"}], ",", " ", 
+        RowBox[{"T", " ", "=", " ", "2"}]}], "]"}], ";", "\n", "\n", "\t\t", 
+      RowBox[{"zero", " ", "=", " ", 
+       RowBox[{"Developer`ToPackedArray", "[", 
+        RowBox[{"ConstantArray", "[", 
+         RowBox[{"0", ",", " ", "NB"}], "]"}], "]"}]}], ";", "\n", "\n", 
+      "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Store", " ", "auto"}], "-", 
+         RowBox[{"association", " ", "A"}]}], " ", "->", " ", 
+        RowBox[{"A", " ", "in", " ", 
+         RowBox[{"memory", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{
+       RowBox[{"store", "[", "A_List", "]"}], " ", ":=", " ", 
+       RowBox[{"store", "[", 
+        RowBox[{"A", ",", " ", "A"}], "]"}]}], ";", "\n", "\t\t", "\n", 
+      "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Store", " ", "hetero"}], "-", 
+         RowBox[{"association", " ", "A"}]}], " ", "->", " ", 
+        RowBox[{"B", " ", "in", " ", 
+         RowBox[{"memory", "."}]}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{
+       RowBox[{"store", "[", 
+        RowBox[{"A_List", ",", " ", "B_List"}], "]"}], " ", ":=", " ", 
+       RowBox[{"Module", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"keys", ",", " ", "existing"}], "}"}], ",", "\n", "\t\t\t", 
+         
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Length", "[", "A", "]"}], " ", "<", " ", "2"}], ",", 
+            " ", 
+            RowBox[{"Return", "[", "]"}]}], "]"}], ";", "\n", "\t\t\t", "\n", 
+          "\t\t\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"Step", " ", "1"}], ":", " ", 
+            RowBox[{"Expansion", " ", 
+             RowBox[{"coding", "."}]}]}], " ", "*)"}], "\n", "\t\t\t", 
+          RowBox[{"keys", " ", "=", " ", 
+           RowBox[{"Subsets", "[", 
+            RowBox[{"A", ",", " ", 
+             RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\n", "\t\t\t", "\n", 
+          "\t\t\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"Step", " ", "2"}], ":", " ", 
+            RowBox[{"Bulk", " ", "memory", " ", 
+             RowBox[{"retrieval", "."}]}]}], " ", "*)"}], "\n", "\t\t\t", 
+          RowBox[{"existing", " ", "=", " ", 
+           RowBox[{"Lookup", "[", 
+            RowBox[{"mem", ",", " ", "keys", ",", " ", "zero"}], "]"}]}], ";",
+           "\n", "\t\t\t", "\n", "\t\t\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"Step", " ", "3"}], ":", " ", 
+            RowBox[{"Vectorized", " ", "memory", " ", 
+             RowBox[{"update", "."}]}]}], " ", "*)"}], "\n", "\t\t\t", 
+          RowBox[{
+           RowBox[{"existing", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", " ", "B"}], "]"}], "]"}], " ", "=", " ", 
+           "1"}], ";", "\n", "\t\t\t", "\n", "\t\t\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"Step", " ", "4"}], ":", " ", 
+            RowBox[{"Bulk", " ", "memory", " ", 
+             RowBox[{"commit", "."}]}]}], " ", "*)"}], "\n", "\t\t\t", 
+          RowBox[{"AssociateTo", "[", 
+           RowBox[{"mem", ",", " ", 
+            RowBox[{"AssociationThread", "[", 
+             RowBox[{"keys", ",", " ", "existing"}], "]"}]}], "]"}], ";"}]}], 
+        "\n", "\t\t", "]"}]}], ";", "\n", "\t\t", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Helper", " ", 
+        RowBox[{"function", "."}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"accumulate", " ", "=", " ", 
+       RowBox[{"Compile", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"P", ",", " ", "_Integer"}], "}"}], ",", " ", 
+           RowBox[{"{", 
+            RowBox[{"valsY", ",", " ", "_Integer", ",", " ", "1"}], "}"}]}], 
+          "}"}], ",", "\n", "\t\t\t", 
+         RowBox[{"Module", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"w", " ", "=", " ", 
+              RowBox[{"Table", "[", 
+               RowBox[{"0", ",", " ", 
+                RowBox[{"{", "P", "}"}]}], "]"}]}], ",", " ", 
+             RowBox[{"k", " ", "=", " ", "1"}]}], "}"}], ",", "\n", 
+           "\t\t\t\t", 
+           RowBox[{
+            RowBox[{"Do", "[", "\n", "\t\t\t\t\t", 
+             RowBox[{
+              RowBox[{
+               RowBox[{
+                RowBox[{"w", "[", 
+                 RowBox[{"[", "i", "]"}], "]"}], " ", "+=", " ", 
+                RowBox[{"valsY", "[", 
+                 RowBox[{"[", "k", "]"}], "]"}]}], ";", "\n", "\t\t\t\t\t", 
+               RowBox[{
+                RowBox[{"w", "[", 
+                 RowBox[{"[", "j", "]"}], "]"}], " ", "+=", " ", 
+                RowBox[{"valsY", "[", 
+                 RowBox[{"[", "k", "]"}], "]"}]}], ";", "\n", "\t\t\t\t\t", 
+               RowBox[{"k", "++"}]}], ",", "\n", "\t\t\t\t", 
+              RowBox[{"{", 
+               RowBox[{"i", ",", " ", "1", ",", " ", 
+                RowBox[{"P", " ", "-", " ", "1"}]}], "}"}], ",", " ", 
+              RowBox[{"{", 
+               RowBox[{"j", ",", " ", 
+                RowBox[{"i", " ", "+", " ", "1"}], ",", " ", "P"}], "}"}]}], 
+             " ", "]"}], ";", "\n", "\t\t\t\t", "w"}]}], "]"}], ",", " ", 
+         RowBox[{"RuntimeOptions", " ", "->", " ", "\"\<Speed\>\""}]}], "\n", 
+        "\t\t\t", "]"}]}], ";", "\n", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Memory", " ", 
+        RowBox[{"retrieval", "."}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{
+       RowBox[{"retrieve", "[", "A_List", "]"}], " ", ":=", " ", "\n", 
+       "\t\t\t", 
+       RowBox[{"Module", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"X", " ", "=", " ", "A"}], ",", " ", "P", ",", " ", "Y", ",",
+            " ", "R", ",", " ", "vals", ",", " ", "valsY", ",", " ", "t", ",",
+            " ", "w", ",", " ", "ws", ",", " ", "h", ",", " ", "cutoff"}], 
+          "}"}], ",", "\n", "\t\t\t", "\n", "\t\t\t", 
+         RowBox[{"While", "[", 
+          RowBox[{"True", ",", "\n", "\t\t\t", "\n", "\t\t\t\t", 
+           RowBox[{
+            RowBox[{"P", " ", "=", " ", 
+             RowBox[{"Length", "[", "X", "]"}]}], ";", "\n", "\t\t\t\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"P", " ", "<", " ", "T"}], ",", " ", 
+              RowBox[{"Return", "[", 
+               RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"(*", " ", 
+             RowBox[{
+              RowBox[{
+              "Bulk", " ", "native", " ", "lookup", " ", "returning", " ", 
+               "a", " ", "2", "D", " ", "packed", " ", "C"}], "-", "array"}], 
+             " ", "*)"}], "\n", "\t\t\t\t", 
+            RowBox[{"vals", " ", "=", " ", 
+             RowBox[{"Lookup", "[", 
+              RowBox[{"mem", ",", " ", 
+               RowBox[{"Subsets", "[", 
+                RowBox[{"X", ",", " ", 
+                 RowBox[{"{", "2", "}"}]}], "]"}], ",", " ", "zero"}], 
+              "]"}]}], ";", "\n", "\n", "\t\t\t\t", 
+            RowBox[{"(*", " ", 
+             RowBox[{"Vectorized", " ", "column", " ", "accumulation"}], " ", 
+             "*)"}], "\n", "\t\t\t\t", 
+            RowBox[{"R", " ", "=", " ", 
+             RowBox[{"Total", "[", "vals", "]"}]}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"t", " ", "=", " ", 
+             RowBox[{"Max", "[", 
+              RowBox[{"1", ",", " ", 
+               RowBox[{"R", "[", 
+                RowBox[{"[", 
+                 RowBox[{"First", " ", "@", " ", 
+                  RowBox[{"Ordering", "[", 
+                   RowBox[{"R", ",", " ", 
+                    RowBox[{"-", "PB"}]}], "]"}]}], "]"}], "]"}]}], "]"}]}], ";",
+             "\n", "\t\t\t\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"t", " ", "<", " ", 
+               RowBox[{"T", " ", 
+                RowBox[{
+                 RowBox[{"(", 
+                  RowBox[{"T", " ", "-", " ", "1"}], ")"}], " ", "/", " ", 
+                 "2"}]}]}], ",", " ", 
+              RowBox[{"Return", "[", 
+               RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"Y", " ", "=", " ", 
+             RowBox[{"Pick", "[", 
+              RowBox[{
+               RowBox[{"Range", "[", "NB", "]"}], ",", " ", 
+               RowBox[{"UnitStep", "[", 
+                RowBox[{"R", " ", "-", " ", "t"}], "]"}], ",", " ", "1"}], 
+              "]"}]}], ";", "\n", "\n", "\t\t\t\t", 
+            RowBox[{"(*", " ", 
+             RowBox[{
+              RowBox[{
+              "Slice", " ", "array", " ", "to", " ", "columns", " ", "Y", " ",
+                "and", " ", "row"}], "-", 
+              RowBox[{
+              "reduce", " ", "to", " ", "scalar", " ", "pair", " ", 
+               "weights"}]}], " ", "*)"}], "\n", "\t\t\t\t", 
+            RowBox[{"valsY", " ", "=", " ", 
+             RowBox[{"Total", "[", 
+              RowBox[{
+               RowBox[{"vals", "[", 
+                RowBox[{"[", 
+                 RowBox[{"All", ",", " ", "Y"}], "]"}], "]"}], ",", " ", 
+               RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"(*", " ", 
+             RowBox[{
+             "1", "D", " ", "compiled", " ", "distribution", " ", "to", " ", 
+              "element", " ", "weights"}], " ", "*)"}], "\n", "\t\t\t\t", 
+            RowBox[{"w", " ", "=", " ", 
+             RowBox[{"accumulate", "[", 
+              RowBox[{"P", ",", " ", "valsY"}], "]"}]}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"ws", " ", "=", " ", 
+             RowBox[{"Sort", "[", "w", "]"}]}], ";", "\n", "\t\t\t\t", 
+            RowBox[{"h", " ", "=", " ", "P"}], ";", "\n", "\t\t\t\t", 
+            RowBox[{"While", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"cutoff", " ", "=", " ", 
+                 RowBox[{"ws", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"-", "h"}], "]"}], "]"}]}], ")"}], " ", "<", " ", 
+               RowBox[{
+                RowBox[{"Length", "[", "Y", "]"}], " ", "*", " ", 
+                RowBox[{"(", 
+                 RowBox[{"h", " ", "-", " ", "1"}], ")"}]}]}], ",", " ", 
+              RowBox[{"--", "h"}]}], "]"}], ";", "\n", "\n", "\t\t\t\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"h", " ", "<", " ", "T"}], ",", " ", 
+              RowBox[{"Return", "[", 
+               RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\n", 
+            "\t\t\t\t", 
+            RowBox[{"X", " ", "=", " ", 
+             RowBox[{"Pick", "[", 
+              RowBox[{"X", ",", " ", 
+               RowBox[{"UnitStep", "[", 
+                RowBox[{"w", " ", "-", " ", "cutoff"}], "]"}], ",", " ", 
+               "1"}], "]"}]}], ";", "\n", "\n", "\t\t\t\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"h", " ", "===", " ", "T"}], " ", "&&", " ", 
+               RowBox[{"h", " ", "<", " ", 
+                RowBox[{"Length", "[", "X", "]"}]}]}], ",", " ", 
+              RowBox[{"Return", "[", 
+               RowBox[{"{", "}"}], "]"}]}], "]"}], ";", "\n", "\t\t\t\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Length", "[", "X", "]"}], " ", "==", " ", "P"}], ",", 
+              " ", 
+              RowBox[{"Return", "[", "Y", "]"}]}], "]"}], ";"}]}], "\n", 
+          "\t\t\t\t", "]"}]}], "\n", "\t\t\t", "]"}]}], ";", "\t", "\n", 
+      "  \t\t", "\n", "\t\t", 
+      RowBox[{"clear", " ", ":=", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"mem", " ", "=", " ", 
+          RowBox[{"<|", "|>"}]}], ";"}], ")"}]}], ";", "\n", "\t\t", 
+      RowBox[{"memorycount", " ", ":=", " ", 
+       RowBox[{"Total", "[", 
+        RowBox[{
+         RowBox[{"Values", "[", "mem", "]"}], ",", " ", "2"}], "]"}]}], ";", 
+      "\n", "\t\t\t\t", "\n", "\t\t", 
+      RowBox[{"<|", "\n", "\t\t\t", 
+       RowBox[{
+        RowBox[{"\"\<A_parameters\>\"", " ", "->", " ", 
+         RowBox[{"{", 
+          RowBox[{"NA", ",", " ", "PA"}], "}"}]}], ",", "\n", "\t\t\t", 
+        RowBox[{"\"\<B_parameters\>\"", " ", "->", " ", 
+         RowBox[{"{", 
+          RowBox[{"NB", ",", " ", "PB"}], "}"}]}], ",", "\n", "\t\t\t", 
+        RowBox[{"\"\<T\>\"", " ", "->", " ", "T"}], ",", " ", 
+        RowBox[{"(*", " ", 
+         RowBox[{"Absolute", " ", "pattern", " ", "matching", " ", 
+          RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t\t", 
+        RowBox[{"\"\<store\>\"", " ", "->", " ", "store"}], ",", "\n", 
+        "\t\t\t", 
+        RowBox[{"\"\<retrieve\>\"", " ", "->", " ", "retrieve"}], ",", "\n", 
+        "\t\t\t", 
+        RowBox[{"\"\<clear\>\"", " ", ":>", " ", "clear"}], ",", "\n", 
+        "\t\t\t", 
+        RowBox[{"\"\<memorycount\>\"", " ", ":>", " ", "memorycount"}], ",", 
+        "\n", "\t\t\t", 
+        RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<Mathematica\>\""}]}], 
+       "\n", "\t\t", "|>"}]}]}], "\[IndentingNewLine]", "\t\t", 
+    "]"}]}]}]], "Code",
+ CellLabel->"In[40]:=",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Messages", "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Memory", "::", "params"}], "  ", "=", 
+   " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
+ CellLabel->"In[41]:=",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Installer", "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"nb", ",", " ", "source", ",", " ", "target"}], "}"}], ",", "\n",
+     "    ", 
+    RowBox[{
+     RowBox[{"nb", " ", "=", " ", 
+      RowBox[{"EvaluationNotebook", "[", "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Check", " ", "if", " ", "the", " ", "notebook", " ", "has", " ", 
+       "been", " ", "saved", " ", "at", " ", "least", " ", "once", " ", "to", 
+       " ", "have", " ", "a", " ", 
+       RowBox[{"directory", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Quiet", "[", 
+         RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "===", " ", 
+        "$Failed"}], ",", "\n", "        ", 
+       RowBox[{
+        RowBox[{
+        "Print", 
+         "[", "\"\<Error: Save this notebook somewhere on your computer \
+first.\>\"", "]"}], ";", "\n", "        ", 
+        RowBox[{"Return", "[", "]"}]}]}], "\n", "    ", "]"}], ";", "\n", 
+     "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Force", " ", "the", " ", "AutoGenerate", " ", "setting", " ", "for", " ",
+        "this", " ", 
+       RowBox[{"notebook", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"SetOptions", "[", 
+      RowBox[{"nb", ",", " ", 
+       RowBox[{"AutoGeneratedPackage", " ", "->", " ", "Automatic"}]}], "]"}],
+      ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Programmatically", " ", "save", " ", "to", " ", "trigger", " ", 
+       RowBox[{"the", " ", ".", "m"}], " ", "file", " ", 
+       RowBox[{"generation", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"NotebookSave", "[", "nb", "]"}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Pause", " ", "to", " ", "ensure", " ", "the", " ", "OS", " ", 
+       "finishes", " ", "writing", " ", "the", " ", "file"}], " ", "*)"}], 
+     "\n", "    ", 
+     RowBox[{"Pause", "[", "0.5", "]"}], ";", "\n", "    ", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Define", " ", "paths", " ", "dynamically", " ", "based", " ", "on", " ",
+        "the", " ", "current", " ", 
+       RowBox[{"notebook", "'"}], "s", " ", 
+       RowBox[{"name", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"source", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"NotebookDirectory", "[", "]"}], ",", " ", 
+         RowBox[{
+          RowBox[{"FileBaseName", "[", 
+           RowBox[{"NotebookFileName", "[", "]"}], "]"}], " ", "<>", 
+          " ", "\"\<.m\>\""}]}], "}"}], "]"}]}], ";", "\n", "    ", 
+     RowBox[{"target", " ", "=", " ", 
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+        "$UserBaseDirectory", ",", " ", "\"\<Applications\>\"", ",", 
+         " ", "\"\<Memory.m\>\""}], "}"}], "]"}]}], ";", "\n", "    ", "\n", 
+     "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Install", " ", "the", " ", 
+       RowBox[{"file", "."}]}], " ", "*)"}], "\n", "    ", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"FileExistsQ", "[", "source", "]"}], ",", "\n", "        ", 
+       RowBox[{"CopyFile", "[", 
+        RowBox[{"source", ",", " ", "target", ",", " ", 
+         RowBox[{"OverwriteTarget", " ", "->", " ", "True"}]}], "]"}], ",", 
+       "\n", "        ", 
+       RowBox[{"Print", "[", 
+        RowBox[{"\"\<Error: Auto-generation failed. Could not find \>\"", ",",
+          " ", "source"}], "]"}]}], "\n", "    ", "]"}]}]}], "\n", "]"}], 
+  ";"}]], "Code",
+ InitializationCell->False,
+ CellLabel->"In[42]:=",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170"]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{853, 940},
+WindowMargins->{{Automatic, 394}, {-63, Automatic}},
+DockedCells->{
+  Cell[
+   BoxData[
+    TemplateBox[{
+      ButtonBox[
+      "\"Install $UserBaseDirectory/Applications/Memory.m\"", ButtonFunction :> 
+       FrontEndExecute[
+         FrontEndToken[
+          EvaluationNotebook[], "EvaluateNotebook"]], Method -> "Queued", 
+       Appearance -> Automatic, Evaluator -> Automatic]}, "RowDefault"]], 
+   "DockedCell", Background -> 
+   RGBColor[0.9215686274509803, 0.796078431372549, 0.5450980392156862], 
+   CellMargins -> {{0, 0}, {0, 0}}]},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+TaggingRules->{"TryRealOnly" -> False},
+DefaultNewCellStyle->"Code",
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"e6f377bb-2994-40e2-a5e7-a51a9ae10dfb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[422, 15, 149, 2, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574",
+ InitializationCell->True],
+Cell[574, 19, 1825, 42, 271, "Code",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+Cell[2402, 63, 1668, 39, 23, "Input",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e",
+ CellOpen->False],
+Cell[4073, 104, 525, 10, 158, "Code",ExpressionUUID->"dbd4e409-ddbe-4a97-b4aa-9983f4013a43"],
+Cell[CellGroupData[{
+Cell[4623, 118, 113, 2, 66, "Subsection",ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b",
+ InitializationCell->True],
+Cell[4739, 122, 18143, 421, 2703, "Code",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22919, 548, 85, 0, 66, "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
+Cell[23007, 550, 230, 5, 63, "Code",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23274, 560, 86, 0, 66, "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
+Cell[23363, 562, 3722, 88, 680, "Code",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170",
+ InitializationCell->False]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
