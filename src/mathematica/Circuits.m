@@ -731,7 +731,7 @@ geneneric cases. Modify as needed.
 *)
 
 auto[config_Association] := 
-	Module[ {f, plugin, dims, pop, params, M, label, size, min, max, 
+	Module[ {f, plugin, dims, pop, params, M, min, max, 
 		 absratelimit, decimation},
 		
 	(* Update rule *)			
@@ -1042,7 +1042,7 @@ Circuit`Registry = <||>; (* To keep track of embedded (nested) circuits. *)
 
 Circuit[expr_] := Module[ 
 		{ 
-		assoc, this, dispatch, 
+		assoc, dispatch, 
 		
 		(* Exposed in dispatch association. *)
 		f, fraw, schematics, clear, receiveparams = {}, sendparams = {}, 
@@ -1092,7 +1092,7 @@ Circuit[expr_] := Module[
 				
 	(* Compile a component. This triggers compilation of incoming pathways. *)
 	compile[node_Association] := Module[
-		{ config, callback, compilepathway, slotparams, fillparams}, 
+		{ config, compilepathway, slotparams, fillparams}, 
 				
 		++ nodeid;
 		
@@ -1267,7 +1267,7 @@ Circuit[expr_] := Module[
 	(except output components), or explicitly when collecting outputs.*)
 
 	patheval[id_Integer] := 
-		Module[ {e, perm, x, tag, gating, n, p},
+		Module[ {e, x, tag, gating, n, p},
 		
 		tag[t_String] := MemberQ[ e["tags"], t]; 
 
@@ -1356,7 +1356,7 @@ Circuit[expr_] := Module[
 	
 		(* Optional kWTA. *) 
 		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
-			Module[{k, U, tally, rankedmax, survivors},
+			Module[{k, U, tally, rankedmax},
 			
 				k = Min[#["hyperparameters"][[2]] & /@ paths ];
 			
@@ -1733,16 +1733,15 @@ FromDFD[dataflow_List] := Module[
 
 	parsenode[compExpr_[send___][receive___]] := Module
 		[
-		{comp, compname, argslist, plugin = Null, opts = <||>},
+		{comp, argslist, plugin = Null, opts = <||>},
 		
 		comp = Head[compExpr]; 
-		compname = ToString[comp];
 		argslist = List @@ compExpr; 
 		
 		Do[ Which
-			[
-			Head[arg] === Rule, AppendTo[opts, arg],
-			True, plugin = arg], {arg, argslist}
+			[Head[arg] === Rule, AppendTo[opts, arg],
+			True, plugin = arg ], 
+				{arg, argslist}
 			];
 		
 		DeleteCases[ 
@@ -1809,10 +1808,9 @@ ToDFD[expr_Association] := Module[
 
 	parsenode[node_Association] := Module[
 
-		{comp, compname,  plugin, opts, send, receive, compExpr},
+		{comp,  plugin, opts, send, receive, compExpr},
 
 		comp = node["component"]; 
-		compname = ToString[comp];
 		plugin = Lookup[node, "plugin", Null];
 		opts = Normal[KeyDrop[node, {"component", "plugin", "send", "receive"}]];		
 		compExpr = comp @@ DeleteCases[Join[If[plugin =!= Null, {plugin}, {}], opts], Null];
