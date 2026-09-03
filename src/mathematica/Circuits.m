@@ -959,7 +959,7 @@ import[config_Association] :=
 			
 	sub = Circuit[circ];
 	
-	sub["label"] = FileBaseName[file];
+	sub["label"] = StringTake[FileBaseName[file],UpTo[5]];
 	
 	sub (* Includes "clear" method. *)
 	]
