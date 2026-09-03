@@ -483,13 +483,16 @@ Input data can be excitatory or inhibitory, or a mix.
 The callback function serves as an optional encoder/preprocessing plugin.
 *)
 	
-input[config_Association] := Module[ {plugin, c, sub},
+input[config_Association] := Module[ {plugin, pluginconfig},
 
-	plugin = Lookup[config, "plugin", <| "function" -> Identity |>&];
+	pluginconfig = 
+		Append[ config, "hyperparameters" -> First[config["send_blocks"]]];
 
-	sub = Append[ config, "hyperparameters" -> First[config["send_blocks"]]];
+	plugin = 
+		Lookup[config, "plugin", <| "function" -> Identity |>&] [pluginconfig];
 
-	Join[ plugin[sub], <|"size" -> 10,  "checks" -> {"input", "oneout"} |> ]	
+
+	Join[ plugin, <|"size" -> 10,  "checks" -> {"input", "oneout"} |> ]	
 	]
 
 
@@ -501,13 +504,16 @@ Output data can be excitatory or inhibitory, or a mix.
 The callback function serves as an optional decoder/postprocessing plugin.
 *)
 
-output[config_Association] := Module[ {plugin, c, sub},
+output[config_Association] := Module[ {plugin, pluginconfig},
 
-	plugin = Lookup[config, "plugin", <| "function" -> Identity |>&];
+	pluginconfig = 
+		Append[ config, "hyperparameters" -> First[config["receive_blocks"]]];
 
-	sub = Append[ config, "hyperparameters" -> First[config["receive_blocks"]]];
+	plugin = 
+		Lookup[config, "plugin", <| "function" -> Identity |>&][pluginconfig];
 
-	Join[ plugin[sub], <|"size" -> 10, "checks" -> {"output", "oneinp"} |> ]	
+
+	Join[ plugin, <|"size" -> 10, "checks" -> {"output", "oneinp"} |> ]	
 	]
 
 
@@ -695,15 +701,25 @@ kwta[config_Association] :=
 	]
 
 
-(* Plug-in mechanism for auto-associative update rules. *)
+(* Plug-ins for auto-associative update rules. *)
 
-replacement[y_,x_]   := y;
-residual[y_, x_]     := Complement[x, y];
-complement[y_, x_]   := Complement[y, x];
-difference[args__]   := SymmetricDifference[args];
-augmentation[args__] := Union[args];
-coincidence[args__]  := Intersection[args];
+replacement[_Association] :=
+	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
+	
+residual[_Association] :=
+	<|"updaterule" -> (Complement[#2, #1]&), "label" -> "\[FilledUpTriangle]", "size" -> 18 |>;
 
+complement[_Association] :=
+	<|"updaterule" -> (Complement[#1, #2] &), "label" -> "\[EmptyDownTriangle]", "size" -> 20 |>;
+	
+difference[_Association] :=
+	<|"updaterule" -> SymmetricDifference, "label" -> "\[EmptyUpTriangle]", "size" -> 20 |>;
+	
+augmentation[_Association] :=
+	<|"updaterule" -> Union, "label" -> "\[Union]", "size" -> 14 |>;
+
+coincidence[_Association] :=
+	<|"updaterule" -> Intersection, "label" -> "\[Intersection]", "size" -> 14 |>;
 
 
 (* 
@@ -719,22 +735,14 @@ auto[config_Association] :=
 		 absratelimit, decimation},
 		
 	(* Update rule *)			
-	plugin = Lookup[config, "plugin", replacement];
-			
+	plugin = Lookup[config, "plugin", replacement][config];
+
+	Print["config = ", config];
+	Print["plugin = ", plugin];
+
 	dims = First /@ config["receive_blocks"];
 	params = Plus @@ config["receive_blocks"];
 	pop  = Last[params];
-
-	{label, size} = 
-		Switch[ plugin, 
-			replacement,  {"\[FilledDownTriangle]", 18 },
-			residual,     {"\[FilledUpTriangle]", 18 },
-			complement,   {"\[EmptyDownTriangle]", 20 },
-			difference,   {"\[EmptyUpTriangle]", 20 },
-			augmentation, {"\[Union]", 14 },
-			coincidence,  {"\[Intersection]", 14 },
-			_,            {ToString[plugin],  10 } (* User plug-in *)
-		];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit  = Round[Lookup[config, "rate_limit", Infinity] * pop];
@@ -777,14 +785,13 @@ auto[config_Association] :=
 		If[Y === {} && Length[A] >= min && Length[A] <= max,
 			If[config["learn"] =!= True, M["store"][A]]; Y = A];
 
-		X = plugin[Y, X]; 
+		X = plugin["updaterule"][Y, X]; 
 
 		Sequence @@ MultisetBlockSplit[X, dims] 
 		]; 
 		
 		
-	Join[ <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
-		"label" :> label, "size" -> size,
+	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
 	    "shape" -> "Square", "fill" -> 8 |>, M]
 	]
 
@@ -830,7 +837,6 @@ associator[config_Association] :=
 		M["store"][X, Y]; 
 		{}	
 		];   
-		
 		
 	Join[ <| "function" -> f, "checks" -> { "dimfirst", "oneout"},
 		"shape" -> "Square", "fill" -> 11, "size" -> 18, "label"-> "\[FilledRightTriangle]\[FilledCircle]" |>, M]
@@ -923,7 +929,7 @@ noise[config_Association] := Module[ {f},
 
 
 (* 
-Embedded circuit helper functions (component plugins).
+Plug-in for importing and compiling an embedded circuit
 *)
 				
 import[config_Association] := 
@@ -955,9 +961,13 @@ import[config_Association] :=
 	
 	sub["label"] = FileBaseName[file];
 	
-	sub
-	];
-	
+	sub (* Includes "clear" method. *)
+	]
+
+
+(* 
+Plug-in for embedded a precompiled circuit
+*)
 
 shared[config_Association] := 
 	Module[ {name, sub},
@@ -971,11 +981,8 @@ shared[config_Association] :=
 
 	sub["label"] = name;
 
-	(* The embedded circuit is to be cleared by its creator. *)
-	KeyDrop[sub, "clear"] 
-	];
-	
-	
+	KeyDrop[sub, "clear"] (* Do not propagate "clear" method. *)
+	]
 
 
 (* 
@@ -984,23 +991,21 @@ Multiple circuit components can reference the same embedded instance.
 *)
 				
 circuit[config_Association] := 
-	Module[ {f, plugin, sub, params},
+	Module[ {f, plugin, params},
 	
-	plugin = Lookup[config, "plugin", shared];
+	plugin = Lookup[config, "plugin", shared] [config];
 	
-	sub = plugin[config];
-
-	If[ sub === <||>, Return[<||>]];
+	If[ plugin === <||>, Return[<||>]];
 	
-	params = {sub["receive_blocks"], sub["send_blocks"]};
+	params = {plugin["receive_blocks"], plugin["send_blocks"]};
 	
 	If[ {config["receive_blocks"], config["send_blocks"]} =!= params,
-			Message[Circuit::embedded, params]; sub = Null];
+			Message[Circuit::embedded, params]; plugin = <||>];
 		
 	(* Raw evaluation, bypassing encoding and decoding. *)
-	f[blocks__] := Sequence @@ sub["$function"][{blocks}];
+	f[blocks__] := Sequence @@ plugin["$function"][{blocks}];
 	
-	Join[sub, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
+	Join[plugin, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
 							"shape" -> "Square", "size" -> 9|>]
 	]					
 
