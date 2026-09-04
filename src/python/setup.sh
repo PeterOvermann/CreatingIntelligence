@@ -1,7 +1,10 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_PATH="$SCRIPT_DIR/.venv"
+
+# The virtual environment must be in a location that's not iCloud-synched.
+# Activate with: source ~/.ci/bin/activate
+VENV_PATH="$HOME/.ci"
 
 if [ -d "$VENV_PATH" ]; then
     echo "Removing existing virtual environment..."
