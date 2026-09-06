@@ -6,25 +6,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Activate with: source ~/.ci/bin/activate
 VENV_PATH="$HOME/.ci"
 
-if [ -d "$VENV_PATH" ]; then
-    echo "Removing existing virtual environment..."
-    rm -rf "$VENV_PATH"
+if [ ! -d "$VENV_PATH" ]; then
+    echo "Creating virtual environment at $VENV_PATH..."
+    python3 -m venv "$VENV_PATH"
+else
+    echo "Using existing virtual environment at $VENV_PATH..."
 fi
 
 echo "Cleaning build artifacts and cache..."
 rm -rf "$SCRIPT_DIR/creating_intelligence.egg-info"
 find "$SCRIPT_DIR" -type d -name "__pycache__" -exec rm -rf {} +
 
-echo "Creating virtual environment at $VENV_PATH..."
-python3 -m venv "$VENV_PATH"
-
-echo "Building C backend..."
-make -C ../c/
-
+echo "Building C backend shared library..."
+make -C ../c/ lib
 
 source "$VENV_PATH/bin/activate"
 echo "Building creating-intelligence package..."
-pip install --upgrade pip
-pip install --force-reinstall -e "$SCRIPT_DIR"
+pip install --no-cache-dir --upgrade pip
+pip install --no-cache-dir --force-reinstall -e "$SCRIPT_DIR"
 
 echo "Setup complete. Run 'source \"$VENV_PATH/bin/activate\"' to start."
