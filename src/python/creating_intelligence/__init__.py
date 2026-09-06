@@ -19,5 +19,7 @@ try:
 except (ImportError, OSError) as e:
     raise ValueError(f"Backend '{backend}' failed to load: {e}")
     
+# Expose Circuit to the package namespace
+from .circuits import Circuit
 
 print(f"[System] Initializing Memory using '{backend}' backend.")
