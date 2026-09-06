@@ -204,7 +204,7 @@ MemoryCapacity[{NA_, PA_}, {NB_, PB_}] :=
 		Round[ Log[2] * (NB * (NA-1) * (NA-2)) / (PB * (PA-1) * (PA-2) ) ],
 		(* Hetero-associative. *)
 		Round[ Log[2] * (NB * NA * (NA-1)) / (PB * PA * (PA-1) ) ]
-		]
+	]
 
 
 MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
@@ -214,7 +214,7 @@ MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=
 		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
 			Binomial[NA, PA] >= 1, T++]; 
 		T
-		]																			
+	]																			
 
 
 (* General-purpose SHR encoder/decoder for symbolic expressions. *)
@@ -341,7 +341,7 @@ binning[config_Association] := Module[ {f, n, p, lex, T},
 	lex = Circuit`binningLexicon[n, p];
 	If[ ! MatchQ[ lex, _DataStructure], 
 		lex = Circuit`binningLexicon[n, p] = CreateDataStructure["HashTable"]];
-	lex["Insert", Null -> {} ];
+	lex["Insert", Null -> {}];
 	
 	(* Use the auto-associative pattern matching threshold. *)
 	T = MatchingThreshold[{n, p}, {n, p}]; 
@@ -384,7 +384,6 @@ vectorencoder[config_Association] := Module[ {f, n, p, R = <||>},
 		If[p <= 0 || d == 0, Return[{}]];
 		
 		sparsity = Lookup[config, "sparsity", N[1/Sqrt[d]]];
-											(* Johnson-Lindenstrauss *)
 		
 		(* Lazy initialization of random sparse binary matrix. *)
 		If[ MissingQ[R[d]], 
@@ -410,7 +409,6 @@ vectorencoder[config_Association] := Module[ {f, n, p, R = <||>},
 		Sort[Ordering[vec, -Min[p, Length[vec]]]]
 		(* Note: This selects elements strictly in the original order,
 		which may introduce a bias in certain datasets. *) 
-
 		];
 
 	<| "label" -> "VEC", "function" -> f, "clear" :> (R = <||>) |>
@@ -432,7 +430,6 @@ flyhash[config_Association] :=
 	If[ config["component"] === output,
 		Message[Circuit::encoder, flyhash]; Return[ <||>];];
     
-   
     f[list_] := 
 		Module[{d, c, centeredlist, vec, indices, min, max, span, 
 					scale, tolerance = 1.*^-10},
@@ -512,7 +509,6 @@ output[config_Association] := Module[ {plugin, pluginconfig},
 	plugin = 
 		Lookup[config, "plugin", <| "function" -> Identity |>&][pluginconfig];
 
-
 	Join[ plugin, <|"size" -> 10, "checks" -> {"output", "oneinp"} |> ]	
 	]
 
@@ -538,7 +534,6 @@ delay[config_Association] :=
 	dims2 = First /@ config["send_blocks"];
 
 	pop = Plus @@ Last /@ config["receive_blocks"];
-	
 	
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
@@ -618,9 +613,8 @@ latch[config_Association] :=
 			If[timer <= cycles, timer++];
 			
 			(* Check expiration. W=1 means the lifespan of the signal is 1. *)
-			If[timer >= cycles, state = ConstantArray[{}, Length[dims2]]
-			]
-		];
+			If[timer >= cycles, state = ConstantArray[{}, Length[dims2]]]
+			];
 
 		Sequence @@ state
 		];
@@ -666,8 +660,7 @@ kwta[config_Association] :=
 
 		(* Sub-threshold input: do not advance window, emit empty sets. *)
 		If[Length[X] < threshold, 
-			Return[Sequence @@ ConstantArray[{}, Length[dims2]]]
-		];
+			Return[Sequence @@ ConstantArray[{}, Length[dims2]]]];
 
 		(* Event-driven window update: X is known to be >= threshold *)
 		window = Rest[window];  AppendTo[window, X];
@@ -929,13 +922,13 @@ noise[config_Association] := Module[ {f},
 
 
 (* 
-Plug-in for importing and compiling an embedded circuit
+Plug-in for importing an embedded circuit from a json file.
 *)
 				
-import[config_Association] := 
+file[config_Association] := 
 	Module[ {file, circ, sub, rescale},
 	
-	file = config["file"];
+	file = config["name"];
 	If[ MissingQ[file], Message[Circuit::nofile, config]; Return[<||>]];
 	
 	(* File name extension may be omitted. *)
@@ -961,7 +954,7 @@ import[config_Association] :=
 	
 	sub["label"] = StringTake[FileBaseName[file],UpTo[5]];
 	
-	sub (* Includes "clear" method. *)
+	sub (* Includes "clear". *)
 	]
 
 
@@ -981,7 +974,7 @@ shared[config_Association] :=
 
 	sub["label"] = name;
 
-	KeyDrop[sub, "clear"] (* Do not propagate "clear" method. *)
+	KeyDrop[sub, "clear"] (* Do not propagate "clear". *)
 	]
 
 
@@ -1003,7 +996,7 @@ circuit[config_Association] :=
 			Message[Circuit::embedded, params]; plugin = <||>];
 		
 	(* Raw evaluation, bypassing encoding and decoding. *)
-	f[blocks__] := Sequence @@ plugin["$function"][{blocks}];
+	f[blocks__] := plugin["function"][blocks];
 	
 	Join[plugin, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
 							"shape" -> "Square", "size" -> 9|>]
@@ -1045,7 +1038,7 @@ Circuit[expr_] := Module[
 		assoc, dispatch, 
 		
 		(* Exposed in dispatch association. *)
-		f, fraw, schematics, clear, receiveparams = {}, sendparams = {}, 
+		f, multiplex, schematics, clear, receiveparams = {}, sendparams = {}, 
 	
 		(* Compiler. *)
 		compile, 
@@ -1269,8 +1262,8 @@ Circuit[expr_] := Module[
 	patheval[id_Integer] := 
 		Module[ {e, x, tag, gating, n, p},
 		
-		tag[t_String] := MemberQ[ e["tags"], t]; 
-
+		tag = MemberQ[e["tags"], #] &;
+		
 		e = pathways[id];
 		
 		{n, p} = e["hyperparameters"];
@@ -1283,7 +1276,7 @@ Circuit[expr_] := Module[
 				
 		(* Process temporal gating (tags of the form @10101). *)
 		gating = Lookup[e, "gating", {1}];
-		If[ gating[[Mod[tick - 1, Length[gating]] + 1]] == 0, Return[{}]];
+		If[gating[[Mod[tick - 1, Length[gating]] + 1]] == 0, Return[{}]];
 		
 		(* 
 		Inhibition transformer. Flips positives to negatives.
@@ -1409,26 +1402,26 @@ Circuit[expr_] := Module[
 	Operates on preprocessed (encoded) data.
 	Used directly by embedded circuits.
 	*)	
-	fraw[x_List] := Module[ {y = {}, multiplex},
+	multiplex[x_List] := Module[ {y = {}, mult},
 	
 		If[ Length[x] =!= Length[inputslots], 
 			Message[Circuit::sequence, inputslots]; Return[Sequence[]]];
 				
 		(* Multiplexed evaluation of encoded data *)
-		multiplex = Lookup[Lookup[assoc, "options", <||>], "multiplex", {1}];
+		mult = Lookup[Lookup[assoc, "options", <||>], "multiplex", {1}];
 		
-		If[ ! MatchQ[ multiplex, {(0 | 1) ..}],
-			Message[Circuit::multiplex, multiplex]; multiplex = {1}];
+		If[ ! MatchQ[ mult, {(0 | 1) ..}],
+			Message[Circuit::multiplex, mult]; mult = {1}];
 		
 		Do[y = If[gate === 1, evaluate[x], 
-			evaluate[{} & /@ x]], {gate, multiplex}];
+			evaluate[{} & /@ x]], {gate, mult}];
 			
 		y (* Can be empty if all gates are zero. *)
 		];			
 
 
 	(* 
-	The circuit specification generates this function. 
+	Top-level function corresponding to the circuit.
 	Each call, even with empty inputs, triggers one execution cycle. 
 	The function has a variable number of arguments which must match
 	the number of input nodes.
@@ -1450,7 +1443,7 @@ Circuit[expr_] := Module[
 		x = MapThread[Construct, {preprocess, x}];
 			
 		(* Main circuit function. *)
-		y = fraw[x];		
+		y = multiplex[x];		
 		
 		(* Postprocess (decode). *)
 		y = MapThread[Construct, {postprocess, y}];	
@@ -1552,24 +1545,26 @@ Circuit[expr_] := Module[
 			]
 		];	
 
-	clear := (Clear[f, fraw, schematics]; Scan[#["clear"]&, nodes];);
+	clear := Scan[#["clear"]&, nodes];
 			
-	(* Register and dispatch association. *)
+	(* Assemble dispatch association. *)
 	
 	dispatch = <|
 		"function" -> f, 
 		"schematics" -> schematics,
 		"clear" :> clear,
-		
-		(* Private properties. *)
-		"$function" -> fraw, 
 		"receive_blocks" -> receiveparams,
 		"send_blocks" -> sendparams,
-		"nodes" :> nodes
+		"nodes" :> nodes (* For inspection only. *)
 		|>;
 	
 		
-	(* Add to registry if "name" property is specified. *)
+	(* Add to registry if "name" property is specified. 
+	Note: this automatically registers embedded circuits loaded from files via
+	JSON file import.
+	*)
+	
+	
 	Module[ {key},
 		key = assoc["options", "name"];
 		If[ ! MissingQ[key],
@@ -1985,25 +1980,6 @@ ImportCircuitHook[channel_, opts___] := Module[
 
 ImportExport`RegisterExport["Circuit", ExportCircuitHook];
 ImportExport`RegisterImport["Circuit", ImportCircuitHook];
-
-
-(* 
-A formatting-invariant hash of a JSON string, used for filename generation.
-*)
-
-JSONHash[data_String] := Module[{sorted, jsonString, hexHash},
-	sorted = Replace[data, a_Association :> KeySort[a], {0, Infinity}];
-
-	jsonString = ExportString[sorted, "JSON", "Compact" -> True, 
-		CharacterEncoding -> "UTF-8"];
-
-	jsonString = StringReplace[jsonString, "\\/" -> "/"];
-	jsonString = StringTrim[jsonString];
-
-	hexHash = Hash[jsonString, "SHA256", "HexString"];
-
-	StringTake[hexHash, 12]
- ]
 
 
 (* -------------------------------------------------------------------------- *)
