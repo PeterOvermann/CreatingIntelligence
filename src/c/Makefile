@@ -1,9 +1,9 @@
-
 #	creatingintelligence.org
 #	Makefile
 #   - memory (CLI)
 # 	- memorytest (performance and capacity testing)
 # 	- libmemory (used by Python frontend)
+	
 	
 CC = gcc
 CFLAGS = -Wall -Wextra -O3 -fPIC
@@ -24,9 +24,11 @@ LIB_TARGET = $(LIB_DIR)/libmemory.$(EXT)
 CLI_TARGET = $(BIN_DIR)/memory
 TEST_TARGET = $(BIN_DIR)/memorytest
 
-.PHONY: all clean directories
+.PHONY: all clean directories lib
 
 all: directories $(LIB_TARGET) $(CLI_TARGET) $(TEST_TARGET)
+
+lib: directories $(LIB_TARGET)
 
 directories:
 	mkdir -p $(BIN_DIR) $(LIB_DIR)
