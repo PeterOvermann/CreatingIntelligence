@@ -18,7 +18,7 @@ rm -rf "$SCRIPT_DIR/creating_intelligence.egg-info"
 find "$SCRIPT_DIR" -type d -name "__pycache__" -exec rm -rf {} +
 
 echo "Building C backend shared library..."
-make -C ../c/ lib
+make -C "$SCRIPT_DIR/../c" lib
 
 source "$VENV_PATH/bin/activate"
 echo "Building creating-intelligence package..."
