@@ -13,6 +13,15 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
 import json
+import os
+import sys
+
+# Add this script's directory to sys.path for Circuit to find local JSON files
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+    
+    
 from creating_intelligence import Circuit
 
 def match_pattern(expected, actual):
@@ -83,7 +92,8 @@ def run_testsuite(json_path):
     print(f"Regressions:        {failures_count}")
 
 if __name__ == "__main__":
-    run_testsuite("testsuite.json")
-
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(script_dir, "testsuite.json")
+    run_testsuite(json_path)
 
     
