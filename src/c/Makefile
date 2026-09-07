@@ -31,7 +31,7 @@ all: directories $(LIB_TARGET) $(CLI_TARGET) $(TEST_TARGET)
 lib: directories $(LIB_TARGET)
 
 directories:
-	mkdir -p $(BIN_DIR) $(LIB_DIR)
+	@mkdir -p $(BIN_DIR) $(LIB_DIR)
 
 $(LIB_TARGET): memory.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
