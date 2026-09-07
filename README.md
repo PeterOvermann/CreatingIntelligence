@@ -1,6 +1,5 @@
 # Creating Intelligence
 
-**A Computational Foundation for AGI**
 
 This repository contains the open-source reference implementation and the
 living manuscript for the [Creating
@@ -14,8 +13,11 @@ from network topologies with a combinatorially expanded layer. This opens a new
 route toward synthetic intelligence with human-level energy efficiency.
 
 
-## Repository Structure
+### General Information
 
+* Website: https://creatingintelligence.org
+* Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
+* Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
 
 ### [Source Code](src/)
 
@@ -43,12 +45,6 @@ The complete, living document exploring the mathematical, algorithmic, and neuro
 
 * [Download the full PDF](docs/CreatingIntelligence.pdf)
 
-### Community and Feedback
-
-
-* For architectural discussions, conceptual questions, and sharing experiments, please join the [Discussions](https://github.com/PeterOvermann/CreatingIntelligence/discussions). 
-
-* For bug reports and specific code contributions, please use the [Issue Tracker](https://github.com/PeterOvermann/CreatingIntelligence/issues).
 
 
 ---
