@@ -1,21 +1,27 @@
-# Creating Intelligence
+# About the *Creating Intelligence* Project
 
+Our goal is to build a Computational Theory of Mind, based on a 
+new approach to Hyperdimensional Computing. It proposes an alternative to classical
+computationalist models and to neural-network-based connectionist models of the mind.
 
-This repository contains the open-source reference implementation and the
-living manuscript for the [Creating
-Intelligence](https://creatingintelligence.org) project.
+In this theory, the mind performs computations on sparse binary data. The fundamental
+data structures are Sparse Distributed Representations (SDRs) for perceptual information 
+and Sparse Holographic Representations (SHRs) for symbols. 
 
-This project introduces a new computational theory of mind grounded in set
-theory and hyperdimensional computing. Unlike traditional neural networks that
-rely on continuous weights and matrix multiplication, this framework uses
-sparse binary data. It demonstrates that associative memory emerges naturally
-from network topologies with a combinatorially expanded layer. This opens a new
-route toward synthetic intelligence with human-level energy efficiency.
+The centerpiece of this project is the Topological Associative Memory &mdash; a 
+newly discovered associative memory for sparse data, serving as the computational
+kernel that models the brain's core algorithm. A software frontend
+for modeling and simulating neural circuits and pathways complements the memory backend.
+
+The methods introduced here lend themselves to binary in-memory computation, opening a
+new route toward synthetic intelligence that does not rely on GPU acceleration.
 
 
 ### General Information
 
 * Website: https://creatingintelligence.org
+* Download PDF: https://creatingintelligence.org/CreatingIntelligence.pdf
+* Preprint: https://arxiv.org/abs/2606.31819
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
 * Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
 
@@ -26,30 +32,63 @@ The zero-dependency standard-C reference implementation of the core topological 
 A portable *Mathematica* package that implements the neural circuit 
 components and the data flow logic. 
 
+### Build Instructions
+
+On Unix, Linux, BSD, and macOS, run
+
+```
+src/python/setup.sh
+```
+
+This will create a Python virtual environment `~/.ci` in your home directory and build the *creating_intelligence* package.
+It includes a high-performance memory backend written in Standard C, and an alternative native Python version.
+
+To build stand-alone zero-dependency versions of the Standard C memory kernel (a command line interface and test program), run
+
+```
+make -C src/c/
+```
 
 ### [Getting Started](experiments/getting-started/GettingStarted.pdf) 
 
-A brief guide to building neural circuits.
+Learn how to design neural architectures via the JSON dataflow description language: [GettingStarted.pdf](experiments/getting-started/GettingStarted.pdf) 
+
+Run a first example:
+
+```
+python3 experiments/hello-world/hello-world.py 
+```
 
 
-### [Experiments](experiments/)
 
-A collection of circuit models demonstrating hetero-associative memory and
-auto-associative memory architectures.
+### Testing
 
-### Read the Manuscript
+To test the circuit package (and indirectly the memory backend), run
 
-The complete, living document exploring the mathematical, algorithmic, and neuroscientific foundations of this framework is available online.
+```
+python3 experiments/circuit-tests/run.py
+```
 
-* [Read online at creatingintelligence.org](https://creatingintelligence.org)
+Test the stand-alone memory kernel (storage capacity, retrieval accuracy, and I/O performance) with
 
-* [Download the full PDF](docs/CreatingIntelligence.pdf)
+```
+python3 experiments/memory-tests/run.py
+```
+
+or as a stand-alone C binary with
+
+```
+bin/memorytest
+```
+
 
 
 
 ---
 
-### License
+### Copyright and License Information
+
+Copyright © 2026 Peter Overmann. All rights reserved.
 
 This repository contains two distinct categories of content, which are licensed separately:
 
@@ -59,7 +98,3 @@ This repository contains two distinct categories of content, which are licensed 
 
 See the full [LICENSE](LICENSE) file for details.
 
-
----
-
-*Copyright © 2026 Peter Overmann. All rights reserved.*
