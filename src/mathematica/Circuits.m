@@ -730,9 +730,6 @@ auto[config_Association] :=
 	(* Update rule *)			
 	plugin = Lookup[config, "plugin", replacement][config];
 
-	Print["config = ", config];
-	Print["plugin = ", plugin];
-
 	dims = First /@ config["receive_blocks"];
 	params = Plus @@ config["receive_blocks"];
 	pop  = Last[params];
