@@ -25,12 +25,6 @@ new route toward synthetic intelligence that does not rely on GPU acceleration.
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
 * Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
 
-### [Source Code](src/)
-
-The zero-dependency standard-C reference implementation of the core topological associative memory algorithm. 
-
-A portable *Mathematica* package that implements the neural circuit 
-components and the data flow logic. 
 
 ### Build Instructions
 
@@ -49,9 +43,9 @@ To build stand-alone zero-dependency versions of the Standard C memory kernel (a
 make -C src/c/
 ```
 
-### [Getting Started](experiments/getting-started/GettingStarted.pdf) 
+### Getting Started
 
-Learn how to design neural architectures via the JSON dataflow description language: [GettingStarted.pdf](experiments/getting-started/GettingStarted.pdf) 
+Learn how to set up neural architectures via the JSON dataflow description language: [GettingStarted.pdf](experiments/getting-started/GettingStarted.pdf) 
 
 Run a first example:
 
