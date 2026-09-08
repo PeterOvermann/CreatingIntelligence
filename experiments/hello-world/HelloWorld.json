@@ -6,6 +6,6 @@
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [11]},
 
-	{"component": "output", "plugin": "codec", "receive": [11]}
+	{"component": "output", "plugin": "codec", "receive": [{"slot": 11, "tags": ["log"]}]}
   ]
 }
