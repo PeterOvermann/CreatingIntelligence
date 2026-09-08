@@ -11,6 +11,11 @@ The Topological Assoicative Memory kernel is available in multiple interchangeab
 - Memory CLT.m: Wrapper for the Standard C command line interface.
 
 
+### Requirements
+
+Mathematica 14.3 or later for Macintosh, Windows or Linux.
+
+
 ### Build and Installation Instructions
 
 - Choose one of the Memory notebooks and click the `Install` button at the top.
@@ -18,6 +23,8 @@ The Topological Assoicative Memory kernel is available in multiple interchangeab
 
 
 ### Testing
+
+Run the [HelloWorld](../../experiments/hello-world) notebook to verify the installation.
 
 To test the entire package, evaluate the [Getting Started](../../experiments/getting-started)
 notebook. 
