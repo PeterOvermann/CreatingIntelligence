@@ -18,7 +18,7 @@ from creating_intelligence import Circuit
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(script_dir, "io.json")
+    json_path = os.path.join(script_dir, "HelloWorld.json")
 
     with open(json_path, "r") as f:
         config = json.load(f)

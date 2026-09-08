@@ -1,4 +1,16 @@
 
+### General Information
+
+This Python implementation of the *Creating Intelligence* framework is functionally
+equivalent to the [Mathematica](../../mathematica) prototype.
+
+The Topological Assoicative Memory kernel is available in multiple interchangeable versions:
+
+- memory_python.py: A direct implementation of the core memory algorithm, serving as a starting point for derived work.
+- memory_c_ffi.py: Wrapper for the Standard C memory kernel (**recommended**).
+
+
+
 ### Software Design Notes
 
 This package uses a data-driven architecture inspired by the Clojure language.
