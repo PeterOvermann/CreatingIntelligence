@@ -1163,20 +1163,27 @@ def noise(config):
 
 
 def file(config):
-    """
-    Plug-in for importing, optionally rescaling, and compiling an embedded circuit from a JSON file.
-    """
     file_path = config.get("name")
     if not file_path:
         raise CircuitError(f"Missing 'name' property in {config}")
         
     if not file_path.endswith(".json"):
         file_path += ".json"
+
+    # Search current working directory first, then sys.path
+    search_paths = [""] + sys.path 
+    
+    full_path = None
+    for base in search_paths:
+        target = os.path.join(base, file_path) if base else file_path
+        if os.path.exists(target):
+            full_path = target
+            break
+            
+    if not full_path:
+        raise CircuitError(f"File '{file_path}' not found in current directory or sys.path.")
         
-    if not os.path.exists(file_path):
-        raise CircuitError(f"File '{file_path}' not found.")
-        
-    with open(file_path, "r") as f:
+    with open(full_path, "r") as f:
         circ_expr = json.load(f)
     
     # Rescale hyperparameters of embedded circuit
