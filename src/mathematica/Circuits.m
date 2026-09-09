@@ -561,10 +561,8 @@ delay[config_Association] :=
 			X = Sort[RandomSample[X, absratelimit]]]; 
 		
 		Y = RandomSample[Y, UpTo[Round[capacity * pop]]]; 
-		X = Multiset[X, Y]; (* Temporal integration. *)
-		Y = X; (* Persist state. *)
-
-		Sequence @@ MultisetBlockSplit[X, dims2]
+		Y = Multiset[Y, X]; (* Temporal integration. *)
+		Sequence @@ MultisetBlockSplit[Y, dims2]
 		];
 
 	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
