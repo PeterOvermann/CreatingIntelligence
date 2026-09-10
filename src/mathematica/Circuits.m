@@ -632,30 +632,6 @@ latch[config_Association] :=
 	]
 
 
-(* Plug-ins for auto-associative update rules. *)
-
-(*(
-replacement[_Association] :=
-	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
-	
-residual[_Association] :=
-	<|"updaterule" -> (Complement[#2, #1]&), "label" -> "\[FilledUpTriangle]", "size" -> 18 |>;
-
-complement[_Association] :=
-	<|"updaterule" -> (Complement[#1, #2] &), "label" -> "\[EmptyDownTriangle]", "size" -> 20 |>;
-	
-difference[_Association] :=
-	<|"updaterule" -> SymmetricDifference, "label" -> "\[EmptyUpTriangle]", "size" -> 20 |>;
-	
-augmentation[_Association] :=
-	<|"updaterule" -> Union, "label" -> "\[Union]", "size" -> 14 |>;
-
-coincidence[_Association] :=
-	<|"updaterule" -> Intersection, "label" -> "\[Intersection]", "size" -> 14 |>;
-*)
-	
-
-
 (* 
 Plug-ins for update rules ("auto" component") 
 and temporal integration ("delay" component).
