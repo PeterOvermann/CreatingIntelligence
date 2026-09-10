@@ -514,59 +514,69 @@ output[config_Association] := Module[ {plugin, pluginconfig},
 
 
 (*
-A delay node encapsulates five functions in one node:
+The delay node encapsulates multiple functionalities:
 
-- block coding
 - signal delay
-- proportional decimation by a factor D     (default: 1)
-- rate limiting to max population R         (default: Infinity)
-- temporal integration of C elements        (default: 0)
+- block coding and re-coding
+- proportional decimation (default: none)
+- rate limiting  (default: none)
+- temporal integration via internal capacity (default: none),
+    using the plugin mechanism for update rules.
 
 Multisets and inhibitory signals are handled transparently. 
-Temporal integration resolves inhibition.
 *)
 
 delay[config_Association] := 
-	Module[ {f, pop, dims1, dims2, decimation, 
-			absratelimit, capacity, Y = {}, label = ""},
+	Module[ {f, plugin, pop, dims1, dims2, decay, decimation, 
+			absratelimit, abscapacity, Xstate = {}},
+
+	plugin = Lookup[config, "plugin", augmentation][config];
+
+	If[ MissingQ[config["plugin"] && MissingQ[config["capacity"]]], 
+		plugin = KeyDrop[plugin, "label"]];
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
 
 	pop = Plus @@ Last /@ config["receive_blocks"];
 	
+	(* Limit size of query pattern. Default: unlimited. *)			
+	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
+	(* Pre-integration decay (leak rate). *)			
+	decay = Lookup[config, "decay", 0];
+	(* Temporal capacity, carry over from previous cycle. *)
+	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
-	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit  = Round[ Lookup[config, "rate_limit", Infinity] * pop];
-	(* Temporal capacity, carry over from previous cycle. *)
-	capacity = Lookup[config, "capacity", 0];				
 
-	(* Visualization. *)
-	If[decimation < 1, label = "D"];	
-	If[absratelimit < Infinity, label = label <> "R"];	
-	If[capacity > 0, label = label <> ".."];	
 
 	f[blocks__List] := Module[ {X},
 		
 		X = MultisetBlockJoin[ {blocks}, dims1];
 		
-		(* X may be a mix of excitatory and inhibitory elements. 
-			We let both fade at the same rate. *)
-		If[decimation < 1,  (* This may result in an empty list. *)
-			X = Sort[RandomSample[X, Floor[decimation Length[X]]]]]; 
-
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 
 			X = Sort[RandomSample[X, absratelimit]]]; 
+
+		(* Pre-integration stochastic decay. *)
+		If[decay > 0, Xstate = 
+			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+
+		(* Multiset subsampling applied to previous state. *)
+		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
 		
-		Y = RandomSample[Y, UpTo[Round[capacity * pop]]]; 
-		Y = Multiset[Y, X]; (* Temporal integration. *)
-		Sequence @@ MultisetBlockSplit[Y, dims2]
+		(* Temporal integration via update rules. *)
+		Xstate = plugin["updaterule"][X, Xstate]; 
+
+		(* Proportional multiset subsampling applied to the integrated state. *)
+		If[decimation < 1,  
+			Xstate = Sort[RandomSample[Xstate, Floor[decimation * Length[Xstate]]]]]; 
+
+		Sequence @@ MultisetBlockSplit[Xstate, dims2]
 		];
 
-	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
-		"fill" -> 13, "label" -> label |>	
+	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
+		"fill" -> 13 |>]	
 	]
 
 
@@ -622,78 +632,9 @@ latch[config_Association] :=
 	]
 
 
-(* 
-KWTA computed for multisets across multiple input slots.
-Integrates time-bounding (cycles) and space-bounding (capacity).
-Filters sparse signals below a minimum population threshold.
-
-Note about the source of multisets: A single input pathway may already carry
-a multiset ("+" modifier), or receive a multiset through pathway merging.
-*)
-	
-kwta[config_Association] := 
-	Module[ {f, dims1, dims2, pop, k, cutoff, cycles, capacity, threshold, 
-		window},
-
-	dims1 = First /@ config["receive_blocks"];
-	dims2 = First /@ config["send_blocks"];
-	pop   = Plus @@ Last /@ config["receive_blocks"];
-	
-	(* k is the population of the output channel. *)
-	k = config["send_blocks"][[1, 2]]; 
-	
-	(* Temporal and space bounding parameters *)
-	cycles    = Lookup[config, "cycles", 1];
-	capacity  = Lookup[config, "capacity", Infinity];
-	threshold = Lookup[config, "threshold", 0];
-	
-	(* Minimum number of occurrences. Acts as a high-pass filter. *)			
-	cutoff = Lookup[config, "cutoff", 2];
-		
-	window = ConstantArray[{}, cycles];
-	
-	f[blocks__List] := Module[ {X, U, tally, rankedmax, winners = {}}, 
-
-		X = MultisetBlockJoin[ {blocks}, dims1];
-
-		(* Sub-threshold input: do not advance window, emit empty sets. *)
-		If[Length[X] < threshold, 
-			Return[Sequence @@ ConstantArray[{}, Length[dims2]]]];
-
-		(* Event-driven window update: X is known to be >= threshold *)
-		window = Rest[window];  AppendTo[window, X];
-		
-		(* Aggregate all positive elements from the current window *)
-		U = Multiset[window]; 
-		
-		(* Capacity bounding: Unbiased subsampling if capacity is exceeded. *)
-
-		(* Note: A biologically more plausible approach would apply either 
-		   stochasitic exponential decay or linear  graded decay (multiset 
-		   substraction). Modify as needed. See also: kwta component. *)
-		  
-		If[Length[U] > capacity * pop,  
-			U = Sort[RandomSample[U, Round[capacity * pop]]]];
-			
-		(* KWTA consensus on the surviving elements *)
-		tally = SortBy[Last][Tally[U]]; 
-		
-		If[ Length[tally] >= k, 
-			rankedmax = tally[[-k, 2]];
-			If[rankedmax >= cutoff,
-				winners = Sort[Select[tally, Last[#] >= rankedmax &][[All, 1]]]]
-			];
-		
-		Sequence @@ MultisetBlockSplit[winners, dims2]
-		];
-		
-	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"}, 
-		"label" -> "k", "fill" -> 13 |>
-	]
-
-
 (* Plug-ins for auto-associative update rules. *)
 
+(*(
 replacement[_Association] :=
 	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
 	
@@ -711,6 +652,76 @@ augmentation[_Association] :=
 
 coincidence[_Association] :=
 	<|"updaterule" -> Intersection, "label" -> "\[Intersection]", "size" -> 14 |>;
+*)
+	
+
+
+(* 
+Plug-ins for update rules ("auto" component") 
+and temporal integration ("delay" component).
+*)
+
+
+(* 
+Replaces #2 with #1.
+*)
+replacement[_Association] :=
+	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
+	
+(* 
+Multiset Complement[#2, #1]. 
+Removes #1 from #2. 
+Retains novel input.
+*)
+residual[_Association] :=
+	<|"updaterule" -> (ResolveGraded[Multiset[#2, -#1]]&), "label" -> "\[FilledUpTriangle]", "size" -> 18 |>;
+
+(* 
+Multiset Complement[#1, #2]. 
+Removes the #2 from #1. 
+Isolates predicted elements.
+*)
+complement[_Association] :=
+	<|"updaterule" -> (ResolveGraded[Multiset[#1, -#2]] &), "label" -> "\[EmptyDownTriangle]", "size" -> 20 |>;
+	
+(* 
+Multiset SymmetricDifference[#1, #2].
+Retains the symmetric difference between #2 and #1. 
+*)
+difference[_Association] :=
+	<|"updaterule" -> (Abs[Multiset[#1, -#2]] &), "label" -> "\[EmptyUpTriangle]", "size" -> 20 |>;
+	
+(* 
+Multiset Union[#1, #2]. 
+Adds #1 to #2 via multiset aggregation.  
+*)
+augmentation[_Association] :=
+	<|"updaterule" -> Multiset, "label" -> "\[Union]", "size" -> 14 |>;
+
+(* 
+Multiset Intersection[#1, #2].
+Retains only the elements present in both #1 and #2.
+*)
+coincidence[_Association] :=
+	<|"updaterule" -> (Module[{cY = Counts[#1], cX = Counts[#2]}, 
+        Flatten @ KeyValueMap[ConstantArray[#1, Min[#2, Lookup[cX, #1, 0]]] &, cY]] &), 
+        "label" -> "\[Intersection]", "size" -> 14 |>;
+        
+  
+(*
+Multiset permutation.
+*)            
+permutation[config_Association] := Module[{perm, dim},
+	
+	(* Total dimension needed to generate the permutation mapping. *)
+	dim = First[Plus @@ config["receive_blocks"]];
+	
+	(* Initialize fixed, instance-specific permutation array. *)
+	perm = RandomSample[Range[dim]];
+
+	<| "updaterule" -> (Multiset[#1, Sort[Sign[#2] * perm[[Abs[#2]]]]] &), 
+		"label" -> "\[Pi]", "size" -> 16 |>
+]        
 
 
 (* 
@@ -773,7 +784,7 @@ auto[config_Association] :=
 		If[Y === {} && Length[A] >= min && Length[A] <= max,
 			If[config["learn"] =!= True, M["store"][A]]; Y = A];
 
-		X = plugin["updaterule"][Y, X]; 
+		X = Union[plugin["updaterule"][Y, X]]; 
 
 		Sequence @@ MultisetBlockSplit[X, dims] 
 		]; 
@@ -873,8 +884,10 @@ To do so, the node remembers its context from the previous cycle.
 *)
 
 predictor[config_Association] := 
-		Module[ {f, M, X = {}, prediction = {}, itemconfig, contextconfig},
+		Module[ {f, M, X = {}, prediction = {}, decimation,
+						itemconfig, contextconfig},
 
+	decimation = Lookup[config, "decimate", 1];
 	itemconfig = First[config["receive_blocks"]];
 	contextconfig = Rest[config["receive_blocks"]]; (* Context may be partitioned *)
 	
@@ -882,17 +895,17 @@ predictor[config_Association] :=
 		"A_parameters" -> Plus @@ contextconfig,
 		"B_parameters" -> itemconfig   |> ]]; 
 	
-	f[item_List, blocks__List] := Module[{Y},
+	f[item_List, blocks__List] := Module[{Xdec},
 	
-		Y = ResolveNormal[item];
-		
-		(* State X and prediction from previous cycle *)
+		(* State X from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
-		M["store"][X, Y];
+		M["store"][X, ResolveNormal[item]];
 		
 		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 
-		prediction = M["retrieve"][X]
+		Xdec = Sort[RandomSample[X, Floor[decimation * Length[X]]]];
+		
+		prediction = M["retrieve"][Xdec]
 		]; 
 
 
@@ -1003,7 +1016,7 @@ Circuit`TagMap = <|
 
 "multiset"        -> "+", (* only multisets may contain negatives *)
 "inhibit"         -> "-", (* if - then automatically + *) 
-"permute"         -> "P", (* permuation, unique per pathway *)
+"permute"         -> "\[Pi]", (* permuation, unique per pathway *)
 "noise"           -> "~", (* random noise if empty, else clear elements *)
 "rate_limit"      -> "R", (* stochastic rate limiting up to hyperparameter P *)
 "threshold"       -> "T", (* clearing data below hyperparameter population P *)
@@ -1307,17 +1320,15 @@ Circuit[expr_] := Module[
 		
 
 	(* 
-	Merge pathways. 
+	Merge pathways. Also apply this if there's only one pathway.
 	*)
-	pathmerge[ids_ : _Integer | {__Integer}] := 
+	pathmerge[id_Integer] := pathmerge[ {id}];
+	
+	pathmerge[list : {__Integer}] := 
 		Module[ {x, paths, tags, merged},
 
-		(* Single path? Skip merge. *)
-		If[ IntegerQ[ids], Return[patheval[ids]]]; 
-
-		x = patheval /@ ids;
-		
-		paths = pathways /@ ids;
+		x = patheval /@ list;
+		paths = pathways /@ list;
 		
 		(* List of Booleans with the same length as x. *)
 		tags = Function[t, MemberQ[Lookup[#, "tags", {}], t] & /@ paths];		
@@ -1461,7 +1472,7 @@ Circuit[expr_] := Module[
 		
 		(* Convert tag names to single-character display labels. *)
 		display = Reverse[Circuit`TagMap];
-					
+							
 		edgetag[a_Association] := Module[ {str, rules},
 
 			str = Lookup[a, "label", ""] <> 
@@ -1712,6 +1723,8 @@ FromDFD[dataflow_List] := Module[
 			];
 		
 		tagmap = Association[Reverse /@ Normal[Circuit`TagMap]];
+		tagmap["P"] = "permute"; (* Legacy support. *)
+
 		found = Values[KeyTake[tagmap, Characters[tags]]];
 		If[Positive[Length[found]], result["tags"] = found];
 		

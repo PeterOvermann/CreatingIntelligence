@@ -648,79 +648,65 @@ def output(config):
 ## -----------------------------------------------------------------------------
 
 
-
-
 def delay(config):
-    """
-    A delay node encapsulates block coding, signal delay, proportional decimation,
-    rate limiting, and temporal integration.
-    Multisets and inhibitory signals are handled transparently.
-    """
+    plugin_factory = config.get("plugin", augmentation)
+    
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(sys.modules[__name__], plugin_factory, augmentation)
+        
+    plugin = plugin_factory(config)
+    
+    # Remove label if plugin and capacity were implicitly defaulted
+    if "plugin" not in config and "capacity" not in config:
+        plugin.pop("label", None)
+
     dims1 = [b[0] for b in config.get("receive_blocks", [])]
     dims2 = [b[0] for b in config.get("send_blocks", [])]
-
     pop = sum(b[1] for b in config.get("receive_blocks", []))
-    
-    decimation = config.get("decimate", 1.0)
     
     rate_limit_factor = config.get("rate_limit", float('inf'))
     absratelimit = round(rate_limit_factor * pop) if rate_limit_factor != float('inf') else float('inf')
     
+    decay = config.get("decay", 0.0)
     capacity_factor = config.get("capacity", 0.0)
+    abscapacity = round(capacity_factor * pop)
+    decimation = config.get("decimate", 1.0)
 
-    # Visualization label construction
-    label = ""
-    if decimation < 1.0:
-        label += "D"
-    if absratelimit < float('inf'):
-        label += "R"
-    if capacity_factor > 0.0:
-        label += ".."
-
-    # Internal state encapsulation
-    Y = []
+    Xstate = []
 
     def f(*blocks):
-        nonlocal Y
-        
-        # MultisetBlockJoin transparently handles mixed signs
+        nonlocal Xstate
         X = multiset_block_join(list(blocks), dims1)
         
-        # Proportional stochastic subsampling
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(X))
-            if sample_size < len(X):
-                X = sorted(rng.choice(X, size=sample_size, replace=False).tolist())
-                
-        # Rate limiting (applies equally to positive and negative elements)
         if len(X) > absratelimit:
             X = sorted(rng.choice(X, size=absratelimit, replace=False).tolist())
             
-        # Temporal integration
-        cap_limit = round(capacity_factor * pop)
-        if Y:
-            Y_sample = Y
-            if len(Y) > cap_limit:
-                Y_sample = sorted(rng.choice(Y, size=cap_limit, replace=False).tolist())
-            X = multiset([X, Y_sample])
-        else:
-            X = multiset(X)
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(rng.choice(Xstate, size=keep_size, replace=False).tolist())
             
-        # Persist state for the next cycle
-        Y = X
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(rng.choice(Xstate, size=abscapacity, replace=False).tolist())
+            
+        Xstate = plugin["updaterule"](X, Xstate)
         
-        # Return tuple to enable output chaining/unpacking
-        return tuple(multiset_block_split(X, dims2))
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xstate))
+            Xstate = sorted(rng.choice(Xstate, size=sample_size, replace=False).tolist())
+            
+        return tuple(multiset_block_split(Xstate, dims2))
 
-    return {
+    result = dict(plugin)
+    
+    result.update({
         "function": f,
         "checks": ["arginp", "argout", "totaldim"],
-        "fill": 13,
-        "label": label
-    }
-
-
+        "fill": 13
+    })
+    return result
     
+        
 
 ## -----------------------------------------------------------------------------
 
@@ -774,103 +760,48 @@ def latch(config):
     }
 
 
-
-
-## -----------------------------------------------------------------------------
-
-
-
-
-def kwta(config):
-    """
-    KWTA computed for multisets across multiple input slots.
-    Integrates time-bounding (cycles) and space-bounding (capacity).
-    Filters sparse signals below a minimum population threshold.
-    """
-    dims1 = [b[0] for b in config.get("receive_blocks", [])]
-    dims2 = [b[0] for b in config.get("send_blocks", [])]
-    pop = sum(b[1] for b in config.get("receive_blocks", []))
-    
-    # k is the population of the output channel.
-    send_blocks = config.get("send_blocks", [[0, 0]])
-    k = send_blocks[0][1] if send_blocks else 0
-    
-    # Temporal and space bounding parameters
-    cycles = config.get("cycles", 1)
-    capacity_factor = config.get("capacity", float('inf'))
-    threshold = config.get("threshold", 0.0)
-    cutoff = config.get("cutoff", 2)
-    
-    # Internal state
-    window = [[] for _ in range(cycles)]
-
-    def f(*blocks):
-        nonlocal window
-        
-        X = multiset_block_join(list(blocks), dims1)
-
-        # Sub-threshold input: do not advance window, emit empty sets.
-        if len(X) < threshold:
-            return tuple([] for _ in dims2)
-
-        # Event-driven window update: X is known to be >= threshold
-        window = window[1:] + [X]
-        
-        # Aggregate all elements from the current window
-        U = multiset(window)
-        
-        # Capacity bounding: Unbiased subsampling if capacity is exceeded.
-        cap_limit = round(capacity_factor * pop) if capacity_factor != float('inf') else float('inf')
-        
-        if len(U) > cap_limit:
-            U = sorted(rng.choice(U, size=cap_limit, replace=False).tolist())
-            
-        # KWTA consensus on the surviving elements
-        winners = []
-        tally = Counter(U)
-        
-        if len(tally) >= k:
-            freqs = sorted(tally.values())
-            rankedmax = freqs[-k]
-            
-            if rankedmax >= cutoff:
-                winners = sorted([val for val, count in tally.items() if count >= rankedmax])
-                
-        return tuple(multiset_block_split(winners, dims2))
-
-    return {
-        "function": f,
-        "checks": ["arginp", "argout", "totaldim"],
-        "label": "k",
-        "fill": 13
-    }
-
-
     
 
 ## -----------------------------------------------------------------------------
 
-## Update rules for auto-associative memory components
+## Update rules for auto-associative memory components ("auto")
+## and temporal integration ("delay").
 
 def replacement(config):
     return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
 
 def residual(config):
-    return {"updaterule": lambda y, x: sorted(list(set(x) - set(y))), "label": "▲", "size": 18}
+    return {"updaterule": lambda y, x: resolve_graded(multiset([x, [-i for i in y]])), "label": "▲", "size": 18}
 
 def complement(config):
-    return {"updaterule": lambda y, x: sorted(list(set(y) - set(x))), "label": "▽", "size": 20}
+    return {"updaterule": lambda y, x: resolve_graded(multiset([y, [-i for i in x]])), "label": "▽", "size": 20}
 
 def difference(config):
-    return {"updaterule": lambda y, x: sorted(list(set(y) ^ set(x))), "label": "△", "size": 20}
+    return {"updaterule": lambda y, x: sorted([abs(i) for i in multiset([y, [-i for i in x]])]), "label": "△", "size": 20}
 
 def augmentation(config):
-    return {"updaterule": lambda y, x: sorted(list(set(y) | set(x))), "label": "∪", "size": 14}
+    return {"updaterule": lambda y, x: multiset([y, x]), "label": "∪", "size": 14}
 
 def coincidence(config):
-    return {"updaterule": lambda y, x: sorted(list(set(y) & set(x))), "label": "∩", "size": 14}
+    def multiset_intersection(y, x):
+        counts_y = Counter(y)
+        counts_x = Counter(x)
+        res = []
+        for k, v in counts_y.items():
+            res.extend([k] * min(v, counts_x.get(k, 0)))
+        return sorted(res)
+    return {"updaterule": multiset_intersection, "label": "∩", "size": 14}
 
-
+def permutation(config):
+    dims = sum(b[0] for b in config.get("receive_blocks", []))
+    dim = dims if dims else 0
+    perm = rng.choice(range(1, dim + 1), size=dim, replace=False).tolist() if dim > 0 else []
+    
+    def updaterule(y, x):
+        mapped_x = sorted([(1 if i > 0 else -1 if i < 0 else 0) * perm[abs(i) - 1] for i in x if i != 0])
+        return multiset([y, mapped_x])
+        
+    return {"updaterule": updaterule, "label": "π", "size": 16}
 
 
 ## -----------------------------------------------------------------------------
@@ -954,7 +885,8 @@ def auto(config):
             Y = A
             
         X_out = plugin["updaterule"](Y, X)
-        
+        X_out = sorted(list(set(X_out))) 
+              
         return tuple(multiset_block_split(X_out, dims))
 
     # Merge plugin attributes, component defaults, and Memory closures (e.g., "clear")
@@ -1088,7 +1020,6 @@ def heteroencoder(config):
 
 
 
-
 def predictor(config):
     """
     Generates a prediction based on the current input (slot #1) and context (slots #2,...).
@@ -1097,6 +1028,9 @@ def predictor(config):
     receive_blocks = config.get("receive_blocks", [])
     itemconfig = receive_blocks[0]
     contextconfig = receive_blocks[1:]
+    
+    # Extract decimation parameter, defaulting to 1.0
+    decimation = config.get("decimate", 1.0)
     
     params_A = [sum(b[0] for b in contextconfig), sum(b[1] for b in contextconfig)]
     params_B = itemconfig
@@ -1117,7 +1051,15 @@ def predictor(config):
         M["store"](X, Y)
         
         X = resolve_block_join_normal(list(blocks), [b[0] for b in contextconfig])
-        prediction = M["retrieve"](X)
+        
+        # Apply stochastic subsampling to X before retrieval
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(X))
+            Xdec = sorted(rng.choice(X, size=sample_size, replace=False).tolist())
+        else:
+            Xdec = X
+            
+        prediction = M["retrieve"](Xdec)
         
         return (prediction,)
 
@@ -1131,8 +1073,7 @@ def predictor(config):
     }
     result.update(M)
     return result
-
-
+    
 
 
 ## -----------------------------------------------------------------------------
@@ -1322,7 +1263,7 @@ NORD_PALETTE = [
 
 # Tag mapping for edge labels
 TAG_MAP = {
-    "multiset": "+", "inhibit": "-", "permute": "P",
+    "multiset": "+", "inhibit": "-", "permute": "π",
     "noise": "~", "rate_limit": "R", "threshold": "T",
     "veto": "X", "mandatory": "*", "priority": "!",
     "dependency": "&", "fallback": "|", "barrier": "=",
@@ -1558,9 +1499,11 @@ def Circuit(expr):
             
         return x
 
+
+
     def pathmerge(ids):
         if isinstance(ids, int):
-            return patheval(ids)
+            ids = [ids]
             
         x_list = [patheval(i) for i in ids]
         paths = [pathways[i] for i in ids]
@@ -1613,7 +1556,8 @@ def Circuit(expr):
                 merged = []
                 
         return merged
-
+        
+        
     def componenteval(config):
         if config.get("component") in ("input", "output"):
             return
