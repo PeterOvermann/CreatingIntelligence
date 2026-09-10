@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[     58897,       1409]
-NotebookOptionsPosition[     52164,       1266]
-NotebookOutlinePosition[     56199,       1365]
-CellTagsIndexPosition[     56156,       1362]
+NotebookDataLength[     58915,       1409]
+NotebookOptionsPosition[     52182,       1266]
+NotebookOutlinePosition[     56217,       1365]
+CellTagsIndexPosition[     56174,       1362]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -459,7 +459,7 @@ Cell[BoxData[{
   RowBox[{"circ", "[", "\"\<schematics\>\"", "]"}], "[", 
   RowBox[{"ImageSize", "->", "500"}], "]"}]}], "Code",
  CellLabel->
-  "In[1932]:=",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
+  "In[6779]:=",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
 
 Cell[BoxData[
  GraphicsBox[
@@ -467,19 +467,19 @@ Cell[BoxData[
    DynamicModuleBox[{Typeset`graph = HoldComplete[
      Graph[{1, 2, 3, 4, 5, 6, 
       7}, {{{1, 2}, {1, 3}, {2, 3}, {3, 4}, {5, 4}, {4, 5}, {1, 6}, {1, 6}, {
-       4, 6}, {6, 7}}, Null, {"", "", "", "", "P", "", "", "", "", ""}}, {
+       4, 6}, {6, 7}}, Null, {"", "", "", "", "\[Pi]", "", "", "", "", ""}}, {
       BaseStyle -> {FontFamily -> "Inter Variable", 
          Opacity[1]}, 
        EdgeLabels -> {
-        DirectedEdge[1, 2, ""] -> None, DirectedEdge[5, 4, "P"] -> Placed[
+        DirectedEdge[1, 2, ""] -> None, DirectedEdge[1, 6, ""] -> None, 
+         DirectedEdge[4, 5, ""] -> None, DirectedEdge[5, 4, "\[Pi]"] -> Placed[
            Framed[
-           "P", Background -> GrayLevel[1], FrameStyle -> None, BaseStyle -> 
+           "\[Pi]", Background -> GrayLevel[1], FrameStyle -> None, BaseStyle -> 
             Directive[12, Bold, 
               RGBColor[
               0.1803921568627451, 0.20392156862745098`, 
                0.25098039215686274`]], RoundingRadius -> 30, FrameMargins -> 
-            0], Center], DirectedEdge[1, 6, ""] -> None, 
-         DirectedEdge[4, 5, ""] -> None, DirectedEdge[4, 6, ""] -> None, 
+            0], Center], DirectedEdge[4, 6, ""] -> None, 
          DirectedEdge[2, 3, ""] -> None, DirectedEdge[1, 3, ""] -> None, 
          DirectedEdge[6, 7, ""] -> None, DirectedEdge[3, 4, ""] -> None}, 
        EdgeStyle -> {DirectedEdge[4, 6, ""] -> Directive[
@@ -506,11 +506,11 @@ Cell[BoxData[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
-           AbsoluteThickness[0.5]], DirectedEdge[1, 3, ""] -> Directive[
+           AbsoluteThickness[0.5]], DirectedEdge[5, 4, "\[Pi]"] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
-           AbsoluteThickness[0.5]], DirectedEdge[5, 4, "P"] -> Directive[
+           AbsoluteThickness[0.5]], DirectedEdge[1, 3, ""] -> Directive[
            RGBColor[
            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
            Opacity[1], 
@@ -534,18 +534,18 @@ Cell[BoxData[
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
             18, Bold], Center], 5 -> Placed[
-           Style["R", 
-            RGBColor[
-            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            12, Bold], Center], 2 -> Placed[
            Style["", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            12, Bold], Center], 4 -> Placed[
+            14, Bold], Center], 2 -> Placed[
            Style["", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
-            12, Bold], Center], 6 -> Placed[
+            14, Bold], Center], 4 -> Placed[
+           Style["", 
+            RGBColor[
+            0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
+            14, Bold], Center], 6 -> Placed[
            Style["\[FilledRightTriangle]\[FilledRightTriangle]", 
             RGBColor[
             0.1803921568627451, 0.20392156862745098`, 0.25098039215686274`], 
@@ -754,7 +754,7 @@ Cell[BoxData[
             "DynamicName",
             BoxID -> "EdgeLabelID$9"], InsetBox[
             StyleBox[
-             FrameBox["\<\"P\"\>",
+             FrameBox["\<\"\[Pi]\"\>",
               Background->GrayLevel[1],
               BaseStyle->Directive[12, Bold, 
                 RGBColor[
@@ -858,7 +858,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->12,
+               FontSize->14,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -950,7 +950,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->12,
+               FontSize->14,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -978,7 +978,7 @@ Cell[BoxData[
              "DynamicName",
              BoxID -> "VertexID$5"], InsetBox[
              StyleBox[
-              StyleBox["\<\"R\"\>",
+              StyleBox["\<\"\"\>",
                StripOnInput->False,
                
                LineColor->RGBColor[
@@ -995,7 +995,7 @@ Cell[BoxData[
                GraphicsColor->RGBColor[
                 0.1803921568627451, 0.20392156862745098`, 
                  0.25098039215686274`],
-               FontSize->12,
+               FontSize->14,
                FontWeight->Bold,
                
                FontColor->RGBColor[
@@ -1115,7 +1115,7 @@ Cell[BoxData[
   FrameTicks->None,
   ImageSize->500]], "Output",
  CellLabel->
-  "Out[1934]=",ExpressionUUID->"8352e780-9741-48b1-90a4-25e5a84388d9"]
+  "Out[6781]=",ExpressionUUID->"d604c407-29ae-4dcb-9bb6-653d460e7704"]
 }, Open  ]]
 }, Open  ]],
 
@@ -1381,32 +1381,32 @@ Cell[17476, 415, 84, 0, 66, "Subsection",ExpressionUUID->"1729613a-a3b8-4ec9-b03
 Cell[17563, 417, 807, 28, 457, "Program",ExpressionUUID->"7f26f0a8-ce57-4f0e-85da-ea320eed9a6b"],
 Cell[CellGroupData[{
 Cell[18395, 449, 451, 12, 110, "Code",ExpressionUUID->"4c85ed39-9e32-4deb-a9b3-4d9d13ecbbf2"],
-Cell[18849, 463, 28316, 654, 312, "Output",ExpressionUUID->"8352e780-9741-48b1-90a4-25e5a84388d9"]
+Cell[18849, 463, 28334, 654, 312, "Output",ExpressionUUID->"d604c407-29ae-4dcb-9bb6-653d460e7704"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[47214, 1123, 94, 0, 66, "Subsection",ExpressionUUID->"684f58ca-430e-4f62-ba92-79e1f1272a17"],
-Cell[47311, 1125, 243, 6, 36, "Input",ExpressionUUID->"fc4ae4e1-bd6d-48c1-ae96-5a41ada6d326"],
+Cell[47232, 1123, 94, 0, 66, "Subsection",ExpressionUUID->"684f58ca-430e-4f62-ba92-79e1f1272a17"],
+Cell[47329, 1125, 243, 6, 36, "Input",ExpressionUUID->"fc4ae4e1-bd6d-48c1-ae96-5a41ada6d326"],
 Cell[CellGroupData[{
-Cell[47579, 1135, 144, 2, 36, "Input",ExpressionUUID->"100a3e50-6180-42ea-8a79-50de27605d04"],
-Cell[47726, 1139, 740, 13, 67, "Output",ExpressionUUID->"b87e0f91-6341-4be5-84ef-4cd9aa90fe6d"]
+Cell[47597, 1135, 144, 2, 36, "Input",ExpressionUUID->"100a3e50-6180-42ea-8a79-50de27605d04"],
+Cell[47744, 1139, 740, 13, 67, "Output",ExpressionUUID->"b87e0f91-6341-4be5-84ef-4cd9aa90fe6d"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[48515, 1158, 84, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
-Cell[48602, 1160, 97, 0, 42, "Text",ExpressionUUID->"ad453c0d-aa19-4af7-92ec-65374d74dbbb"],
-Cell[48702, 1162, 306, 9, 63, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
+Cell[48533, 1158, 84, 0, 66, "Subsection",ExpressionUUID->"4d27fc5b-ff63-4dd1-9cd3-d01f4584a70b"],
+Cell[48620, 1160, 97, 0, 42, "Text",ExpressionUUID->"ad453c0d-aa19-4af7-92ec-65374d74dbbb"],
+Cell[48720, 1162, 306, 9, 63, "Code",ExpressionUUID->"e806d413-0c92-4cc7-9b23-4fc824eb8759"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[49045, 1176, 93, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
+Cell[49063, 1176, 93, 0, 66, "Subsection",ExpressionUUID->"43b23ddc-096d-451f-92cd-c27b2a89dbd7"],
 Cell[CellGroupData[{
-Cell[49163, 1180, 935, 23, 181, "Code",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
+Cell[49181, 1180, 935, 23, 181, "Code",ExpressionUUID->"d1e2c6d5-9295-420f-9498-3927ef0f8727"],
 Cell[CellGroupData[{
-Cell[50123, 1207, 399, 9, 28, "Print",ExpressionUUID->"9a1cd29f-a42a-4a17-9530-24ea36ef839b"],
-Cell[50525, 1218, 399, 9, 28, "Print",ExpressionUUID->"a89b3f0d-1502-4212-8434-c6c106a510f3"],
-Cell[50927, 1229, 393, 9, 28, "Print",ExpressionUUID->"55ee24eb-8d4f-4111-9af6-4b9f16f5ef4e"],
-Cell[51323, 1240, 393, 9, 28, "Print",ExpressionUUID->"ffb6deb3-dc3e-4574-ad2e-1610cf75fa69"],
-Cell[51719, 1251, 393, 9, 28, "Print",ExpressionUUID->"f1b8b292-4615-4f93-a5e8-46e44401b648"]
+Cell[50141, 1207, 399, 9, 28, "Print",ExpressionUUID->"9a1cd29f-a42a-4a17-9530-24ea36ef839b"],
+Cell[50543, 1218, 399, 9, 28, "Print",ExpressionUUID->"a89b3f0d-1502-4212-8434-c6c106a510f3"],
+Cell[50945, 1229, 393, 9, 28, "Print",ExpressionUUID->"55ee24eb-8d4f-4111-9af6-4b9f16f5ef4e"],
+Cell[51341, 1240, 393, 9, 28, "Print",ExpressionUUID->"ffb6deb3-dc3e-4574-ad2e-1610cf75fa69"],
+Cell[51737, 1251, 393, 9, 28, "Print",ExpressionUUID->"f1b8b292-4615-4f93-a5e8-46e44401b648"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
