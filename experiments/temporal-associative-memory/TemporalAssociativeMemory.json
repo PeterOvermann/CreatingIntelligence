@@ -1,0 +1,13 @@
+{
+  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+
+  "hyperparameters": {"default": [2000, 10]},
+
+  "dataflow": [
+	{"component": "input", "plugin": "codec", "send": [11]},
+
+	{"component": "temporal", "send": [21], "receive": [11], "capacity": 3, "decimate": 0.8},
+
+	{"component": "output", "plugin": "codec", "receive": [21]}
+  ]
+}
