@@ -647,6 +647,18 @@ def output(config):
 
 ## -----------------------------------------------------------------------------
 
+"""
+The delay node encapsulates multiple functionalities:
+
+- signal delay
+- block coding and re-coding
+- proportional decimation (default: none)
+- rate limiting  (default: none)
+- temporal integration via internal capacity (default: none),
+    using the plugin mechanism for update rules .
+
+Multisets and inhibitory signals are handled transparently . 
+"""
 
 def delay(config):
     plugin_factory = config.get("plugin", augmentation)
@@ -691,12 +703,15 @@ def delay(config):
             
         Xstate = plugin["updaterule"](X, Xstate)
         
+        # Proportional multiset subsampling applied to output
+        Xdec = Xstate
         if decimation < 1.0:
-            sample_size = math.floor(decimation * len(Xstate))
-            Xstate = sorted(rng.choice(Xstate, size=sample_size, replace=False).tolist())
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(rng.choice(Xdec, size=sample_size, replace=False).tolist())
             
-        return tuple(multiset_block_split(Xstate, dims2))
-
+        return tuple(multiset_block_split(Xdec, dims2))
+        
+        
     result = dict(plugin)
     
     result.update({
@@ -806,13 +821,15 @@ def permutation(config):
 
 ## -----------------------------------------------------------------------------
 
+"""
+Auto-associative memory component . 
 
-
+Note: There is a wide range of possible learning, subsampling, retrieval 
+and update rules for auto-associative memory . This prototype captures the 
+geneneric cases . Modify as needed .
+"""
 
 def auto(config):
-    """
-    Auto-associative memory component.
-    """
     plugin_factory = config.get("plugin", replacement)
     
     if isinstance(plugin_factory, str):
@@ -902,7 +919,95 @@ def auto(config):
     return result
   
 
+## -----------------------------------------------------------------------------
 
+"""
+Temporal-associative memory component . 
+Learns higher-order sequences on the fly and predicts the next token .
+A hybrid between auto-associative and hetero-associative architectures .
+Uses the same temporal integration parametrization as "delay" .
+"""
+
+def temporal(config):
+    plugin_factory = config.get("plugin", permutation)
+    
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(sys.modules[__name__], plugin_factory, permutation)
+        
+    plugin = plugin_factory(config)
+    
+    if "plugin" not in config and "capacity" not in config:
+        plugin.pop("label", None)
+
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+    
+    params = [sum(b[0] for b in receive_blocks), sum(b[1] for b in receive_blocks)]
+    pop = params[1] if len(params) > 1 else 0
+    
+    rate_limit_factor = config.get("rate_limit", float('inf'))
+    absratelimit = round(rate_limit_factor * pop) if rate_limit_factor != float('inf') else float('inf')
+    
+    decay = config.get("decay", 0.0)
+    capacity_factor = config.get("capacity", 0.0)
+    abscapacity = round(capacity_factor * pop)
+    decimation = config.get("decimate", 1.0)
+
+    # Memory with identical input and output parameters
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params,
+        "B_parameters": params
+    })
+    
+    M = Memory(m_config)
+    Xstate = []
+
+    def f(*blocks):
+        nonlocal Xstate
+        X = multiset_block_join(list(blocks), dims)
+        
+        # Rate limiting equally applies to positive and negative elements
+        if len(X) > absratelimit:
+            X = sorted(rng.choice(X, size=absratelimit, replace=False).tolist())
+            
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(rng.choice(Xstate, size=keep_size, replace=False).tolist())
+            
+        # Always learn state -> current input
+        M["store"](resolve_normal(Xstate), resolve_normal(X))
+        
+        # Multiset subsampling applied to previous state
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(rng.choice(Xstate, size=abscapacity, replace=False).tolist())
+            
+        # Temporal integration via update rules
+        Xstate = plugin["updaterule"](X, Xstate)
+        
+        # Proportional multiset subsampling applied to the integrated state
+        Xdec = Xstate
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(rng.choice(Xdec, size=sample_size, replace=False).tolist())
+            
+        # Predict next token
+        prediction = M["retrieve"](resolve_normal(Xdec))
+        
+        return tuple(multiset_block_split(prediction, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout", "ident"],
+        "shape": "Square",
+        "fill": 14
+    })
+    result.update(M)
+    
+    return result
 
   
 ## -----------------------------------------------------------------------------

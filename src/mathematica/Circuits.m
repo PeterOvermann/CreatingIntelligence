@@ -550,7 +550,7 @@ delay[config_Association] :=
 	decimation = Lookup[config, "decimate", 1];
 
 
-	f[blocks__List] := Module[ {X},
+	f[blocks__List] := Module[ {X, Xdec},
 		
 		X = MultisetBlockJoin[ {blocks}, dims1];
 		
@@ -568,11 +568,12 @@ delay[config_Association] :=
 		(* Temporal integration via update rules. *)
 		Xstate = plugin["updaterule"][X, Xstate]; 
 
-		(* Proportional multiset subsampling applied to the integrated state. *)
+		(* Proportional multiset subsampling applied to output *)
+		Xdec = Xstate;
 		If[decimation < 1,  
-			Xstate = Sort[RandomSample[Xstate, Floor[decimation * Length[Xstate]]]]]; 
+			Xdec = Sort[RandomSample[Xdec, Floor[decimation * Length[Xdec]]]]]; 
 
-		Sequence @@ MultisetBlockSplit[Xstate, dims2]
+		Sequence @@ MultisetBlockSplit[Xdec, dims2]
 		];
 
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
@@ -645,16 +646,13 @@ replacement[_Association] :=
 	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
 	
 (* 
-Multiset Complement[#2, #1]. 
-Removes #1 from #2. 
-Retains novel input.
+Multiset Complement[#2, #1]. Removes #1 from #2. Retains novel input.
 *)
 residual[_Association] :=
 	<|"updaterule" -> (ResolveGraded[Multiset[#2, -#1]]&), "label" -> "\[FilledUpTriangle]", "size" -> 18 |>;
 
 (* 
-Multiset Complement[#1, #2]. 
-Removes the #2 from #1. 
+Multiset Complement[#1, #2]. Removes the #2 from #1. 
 Isolates predicted elements.
 *)
 complement[_Association] :=
@@ -668,8 +666,7 @@ difference[_Association] :=
 	<|"updaterule" -> (Abs[Multiset[#1, -#2]] &), "label" -> "\[EmptyUpTriangle]", "size" -> 20 |>;
 	
 (* 
-Multiset Union[#1, #2]. 
-Adds #1 to #2 via multiset aggregation.  
+Multiset Union[#1, #2]. Adds #1 to #2 via multiset aggregation.  
 *)
 augmentation[_Association] :=
 	<|"updaterule" -> Multiset, "label" -> "\[Union]", "size" -> 14 |>;
@@ -682,10 +679,10 @@ coincidence[_Association] :=
 	<|"updaterule" -> (Module[{cY = Counts[#1], cX = Counts[#2]}, 
         Flatten @ KeyValueMap[ConstantArray[#1, Min[#2, Lookup[cX, #1, 0]]] &, cY]] &), 
         "label" -> "\[Intersection]", "size" -> 14 |>;
-        
+
   
 (*
-Multiset permutation.
+Multiset Union of [ #1, permutation[#2]]
 *)            
 permutation[config_Association] := Module[{perm, dim},
 	
@@ -697,7 +694,7 @@ permutation[config_Association] := Module[{perm, dim},
 
 	<| "updaterule" -> (Multiset[#1, Sort[Sign[#2] * perm[[Abs[#2]]]]] &), 
 		"label" -> "\[Pi]", "size" -> 16 |>
-]        
+	]        
 
 
 (* 
@@ -768,6 +765,78 @@ auto[config_Association] :=
 		
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
 	    "shape" -> "Square", "fill" -> 8 |>, M]
+	]
+
+
+(*
+Temporal-associative memory component. 
+Learns higher-order sequences on the fly and predicts the next token.
+A hybrid between auto-associative and hetero-associative architectures.
+Uses the same temporal integration parametrization as "delay".
+*)
+
+temporal[config_Association] := 
+	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
+			absratelimit, abscapacity, Xstate = {}, Xdec, prediction},
+
+	plugin = Lookup[config, "plugin", permutation][config];
+
+	If[ MissingQ[config["plugin"] && MissingQ[config["capacity"]]], 
+		plugin = KeyDrop[plugin, "label"]];
+
+	dims = First /@ config["receive_blocks"];
+	params = Plus @@ config["receive_blocks"];
+	pop  = Last[params];
+	
+	(* Limit size of query pattern. Default: unlimited. *)			
+	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
+	(* Pre-integration decay (leak rate). *)			
+	decay = Lookup[config, "decay", 0];
+	(* Temporal capacity, carry over from previous cycle. *)
+	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
+	(* Proportional stochastic subsampling for memory query. *)
+	decimation = Lookup[config, "decimate", 1];
+
+	(* Memory with identical input and output parameters. *)
+	M = Memory[Join[config, 
+		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
+
+
+	f[blocks__List] := Module[ {X},
+		
+		X = MultisetBlockJoin[ {blocks}, dims];
+		
+		(* Rate limiting equally applies to positive and negative elements *)
+		If[Length[X] > absratelimit, 
+			X = Sort[RandomSample[X, absratelimit]]]; 
+
+		(* Pre-integration stochastic decay. *)
+		If[decay > 0, Xstate = 
+			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+
+		(* Always learn state -> current input. *)
+		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
+
+		(* Multiset subsampling applied to previous state. *)
+		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+		
+		(* Temporal integration via update rules. *)
+		Xstate = plugin["updaterule"][X, Xstate]; 
+
+		(* Proportional multiset subsampling applied to the integrated state,
+		 to break symmetry during retrieval. *)
+		Xdec = Xstate;
+		If[decimation < 1,  
+			Xdec = Sort[RandomSample[Xdec, Floor[decimation * Length[Xdec]]]]]; 
+
+		(* Predict next token. *)
+		prediction = M["retrieve"][ResolveNormal[Xdec]];
+
+		Sequence @@ MultisetBlockSplit[prediction, dims]
+		];
+
+	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"},
+		"shape" -> "Square", "fill" -> 14 |>]	
 	]
 
 
