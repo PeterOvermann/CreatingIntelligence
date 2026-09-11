@@ -963,9 +963,10 @@ def temporal(config):
     
     M = Memory(m_config)
     Xstate = []
+    prediction = []
 
     def f(*blocks):
-        nonlocal Xstate
+        nonlocal Xstate, prediction
         X = multiset_block_join(list(blocks), dims)
         
         # Rate limiting equally applies to positive and negative elements
@@ -977,8 +978,9 @@ def temporal(config):
             keep_size = math.floor((1.0 - decay) * len(Xstate))
             Xstate = sorted(rng.choice(Xstate, size=keep_size, replace=False).tolist())
             
-        # Always learn state -> current input
-        M["store"](resolve_normal(Xstate), resolve_normal(X))
+        # Learn state -> current input if prediction was incorrect.
+        if prediction != X:
+            M["store"](resolve_normal(Xstate), resolve_normal(X))
         
         # Multiset subsampling applied to previous state
         if len(Xstate) > abscapacity:
