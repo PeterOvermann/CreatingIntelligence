@@ -777,7 +777,7 @@ Uses the same temporal integration parametrization as "delay".
 
 temporal[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
-			absratelimit, abscapacity, Xstate = {}, Xdec, prediction},
+			absratelimit, abscapacity, Xstate = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", permutation][config];
 
@@ -814,8 +814,9 @@ temporal[config_Association] :=
 		If[decay > 0, Xstate = 
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 
-		(* Always learn state -> current input. *)
-		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
+		(* Learn state -> current input if prediction was incorrect. *)
+		If[ prediction =!= X, 
+			M["store"][ResolveNormal[Xstate], ResolveNormal[X]]];
 
 		(* Multiset subsampling applied to previous state. *)
 		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 

@@ -58,7 +58,7 @@ Cell[BoxData[
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
  CellLabel->
-  "In[1874]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
+  "In[3539]:=",ExpressionUUID->"0185702d-9240-425c-9fbf-641f21c63de0"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +100,7 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
  CellLabel->
-  "In[1875]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
+  "In[3540]:=",ExpressionUUID->"977025c7-4ef6-4453-a909-9e8ee6a8940d"],
 
 Cell[BoxData[
  RowBox[{"(*", "\n", 
@@ -109,7 +109,7 @@ Cell[BoxData[
    "implementation", " ", "of", " ", "topological", " ", "associative", " ", 
    RowBox[{"memory", "."}]}], "\n", "*)"}]], "Code",
  CellLabel->
-  "In[1876]:=",ExpressionUUID->"6248123b-2253-4939-99ae-046b1a4a31b9"],
+  "In[3541]:=",ExpressionUUID->"6248123b-2253-4939-99ae-046b1a4a31b9"],
 
 Cell[CellGroupData[{
 
@@ -358,7 +358,7 @@ Cell[BoxData[
        RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<C_FFI\>\""}]}], "\n", 
       "\t\t", "|>"}]}]}], "\[IndentingNewLine]", "\t\t", "]"}]}]], "Code",
  CellLabel->
-  "In[1877]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
+  "In[3542]:=",ExpressionUUID->"0a6286ac-b084-4602-b48d-48b3101e2448"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -371,7 +371,7 @@ Cell[BoxData[
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
  CellLabel->
-  "In[1878]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
+  "In[3543]:=",ExpressionUUID->"ff4157f9-049c-410c-bbe9-82c510b82162"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -500,7 +500,7 @@ first.\>\"", "]"}], ";", "\n", "        ",
   ";"}]], "Code",
  InitializationCell->False,
  CellLabel->
-  "In[1879]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
+  "In[3544]:=",ExpressionUUID->"929ac1ad-035b-49b9-829d-db18e804e6af"]
 }, Open  ]]
 }, Open  ]]
 },
