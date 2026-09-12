@@ -676,7 +676,10 @@ def delay(config):
     dims1 = [b[0] for b in config.get("receive_blocks", [])]
     dims2 = [b[0] for b in config.get("send_blocks", [])]
     pop = sum(b[1] for b in config.get("receive_blocks", []))
-    
+ 
+    threshold_factor = config.get("threshold", 0.0)
+    absthreshold = round(threshold_factor * pop)
+        
     rate_limit_factor = config.get("rate_limit", float('inf'))
     absratelimit = round(rate_limit_factor * pop) if rate_limit_factor != float('inf') else float('inf')
     
@@ -690,7 +693,11 @@ def delay(config):
     def f(*blocks):
         nonlocal Xstate
         X = multiset_block_join(list(blocks), dims1)
-        
+ 
+        # Enforce minimum population
+        if len(X) < absthreshold:
+             X = []       
+
         if len(X) > absratelimit:
             X = sorted(rng.choice(X, size=absratelimit, replace=False).tolist())
             
@@ -725,65 +732,14 @@ def delay(config):
 
 ## -----------------------------------------------------------------------------
 
-
-
-
-def latch(config):
-    """
-    A sample-and-hold latch with threshold and expiration.
-    Latches onto a signal if its population meets threshold T.
-    Holds and broadcasts the state for the specified number of additional cycles.
-    """
-    dims1 = [b[0] for b in config.get("receive_blocks", [])]
-    dims2 = [b[0] for b in config.get("send_blocks", [])]
-    pop = sum(b[1] for b in config.get("receive_blocks", []))
-
-    # Hyperparameters
-    threshold = config.get("threshold", 1.0)
-    cycles = config.get("cycles", float('inf'))
-
-    # Internal state and age tracker
-    state = [[] for _ in dims2]
-    timer = cycles + 1  # Start in an expired state
-
-    def f(*blocks):
-        nonlocal state, timer
-        
-        X = multiset_block_join(list(blocks), dims1)
-        
-        # Event-driven latch: Update state if threshold is met.
-        if len(X) >= threshold * pop:
-            state = multiset_block_split(X, dims2)
-            timer = 0
-        else:
-            # Sub-threshold input: tick the timer only if within bounds.
-            if timer <= cycles:
-                timer += 1
-            
-            # Check expiration.
-            if timer >= cycles:
-                state = [[] for _ in dims2]
-
-        return tuple(state)
-
-    return {
-        "function": f,
-        "checks": ["arginp", "argout", "totaldim"],
-        "fill": 13,
-        "label": "■",
-        "size": 17
-    }
-
-
-    
-
-## -----------------------------------------------------------------------------
-
 ## Update rules for auto-associative memory components ("auto")
 ## and temporal integration ("delay").
 
 def replacement(config):
     return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
+    
+def latch(config):
+    return {"updaterule": lambda y, x: y if len(y) > 0 else x, "label": "■", "size": 18}    
 
 def residual(config):
     return {"updaterule": lambda y, x: resolve_graded(multiset([x, [-i for i in y]])), "label": "▲", "size": 18}
@@ -945,7 +901,10 @@ def temporal(config):
     
     params = [sum(b[0] for b in receive_blocks), sum(b[1] for b in receive_blocks)]
     pop = params[1] if len(params) > 1 else 0
-    
+
+    threshold_factor = config.get("threshold", 0.0)
+    absthreshold = round(threshold_factor * pop)
+        
     rate_limit_factor = config.get("rate_limit", float('inf'))
     absratelimit = round(rate_limit_factor * pop) if rate_limit_factor != float('inf') else float('inf')
     
@@ -968,7 +927,11 @@ def temporal(config):
     def f(*blocks):
         nonlocal Xstate, prediction
         X = multiset_block_join(list(blocks), dims)
-        
+ 
+        # Enforce minimum population
+        if len(X) < absthreshold:
+             X = []
+                    
         # Rate limiting equally applies to positive and negative elements
         if len(X) > absratelimit:
             X = sorted(rng.choice(X, size=absratelimit, replace=False).tolist())

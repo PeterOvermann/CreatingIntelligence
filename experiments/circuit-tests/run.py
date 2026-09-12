@@ -12,6 +12,12 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
+
+# Run tests exported from the getting-started notebook
+
+
+
+
 import json
 import os
 import sys

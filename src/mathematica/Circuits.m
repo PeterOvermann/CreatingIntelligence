@@ -527,7 +527,7 @@ Multisets and inhibitory signals are handled transparently.
 *)
 
 delay[config_Association] := 
-	Module[ {f, plugin, pop, dims1, dims2, decay, decimation, 
+	Module[ {f, plugin, pop, dims1, dims2, absthreshold, decay, decimation, 
 			absratelimit, abscapacity, Xstate = {}},
 
 	plugin = Lookup[config, "plugin", augmentation][config];
@@ -539,7 +539,9 @@ delay[config_Association] :=
 	dims2 = First /@ config["send_blocks"];
 
 	pop = Plus @@ Last /@ config["receive_blocks"];
-	
+
+	(* Drop inputs below threshold population. *)
+	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
 	(* Pre-integration decay (leak rate). *)			
@@ -553,6 +555,9 @@ delay[config_Association] :=
 	f[blocks__List] := Module[ {X, Xdec},
 		
 		X = MultisetBlockJoin[ {blocks}, dims1];
+		
+		(* Enforce minimum population. *)
+		If[Length[X] < absthreshold, X = {}];
 		
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 
@@ -582,58 +587,6 @@ delay[config_Association] :=
 
 
 (* 
-A sample-and-hold latch with threshold and expiration.
-Latches onto a signal if its population meets threshold T.
-Holds and broadcasts the state for the specified number of additional cycles.
-*)
-
-latch[config_Association] := 
-	Module[ {f, dims1, dims2, pop, threshold, cycles, state, timer},
-
-	dims1 = First /@ config["receive_blocks"];
-	dims2 = First /@ config["send_blocks"];
-	pop   = Plus @@ Last /@ config["receive_blocks"];
-
-	(* Hyperparameters *)
-	(* Must have at least pop element to latch by default. *)
-	threshold = Lookup[config, "threshold", 1]; 
-	
-	(* Default window is Infinity. *)
-	cycles = Lookup[config, "cycles", Infinity];
-	
-	(* Internal state and age tracker *)
-	state = ConstantArray[{}, Length[dims2]];
-	
-	(* Start in an expired state. 
-	If window is Infinity, Infinity + 1 simply evaluates to Infinity.
-	*)
-	timer = cycles + 1; 
-
-	f[blocks__List] := Module[ {X},
-		
-		X = MultisetBlockJoin[ {blocks}, dims1];
-		
-		(* Event-driven latch: Update state if threshold is met. *)
-		If[Length[X] >= threshold * pop, 
-			state = MultisetBlockSplit[X, dims2];
-			timer = 0,
-			
-			(* Sub-threshold input: tick the timer only if within bounds. *)
-			If[timer <= cycles, timer++];
-			
-			(* Check expiration. W=1 means the lifespan of the signal is 1. *)
-			If[timer >= cycles, state = ConstantArray[{}, Length[dims2]]]
-			];
-
-		Sequence @@ state
-		];
-
-	<| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
-		"fill" -> 13, "label" -> "\[FilledRectangle]", "size" -> 17 |>	
-	]
-
-
-(* 
 Plug-ins for update rules ("auto" component") 
 and temporal integration ("delay" component).
 *)
@@ -644,6 +597,13 @@ Replaces #2 with #1.
 *)
 replacement[_Association] :=
 	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
+
+	
+(* 
+Replaces #2 with #1 if #1 is non-empty.
+*)
+latch[_Association] :=
+	<|"updaterule" -> (If[Length[#1] > 0, #1, #2] &), "label" -> "\[FilledRectangle]", "size" -> 18 |>;
 	
 (* 
 Multiset Complement[#2, #1]. Removes #1 from #2. Retains novel input.
@@ -776,7 +736,7 @@ Uses the same temporal integration parametrization as "delay".
 *)
 
 temporal[config_Association] := 
-	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
+	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
 			absratelimit, abscapacity, Xstate = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", permutation][config];
@@ -788,6 +748,8 @@ temporal[config_Association] :=
 	params = Plus @@ config["receive_blocks"];
 	pop  = Last[params];
 	
+	(* Drop inputs below threshold population. *)
+	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
 	(* Pre-integration decay (leak rate). *)			
@@ -805,6 +767,9 @@ temporal[config_Association] :=
 	f[blocks__List] := Module[ {X},
 		
 		X = MultisetBlockJoin[ {blocks}, dims];
+		
+		(* Enforce minimum population. *)
+		If[Length[X] < absthreshold, X = {}];
 		
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 

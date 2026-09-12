@@ -1146,46 +1146,11 @@
           "send": [11]
         },
         {
-          "component": "latch",
-          "send": [21],
-          "receive": [11]
-        },
-        {
-          "component": "output",
-          "receive": [21]
-        }
-      ]
-    },
-    "cases": [
-      {
-        "input": [[1, 2, 3, 4, 5]],
-        "output": [[1, 2, 3, 4, 5]]
-      },
-      {
-        "input": [[]],
-        "output": [[1, 2, 3, 4, 5]]
-      },
-      {
-        "input": [[]],
-        "output": [[1, 2, 3, 4, 5]]
-      }
-    ]
-  },
-  {
-    "circuit": {
-      "hyperparameters": {
-        "default": [1000, 5]
-      },
-      "dataflow": [
-        {
-          "component": "input",
-          "send": [11]
-        },
-        {
-          "component": "latch",
+          "component": "delay",
+          "plugin": "latch",
           "send": [21],
           "receive": [11],
-          "cycles": 2,
+          "capacity": 1,
           "threshold": 0.8
         },
         {
@@ -1200,12 +1165,55 @@
         "output": [[1, 2, 3, 4, 5]]
       },
       {
-        "input": [[10, 11, 12]],
+        "input": [[]],
         "output": [[1, 2, 3, 4, 5]]
       },
       {
-        "input": [[20, 21, 22]],
-        "output": [[]]
+        "input": [[10, 11]],
+        "output": [[1, 2, 3, 4, 5]]
+      },
+      {
+        "input": [[6, 7, 8, 9, 10]],
+        "output": [[6, 7, 8, 9, 10]]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "default": [1000, 10]
+      },
+      "dataflow": [
+        {
+          "component": "input",
+          "send": [11]
+        },
+        {
+          "component": "delay",
+          "plugin": "latch",
+          "send": [21],
+          "receive": [11],
+          "capacity": 1,
+          "decay": 0.2
+        },
+        {
+          "component": "output",
+          "receive": [21]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+        "output": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+      },
+      {
+        "input": [[]],
+        "output": [["__"]]
+      },
+      {
+        "input": [[]],
+        "output": [["__"]]
       }
     ]
   },
