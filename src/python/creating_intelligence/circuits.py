@@ -1725,8 +1725,12 @@ def Circuit(expr):
             # Construct edge label logic
             tag_symbols = "".join([TAG_MAP.get(t, "") for t in tags])
             user_label = edge_data.get("label", "")
-            raw_label = f"{user_label}{tag_symbols}"
             
+            gating = edge_data.get("gating")
+            gating_str = "@" + "".join(str(g) for g in gating) if gating else ""
+            
+            raw_label = f"{user_label}{tag_symbols}{gating_str}"   
+                     
             # Substitute dynamic variables
             hyperparams = edge_data.get("hyperparameters", [0, 0])
             replacements = {
