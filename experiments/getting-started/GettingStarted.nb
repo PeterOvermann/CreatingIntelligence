@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[   1617033,      38881]
+NotebookDataLength[   1617029,      38880]
 NotebookOptionsPosition[   1513704,      37184]
-NotebookOutlinePosition[   1518860,      37310]
-CellTagsIndexPosition[   1518817,      37307]
+NotebookOutlinePosition[   1518856,      37309]
+CellTagsIndexPosition[   1518813,      37306]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -37198,9 +37198,8 @@ DockedCells->{
       TemplateBox[{5}, "Spacer1"], 
       DynamicBox[
        ToBoxes[
-        Style[
-        ToString[$CellContext`CIRCUITCOUNT] <> " circuits, " <> 
-         ToString[$CellContext`TESTCOUNT] <> " examples", 12, FontFamily -> 
+        Style[((ToString[$CellContext`CIRCUITCOUNT] <> " circuits, ") <> 
+          ToString[$CellContext`TESTCOUNT]) <> " examples", 12, FontFamily -> 
          "Inter Variable"], StandardForm]], 
       TemplateBox[{5}, "Spacer1"], 
       ButtonBox[

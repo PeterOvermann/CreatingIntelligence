@@ -867,7 +867,7 @@ def auto(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout", "ident"],
-        "shape": "Square",
+        "shape": "square",
         "fill": 8
     })
     result.update(M)
@@ -967,7 +967,7 @@ def temporal(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout", "ident"],
-        "shape": "Square",
+        "shape": "square",
         "fill": 14
     })
     result.update(M)
@@ -1026,7 +1026,7 @@ def associator(config):
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "Square",
+        "shape": "square",
         "fill": 11,
         "size": 18,
         "label": "▶●"
@@ -1075,7 +1075,7 @@ def heteroencoder(config):
     result = {
         "function": f,
         "checks": ["arginp", "oneout"],
-        "shape": "Square",
+        "shape": "square",
         "fill": 11,
         "size": 18,
         "label": "◀▶"
@@ -1136,7 +1136,7 @@ def predictor(config):
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "Square",
+        "shape": "square",
         "fill": 11,
         "size": 18,
         "label": "▶▶"
@@ -1274,7 +1274,7 @@ def circuit(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout"],
-        "shape": "Square",
+        "shape": "square",
         "size": 9
     })
     
@@ -1484,7 +1484,7 @@ def Circuit(expr):
         
         # Strict overriding sequence
         final_config = {
-            "shape": "Circle", "label": "", "fill": 6, "color": 0, "size": 12,
+            "shape": "circle", "label": "", "fill": 6, "color": 0, "size": 12,
             "checks": [], "function": None
         }
         final_config.update(config)
@@ -1697,7 +1697,7 @@ def Circuit(expr):
             label = node_data.get("label", "")
             
             # Map node shapes and apply shape-specific area multipliers
-            if node_data.get("shape") == "Square":
+            if node_data.get("shape") == "square":
                 shape = "s"
                 size_multiplier = 100
             else:

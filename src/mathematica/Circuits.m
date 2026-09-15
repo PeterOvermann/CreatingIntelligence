@@ -548,7 +548,7 @@ delay[config_Association] :=
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
 	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
-	(* Proportional stochastic subsampling for memory query. *)
+	(* Proportional stochastic subsampling. *)
 	decimation = Lookup[config, "decimate", 1];
 
 
@@ -724,7 +724,7 @@ auto[config_Association] :=
 		
 		
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
-	    "shape" -> "Square", "fill" -> 8 |>, M]
+	    "shape" -> "square", "fill" -> 8 |>, M]
 	]
 
 
@@ -802,7 +802,7 @@ temporal[config_Association] :=
 		];
 
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"},
-		"shape" -> "Square", "fill" -> 14 |>]	
+		"shape" -> "square", "fill" -> 14 |>]	
 	]
 
 
@@ -849,7 +849,7 @@ associator[config_Association] :=
 		];   
 		
 	Join[ <| "function" -> f, "checks" -> { "dimfirst", "oneout"},
-		"shape" -> "Square", "fill" -> 11, "size" -> 18, "label"-> "\[FilledRightTriangle]\[FilledCircle]" |>, M]
+		"shape" -> "square", "fill" -> 11, "size" -> 18, "label"-> "\[FilledRightTriangle]\[FilledCircle]" |>, M]
 	]
 
 
@@ -882,7 +882,7 @@ heteroencoder[config_Association] :=
 		]; 
 			
 	Join[ <| "function" -> f, "checks" -> {"arginp", "oneout"}, 
-		"shape" -> "Square",  "fill" -> 11,  "size" -> 18,
+		"shape" -> "square",  "fill" -> 11,  "size" -> 18,
 		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]" |>, M]
 	]
 
@@ -921,7 +921,7 @@ predictor[config_Association] :=
 
 
 	Join[ <| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
-		"shape" -> "Square", "fill" -> 11, "size" -> 18,
+		"shape" -> "square", "fill" -> 11, "size" -> 18,
 		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M]
 	]
 
@@ -1018,7 +1018,7 @@ circuit[config_Association] :=
 	f[blocks__] := plugin["function"][blocks];
 	
 	Join[plugin, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
-							"shape" -> "Square", "size" -> 9|>]
+							"shape" -> "square", "size" -> 9|>]
 	]					
 
 
@@ -1199,7 +1199,7 @@ Circuit[expr_] := Module[
 		config = Join[Lookup[node, "component"][config], config];		
 
 		(* Prepend default visualization settings. *)
-		config = Join[<| "shape" -> "Circle", "label" -> "", "fill" -> 6, 
+		config = Join[<| "shape" -> "circle", "label" -> "", "fill" -> 6, 
 			"color" -> 0, "size" -> 12 |>, config];
 
 		(* Prepend default functional settings. *)
@@ -1512,8 +1512,9 @@ Circuit[expr_] := Module[
 			
 			VertexSize -> radius,  
 			
-			VertexShapeFunction -> Normal[#["shape"] & /@ nodes],
-			
+			VertexShapeFunction -> Normal[Replace[#["shape"], 
+				{"none" -> None, s_String :> Capitalize[s]}] & /@ nodes],
+									
 			VertexStyle -> Normal[
 				Directive[colorscheme[#["fill"]], 
 				EdgeForm[Directive[colorscheme[1], AbsoluteThickness[0.15]]],
