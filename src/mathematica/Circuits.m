@@ -1484,10 +1484,14 @@ Circuit[expr_] := Module[
 		(* Convert tag names to single-character display labels. *)
 		display = Reverse[Circuit`TagMap];
 							
-		edgetag[a_Association] := Module[ {str, rules},
+		edgetag[a_Association] := Module[ {str, rules, gatingstr = ""},
+
+			If[KeyExistsQ[a, "gating"],
+				gatingstr = "@" <> StringJoin[ToString /@ a["gating"]]];
 
 			str = Lookup[a, "label", ""] <> 
-				StringJoin[Lookup[display, #, ""]& /@ Lookup[a, "tags", {}]];
+				StringJoin[Lookup[display, #, ""]& /@ Lookup[a, "tags", {}]] <>
+				gatingstr;
 			
 			rules = 				{
 				display["show_slot"] -> ToString[a["slot"]],
@@ -1808,6 +1812,7 @@ ToDFD[expr_Association] := Module[
 	
 	buildpath[p_] := 
 		Module[{slot, tags = "", tagstr = "", gatingstr = "", userlabel = ""},
+		
 		If[IntegerQ[p] || StringQ[p], Return[p]];
 		slot = p["slot"];
 		If[KeyExistsQ[p, "tags"], tagstr = StringJoin[Lookup[Circuit`TagMap, p["tags"], ""]]];
