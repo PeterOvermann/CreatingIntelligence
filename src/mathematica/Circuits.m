@@ -811,14 +811,12 @@ Always learns if B =!= {}.
 *)
 
 associator[config_Association] := 
-	Module[ {f, Adims, M, decimation, oversampling},
+	Module[ {f, Adims, M, decimation},
 
 	Adims = First /@ Rest[config["receive_blocks"]]; (* Dimensions of input blocks A *)
 
 	(* Proportional stochastic subsampling for training.  *)
 	decimation = Lookup[config, "decimate", 1];
-	(* Proportional stochastic oversampling for training.  *)
-	oversampling = Lookup[config, "oversampling", 1];
 	
 	(* Memory instance: *)
 	M = Memory[Join[config, <|
@@ -833,13 +831,9 @@ associator[config_Association] :=
 		
 		If[Y === {}, Return[ M["retrieve"][X]]]; (* Test. *)
 		
-		(* Train. Optionally apply noise to avoid overfitting. *)
+		(* Train. *)
 		If[decimation < 1, 
 			X = Sort[RandomSample[X, Floor[decimation * Length[X]]]]];
-
-		If[oversampling > 1, 
-			X = Union[X, RandomSample[Range[Length[X], Round[(oversampling-1)
-					 * Length[X]]]]]];
 
 		M["store"][X, Y]; 
 		{}	
@@ -907,7 +901,8 @@ predictor[config_Association] :=
 	
 		(* State X from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
-		M["store"][X, ResolveNormal[item]];
+		If[ prediction =!= X, 
+			M["store"][X, ResolveNormal[item]]];
 		
 		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 
