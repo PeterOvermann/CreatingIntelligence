@@ -1252,10 +1252,9 @@
         },
         {
           "component": "delay",
-          "plugin": "latch",
           "send": [21],
           "receive": [11],
-          "capacity": 1,
+          "latch": true,
           "threshold": 0.8
         },
         {
@@ -1295,10 +1294,9 @@
         },
         {
           "component": "delay",
-          "plugin": "latch",
           "send": [21],
           "receive": [11],
-          "capacity": 1,
+          "latch": true,
           "decay": 0.2
         },
         {

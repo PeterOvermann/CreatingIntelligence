@@ -527,12 +527,13 @@ Multisets and inhibitory signals are handled transparently.
 *)
 
 delay[config_Association] := 
-	Module[ {f, plugin, pop, dims1, dims2, absthreshold, decay, decimation, 
-			absratelimit, abscapacity, Xstate = {}},
+	Module[ {f, plugin, pluginfactory, pop, dims1, dims2, absthreshold, decay, decimation, 
+			absratelimit, abscapacity, latch, Xstate = {}},
 
-	plugin = Lookup[config, "plugin", replacement][config];
+	pluginfactory = Lookup[config, "plugin", replacement];
+	plugin = pluginfactory[config];
 
-	If[ plugin === replacement,  plugin = KeyDrop[plugin, "label"]];
+	If[ pluginfactory === replacement,  plugin = KeyDrop[plugin, "label"]];
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
@@ -546,9 +547,11 @@ delay[config_Association] :=
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
-	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
+	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
 	(* Proportional stochastic subsampling. *)
 	decimation = Lookup[config, "decimate", 1];
+	(* Latch option. *)
+	latch = Lookup[config, "latch", False];
 
 
 	f[blocks__List] := Module[ {X, Xdec},
@@ -567,10 +570,11 @@ delay[config_Association] :=
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 
 		(* Multiset subsampling applied to previous state. *)
-		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+		Xstate = Sort[RandomSample[Xstate, UpTo[abscapacity]]]; 
 		
 		(* Temporal integration via update rules. *)
-		Xstate = plugin["updaterule"][X, Xstate]; 
+		If[ ! (latch && Length[X] == 0), 
+			Xstate = plugin["updaterule"][X, Xstate]]; 
 
 		(* Proportional multiset subsampling applied to output *)
 		Xdec = Xstate;
@@ -597,13 +601,7 @@ Replaces #2 with #1.
 replacement[_Association] :=
 	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
 
-	
-(* 
-Replaces #2 with #1 if #1 is non-empty.
-*)
-latch[_Association] :=
-	<|"updaterule" -> (If[Length[#1] > 0, #1, #2] &), "label" -> "\[FilledRectangle]", "size" -> 18 |>;
-	
+		
 (* 
 Multiset Complement[#2, #1]. Removes #1 from #2. Retains novel input.
 *)
@@ -736,7 +734,7 @@ Uses the same temporal integration plugins and parameterization as "delay".
 
 temporal[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
-			absratelimit, abscapacity, Xstate = {}, Xdec, prediction = {}},
+			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", replacement][config];
 
@@ -751,9 +749,11 @@ temporal[config_Association] :=
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
-	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
+	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
+	(* Latch option. *)
+	latch = Lookup[config, "latch", False];
 
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
@@ -783,7 +783,8 @@ temporal[config_Association] :=
 		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
 		
 		(* Temporal integration via update rules. *)
-		Xstate = plugin["updaterule"][X, Xstate]; 
+		If[ ! (latch && Length[X] == 0), 
+			Xstate = plugin["updaterule"][X, Xstate]]; 
 
 		(* Proportional multiset subsampling applied to the integrated state,
 		 to break symmetry during retrieval. *)
