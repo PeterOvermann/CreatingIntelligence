@@ -811,12 +811,9 @@ Always learns if B =!= {}.
 *)
 
 associator[config_Association] := 
-	Module[ {f, Adims, M, decimation},
+	Module[ {f, Adims, M},
 
 	Adims = First /@ Rest[config["receive_blocks"]]; (* Dimensions of input blocks A *)
-
-	(* Proportional stochastic subsampling for training.  *)
-	decimation = Lookup[config, "decimate", 1];
 	
 	(* Memory instance: *)
 	M = Memory[Join[config, <|
@@ -831,10 +828,6 @@ associator[config_Association] :=
 		
 		If[Y === {}, Return[ M["retrieve"][X]]]; (* Test. *)
 		
-		(* Train. *)
-		If[decimation < 1, 
-			X = Sort[RandomSample[X, Floor[decimation * Length[X]]]]];
-
 		M["store"][X, Y]; 
 		{}	
 		];   

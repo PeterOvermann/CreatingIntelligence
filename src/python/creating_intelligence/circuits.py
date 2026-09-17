@@ -1007,8 +1007,6 @@ def associator(config):
     receive_blocks = config.get("receive_blocks", [])
     Adims = [b[0] for b in receive_blocks[1:]]
 
-    decimation = config.get("decimate", 1.0)
-
     params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
                                                            for b in receive_blocks[1:])]
     params_B = receive_blocks[0]
@@ -1027,10 +1025,6 @@ def associator(config):
 
         if not Y:
             return (M["retrieve"](X),)
-
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(X))
-            X = sorted(rng.choice(X, size=sample_size, replace=False).tolist())
 
         M["store"](X, Y)
         return ([],)
