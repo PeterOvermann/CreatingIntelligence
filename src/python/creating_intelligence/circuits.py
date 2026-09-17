@@ -619,21 +619,20 @@ Multisets and inhibitory signals are handled transparently .
 
 
 def delay(config):
-    plugin_factory = config.get("plugin", augmentation)
+    plugin_factory = config.get("plugin", replacement)
 
     if isinstance(plugin_factory, str):
         import sys
         plugin_factory = getattr(
             sys.modules[__name__],
             plugin_factory,
-            augmentation)
+            replacement)
 
     plugin = plugin_factory(config)
 
-    # Remove label if plugin and capacity were implicitly defaulted
-    if "plugin" not in config and "capacity" not in config:
+    if plugin_factory is replacement:
         plugin.pop("label", None)
-
+        
     dims1 = [b[0] for b in config.get("receive_blocks", [])]
     dims2 = [b[0] for b in config.get("send_blocks", [])]
     pop = sum(b[1] for b in config.get("receive_blocks", []))
@@ -647,7 +646,7 @@ def delay(config):
         pop) if rate_limit_factor != float('inf') else float('inf')
 
     decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 0.0)
+    capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
 
@@ -894,19 +893,16 @@ Uses the same temporal integration parametrization as "delay" .
 
 
 def temporal(config):
-    plugin_factory = config.get("plugin", permutation)
+    plugin_factory = config.get("plugin", replacement)
 
     if isinstance(plugin_factory, str):
         import sys
         plugin_factory = getattr(
             sys.modules[__name__],
             plugin_factory,
-            permutation)
+            replacement)
 
     plugin = plugin_factory(config)
-
-    if "plugin" not in config and "capacity" not in config:
-        plugin.pop("label", None)
 
     receive_blocks = config.get("receive_blocks", [])
     dims = [b[0] for b in receive_blocks]
@@ -924,7 +920,7 @@ def temporal(config):
         pop) if rate_limit_factor != float('inf') else float('inf')
 
     decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 0.0)
+    capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
 
