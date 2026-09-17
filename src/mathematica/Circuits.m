@@ -530,10 +530,9 @@ delay[config_Association] :=
 	Module[ {f, plugin, pop, dims1, dims2, absthreshold, decay, decimation, 
 			absratelimit, abscapacity, Xstate = {}},
 
-	plugin = Lookup[config, "plugin", augmentation][config];
+	plugin = Lookup[config, "plugin", replacement][config];
 
-	If[ MissingQ[config["plugin"] && MissingQ[config["capacity"]]], 
-		plugin = KeyDrop[plugin, "label"]];
+	If[ plugin === replacement,  plugin = KeyDrop[plugin, "label"]];
 
 	dims1 = First /@ config["receive_blocks"];
 	dims2 = First /@ config["send_blocks"];
@@ -732,17 +731,14 @@ auto[config_Association] :=
 Temporal-associative memory component. 
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
-Uses the same temporal integration parametrization as "delay".
+Uses the same temporal integration plugins and parameterization as "delay".
 *)
 
 temporal[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
 			absratelimit, abscapacity, Xstate = {}, Xdec, prediction = {}},
 
-	plugin = Lookup[config, "plugin", permutation][config];
-
-	If[ MissingQ[config["plugin"] && MissingQ[config["capacity"]]], 
-		plugin = KeyDrop[plugin, "label"]];
+	plugin = Lookup[config, "plugin", replacement][config];
 
 	dims = First /@ config["receive_blocks"];
 	params = Plus @@ config["receive_blocks"];

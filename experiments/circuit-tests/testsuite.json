@@ -196,6 +196,38 @@
       {
         "input": [[1, 1, 2, 3, 4, 4]],
         "output": [[1, 1, 2, 3, 4, 4]]
+      },
+      {
+        "input": [[1, 1, 2, 3, -4, -4]],
+        "output": [[-4, -4, 1, 1, 2, 3]]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "11": [1000, 5]
+      },
+      "dataflow": [
+        {
+          "component": "input",
+          "send": [11]
+        },
+        {
+          "component": "output",
+          "receive": [
+            {
+              "slot": 11,
+              "tags": ["inhibit"]
+            }
+          ]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": [[-4, 1, 1, 2, 3, 4, 4]],
+        "output": [[-4, -4, -4, -3, -2, -1, -1]]
       }
     ]
   },
@@ -1110,6 +1142,7 @@
         },
         {
           "component": "delay",
+          "plugin": "augmentation",
           "send": [21],
           "receive": [11],
           "capacity": 2.0
@@ -1132,6 +1165,78 @@
       {
         "input": [[11, 12, 13, 14, 15]],
         "output": [["__"]]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "default": [1000, 5]
+      },
+      "dataflow": [
+        {
+          "component": "input",
+          "send": [11]
+        },
+        {
+          "component": "delay",
+          "plugin": "replacement",
+          "send": [21],
+          "receive": [11],
+          "capacity": 2.0
+        },
+        {
+          "component": "output",
+          "receive": [21]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": [[1, 2, 3, 4, 5]],
+        "output": [[1, 2, 3, 4, 5]]
+      },
+      {
+        "input": [[6, 7, 8, 9, 10]],
+        "output": [[6, 7, 8, 9, 10]]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "default": [1000, 5]
+      },
+      "dataflow": [
+        {
+          "component": "input",
+          "send": [11]
+        },
+        {
+          "component": "delay",
+          "plugin": "complement",
+          "send": [21],
+          "receive": [11],
+          "capacity": 2.0
+        },
+        {
+          "component": "output",
+          "receive": [21]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": [[1, 2, 3, 4, 5]],
+        "output": [[1, 2, 3, 4, 5]]
+      },
+      {
+        "input": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+        "output": [[6, 7, 8, 9, 10]]
+      },
+      {
+        "input": [[6, 7, 8, 9, 10]],
+        "output": [[]]
       }
     ]
   },
@@ -2634,6 +2739,36 @@
       {
         "input": [[1, 2, 3, 4, 5, 6, 7, 100, 101, 102]],
         "output": [[100, 101, 102]]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "default": [1000, 10]
+      },
+      "dataflow": [
+        {
+          "component": "input",
+          "send": [11]
+        },
+        {
+          "component": "delay",
+          "plugin": "residual",
+          "send": [21],
+          "receive": [11],
+          "capacity": 2
+        },
+        {
+          "component": "output",
+          "receive": [21]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": [[1, 2, 3, 4, 5]],
+        "output": [[]]
       }
     ]
   },
