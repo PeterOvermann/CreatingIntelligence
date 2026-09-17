@@ -1,14 +1,15 @@
 # About the *Creating Intelligence* Project
 
 Our goal is to build a Computational Theory of Mind, based on a 
-new approach to Hyperdimensional Computing. It proposes an alternative to classical
+novel theoretical framework in the tradition of Hyperdimensional Computing. 
+It proposes an alternative to classical
 computationalist models and to neural-network-based connectionist models of the mind.
 
 In this theory, the mind performs computations on sparse binary data. The fundamental
 data structures are Sparse Distributed Representations (SDRs) for perceptual information 
 and Sparse Holographic Representations (SHRs) for symbols. 
 
-The centerpiece of this project is the Topological Associative Memory &mdash; a 
+The centerpiece of this project is Topological Associative Memory &mdash; a 
 newly discovered associative memory for sparse data, serving as the computational
 kernel that models the brain's core algorithm. A software frontend
 for modeling and simulating neural circuits and pathways complements the memory backend.
