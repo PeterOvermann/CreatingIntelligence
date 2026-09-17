@@ -1008,7 +1008,6 @@ def associator(config):
     Adims = [b[0] for b in receive_blocks[1:]]
 
     decimation = config.get("decimate", 1.0)
-    oversampling = config.get("oversampling", 1.0)
 
     params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
                                                            for b in receive_blocks[1:])]
@@ -1032,17 +1031,6 @@ def associator(config):
         if decimation < 1.0:
             sample_size = math.floor(decimation * len(X))
             X = sorted(rng.choice(X, size=sample_size, replace=False).tolist())
-
-        if oversampling > 1.0:
-            extra_size = round((oversampling - 1.0) * len(X))
-            pool = [i for i in range(1, params_A[0] + 1) if i not in X]
-            extra = rng.choice(
-                pool,
-                size=min(
-                    extra_size,
-                    len(pool)),
-                replace=False).tolist()
-            X = sorted(X + extra)
 
         M["store"](X, Y)
         return ([],)
@@ -1131,12 +1119,14 @@ def predictor(config):
 
     M = Memory(m_config)
     X = []
+    prediction = []
 
     def f(item, *blocks):
-        nonlocal X
+        nonlocal X, prediction
         Y = resolve_normal(item)
 
-        M["store"](X, Y)
+        if prediction != X:
+            M["store"](X, Y)
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -1166,7 +1156,8 @@ def predictor(config):
     }
     result.update(M)
     return result
-
+    
+    
 
 def noise(config):
     """Random noise generator."""
