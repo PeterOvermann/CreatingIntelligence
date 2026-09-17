@@ -649,6 +649,7 @@ def delay(config):
     capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
+    latch = config.get("latch", False)
 
     Xstate = []
 
@@ -682,7 +683,9 @@ def delay(config):
                     size=abscapacity,
                     replace=False).tolist())
 
-        Xstate = plugin["updaterule"](X, Xstate)
+        # Temporal integration via update rules
+        if not (latch and len(X) == 0):
+            Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to output
         Xdec = Xstate
@@ -704,22 +707,13 @@ def delay(config):
         "fill": 13
     })
     return result
-
+    
 
 # Update rules for auto-associative memory components ("auto")
 # and temporal integration ("delay").
 
 def replacement(config):
     return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
-
-
-def latch(config):
-    return {
-        "updaterule": lambda y,
-        x: y if len(y) > 0 else x,
-        "label": "■",
-        "size": 18}
-
 
 def residual(config):
     return {"updaterule": lambda y, x: resolve_graded(
@@ -923,6 +917,7 @@ def temporal(config):
     capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
+    latch = config.get("latch", False)
 
     # Memory with identical input and output parameters
     m_config = dict(config)
@@ -973,7 +968,8 @@ def temporal(config):
                     replace=False).tolist())
 
         # Temporal integration via update rules
-        Xstate = plugin["updaterule"](X, Xstate)
+        if not (latch and len(X) == 0):
+            Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to the integrated state
         Xdec = Xstate
@@ -1000,7 +996,7 @@ def temporal(config):
     result.update(M)
 
     return result
-
+    
 
 def associator(config):
     """
