@@ -289,9 +289,9 @@ category[config_Association] := Module[ {f, n, p, K, partitionsize, lex, T},
 	(* Create global hash table shared by all instances with
 	the same hyperparameters, enabling encode-decode roundtrips. *)
 
-	lex = Circuit`categoryLexicon[n, p];
+	lex = Circuit`categoryLexicon[n, p, K];
 	If[ ! MatchQ[ lex, _DataStructure], 
-		lex = Circuit`categoryLexicon[n, p] = CreateDataStructure["HashTable"]];
+		lex = Circuit`categoryLexicon[n, p, K] = CreateDataStructure["HashTable"]];
 	lex["Insert", Null -> {} ];
 	
 	(* Use the auto-associative pattern matching threshold. *)

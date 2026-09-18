@@ -322,10 +322,11 @@ def codec(config):
 circuit_category_lexicon = {}
 
 
+circuit_category_lexicon = {}
+
 def category(config):
     hyperparameters = config.get("hyperparameters", [0, 0])
     n, p = hyperparameters[0], hyperparameters[1]
-    lex_key = (n, p)
 
     K = config.get("categories", n // p if p > 0 else 0)
     if K * p > n:
@@ -334,12 +335,14 @@ def category(config):
 
     partitionsize = n // K if K > 0 else 0
 
+    lex_key = (n, p, K)
+
     if lex_key not in circuit_category_lexicon:
         circuit_category_lexicon[lex_key] = {None: []}
 
     lex = circuit_category_lexicon[lex_key]
     T = matching_threshold((n, p), (n, p))
-
+    
     def f(expr):
         if config.get("component") == "input":
             if not isinstance(expr, int) or expr < 0 or expr >= K:
