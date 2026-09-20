@@ -15,5 +15,4 @@ where = ["."]
 include = ["creating_intelligence*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.dylib"]
-
+"*" = ["*.dylib", "*.so", "*.dll", "*.pyd"]
