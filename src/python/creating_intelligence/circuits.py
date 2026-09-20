@@ -1360,10 +1360,13 @@ TAG_MAP = {
 
 def Circuit(expr):
     """
-    Parses a circuit dataflow dictionary and returns 
+    Parses a circuit dataflow dictionary or JSON string and returns 
     a compiled circuit interface.
     Implements data-driven execution flow and state isolation.
     """
+    if isinstance(expr, str):
+        expr = json.loads(expr)
+        
     nodes = {}
     pathways = {}
 

@@ -1,6 +1,11 @@
 import os
 import importlib
+import logging
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
+# Optional: Add a NullHandler to prevent warnings if the parent app doesn't configure logging
+logger.addHandler(logging.NullHandler())
 
 # Calculate absolute path to the repo root relative to this file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,4 +27,6 @@ except (ImportError, OSError) as e:
 # Expose Circuit to the package namespace
 from .circuits import Circuit
 
-print(f"[System] Initializing Memory using '{backend}' backend.")
+logger.debug(f"[System] Initializing Memory using '{backend}' backend.")
+
+__all__ = ['Circuit', 'Memory']
