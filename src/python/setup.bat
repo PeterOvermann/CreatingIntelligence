@@ -1,15 +1,14 @@
 @echo off
 setlocal
 
-rem Pre-flight check to abort cleanly before pip generates verbose errors
 where dot >nul 2>nul
 if %errorlevel% neq 0 (
     echo ============================================================
-    echo ERROR: Graphviz ^('dot'^) is required but was not found.
-    echo Please install Graphviz manually:
+    echo WARNING: Graphviz ^('dot'^) is required for advanced circuit schematics but was not found.
+    echo The package will install normally, but visualization features will use a fallback layout.
+    echo Please install Graphviz manually if needed:
     echo   winget install Graphviz.Graphviz
     echo ============================================================
-    exit /b 1
 )
 
 set "SCRIPT_DIR=%~dp0"
@@ -28,4 +27,3 @@ python -m pip install -q --upgrade pip
 pip install -q -e "%SCRIPT_DIR%."
 
 echo Setup complete. Activate with: "%VENV_PATH%\Scripts\activate.bat"
-

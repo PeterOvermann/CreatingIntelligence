@@ -8,8 +8,9 @@ if not shutil.which("dot"):
     sys.stderr.write(
         "\n"
         "=" * 60 + "\n"
-        "ERROR: Graphviz ('dot') is required but was not found.\n"
-        "Please install Graphviz manually:\n"
+        "WARNING: Graphviz ('dot') is required for advanced circuit schematics but was not found.\n"
+        "The package will install normally, but visualization features will use a fallback layout.\n"
+        "Please install Graphviz manually if needed:\n"
         "  - Windows: winget install Graphviz.Graphviz\n"
         "  - macOS: brew install graphviz\n"
         "  - Ubuntu/Debian: sudo apt-get install graphviz\n"
@@ -17,7 +18,6 @@ if not shutil.which("dot"):
         "  - Arch: sudo pacman -S graphviz\n"
         "=" * 60 + "\n\n"
     )
-    sys.exit(1)
 
 c_source = os.path.join("..", "c", "memory.c")
 
