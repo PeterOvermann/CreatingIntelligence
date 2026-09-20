@@ -38,7 +38,7 @@ src/python/setup.sh
 On Windows, run
 
 ```
-src/python/setup.sh
+src/python/setup.bat
 ```
 
 
