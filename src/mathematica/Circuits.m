@@ -294,7 +294,7 @@ category[config_Association] := Module[ {f, n, p, K, partitionsize, lex, T},
 		lex = Circuit`categoryLexicon[n, p, K] = CreateDataStructure["HashTable"]];
 	lex["Insert", Null -> {} ];
 	
-	(* Use the auto-associative pattern matching threshold. *)
+	(* Use the auto-associative pattern matching threshold (improve?) *)
 	T = MatchingThreshold[{n, p}, {n, p}]; 
 
 	f[expr_] := Module[ {result, overlaps},
