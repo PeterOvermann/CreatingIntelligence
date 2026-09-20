@@ -44,7 +44,7 @@ src/python/setup.bat
 
 This will create a Python virtual environment and build the *creating_intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python version.
 
-To build stand-alone zero-dependency versions of the Standard C memory kernel (a command line interface and test program), run
+Run the following command to build the standalone memory CLI and test program from the zero-dependency Standard C source:
 
 ```
 make -C src/c/
