@@ -79,7 +79,7 @@ python3 experiments/memory-tests/run.py
 or as a stand-alone C binary with
 
 ```
-bin/memorytest
+src/c/build/memorytest
 ```
 
 
