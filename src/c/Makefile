@@ -2,39 +2,23 @@
 #	Makefile
 #   - memory (CLI)
 # 	- memorytest (performance and capacity testing)
-# 	- libmemory (used by Python frontend)
-	
 	
 CC = gcc
-CFLAGS = -Wall -Wextra -O3 -fPIC
-LDFLAGS = -shared
+CFLAGS = -Wall -Wextra -O3
 
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-    EXT = dylib
-else
-    EXT = so
-endif
 
-REPO_ROOT = ../..
-BIN_DIR = $(REPO_ROOT)/bin
-LIB_DIR = lib
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+BIN_DIR := $(MAKEFILE_DIR)build
 
-LIB_TARGET = $(LIB_DIR)/libmemory.$(EXT)
 CLI_TARGET = $(BIN_DIR)/memory
 TEST_TARGET = $(BIN_DIR)/memorytest
 
-.PHONY: all clean directories lib
+.PHONY: all clean directories
 
-all: directories $(LIB_TARGET) $(CLI_TARGET) $(TEST_TARGET)
-
-lib: directories $(LIB_TARGET)
+all: directories $(CLI_TARGET) $(TEST_TARGET)
 
 directories:
-	@mkdir -p $(BIN_DIR) $(LIB_DIR)
-
-$(LIB_TARGET): memory.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	@mkdir -p $(BIN_DIR)
 
 $(CLI_TARGET): commandline.c memory.c
 	$(CC) $(CFLAGS) -o $@ $^
@@ -43,4 +27,4 @@ $(TEST_TARGET): testing.c memory.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f $(LIB_TARGET) $(CLI_TARGET) $(TEST_TARGET)
+	rm -rf $(BIN_DIR)

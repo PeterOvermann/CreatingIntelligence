@@ -14,14 +14,29 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 import ctypes
 import os
+import importlib.machinery
+from pathlib import Path
 
-# Load the shared C library.
-lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "c", "lib", "libmemory.dylib"))
+# Dynamically find the compiled extension file suffix (e.g., .cpython-311-darwin.so)
+ext_suffix = importlib.machinery.EXTENSION_SUFFIXES[0]
+
+# Path where pip/setuptools places the compiled extension
+pkg_dir = Path(__file__).parent
+lib_path = pkg_dir / f"libmemory{ext_suffix}"
+
 try:
-    lib = ctypes.CDLL(lib_path)
+    # Attempt to load the pip-installed extension first
+    lib = ctypes.CDLL(str(lib_path))
 except OSError:
-    lib = ctypes.CDLL("../c/lib/libmemory.dylib")
-
+    # Fallback to the legacy Makefile structure for local development without pip
+    fallback_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "c", "lib", "libmemory.dylib"))
+    try:
+        lib = ctypes.CDLL(fallback_path)
+    except OSError:
+        lib = ctypes.CDLL("../c/lib/libmemory.dylib")
+        
+        
+        
 # Define the C 'Set' struct in Python.
 class CSet(ctypes.Structure):
     _fields_ = [

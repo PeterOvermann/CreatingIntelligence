@@ -1,2 +1,11 @@
-creating_intelligence.egg-info/
 __pycache__/
+
+# Compiled Python C-extensions
+*.so
+*.pyd
+*.dylib
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/

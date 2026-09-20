@@ -35,8 +35,14 @@ On Unix, Linux, BSD, and macOS, run
 src/python/setup.sh
 ```
 
-This will create a Python virtual environment `~/.ci` in your home directory and build the *creating_intelligence* package.
-It includes a high-performance memory backend written in Standard C, and an alternative native Python version.
+On Windows, run
+
+```
+src/python/setup.sh
+```
+
+
+This will create a Python virtual environment and build the *creating_intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python version.
 
 To build stand-alone zero-dependency versions of the Standard C memory kernel (a command line interface and test program), run
 
