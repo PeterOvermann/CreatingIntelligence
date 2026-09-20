@@ -5,6 +5,7 @@ xcuserdata/
 build/
 DerivedData/
 lib/
+bin/
 
 # Compiled C object files and libraries
 *.o

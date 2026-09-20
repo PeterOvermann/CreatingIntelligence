@@ -13,6 +13,3 @@ dependencies = {file = ["requirements.txt"]}
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["creating_intelligence*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.dylib", "*.so", "*.dll", "*.pyd"]
