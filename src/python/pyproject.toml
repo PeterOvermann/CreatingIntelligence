@@ -10,11 +10,10 @@ description = "A computational foundation for AGI, based on hyperdimensional spa
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [{ name = "Peter Overmann", email = "mail@creatingintelligence.org" }]
-license = { text = "MIT" }
+license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: C",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
