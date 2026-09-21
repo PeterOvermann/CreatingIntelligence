@@ -1,0 +1,208 @@
+    /* Self-hosted fonts*/
+    @font-face {
+      font-family: "Inter";
+      src: url("../fonts/Inter-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("../fonts/Inter-Italic.woff2") format("woff2");
+      font-weight: 400;
+      font-style: italic;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("../fonts/Inter-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("../fonts/Inter-BoldItalic.woff2") format("woff2");
+      font-weight: 700;
+      font-style: italic;
+      font-display: block;
+    }
+
+    /* Docsify CSS Variable Overrides */
+    :root {
+      --theme-color: #5e81ac; /* Nord10*/
+      --base-color: #2e3440; /* Nord0*/
+      --heading-color: #2e3440; /* Nord0 */
+      --base-font-family: "Inter", system-ui, -apple-system, sans-serif; 	          --code-font-family: "JetBrains Mono", "SFMono-Regular", monospace; 
+    }
+
+    /* Global Layout & Paper Effect */
+    body {
+      background-color: #eceff4; /* Nord Snow Storm */
+    }
+	
+	.sidebar {
+	      width: 250px !important;
+	    }
+
+	    .content {
+	      left: 250px !important;
+	    }	
+	
+	
+		/* Adds space above the entire top-level category block */
+		/* Increased specificity to override the general list item margin */
+		.sidebar .sidebar-nav > ul > li {
+		  margin-top: 25px !important; 
+		}
+		
+		/* Adds space below the top-level text, before the sub-items begin */
+		.sidebar-nav > ul > li > ul {
+		  margin-top: 10px !important;
+		}
+			
+	.sidebar h1.app-name {
+	      text-align: left !important;
+	      margin: 0 0 20px 15px; 
+		  /* The 15px left margin aligns with the default list indent */
+	    }
+	
+	.sidebar ul li {
+		  margin-top: 5px !important; 
+		  line-height: 1.2; 
+		}	
+		
+					
+	/* Reset Docsify wrapper padding */
+	.content {
+	      padding-top: 0 !important;
+		  padding-bottom: 50px !important;
+	    }
+		
+		.content::after {
+		  content: "";
+		  display: block;
+		  height: 60px; 
+		}	
+    
+   .markdown-section {
+      background-color: #ffffff; 
+      max-width: 720px; 
+      margin: 30px auto 30px 30px; 
+      padding: 30px 30px; 
+      border-radius: 8px; 
+      color: #2e3440; 
+      line-height: 1.6; 
+    }
+	
+	.markdown-section h1 {
+		margin-top: -20px !important;
+		padding-top: 0 !important; 
+		font-size: 2.5em; 
+	    }
+
+			
+	.markdown-section h2 {
+		position: relative;
+		margin-top: 2.0em; /* the white space at the bottom of the block */
+		padding-top: 3.0em; 
+		font-size: 1.5em; 
+		    }
+			
+					
+	/* Paper cut effect for h2 */
+	    .markdown-section h2::before {
+	      content: "";
+	      position: absolute;
+	      top: 0;
+  
+	      /* Pull it slightly PAST the 80px side padding to hide the seam */
+	      left: -85px;
+	      width: calc(100% + 170px);
+  
+	      height: 35px;
+	      background-color: #eceff4; /* Matches the global background */
+	      box-shadow: none;
+	    }
+					
+	
+    /* Selection */
+    ::selection {
+      background-color: #ebcb8b; /* Nord13 */
+      color: #2e3440; 
+    }
+
+    /* Typography Overrides */
+    .markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4 {
+      color: #2e3440; 
+    }
+
+    /* Hyperlinks */
+    .markdown-section a {
+      color: #5e81ac; /* Nord10 */
+      text-decoration: none; 
+      transition: text-decoration-color 0.2s ease; 
+    }
+    .markdown-section a:hover {
+      text-decoration: underline; 
+      text-decoration-color: #ebcb8b; /* Nord13 */
+      text-decoration-thickness: 2px; 
+      text-underline-offset: 3px; 
+    }
+
+    /* Blockquotes */
+    .markdown-section blockquote {
+      border-left: 4px solid #ebcb8b; 
+      background-color: #eceff4; 
+      padding: 2px 20px; 
+      margin: 15px 0; 
+      font-style: italic; 
+      color: #4c566a; /* Nord3 */
+      border-radius: 0 8px 8px 0; 
+      font-size: 0.92em; 
+    }
+
+    /* Tables */
+	.markdown-section table {
+	  border-collapse: collapse; 
+	  display: table !important;
+	  width: 660px !important; 
+	  margin: 20px 0; 
+	}
+	
+	   .markdown-section th, .markdown-section td {
+      border: 1px solid #d8dee9; /* Nord4 */
+      padding: 4px 12px; 
+     /* text-align: left; */ 
+    }
+    .markdown-section th {
+      padding: 12px; 
+      background-color: #e5e9f0; 
+      border-top: 3px solid #ebcb8b; 
+      border-bottom: 1px solid #d8dee9; 
+    }
+
+    /* Large Code Blocks */
+    .markdown-section pre {
+      background-color: #eceff4; 
+      color: #2e3440; 
+      border: 1px solid #d8dee9; 
+      padding: 8px 20px; 
+      border-radius: 4px; 
+      font-size: 0.75em; 
+    }
+    
+    /* Strip inherited backgrounds from code inside pre */
+    .markdown-section pre > code {
+      background-color: transparent; 
+      color: inherit; 
+      padding: 0; 
+    }
+
+    /* Inline Code */
+    .markdown-section code {
+      background-color: #e5e9f0; /* Nord5 */
+      color: #2e3440; 
+      padding: 2px 4px; 
+      border-radius: 4px; 
+    }
