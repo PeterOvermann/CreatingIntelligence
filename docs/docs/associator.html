@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Creating Intelligence &mdash; Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Load base Docsify theme -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+  <!-- Load extracted custom styles -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Static Layout Fixes -->
+  <style>
+    .content, .sidebar {
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .sidebar-icon {
+      display: inline-block;
+      width: 1.5em;
+      text-align: center;
+      margin-right: 0.25em;
+    }
+    /* Inject Pandoc Syntax Highlighting CSS */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+  <main>
+    <aside class="sidebar">
+      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <div class="sidebar-nav">
+<ul>
+<li><strong>CIRCUIT CONFIGURATON</strong>
+<ul>
+<li><a href="circuits.html">Circuits</a></li>
+<li><a href="components.html">Components</a></li>
+<li><a href="pathways.html">Pathways</a></li>
+</ul></li>
+<li><strong>CIRCUIT COMPONENTS</strong>
+<ul>
+<li><a href="input.html">input</a></li>
+<li><a href="output.html">output</a></li>
+<li><a href="delay.html">delay</a></li>
+<li><a href="noise.html">noise</a></li>
+<li><a href="circuit.html">circuit</a></li>
+<li><a href="auto.html">auto</a></li>
+<li><a href="temporal.html">temporal</a></li>
+<li><a href="associator.html">associator</a></li>
+<li><a href="predictor.html">predictor</a></li>
+<li><a href="heteroencoder.html">heteroencoder</a></li>
+</ul></li>
+<li><strong>UPDATE RULE PLUGINS</strong>
+<ul>
+<li><a href="replacement.html"><span
+class="sidebar-icon">▼</span>replacement</a></li>
+<li><a href="residual.html"><span
+class="sidebar-icon">▲</span>residual</a></li>
+<li><a href="difference.html"><span
+class="sidebar-icon">△</span>difference</a></li>
+<li><a href="complement.html"><span
+class="sidebar-icon">▽</span>complement</a></li>
+<li><a href="augmentation.html"><span
+class="sidebar-icon">∪</span>augmentation</a></li>
+<li><a href="coincidence.html"><span
+class="sidebar-icon">∩</span>coincidence</a></li>
+<li><a href="permutation.html"><span
+class="sidebar-icon">π</span>permutation</a></li>
+</ul></li>
+<li><strong>ENCODERS &amp; DECODERS</strong>
+<ul>
+<li><a href="codec.html">codec</a></li>
+<li><a href="category.html">category</a></li>
+<li><a href="binning.html">binning</a></li>
+<li><a href="vectorencoder.html">vectorencoder</a></li>
+<li><a href="flyhash.html">flyhash</a></li>
+</ul></li>
+</ul>
+      </div>
+    </aside>
+    <section class="content">
+      <article class="markdown-section">
+        <p>CIRCUIT COMPONENTS</p>
+        <h1 id="associator">associator</h1>
+        <p><img width="240" alt="image" src="img/associator.png"><br></p>
+        <p>Hetero-associative memory component for supervised
+        learning.</p>
+        <p>See also: <a
+        href="https://creatingintelligence.org/#supervised-learning"
+        class="uri">https://creatingintelligence.org/#supervised-learning</a></p>
+        <h2 id="details-and-properties">Details and properties</h2>
+        <ul>
+        <li>Wrapper for a hetero-associative topological memory
+        instance.</li>
+        <li>Receives the label from its first <code>receive</code> block
+        and data from the remaining blocks.</li>
+        <li>Training is triggered if the label input is non-empty.</li>
+        <li>Inference is triggered by an empty label input.</li>
+        <li>Sends the inferred label.</li>
+        <li>Resolves multiset and inibitory input prior to
+        processing.</li>
+        </ul>
+        <p><br></p>
+        <table>
+        <colgroup>
+        <col style="width: 21%" />
+        <col style="width: 11%" />
+        <col style="width: 67%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th style="text-align: left;">Property</th>
+        <th style="text-align: center;">Default</th>
+        <th style="text-align: left;">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td style="text-align: left;"><code>send</code></td>
+        <td style="text-align: center;"><em>required</em></td>
+        <td style="text-align: left;">integer, representing a single
+        output slot</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><code>receive</code></td>
+        <td style="text-align: center;"><em>required</em></td>
+        <td style="text-align: left;">two or more input slots with
+        pathway tags</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><code>threshold</code></td>
+        <td style="text-align: center;"><em>automatic</em></td>
+        <td style="text-align: left;">relative pattern matching
+        threshold</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><code>decimate</code></td>
+        <td style="text-align: center;">1</td>
+        <td style="text-align: left;">proportional stochastic decimation
+        applied to training data</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><br></p>
+        <p>Use standard <a href="components.html">style options</a> to
+        customize the component’s appearance in circuit schematics.</p>
+        <h2 id="supervised-learning">Supervised learning</h2>
+        <p>A basic supervised learning setup using hetero-associative
+        memory:</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;label&quot;</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;data&quot;</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;associator&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">2</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+        <p><img width="240" alt="image" src="img/associator_circuit.png"><br></p>
+      </article>
+    </section>
+  </main>
+  
+  <!-- Mermaid Support -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+    
+    // Map Pandoc's codeblock output to Mermaid's expected DOM structure
+    document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        const div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = el.textContent;
+        pre.replaceWith(div);
+    });
+  </script>
+</body>
+</html>

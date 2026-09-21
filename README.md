@@ -1,11 +1,10 @@
-# About the *Creating Intelligence* Project
+# About *Creating Intelligence* 
 
-Our goal is to build a Computational Theory of Mind, based on a 
-novel theoretical framework in the tradition of Hyperdimensional Computing. 
-It proposes an alternative to classical
-computationalist models and to neural-network-based connectionist models of the mind.
+Our goal is to build a Computational Theory of Mind based on a new theory of
+Hyperdimensional Computing, entirely departing from neural-network-based connectionist models
+which rely on matrix calculations and continuous weights.
 
-In this theory, the mind performs computations on sparse binary data. The fundamental
+In this model, the mind performs computations on sparse binary data. The fundamental
 data structures are Sparse Distributed Representations (SDRs) for perceptual information 
 and Sparse Holographic Representations (SHRs) for symbols. 
 
@@ -14,14 +13,13 @@ newly discovered associative memory for sparse data, serving as the computationa
 kernel that models the brain's core algorithm. A software frontend
 for modeling and simulating neural circuits and pathways complements the memory backend.
 
-The methods introduced here lend themselves to binary in-memory computation, opening a
-new route toward synthetic intelligence that does not rely on GPU acceleration.
+The methods introduced here lend themselves to binary in-memory and neuromorphic computating, opening a new route toward synthetic intelligence that does not rely on GPU acceleration.
 
 
 ### General Information
 
 * Website: https://creatingintelligence.org
-* Download PDF: https://creatingintelligence.org/CreatingIntelligence.pdf
+* Documentation: https://creatingintelligence.org/docs
 * Preprint: https://arxiv.org/abs/2606.31819
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
 * Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
@@ -31,13 +29,13 @@ new route toward synthetic intelligence that does not rely on GPU acceleration.
 
 On Unix, Linux, BSD, and macOS, run
 
-```
+```bash
 src/python/setup.sh
 ```
 
 On Windows, run
 
-```
+```bash
 src/python/setup.bat
 ```
 
@@ -46,17 +44,16 @@ This will create a Python virtual environment and build the *creating_intelligen
 
 Run the following command to build the standalone memory CLI and test program from the zero-dependency Standard C source:
 
-```
+```bash
 make -C src/c/
 ```
 
 ### Getting Started
 
-Learn how to set up neural architectures via the JSON dataflow description language: [GettingStarted.pdf](experiments/getting-started/GettingStarted.pdf) 
 
-Run a first example:
+Run this:
 
-```
+```bash
 python3 experiments/hello-world/hello-world.py 
 ```
 
@@ -66,19 +63,19 @@ python3 experiments/hello-world/hello-world.py
 
 To test the circuit package (and indirectly the memory backend), run
 
-```
+```bash
 python3 experiments/circuit-tests/run.py
 ```
 
-Test the stand-alone memory kernel (storage capacity, retrieval accuracy, and I/O performance) with
+Test the topological associative memory backend (storage capacity, retrieval accuracy, and I/O performance) with
 
-```
+```bash
 python3 experiments/memory-tests/run.py
 ```
 
 or as a stand-alone C binary with
 
-```
+```bash
 src/c/build/memorytest
 ```
 
