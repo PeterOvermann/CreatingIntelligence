@@ -80,3 +80,8 @@ aggregates an orderless state representing prior inputs.
 
 <img width="240" alt="image" src="img/temporal_augmentation.png"><br>
 
+
+## Source code
+
+*from circuits.py insert augmentation*
+

@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -200,6 +200,11 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/temporal_complement.png"><br></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> complement(config):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;updaterule&quot;</span>: <span class="kw">lambda</span> y, x: resolve_graded(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        multiset([y, [<span class="op">-</span>i <span class="cf">for</span> i <span class="kw">in</span> x]])), <span class="st">&quot;label&quot;</span>: <span class="st">&quot;▽&quot;</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">20</span>}</span></code></pre></div>
       </article>
     </section>
   </main>

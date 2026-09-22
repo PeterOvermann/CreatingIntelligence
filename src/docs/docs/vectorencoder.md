@@ -40,3 +40,10 @@ The following circuit encodes dense vectors as SDRs.
 
 <img width="130" alt="image" src="img/input_vec.png"><br>
 
+
+
+## Source code
+
+*from circuits.py insert vectorencoder*
+
+

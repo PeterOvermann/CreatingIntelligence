@@ -80,3 +80,11 @@ each signal to the subsequent signal.
 
 <img width="240" alt="image" src="img/temporal_replacement.png"><br>
 
+
+
+
+## Source code
+
+*from circuits.py insert replacement*
+
+

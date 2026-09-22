@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -190,6 +190,24 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/temporal_permutation.png"><br></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> permutation(config):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    dims <span class="op">=</span> <span class="bu">sum</span>(b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, []))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    dim <span class="op">=</span> dims <span class="cf">if</span> dims <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    perm <span class="op">=</span> rng.choice(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">range</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="dv">1</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            dim <span class="op">+</span> <span class="dv">1</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        size<span class="op">=</span>dim,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        replace<span class="op">=</span><span class="va">False</span>).tolist() <span class="cf">if</span> dim <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> []</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> updaterule(y, x):</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        mapped_x <span class="op">=</span> <span class="bu">sorted</span>([(<span class="dv">1</span> <span class="cf">if</span> i <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="op">-</span><span class="dv">1</span> <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                          <span class="op">*</span> perm[<span class="bu">abs</span>(i) <span class="op">-</span> <span class="dv">1</span>] <span class="cf">for</span> i <span class="kw">in</span> x <span class="cf">if</span> i <span class="op">!=</span> <span class="dv">0</span>])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> multiset([y, mapped_x])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;updaterule&quot;</span>: updaterule, <span class="st">&quot;label&quot;</span>: <span class="st">&quot;π&quot;</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">16</span>}</span></code></pre></div>
       </article>
     </section>
   </main>

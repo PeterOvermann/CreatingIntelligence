@@ -10,6 +10,9 @@ SRC="$(cd "$SCRIPT_DIR/.." &> /dev/null && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." &> /dev/null && pwd)"
 DEST="$PROJECT_ROOT/docs/docs"
 
+# Define Python sources directory
+PY_SRC_DIR="$SCRIPT_DIR/../../../python/creating_intelligence"
+
 # 1. Create target directories and migrate assets
 mkdir -p "$DEST"
 cp -r "$SRC/img" "$DEST/" 2>/dev/null
@@ -54,7 +57,7 @@ cat << 'EOF' > /tmp/template.html
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 EOF
 
@@ -89,6 +92,36 @@ cat << 'EOF' >> /tmp/template.html
 </html>
 EOF
 
+# 4.5 Generate Python Snippet Preprocessor
+cat << 'EOF' > /tmp/inject_snippets.py
+import sys, re, os, ast
+
+py_dir = sys.argv[2]
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    content = f.read()
+
+def replacer(match):
+    py_file = match.group(1)
+    target = match.group(2)
+    py_path = os.path.join(py_dir, py_file)
+    
+    try:
+        with open(py_path, "r", encoding="utf-8") as pf:
+            code = pf.read()
+        
+        for node in ast.parse(code).body:
+            if getattr(node, 'name', None) == target:
+                snippet = ast.get_source_segment(code, node)
+                return f"```python\n{snippet}\n```"
+                
+        return f"<!-- Target '{target}' not found in {py_file} -->\n{match.group(0)}"
+    except Exception as e:
+        return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
+
+# Match exactly: *from [filename.py] insert [target]*
+print(re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer, content))
+EOF
+
 # 5. Process Content Files
 for file in "$SRC"/*.md; do
     filename=$(basename "$file")
@@ -105,9 +138,10 @@ for file in "$SRC"/*.md; do
         outname="${filename%.md}.html"
     fi
     
-    # Rewrite internal links and compile with Pandoc
+    # Inject python snippets, rewrite internal links, and compile with Pandoc
     # The autolink_bare_uris extension converts plain URLs to links
-    sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' "$file" | \
+    python3 /tmp/inject_snippets.py "$file" "$PY_SRC_DIR" | \
+    sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' | \
     pandoc -f markdown+autolink_bare_uris -t html \
         --template=/tmp/template.html \
         -o "$DEST/$outname"

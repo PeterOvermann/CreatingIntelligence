@@ -55,3 +55,10 @@ A basic setup for predictive learning with hetero-associative memory:
 
 <img width="240" alt="image" src="img/predictor_circuit.png"><br>
 
+
+
+## Source code
+
+*from circuits.py insert predictor*
+
+

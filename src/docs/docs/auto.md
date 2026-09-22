@@ -163,3 +163,6 @@ retaining the matching elements between the query and the retrieved pattern.
 <img width="240" alt="image" src="img/auto_coincidence.png"><br>
 
 
+## Source code
+
+*from circuits.py insert auto*

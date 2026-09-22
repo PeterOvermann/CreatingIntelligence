@@ -47,3 +47,8 @@ and subsequently decodes the internal representation, mirroring the input.
 
 <img width="130" alt="image" src="img/input_output_cat.png"><br>
 
+
+## Source code
+
+*from circuits.py insert category*
+

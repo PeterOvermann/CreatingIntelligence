@@ -68,4 +68,9 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 <img width="240" alt="image" src="img/temporal_complement.png"><br>
 
 
+## Source code
+
+*from circuits.py insert complement*
+
+
 

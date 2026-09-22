@@ -39,3 +39,10 @@ This mechanism is the basis for associative novelty detection.
 
 See also: https://creatingintelligence.org/#auto-associative-memory
 
+
+
+## Source code
+
+*from circuits.py insert residual*
+
+

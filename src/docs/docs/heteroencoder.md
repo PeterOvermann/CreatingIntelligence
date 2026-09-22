@@ -53,3 +53,11 @@ A simple hetero-encoding circuit:
 
 <img width="240" alt="image" src="img/heteroencoder_circuit.png"><br>
 
+
+
+
+## Source code
+
+*from circuits.py insert heteroencoder*
+
+

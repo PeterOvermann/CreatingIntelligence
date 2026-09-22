@@ -2,7 +2,7 @@
 
 CREATING INTELLIGENCE
 
-# A Computational Foundation for AGI
+# Documentation
 
 
 This is a software framework for cognitive computing, based on hyperdimensional sparse representations.

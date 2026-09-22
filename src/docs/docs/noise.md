@@ -55,3 +55,11 @@ Use an inhibitory pathway to make the noise subtractive:
 
 <img width="130" alt="image" src="img/inhibit_noise.png"><br>
 
+
+
+## Source code
+
+*from circuits.py insert noise*
+
+
+
