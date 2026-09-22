@@ -739,10 +739,8 @@ def permutation(config):
     dims = sum(b[0] for b in config.get("receive_blocks", []))
     dim = dims if dims else 0
     perm = rng.choice(
-        range(
-            1,
-            dim + 1),
-        size=dim,
+        range(1, dim + 1),
+        size = dim,
         replace=False).tolist() if dim > 0 else []
 
     def updaterule(y, x):
@@ -808,7 +806,7 @@ def auto(config):
         "B_parameters": params
     })
 
-    # Depends on Memory imported from creating_intelligence
+    # Memory backend
     M = Memory(m_config)
 
     def f(*blocks):
@@ -990,14 +988,15 @@ def temporal(config):
 def associator(config):
     """
     Vanilla hetero-associative node for supervised learning A -> B.
-    B is the first input argument. A is given by the rest of the input arguments.
+    B is the first input argument. 
+    A is given by the rest of the input arguments.
     Can be block-coded. Always learns if B != [].
     """
     receive_blocks = config.get("receive_blocks", [])
     Adims = [b[0] for b in receive_blocks[1:]]
 
     params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
-                                                           for b in receive_blocks[1:])]
+                    for b in receive_blocks[1:])]
     params_B = receive_blocks[0]
 
     m_config = dict(config)
@@ -1038,7 +1037,7 @@ def heteroencoder(config):
     dims = [b[0] for b in receive_blocks]
 
     params_A = [sum(b[0] for b in receive_blocks), sum(b[1]
-                                                       for b in receive_blocks)]
+                    for b in receive_blocks)]
     params_B = config.get("send_blocks", [[0, 0]])[0]
 
     m_config = dict(config)
@@ -1080,7 +1079,8 @@ def heteroencoder(config):
 
 def predictor(config):
     """
-    Generates a prediction based on the current input (slot #1) and context (slots #2,...).
+    Generates a prediction based on the current input (slot #1) 
+    and context (slots #2,...).
     Automatically learns the correct prediction in the following cycle.
     """
     receive_blocks = config.get("receive_blocks", [])
@@ -1091,7 +1091,7 @@ def predictor(config):
     decimation = config.get("decimate", 1.0)
 
     params_A = [sum(b[0] for b in contextconfig), sum(b[1]
-                                                      for b in contextconfig)]
+                    for b in contextconfig)]
     params_B = itemconfig
 
     m_config = dict(config)
