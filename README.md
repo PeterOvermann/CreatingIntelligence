@@ -1,6 +1,6 @@
 # Creating Intelligence
 
-Our goal is to build a Computational Theory of Mind based on a new theory of
+This project aims to build a Computational Theory of Mind based on a new theory of
 Hyperdimensional Computing, entirely departing from neural-network-based connectionist models
 which rely on matrix calculations and continuous weights.
 
@@ -41,7 +41,7 @@ src/python/setup.bat
 ```
 
 
-This will create a Python virtual environment and build the *creating_intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python version.
+This will create a Python virtual environment and build the *creating_intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python backend.
 
 Run the following command to build the standalone memory CLI and test program from the zero-dependency Standard C source:
 
