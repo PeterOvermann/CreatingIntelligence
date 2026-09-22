@@ -1,8 +1,7 @@
 # Creating Intelligence
 
-This project aims to build a Computational Theory of Mind based on a new theory of
-Hyperdimensional Computing, entirely departing from neural-network-based connectionist models
-which rely on matrix calculations and continuous weights.
+This project aims to build a computational theory of mind based on a new theory of
+hyperdimensional computing (HDC), entirely departing from neural-network-based connectionist models which rely on matrix calculations and continuous weights.
 
 In this model, the mind performs computations on sparse binary data. The fundamental
 data structures are Sparse Distributed Representations (SDRs) for perceptual information 
