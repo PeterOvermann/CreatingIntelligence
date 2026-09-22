@@ -9,8 +9,6 @@ This is a software framework for cognitive computing, based on hyperdimensional 
 
 It is used for modeling and simulating spiking neural networks that transmit sparse discrete codes between instances of Topological Associative Memory. In this framework, mathematical sets are the fundamental datatype, representing either Sparse Distributed Representations (SDRs) or Sparse Holographic Representations (SHRs).
 
-See also: https://creatingintelligence.org/
-
 
 ## Circuit dataflow description
 
