@@ -47,10 +47,11 @@
       --base-font-family: "Inter", system-ui, -apple-system, sans-serif; 	          --code-font-family: "JetBrains Mono", "SFMono-Regular", monospace; 
     }
 
-    /* Global Layout & Paper Effect */
-    body {
-      background-color: #eceff4; /* Nord Snow Storm */
-    }
+	body {
+	  background-color: #eceff4; /* Nord Snow Storm */
+	  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	  color: #2e3440;
+	}
 	
 	/* Push Docsify components down to prevent overlap with the 40px menubar */
 	    .sidebar {
@@ -64,7 +65,28 @@
 	      height: calc(100vh - 40px) !important;
 	      left: 300px !important;  /* sidebar width */
 	    }
-			
+
+		.sidebar-nav a {
+		    color: #4c566a;
+		    text-decoration: none;
+		    font-weight: bold;
+		    font-size: 0.95em;
+		    display: block;
+		    transition: color 0.2s ease;
+		}
+
+		.sidebar-nav ul ul a {
+		    font-weight: normal;
+		    font-size: 0.85em;
+		    color: #4c566a;
+		}
+
+		.sidebar-nav a:hover {
+		    color: #5e81ac;
+		    text-decoration: underline;
+		    text-decoration-color: #ebcb8b;
+		}
+					
 		/* Adds space above the entire top-level category block */
 		/* Increased specificity to override the general list item margin */
 		.sidebar .sidebar-nav > ul > li {
@@ -240,18 +262,19 @@
 	    z-index: 1000;
 	}
 
-    .menubar a {
-        color: #eceff4; /* Nord6 Snow Storm */
-        text-decoration: none;
-        line-height: 40px;
-        text-align: center;
-        font-weight: normal;
-        font-size: 13px; 
-        -webkit-font-smoothing: antialiased; 
-        -moz-osx-font-smoothing: grayscale;
-        transition: background-color 0.05s ease;
-    }
-    
+	.menubar a {
+	    color: #eceff4; /* Nord6 Snow Storm */
+	    text-decoration: none;
+	    line-height: 40px;
+	    text-align: center;
+	    font-weight: normal;
+	    font-size: 13px; 
+	    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	    -webkit-font-smoothing: antialiased; 
+	    -moz-osx-font-smoothing: grayscale;
+	    transition: background-color 0.05s ease;
+	}
+	    
     .menubar a:hover {
         background-color: #ebcb8b; /* Nord13 Yellow */
         color: #2e3440 !important; /* Nord0 Dark text for high contrast */
