@@ -704,6 +704,7 @@ def delay(config):
 def replacement(config):
     return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
 
+
 def residual(config):
     return {"updaterule": lambda y, x: resolve_graded(
         multiset([x, [-i for i in y]])), "label": "▲", "size": 18}
@@ -857,8 +858,7 @@ def auto(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout", "ident"],
-        "shape": "square",
-        "fill": 8
+        "shape": "square", "fill": 8
     })
     result.update(M)
 
@@ -977,8 +977,7 @@ def temporal(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout", "ident"],
-        "shape": "square",
-        "fill": 14
+        "shape": "square", "fill": 14
     })
     result.update(M)
 
@@ -1020,10 +1019,7 @@ def associator(config):
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "square",
-        "fill": 11,
-        "size": 18,
-        "label": "▶●"
+        "shape": "square", "fill": 11, "size": 18, "label": "▶●"
     }
     result.update(M)
     return result
@@ -1056,11 +1052,8 @@ def heteroencoder(config):
             n, p = params_B
             Y = sorted(
                 rng.choice(
-                    range(
-                        1,
-                        n + 1),
-                    size=p,
-                    replace=False).tolist())
+                    range(1, n + 1),
+                    size=p, replace=False).tolist())
 
         M["store"](X, Y)
         return (Y,)
@@ -1132,10 +1125,7 @@ def predictor(config):
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "square",
-        "fill": 11,
-        "size": 18,
-        "label": "▶▶"
+        "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
     }
     result.update(M)
     return result
@@ -1143,16 +1133,12 @@ def predictor(config):
     
 
 def noise(config):
-    """Random noise generator."""
     n, p = config.get("send_blocks", [[0, 0]])[0]
 
     def f(*blocks):
         return (
             sorted(
-                rng.choice(
-                    range(
-                        1,
-                        n + 1),
+                rng.choice(range(1, n + 1),
                     size=p,
                     replace=False).tolist()),
         )
@@ -1160,9 +1146,7 @@ def noise(config):
     return {
         "function": f,
         "checks": ["input", "oneout"],
-        "label": "~",
-        "fill": 13,
-        "size": 18
+        "label": "~", "fill": 13, "size": 18
     }
 
 
@@ -1271,8 +1255,7 @@ def circuit(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout"],
-        "shape": "square",
-        "size": 9
+        "shape": "square", "size": 9
     })
 
     return result
