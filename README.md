@@ -1,4 +1,4 @@
-# About *Creating Intelligence* 
+# Creating Intelligence
 
 Our goal is to build a Computational Theory of Mind based on a new theory of
 Hyperdimensional Computing, entirely departing from neural-network-based connectionist models
