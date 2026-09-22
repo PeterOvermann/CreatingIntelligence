@@ -67,7 +67,6 @@ cat << 'EOF' > /tmp/template.html
 <body>
   <div class="menubar">
     <a href="../index.html" class="menu-item-1">Creating Intelligence</a>
-    <div class="menu-spacer"></div>
     <div class="menu-group">
       <a href="index.html">Documentation</a>
       <a href="https://github.com/peterovermann/creatingintelligence">GitHub</a>
