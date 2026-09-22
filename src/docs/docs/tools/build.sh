@@ -26,6 +26,7 @@ sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' "$SRC/_sidebar.md" | \
 sed -E 's/\[([^&]+)&emsp;/\[<span class="sidebar-icon">\1<\/span>/g' > /tmp/sidebar_temp.md
 pandoc /tmp/sidebar_temp.md -o /tmp/sidebar.html
 
+
 # 4. Construct the Pandoc Template
 cat << 'EOF' > /tmp/template.html
 <!DOCTYPE html>
@@ -39,22 +40,40 @@ cat << 'EOF' > /tmp/template.html
   <!-- Load extracted custom styles -->
   <link rel="stylesheet" href="style.css">
   <!-- Static Layout Fixes -->
-  <style>
-    .content, .sidebar {
-      overflow-y: auto;
-      height: 100vh;
-    }
-    .sidebar-icon {
-      display: inline-block;
-      width: 1.5em;
-      text-align: center;
-      margin-right: 0.25em;
-    }
-    /* Inject Pandoc Syntax Highlighting CSS */
-    $highlighting-css$
-  </style>
+    <style>
+      .content {
+        overflow-y: auto;
+        height: calc(100vh - 40px);
+        top: 40px;
+        left: 250px;
+      }
+      .sidebar {
+        overflow-y: auto;
+        height: calc(100vh - 40px);
+        top: 40px;
+        padding-top: 15px;
+        width: 250px;
+      }
+      .sidebar-icon {
+        display: inline-block;
+        width: 1.5em;
+        text-align: center;
+        margin-right: 0.25em;
+      }
+      /* Inject Pandoc Syntax Highlighting CSS */
+      $highlighting-css$
+    </style>
 </head>
 <body>
+  <div class="menubar">
+    <a href="../index.html" class="menu-item-1">Creating Intelligence</a>
+    <div class="menu-spacer"></div>
+    <div class="menu-group">
+      <a href="index.html">Documentation</a>
+      <a href="https://github.com/peterovermann/creatingintelligence">GitHub</a>
+      <a href="mailto:mail&#64;creatingintelligence&#46;org">Contact</a>
+    </div>
+  </div>
   <main>
     <aside class="sidebar">
       <h1 class="app-name"><a href="index.html">Documentation</a></h1>
