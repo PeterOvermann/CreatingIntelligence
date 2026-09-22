@@ -223,16 +223,18 @@
 	      z-index: 1000;
 	    }
 
-	    .menubar a {
-	      color: #eceff4; /* Nord6 Snow Storm */
-	      text-decoration: none;
-	      line-height: 40px;
-	      text-align: center;
-	      font-weight: bold;
-	      font-size: 0.9em;
-	      transition: background-color 0.05s ease; /* Snappy hover transition */
-	    }
-
+		.menubar a {
+		  color: #eceff4; /* Nord6 Snow Storm */
+		  text-decoration: none;
+		  line-height: 40px;
+		  text-align: center;
+		  font-weight: normal; /* Changed from bold */
+		  font-size: 13px; /* Changed from 0.9em */
+		  -webkit-font-smoothing: antialiased; /* Forces crisp rendering */
+		  -moz-osx-font-smoothing: grayscale;
+		  transition: background-color 0.05s ease;
+		}
+		
 	    /* Hover state: Nord yellow background with dark text */
 	    .menubar a:hover {
 	      background-color: #ebcb8b; /* Nord13 Yellow */
