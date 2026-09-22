@@ -151,6 +151,14 @@ a:not([href]) {
     box-sizing: border-box; 
 }
 
+.sidebar-nav::before {
+    content: "Contents";
+    display: block;
+    font-size: 1.5em; 
+    font-weight: normal; 
+    color: #2e3440;
+    margin-bottom: 20px; 
+}
 .sidebar-nav ul {
     list-style: none;
     padding: 0;
