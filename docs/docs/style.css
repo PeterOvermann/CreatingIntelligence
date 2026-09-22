@@ -212,6 +212,11 @@
     }
 	
 	/* Fixed Menubar Layout */
+
+	.menubar, .menubar * {
+	    box-sizing: border-box;
+	}
+
 	    .menubar {
 	      position: fixed;
 	      top: 0;
