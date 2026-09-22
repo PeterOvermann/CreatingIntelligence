@@ -46,12 +46,12 @@
 	      top: 40px !important;
 	      height: calc(100vh - 40px) !important;
 	      padding-top: 15px !important; 
-	      width: 250px !important; 
+	      width: 300px !important; /* sidebar width */
 	    }
 	    .content {
 	      top: 40px !important;
 	      height: calc(100vh - 40px) !important;
-	      left: 250px !important; 
+	      left: 300px !important;  /* sidebar width */
 	    }
 			
 		/* Adds space above the entire top-level category block */
@@ -249,7 +249,7 @@
 		
 	    /* Alignment rules based on layout grid */
 	    .menu-item-1 {
-	      width: 250px; /* Matches .sidebar width */
+	      width: 300px; /* Matches sidebar width */
 	      flex-shrink: 0;
 	    }
 	    .menu-spacer {

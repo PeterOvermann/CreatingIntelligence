@@ -45,14 +45,14 @@ cat << 'EOF' > /tmp/template.html
         overflow-y: auto;
         height: calc(100vh - 40px);
         top: 40px;
-        left: 250px;
+        left: 300px;
       }
       .sidebar {
         overflow-y: auto;
         height: calc(100vh - 40px);
         top: 40px;
         padding-top: 15px;
-        width: 250px;
+        width: 300px; 
       }
       .sidebar-icon {
         display: inline-block;
