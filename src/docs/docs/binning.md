@@ -34,3 +34,7 @@ The following circuit classifies SDRs, returning bin numbers 1,2,...
 
 <img width="130" alt="image" src="img/input_output_bin.png"><br>
 
+
+## Source code
+
+*from circuits.py insert binning*

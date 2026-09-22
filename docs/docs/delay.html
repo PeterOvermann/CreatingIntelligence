@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -341,6 +341,97 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/delay_permutation.png"><br></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> delay(config):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    plugin_factory <span class="op">=</span> config.get(<span class="st">&quot;plugin&quot;</span>, replacement)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(plugin_factory, <span class="bu">str</span>):</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> sys</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        plugin_factory <span class="op">=</span> <span class="bu">getattr</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            sys.modules[<span class="va">__name__</span>],</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            plugin_factory,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            replacement)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    plugin <span class="op">=</span> plugin_factory(config)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> plugin_factory <span class="kw">is</span> replacement:</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        plugin.pop(<span class="st">&quot;label&quot;</span>, <span class="va">None</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    dims1 <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, [])]</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    dims2 <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> config.get(<span class="st">&quot;send_blocks&quot;</span>, [])]</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    pop <span class="op">=</span> <span class="bu">sum</span>(b[<span class="dv">1</span>] <span class="cf">for</span> b <span class="kw">in</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, []))</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    threshold_factor <span class="op">=</span> config.get(<span class="st">&quot;threshold&quot;</span>, <span class="fl">0.0</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    absthreshold <span class="op">=</span> <span class="bu">round</span>(threshold_factor <span class="op">*</span> pop)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    rate_limit_factor <span class="op">=</span> config.get(<span class="st">&quot;rate_limit&quot;</span>, <span class="bu">float</span>(<span class="st">&#39;inf&#39;</span>))</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    absratelimit <span class="op">=</span> <span class="bu">round</span>(</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        rate_limit_factor <span class="op">*</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        pop) <span class="cf">if</span> rate_limit_factor <span class="op">!=</span> <span class="bu">float</span>(<span class="st">&#39;inf&#39;</span>) <span class="cf">else</span> <span class="bu">float</span>(<span class="st">&#39;inf&#39;</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    decay <span class="op">=</span> config.get(<span class="st">&quot;decay&quot;</span>, <span class="fl">0.0</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    capacity_factor <span class="op">=</span> config.get(<span class="st">&quot;capacity&quot;</span>, <span class="fl">1.0</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    abscapacity <span class="op">=</span> <span class="bu">round</span>(capacity_factor <span class="op">*</span> pop)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    decimation <span class="op">=</span> config.get(<span class="st">&quot;decimate&quot;</span>, <span class="fl">1.0</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    latch <span class="op">=</span> config.get(<span class="st">&quot;latch&quot;</span>, <span class="va">False</span>)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    Xstate <span class="op">=</span> []</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(<span class="op">*</span>blocks):</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        <span class="kw">nonlocal</span> Xstate</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> multiset_block_join(<span class="bu">list</span>(blocks), dims1)</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Enforce minimum population</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(X) <span class="op">&lt;</span> absthreshold:</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>            X <span class="op">=</span> []</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(X) <span class="op">&gt;</span> absratelimit:</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>            X <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>                    X,</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>absratelimit,</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decay <span class="op">&gt;</span> <span class="fl">0.0</span>:</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>            keep_size <span class="op">=</span> math.floor((<span class="fl">1.0</span> <span class="op">-</span> decay) <span class="op">*</span> <span class="bu">len</span>(Xstate))</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>                    Xstate,</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>keep_size,</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xstate) <span class="op">&gt;</span> abscapacity:</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>                    Xstate,</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>abscapacity,</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Temporal integration via update rules</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> (latch <span class="kw">and</span> <span class="bu">len</span>(X) <span class="op">==</span> <span class="dv">0</span>):</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> plugin[<span class="st">&quot;updaterule&quot;</span>](X, Xstate)</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Proportional multiset subsampling applied to output</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>        Xdec <span class="op">=</span> Xstate</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decimation <span class="op">&lt;</span> <span class="fl">1.0</span>:</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>            sample_size <span class="op">=</span> math.floor(decimation <span class="op">*</span> <span class="bu">len</span>(Xdec))</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>            Xdec <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>                    Xdec,</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>sample_size,</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">tuple</span>(multiset_block_split(Xdec, dims2))</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="bu">dict</span>(plugin)</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>    result.update({</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;arginp&quot;</span>, <span class="st">&quot;argout&quot;</span>, <span class="st">&quot;totaldim&quot;</span>],</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fill&quot;</span>: <span class="dv">13</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
       </article>
     </section>
   </main>

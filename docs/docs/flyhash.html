@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -166,6 +166,69 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/input_flyhash.png"><br></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> flyhash(config):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    hyperparameters <span class="op">=</span> config.get(<span class="st">&quot;hyperparameters&quot;</span>, [<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    n, p <span class="op">=</span> hyperparameters[<span class="dv">0</span>], hyperparameters[<span class="dv">1</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> (n, p)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> key <span class="kw">not</span> <span class="kw">in</span> circuit_flyhash_matrices:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        circuit_flyhash_matrices[key] <span class="op">=</span> {}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        circuit_flyhash_resting[key] <span class="op">=</span> {}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> circuit_flyhash_matrices[key]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    restingpotential <span class="op">=</span> circuit_flyhash_resting[key]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    sparsity <span class="op">=</span> config.get(<span class="st">&quot;sparsity&quot;</span>, <span class="fl">0.1</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> config.get(<span class="st">&quot;component&quot;</span>) <span class="op">==</span> <span class="st">&quot;output&quot;</span>:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;flyhash cannot be used as a decoder.&quot;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(lst):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(lst, <span class="bu">list</span>):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            lst <span class="op">=</span> <span class="bu">list</span>(lst)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        d <span class="op">=</span> <span class="bu">len</span>(lst)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p <span class="op">&lt;=</span> <span class="dv">0</span> <span class="kw">or</span> d <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> []</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        arr <span class="op">=</span> np.array(lst)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        centeredlist <span class="op">=</span> arr <span class="op">-</span> np.mean(arr)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        tolerance <span class="op">=</span> <span class="fl">1e-10</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> d <span class="kw">not</span> <span class="kw">in</span> R:</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            c <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">round</span>(d <span class="op">*</span> sparsity))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            rows <span class="op">=</span> np.repeat(np.arange(n), c)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            cols <span class="op">=</span> np.concatenate(</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                [rng.choice(d, size<span class="op">=</span>c, replace<span class="op">=</span><span class="va">False</span>) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n)])</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            vals <span class="op">=</span> np.ones(n <span class="op">*</span> c)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            R[d] <span class="op">=</span> sp.csr_matrix((vals, (rows, cols)), shape<span class="op">=</span>(n, d))</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            restingpotential[d] <span class="op">=</span> rng.uniform(<span class="dv">0</span>, tolerance <span class="op">*</span> <span class="fl">0.01</span>, size<span class="op">=</span>n)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        vec <span class="op">=</span> R[d].dot(centeredlist) <span class="op">+</span> restingpotential[d]</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        min_val, max_val <span class="op">=</span> np.<span class="bu">min</span>(vec), np.<span class="bu">max</span>(vec)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        span <span class="op">=</span> max_val <span class="op">-</span> min_val</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        scale <span class="op">=</span> <span class="bu">max</span>(<span class="bu">abs</span>(min_val), <span class="bu">abs</span>(max_val))</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> scale <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> span <span class="op">&lt;=</span> tolerance <span class="op">*</span> scale:</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> []</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> <span class="bu">min</span>(p, <span class="bu">len</span>(vec))</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        top_k_indices <span class="op">=</span> np.argsort(vec)[<span class="op">-</span>k:]</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">sorted</span>((top_k_indices <span class="op">+</span> <span class="dv">1</span>).tolist())</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> clear():</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        R.clear()</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        restingpotential.clear()</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;FLY&quot;</span>,</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;clear&quot;</span>: clear</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
       </article>
     </section>
   </main>

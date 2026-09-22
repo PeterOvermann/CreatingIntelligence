@@ -62,3 +62,12 @@ the symmetric multiset difference of the state and the incoming signal.
 
 <img width="240" alt="image" src="img/temporal_difference.png"><br>
 
+
+
+
+
+## Source code
+
+*from circuits.py insert difference*
+
+

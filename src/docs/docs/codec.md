@@ -42,3 +42,8 @@ mirroring the input.
 
 <img width="130" alt="image" src="img/input_output_codec.png"><br>
 
+
+## Source code
+
+*from circuits.py insert codec*
+

@@ -41,3 +41,6 @@ retains only the matching elements, without completing the pattern.
 
 See also: https://creatingintelligence.org/#auto-associative-memory
 
+## Source code
+
+*from circuits.py insert coincidence*

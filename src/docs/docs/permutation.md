@@ -57,3 +57,12 @@ aggregates a state that preservers the order of prior inputs.
 
 <img width="240" alt="image" src="img/temporal_permutation.png"><br>
 
+
+
+
+## Source code
+
+*from circuits.py insert permutation*
+
+
+

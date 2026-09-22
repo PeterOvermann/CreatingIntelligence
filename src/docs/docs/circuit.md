@@ -95,4 +95,13 @@ The hyperparameters of local embedded circuits are automatically rescaled to
 match the parameters of its inbound and outbound slots.
 
 
+## Source code
+
+*from circuits.py insert circuit*
+
+### Plugins
+
+*from circuits.py insert shared*
+
+*from circuits.py insert file*
 

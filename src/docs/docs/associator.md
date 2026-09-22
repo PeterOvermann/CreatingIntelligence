@@ -54,3 +54,7 @@ A basic supervised learning setup using hetero-associative memory:
 
 <img width="240" alt="image" src="img/associator_circuit.png"><br>
 
+
+## Source code
+
+*from circuits.py insert associator*

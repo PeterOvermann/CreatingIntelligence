@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -197,6 +197,70 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;categories&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">}</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/input_output_cat.png"><br></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> category(config):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    hyperparameters <span class="op">=</span> config.get(<span class="st">&quot;hyperparameters&quot;</span>, [<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    n, p <span class="op">=</span> hyperparameters[<span class="dv">0</span>], hyperparameters[<span class="dv">1</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> config.get(<span class="st">&quot;categories&quot;</span>, n <span class="op">//</span> p <span class="cf">if</span> p <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> K <span class="op">*</span> p <span class="op">&gt;</span> n:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;Encoder requires dimension </span><span class="sc">{</span>K <span class="op">*</span> p<span class="sc">}</span><span class="ss"> or greater.&quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    partitionsize <span class="op">=</span> n <span class="op">//</span> K <span class="cf">if</span> K <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    lex_key <span class="op">=</span> (n, p, K)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> lex_key <span class="kw">not</span> <span class="kw">in</span> circuit_category_lexicon:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        circuit_category_lexicon[lex_key] <span class="op">=</span> {<span class="va">None</span>: []}</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    lex <span class="op">=</span> circuit_category_lexicon[lex_key]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> matching_threshold((n, p), (n, p))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(expr):</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> config.get(<span class="st">&quot;component&quot;</span>) <span class="op">==</span> <span class="st">&quot;input&quot;</span>:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="bu">isinstance</span>(expr, <span class="bu">int</span>) <span class="kw">or</span> expr <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> expr <span class="op">&gt;=</span> K:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> []</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> expr <span class="kw">not</span> <span class="kw">in</span> lex:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 1-based indexing for native arrays</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                start <span class="op">=</span> partitionsize <span class="op">*</span> expr <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                end <span class="op">=</span> start <span class="op">+</span> partitionsize</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                lex[expr] <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(start, end))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            pool <span class="op">=</span> lex[expr]</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            sample_size <span class="op">=</span> <span class="bu">min</span>(p, <span class="bu">len</span>(pool))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="bu">sorted</span>(</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                    pool,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>sample_size,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> expr:</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        overlaps <span class="op">=</span> {k: <span class="bu">len</span>(<span class="bu">set</span>(v).intersection(expr))</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> k, v <span class="kw">in</span> lex.items() <span class="cf">if</span> k <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>}</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> [k <span class="cf">for</span> k, overlap <span class="kw">in</span> overlaps.items() <span class="cf">if</span> overlap <span class="op">&gt;=</span> T]</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> result[<span class="dv">0</span>]</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="bu">sorted</span>(result)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> clear():</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        lex.clear()</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        lex[<span class="va">None</span>] <span class="op">=</span> []</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;CAT&quot;</span>,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;clear&quot;</span>: clear</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
       </article>
     </section>
   </main>

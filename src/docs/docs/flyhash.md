@@ -33,3 +33,10 @@ The following circuit encodes dense vectors as SDRs:
 
 <img width="130" alt="image" src="img/input_flyhash.png"><br>
 
+
+
+## Source code
+
+*from circuits.py insert flyhash*
+
+

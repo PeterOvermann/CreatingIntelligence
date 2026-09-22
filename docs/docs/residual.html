@@ -90,7 +90,7 @@
 <body>
   <main>
     <aside class="sidebar">
-      <h1 class="app-name"><a href="index.html">Creating Intelligence</a></h1>
+      <h1 class="app-name"><a href="index.html">Documentation</a></h1>
       <div class="sidebar-nav">
 <ul>
 <li><strong>CIRCUIT CONFIGURATON</strong>
@@ -180,6 +180,11 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p>See also: <a
         href="https://creatingintelligence.org/#auto-associative-memory"
         class="uri">https://creatingintelligence.org/#auto-associative-memory</a></p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> residual(config):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;updaterule&quot;</span>: <span class="kw">lambda</span> y, x: resolve_graded(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        multiset([x, [<span class="op">-</span>i <span class="cf">for</span> i <span class="kw">in</span> y]])), <span class="st">&quot;label&quot;</span>: <span class="st">&quot;▲&quot;</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">18</span>}</span></code></pre></div>
       </article>
     </section>
   </main>

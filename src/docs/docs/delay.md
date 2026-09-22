@@ -173,3 +173,13 @@ The accumulated state retains information about the order within the temporal se
 ```  
 
 <img width="240" alt="image" src="img/delay_permutation.png"><br>
+
+
+
+
+## Source code
+
+*from circuits.py insert delay*
+
+
+

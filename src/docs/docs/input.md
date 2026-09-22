@@ -130,3 +130,11 @@ This uses the [`flyhash`](flyhash.md) encoder:
 <img width="130" alt="image" src="img/input_flyhash.png"><br>
 
 
+
+
+## Source code
+
+*from circuits.py insert input*
+
+
+

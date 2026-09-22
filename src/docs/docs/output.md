@@ -99,3 +99,11 @@ same plugin instance to decode the SHRs, exactly reversing the mapping.
 <img width="130" alt="image" src="img/input_output_codec.png"><br>
 
 
+
+
+## Source code
+
+*from circuits.py insert output*
+
+
+
