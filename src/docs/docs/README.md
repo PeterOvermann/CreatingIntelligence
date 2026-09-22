@@ -13,7 +13,7 @@ It is used for modeling and simulating spiking neural networks that transmit spa
 ## Circuit dataflow description
 
 
-Circuits configurations are specified by a either a JSON string or the equivalent Python dictionary:
+Circuits configurations are specified by a either a Python dictionary or the equivalent JSON string:
 
 
 ```json
@@ -68,7 +68,7 @@ print(circ["function"]("Hello, World!"))
 ('Hello, World!',)
 ```
 
-The compiled circuit is represented by a dispatch dictionary:
+Inspect the dispatch dictionary:
 
 **Code**
 ```python
@@ -102,9 +102,10 @@ Properties of the output dictionary:
 
 ## Python Memory backend
 
-Like the `Circuit` frontend, a  `Memory` backend  is constructed via a factory function.
-While this mechanism is usually encapsulated within the circuit's memory components,
-a standalone Topological Associative Memory instance can be directly created as follows:
+Like the `Circuit` frontend, the  `Memory` backend  is constructed via a factory function.
+This mechanism is usually encapsulated within the circuit's memory components. 
+
+Here we create a standalone Topological Associative Memory instance:
 
 **Code**
 ```python
@@ -142,15 +143,16 @@ Properties of the output dictionary:
 | `clear` |   destructor function  |
 
 This framework includes multiple, functionally equivalent implementations of the 
-Topological Associative Memory algorithm  By default, a performance-optimized  version
-implement in Standard C is used. Switch to a native Python 
+Topological Associative Memory backend  By default, a performance-optimized  version
+written in Standard C is used. Switch to a native Python 
  backend  by setting this environment variable:
 
  ```python
  MEMORY_BACKEND="python"
  ```
 
-The same mechanism allows custom backend versions to be plugged into the framework.
+The same mechanism allows custom backend versions to be plugged into the framework
+and selected via the environment variable.
 
  
 
