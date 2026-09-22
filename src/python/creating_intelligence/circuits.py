@@ -581,8 +581,6 @@ def input(config):
         # Default Identity function
         plugin = {"function": lambda x: x}
 
-    # Strict dictionary union: plugin properties are overridden by component
-    # hard requirements
     return plugin | {"size": 10, "checks": ["input", "oneout"]}
 
 
@@ -607,18 +605,6 @@ def output(config):
     return plugin | {"size": 10, "checks": ["output", "oneinp"]}
 
 
-"""
-The delay node encapsulates multiple functionalities:
-
-- signal delay
-- block coding and re-coding
-- proportional decimation (default: none)
-- rate limiting  (default: none)
-- temporal integration via internal capacity (default: none),
-    using the plugin mechanism for update rules .
-
-Multisets and inhibitory signals are handled transparently .
-"""
 
 
 def delay(config):
@@ -849,7 +835,7 @@ def auto(config):
         else:
             Xdec = X
 
-        # Always learn if "learn" is strictly True
+        # Always learn if "learn" is True
         if learn_val is True:
             M["store"](A)
 
@@ -1811,7 +1797,7 @@ def Circuit(expr):
         # Render graph
         fig, ax = plt.subplots(figsize=(12, 8))
 
-        # Create a clean graph strictly for layout calculation
+        # Create a clean graph for layout calculation
         G_layout = nx.MultiDiGraph()
         G_layout.add_nodes_from(G.nodes())
         G_layout.add_edges_from(G.edges(keys=True))
