@@ -1,8 +1,9 @@
 
 
-- **GENERAL INFORMATION**
+- **GETTING STARTED**
   - [Installation](installation.md)
-
+  - [Quickstart](quickstart.md)
+  
 - **CIRCUIT CONFIGURATON**
   - [Circuits](circuits.md)
   - [Components](components.md)
