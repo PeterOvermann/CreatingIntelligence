@@ -1,3 +1,8 @@
+
+
+- **GENERAL INFORMATION**
+  - [Installation](installation.md)
+
 - **CIRCUIT CONFIGURATON**
   - [Circuits](circuits.md)
   - [Components](components.md)
