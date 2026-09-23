@@ -163,55 +163,13 @@ class="sidebar-icon">π</span>permutation</a></li>
     </aside>
     <section class="content">
       <article class="markdown-section">
-        <p>UPDATE RULE PLUGINS</p>
-        <h1 id="coincidence">coincidence</h1>
-        <p><img width="240" alt="image" src="img/coincidence.png"><br></p>
-        <p>Update rule plugin for auto-associative memory, retaining the
-        matching elements between the query and the retrieved
-        pattern.</p>
-        <p>See also: <a
-        href="https://creatingintelligence.org/#update-rules"
-        class="uri">https://creatingintelligence.org/#update-rules</a></p>
-        <h2 id="details">Details</h2>
-        <ul>
-        <li>Plugin for the <a href="auto.html"><code>auto</code></a>
-        component.</li>
-        <li>Not applicable for temporal integration (<a
-        href="delay.html"><code>delay</code></a> and <a
-        href="temporal.html"><code>temporal</code></a>).</li>
-        <li>Transparently handles multisets and inhibitory signals.</li>
-        <li>Corresponds to the set intersection after
-        deduplication.</li>
-        </ul>
-        <h2
-        id="auto-associative-memory-with-coincidence-update">Auto-associative
-        memory with coincidence update</h2>
-        <p>As a plugin for the <a href="auto.html"><code>auto</code></a>
-        component, the <code>coincidence</code> update rule retains only
-        the matching elements, without completing the pattern.</p>
+        <p>GENERAL INFORMATION</p>
+        <h1 id="installation">Installation</h1>
+        <p>Source distribution:</p>
         <div class="sourceCode" id="cb1"><pre
-        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;auto&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;coincidence&quot;</span><span class="fu">,</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
-        <p><img width="240" alt="image" src="img/auto_coincidence.png"><br></p>
-        <p>See also: <a
-        href="https://creatingintelligence.org/#auto-associative-memory"
-        class="uri">https://creatingintelligence.org/#auto-associative-memory</a></p>
-        <h2 id="source-code">Source code</h2>
-        <div class="sourceCode" id="cb2"><pre
-        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> coincidence(config):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> multiset_intersection(y, x):</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        counts_y <span class="op">=</span> Counter(y)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        counts_x <span class="op">=</span> Counter(x)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> []</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k, v <span class="kw">in</span> counts_y.items():</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            res.extend([k] <span class="op">*</span> <span class="bu">min</span>(v, counts_x.get(k, <span class="dv">0</span>)))</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">sorted</span>(res)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;updaterule&quot;</span>: multiset_intersection, <span class="st">&quot;label&quot;</span>: <span class="st">&quot;∩&quot;</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">14</span>}</span></code></pre></div>
+        class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install creating<span class="op">-</span>intelligence</span></code></pre></div>
+        <p>You can build the package from the most recent sources on <a
+        href="https://github.com/PeterOvermann/CreatingIntelligence">GitHub</a>.</p>
       </article>
     </section>
   </main>

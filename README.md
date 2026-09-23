@@ -24,8 +24,14 @@ The methods introduced here lend themselves to binary in-memory and neuromorphic
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
 * Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
 
+### Python Installation
 
-### Build Instructions
+```python
+pip install creating-intelligence
+```
+
+
+### Development Setup
 
 On Unix, Linux, BSD, and macOS, run
 
@@ -40,7 +46,7 @@ src/python/setup.bat
 ```
 
 
-This will create a Python virtual environment and build the *creating_intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python backend.
+This will create a Python virtual environment and build the *creating-intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python backend.
 
 Run the following command to build the standalone memory CLI and test program from the zero-dependency Standard C source:
 
@@ -50,13 +56,11 @@ make -C src/c/
 
 ### Getting Started
 
-
 Run this:
 
 ```bash
 python3 experiments/hello-world/hello-world.py 
 ```
-
 
 
 ### Testing
@@ -79,6 +83,9 @@ or as a stand-alone C binary with
 src/c/build/memorytest
 ```
 
+### Mathematica
+
+A Mathematica version, functionally equivalent to the Python package, is available [here](src/mathematica).
 
 
 
