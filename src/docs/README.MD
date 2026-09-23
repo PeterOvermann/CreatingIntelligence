@@ -1,7 +1,6 @@
 
-### Website sources
+### Web build
 
-Build the documentation tree with:
 
 ```bash
 ./build.sh docs
