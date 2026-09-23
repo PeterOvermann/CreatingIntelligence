@@ -1,17 +1,30 @@
 #!/bin/bash
 
+# Require the source directory as an argument
+if [ -z "$1" ]; then
+    echo "Usage: $0 <source_directory>"
+    exit 1
+fi
+
 # Resolve the absolute path to the directory containing this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-# Navigate up one level from tools/ to reach src/docs/docs
-SRC="$(cd "$SCRIPT_DIR/.." &> /dev/null && pwd)"
+# Set the source directory from the script argument
+SRC="$(cd "$SCRIPT_DIR/$1" &> /dev/null && pwd)"
+if [ -z "$SRC" ]; then
+    echo "Error: Source directory '$1' not found."
+    exit 1
+fi
 
-# Navigate up four levels from tools/ to reach the project root, then set DEST
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." &> /dev/null && pwd)"
-DEST="$PROJECT_ROOT/docs/docs"
+# Navigate up two levels from the new script location to reach the project root
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd)"
+
+# Extract the base name of the argument and use it as the final destination directory
+TARGET_NAME=$(basename "$1")
+DEST="$PROJECT_ROOT/docs/$TARGET_NAME"
 
 # Define Python sources directory
-PY_SRC_DIR="$SCRIPT_DIR/../../../python/creating_intelligence"
+PY_SRC_DIR="$SCRIPT_DIR/../python/creating_intelligence"
 
 # 1. Create target directories and migrate assets
 mkdir -p "$DEST"
@@ -25,7 +38,6 @@ awk '/<style>/{flag=1; next} /<\/style>/{flag=0} flag' "$SRC/index.html" > "$DES
 sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' "$SRC/_sidebar.md" | \
 sed -E 's/\[([^&]+)&emsp;/\[<span class="sidebar-icon">\1<\/span>/g' > /tmp/sidebar_temp.md
 pandoc /tmp/sidebar_temp.md -o /tmp/sidebar.html
-
 
 # 4. Construct the Pandoc Template
 cat << 'EOF' > /tmp/template.html
@@ -165,4 +177,4 @@ for file in "$SRC"/*.md; do
         -o "$DEST/$outname"
 done
 
-echo "Static site generated in $DEST"
+echo "Site generated in $DEST"
