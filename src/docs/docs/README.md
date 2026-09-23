@@ -59,7 +59,7 @@ config = {
 
 circ = Circuit(config)
 
-print(circ["function"]("Hello, World!"))
+print(circ['function']('Hello, World!'))
 ```
 
 **Output**
@@ -128,6 +128,22 @@ pprint(mem)
  'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
  'store': <function Memory.<locals>.store at 0x109a65d20>}
 ```
+
+Store an auto-association in memory, then retrieve it from a partial, noisy query pattern:
+
+
+**Code**
+```python
+mem['store']([1,2,3,4,5,6,7,8,9,10])
+mem['retrieve']([1,2,3,4,5,6,7,50,51,52,53,54,55,56])
+```
+
+**Output**
+```python
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+
 
 Properties of the output dictionary:
 

@@ -215,7 +215,7 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>circ <span class="op">=</span> Circuit(config)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(circ[<span class="st">&quot;function&quot;</span>](<span class="st">&quot;Hello, World!&quot;</span>))</span></code></pre></div>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(circ[<span class="st">&#39;function&#39;</span>](<span class="st">&#39;Hello, World!&#39;</span>))</span></code></pre></div>
         <p><strong>Output</strong></p>
         <pre class="text"><code>(&#39;Hello, World!&#39;,)</code></pre>
         <p>Inspect the dispatch dictionary:</p>
@@ -300,6 +300,15 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;memorycount&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.memorycount at <span class="bn">0x109b95380</span><span class="op">&gt;</span>,</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;retrieve&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.retrieve at <span class="bn">0x109a65c70</span><span class="op">&gt;</span>,</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;store&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.store at <span class="bn">0x109a65d20</span><span class="op">&gt;</span>}</span></code></pre></div>
+        <p>Store an auto-association in memory, then retrieve it from a
+        partial, noisy query pattern:</p>
+        <p><strong>Code</strong></p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mem[<span class="st">&#39;store&#39;</span>]([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>])</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mem[<span class="st">&#39;retrieve&#39;</span>]([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">50</span>,<span class="dv">51</span>,<span class="dv">52</span>,<span class="dv">53</span>,<span class="dv">54</span>,<span class="dv">55</span>,<span class="dv">56</span>])</span></code></pre></div>
+        <p><strong>Output</strong></p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>]</span></code></pre></div>
         <p>Properties of the output dictionary:</p>
         <table>
         <thead>
@@ -350,8 +359,8 @@ class="sidebar-icon">π</span>permutation</a></li>
         default, a performance-optimized version written in Standard C
         is used. Switch to a native Python backend by setting this
         environment variable:</p>
-        <div class="sourceCode" id="cb8"><pre
-        class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>MEMORY_BACKEND<span class="op">=</span><span class="st">&quot;python&quot;</span></span></code></pre></div>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>MEMORY_BACKEND<span class="op">=</span><span class="st">&quot;python&quot;</span></span></code></pre></div>
         <p>The same mechanism allows custom backend versions to be
         plugged into the framework and selected via the environment
         variable.</p>
