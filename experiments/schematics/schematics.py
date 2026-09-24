@@ -12,6 +12,22 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
+
+"""
+Graphviz ('dot') is required for advanced circuit schematics.
+
+If it is not found, visualization features will use a fallback layout.
+
+Install Graphviz manually if needed:
+  - Windows: winget install Graphviz.Graphviz
+  - macOS: brew install graphviz
+  - Ubuntu/Debian: sudo apt-get install graphviz
+  - Fedora: sudo dnf install graphviz
+  - Arch: sudo pacman -S graphviz
+
+"""
+
+
 import os
 import sys
 import json
