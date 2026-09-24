@@ -3,23 +3,26 @@ import shutil
 import sys
 import platform
 from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
 
-if not os.environ.get("_CI_GRAPHVIZ_WARN_SHOWN"):
-    if not shutil.which("dot"):
-        sys.stderr.write(
-            "\n"
-            "=" * 60 + "\n"
-            "WARNING: Graphviz ('dot') is required for advanced circuit schematics but was not found.\n"
-            "The package will install normally, but visualization features will use a fallback layout.\n"
-            "Please install Graphviz manually if needed:\n"
-            "  - Windows: winget install Graphviz.Graphviz\n"
-            "  - macOS: brew install graphviz\n"
-            "  - Ubuntu/Debian: sudo apt-get install graphviz\n"
-            "  - Fedora: sudo dnf install graphviz\n"
-            "  - Arch: sudo pacman -S graphviz\n"
-            "=" * 60 + "\n\n"
-        )
-    os.environ["_CI_GRAPHVIZ_WARN_SHOWN"] = "1"
+GRAPHVIZ_WARNING = """
+======================================================================
+
+WARNING: Graphviz ('dot') is required for advanced circuit schematics 
+but was not found.
+
+The package will install normally, but visualization features will 
+use a fallback layout.
+
+Please install Graphviz manually if needed:
+  - Windows: winget install Graphviz.Graphviz
+  - macOS: brew install graphviz
+  - Ubuntu/Debian: sudo apt-get install graphviz
+  - Fedora: sudo dnf install graphviz
+  - Arch: sudo pacman -S graphviz
+
+======================================================================
+"""
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 repo_c_dir = os.path.abspath(os.path.join(current_dir, "..", "c"))
@@ -45,9 +48,46 @@ libmemory_ext = Extension(
     extra_compile_args=compile_args
 )
 
+BUILD_TOOLS_ERROR = """
+======================================================================
+
+ERROR: Failed to build the memory backend.
+
+This package requires a C/C++ compiler.
+
+Please install the standard build tools for your operating system,
+then retry the installation:
+
+  - Ubuntu/Debian: sudo apt-get install build-essential python3-dev
+  - Windows:       Install Visual Studio Build Tools (C++ workload)
+  - macOS:         xcode-select --install
+  - Fedora:        sudo dnf groupinstall "Development Tools" && sudo dnf install python3-devel
+  - Arch Linux:    sudo pacman -S base-devel python
+  
+======================================================================
+"""
+
+class StrictBuildExt(build_ext):
+    def run(self):
+        if not shutil.which("dot"):
+            sys.stderr.write(GRAPHVIZ_WARNING)
+        try:
+            super().run()
+        except Exception as e:
+            sys.stderr.write(f"\n{e}\n{BUILD_TOOLS_ERROR}")
+            sys.exit(1)
+
+    def build_extension(self, ext):
+        try:
+            super().build_extension(ext)
+        except Exception as e:
+            sys.stderr.write(f"\n{e}\n{BUILD_TOOLS_ERROR}")
+            sys.exit(1)
+
 try:
     setup(
-        ext_modules=[libmemory_ext]
+        ext_modules=[libmemory_ext],
+        cmdclass={"build_ext": StrictBuildExt},
     )
 finally:
     if staged_files and os.path.exists(staged_c_dir):
