@@ -1,0 +1,36 @@
+name: Test Cross-Platform Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install build dependencies
+      run: python -m pip install --upgrade pip setuptools wheel
+
+    - name: Build and install local package
+      # This triggers the C compiler via your setup.py
+      run: python -m pip install .
+
+    - name: Verify import
+      # Ensures the compiled extension is actually loadable
+      run: python -c "import your_package_name"
