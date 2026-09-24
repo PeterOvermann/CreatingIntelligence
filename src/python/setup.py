@@ -5,25 +5,6 @@ import platform
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 
-GRAPHVIZ_WARNING = """
-======================================================================
-
-WARNING: Graphviz ('dot') is required for advanced circuit schematics 
-but was not found.
-
-The package will install normally, but visualization features will 
-use a fallback layout.
-
-Please install Graphviz manually if needed:
-  - Windows: winget install Graphviz.Graphviz
-  - macOS: brew install graphviz
-  - Ubuntu/Debian: sudo apt-get install graphviz
-  - Fedora: sudo dnf install graphviz
-  - Arch: sudo pacman -S graphviz
-
-======================================================================
-"""
-
 current_dir = os.path.dirname(os.path.abspath(__file__))
 repo_c_dir = os.path.abspath(os.path.join(current_dir, "..", "c"))
 staged_c_dir = os.path.join(current_dir, "c_build")
@@ -69,8 +50,6 @@ then retry the installation:
 
 class StrictBuildExt(build_ext):
     def run(self):
-        if not shutil.which("dot"):
-            sys.stderr.write(GRAPHVIZ_WARNING)
         try:
             super().run()
         except Exception as e:
