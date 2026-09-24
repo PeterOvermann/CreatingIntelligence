@@ -63,11 +63,7 @@ class StrictBuildExt(build_ext):
             sys.stderr.write(f"\n{e}\n{BUILD_TOOLS_ERROR}")
             sys.exit(1)
 
-try:
-    setup(
-        ext_modules=[libmemory_ext],
-        cmdclass={"build_ext": StrictBuildExt},
-    )
-finally:
-    if staged_files and os.path.exists(staged_c_dir):
-        shutil.rmtree(staged_c_dir)
+setup(
+    ext_modules=[libmemory_ext],
+    cmdclass={"build_ext": StrictBuildExt},
+)
