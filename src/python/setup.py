@@ -18,8 +18,16 @@ if os.path.exists(repo_c_source):
         src_file = os.path.join(repo_c_dir, filename)
         if os.path.exists(src_file):
             shutil.copy2(src_file, os.path.join(staged_c_dir, filename))
+            
+    # Append a dummy initialization symbol to satisfy the MSVC linker on Windows
+    with open(os.path.join(staged_c_dir, "memory.c"), "a") as f:
+        f.write("\n\n/* Dummy Python init function to satisfy MSVC linker */\n")
+        f.write("#if defined(_WIN32)\n__declspec(dllexport)\n#endif\n")
+        f.write("void* PyInit_libmemory(void) { return 0; }\n")
+        
     staged_files = True
-
+    
+    
 compile_args = ["/O2"] if platform.system() == "Windows" else ["-O3"]
 
 libmemory_ext = Extension(
