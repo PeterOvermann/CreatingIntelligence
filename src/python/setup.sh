@@ -2,15 +2,20 @@
 set -e
 
 if ! command -v dot &> /dev/null; then
-    echo "============================================================"
-    echo "WARNING: Graphviz ('dot') is required for advanced circuit schematics but was not found."
-    echo "The package will install normally, but visualization features will use a fallback layout."
+    echo "======================================================================"
+    echo " "
+    echo "WARNING: Graphviz ('dot') is required for advanced circuit schematics" 
+    echo "but was not found."
+    echo "The package will install normally, but visualization features will" 
+    echo "use a fallback layout."
+    echo " "
     echo "Please install Graphviz manually if needed:"
     echo "  - macOS: brew install graphviz"
     echo "  - Ubuntu/Debian: sudo apt-get install graphviz"
     echo "  - Fedora: sudo dnf install graphviz"
     echo "  - Arch: sudo pacman -S graphviz"
-    echo "============================================================"
+    echo " "
+    echo "======================================================================"
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
