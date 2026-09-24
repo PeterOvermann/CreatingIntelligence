@@ -34,7 +34,16 @@ libmemory_ext = Extension(
     name="creating_intelligence.libmemory",
     sources=[os.path.join("c_build", "memory.c")],
     depends=[os.path.join("c_build", "memory.h")],
-    extra_compile_args=compile_args
+    extra_compile_args=compile_args,
+    export_symbols=[
+        "Memory_new",
+        "Memory_set_threshold",
+        "Memory_get_threshold",
+        "Memory_count",
+        "Memory_free",
+        "Memory_write",
+        "Memory_read"
+    ]
 )
 
 BUILD_TOOLS_ERROR = """
