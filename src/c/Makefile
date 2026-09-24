@@ -21,10 +21,10 @@ directories:
 	@mkdir -p $(BIN_DIR)
 
 $(CLI_TARGET): commandline.c memory.c
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 $(TEST_TARGET): testing.c memory.c
-	$(CC) $(CFLAGS) -o $@ $^
-
+	$(CC) $(CFLAGS) -o $@ $^ -lm
+	
 clean:
 	rm -rf $(BIN_DIR)

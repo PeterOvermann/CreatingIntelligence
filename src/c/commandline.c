@@ -23,6 +23,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <inttypes.h>
 
 #include "memory.h"
 
@@ -117,8 +118,8 @@ int main(int argc, char *argv[])
 	while (	fgets(inputline, sizeof(inputline), stdin) != NULL)
 		{
 		if ( strcmp(inputline, "memorycount\n") == 0)
-			{ printf("%lld\n", Memory_count(H)); fflush(stdout);}
-
+			    { printf("%" PRId64 "\n", Memory_count(H)); fflush(stdout);}
+		
 		else if ( strcmp(inputline, "threshold\n") == 0)
 			{ printf("%d\n", Memory_get_threshold(H)); fflush(stdout);}
 
