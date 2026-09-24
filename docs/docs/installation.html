@@ -166,12 +166,29 @@ class="sidebar-icon">π</span>permutation</a></li>
       <article class="markdown-section">
         <p>GETTING STARTED</p>
         <h1 id="installation">Installation</h1>
-        <p>Source distribution:</p>
+        <p>See also: <a href="quickstart.html">Quickstart</a></p>
+        <h2 id="pypi-distribution">PyPI distribution</h2>
         <div class="sourceCode" id="cb1"><pre
         class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install creating<span class="op">-</span>intelligence</span></code></pre></div>
-        <p>You can build the package from the most recent sources on <a
-        href="https://github.com/PeterOvermann/CreatingIntelligence">GitHub</a>.</p>
-        <p>See also: <a href="quickstart.html">Quickstart</a></p>
+        <h2 id="local-build">Local build</h2>
+        <p>Building the package from the most recent sources:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/peterovermann/creatingintelligence</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">creatingintelligence/src/python/setup.sh</span></span></code></pre></div>
+        <h2 id="optional-components">Optional components</h2>
+        <p>Graphviz (<em>dot</em>) is required for advanced circuit
+        schematics. If it is not present at runtime, visualization
+        features will use a fallback layout.</p>
+        <p>Install Graphviz manually if needed:</p>
+        <ul>
+        <li><strong>Windows:</strong> winget install
+        Graphviz.Graphviz</li>
+        <li><strong>macOS:</strong> brew install graphviz</li>
+        <li><strong>Ubuntu/Debian:</strong> sudo apt-get install
+        graphviz</li>
+        <li><strong>Fedora:</strong> sudo dnf install graphviz</li>
+        <li><strong>Arch:</strong> sudo pacman -S graphviz</li>
+        </ul>
       </article>
     </section>
   </main>

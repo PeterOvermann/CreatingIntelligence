@@ -3,17 +3,39 @@ GETTING STARTED
 
 # Installation
 
+See also: [Quickstart](quickstart.md)
 
-Source distribution:
+
+
+## PyPI distribution
+
 
 ```python
 pip install creating-intelligence
 ```
 
 
-You can build the package from the most recent sources on [GitHub](https://github.com/PeterOvermann/CreatingIntelligence). 
+## Local build
+
+Building the package from the most recent sources:
+
+```bash
+git clone https://github.com/peterovermann/creatingintelligence
+creatingintelligence/src/python/setup.sh
+```
 
 
-See also: [Quickstart](quickstart.md)
+## Optional components
+
+Graphviz (*dot*) is required for advanced circuit schematics. If it is not present at runtime, visualization features will use a fallback layout.
+
+Install Graphviz manually if needed:
+
+  - **Windows:** winget install Graphviz.Graphviz
+  - **macOS:** brew install graphviz
+  - **Ubuntu/Debian:** sudo apt-get install graphviz
+  - **Fedora:** sudo dnf install graphviz
+  - **Arch:** sudo pacman -S graphviz
+
 
 
