@@ -37,4 +37,4 @@ jobs:
       run: python -m pip install src/python/dist/*.tar.gz
 
     - name: Verify import
-      run: python -c "import creating_intelligence.libmemory"
+      run: python -c "from creating_intelligence import memory_c_ffi"
