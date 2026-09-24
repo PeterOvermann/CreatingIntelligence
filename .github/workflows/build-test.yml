@@ -26,16 +26,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install build dependencies
-      # Matches the pip install step in build_package.sh
       run: python -m pip install -q --upgrade pip build setuptools wheel
 
     - name: Build the sdist
       working-directory: ./src/python
-      # Matches the core command from build_package.sh
       run: python -m build --sdist
 
     - name: Install from the generated sdist
-      # Uses wildcard to catch whatever .tar.gz was just generated
+      shell: bash
       run: python -m pip install src/python/dist/*.tar.gz
 
     - name: Verify import
