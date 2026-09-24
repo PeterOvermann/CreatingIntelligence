@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
 		printf("\n| %10s | %10s | %10s | %10s | %10s | %10s |\n|",
 			"items","writes/s","memory","reads/s","distance","overlap");
 				
-	for (int i = 0; i < 6; i++) printf("------------|"); printf("\n");
+	for (int i = 0; i < 6; i++) printf("------------|"); 
+	printf("\n");
 		
 	Memory *M = Memory_new(Adim, Apop, Bdim, Bpop);
 	
