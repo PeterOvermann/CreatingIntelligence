@@ -30,6 +30,16 @@ The methods introduced here lend themselves to binary in-memory and neuromorphic
 pip install creating-intelligence
 ```
 
+### Getting Started
+
+
+```bash
+python3 experiments/hello-world/hello-world.py 
+```
+
+See also: https://creatingintelligence.org/docs/quickstart.html
+
+
 
 ### Development Setup
 
@@ -53,15 +63,6 @@ Build the standalone memory CLI and test programs from the zero-dependency Stand
 ```bash
 make -C src/c/
 ```
-
-### Getting Started
-
-
-```bash
-python3 experiments/hello-world/hello-world.py 
-```
-
-See also: https://creatingintelligence.org/docs/quickstart.html
 
 ### Testing
 
