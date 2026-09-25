@@ -3,7 +3,7 @@ GETTING STARTED
 
 # Quickstart
 
-[Install](installation.md) the software framework before running the following examples.
+See also: [Installation](installation.md)
 
 
 ## Circuits frontend
