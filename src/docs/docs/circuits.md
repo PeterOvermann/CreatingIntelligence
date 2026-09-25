@@ -15,7 +15,8 @@ Circuits are specified by a JSON string or the equivalent Python dictionary:
 
 
 ```json
-{ "options": {"name": "Reservoir"},
+{  "$schema": "https://creatingintelligence.org/schemas/circuit-v1.json",
+   "options": {"name": "Reservoir"},
   "hyperparameters": {"default": [2000, 8], "61": [2000, 8]},
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [11]},

@@ -7,7 +7,8 @@ See also: [Quickstart](quickstart.md)
 
 
 
-## PyPI distribution
+## PyPI source distribution
+
 
 
 ```python
@@ -15,9 +16,9 @@ pip install creating-intelligence
 ```
 
 
-## Local build
+## Build from source
 
-Building the package from the most recent sources:
+
 
 ```bash
 git clone https://github.com/peterovermann/creatingintelligence

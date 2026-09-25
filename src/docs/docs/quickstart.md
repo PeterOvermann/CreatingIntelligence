@@ -123,7 +123,7 @@ pprint(mem)
  'store': <function Memory.<locals>.store at 0x109a65d20>}
 ```
 
-Store an auto-association in memory, then retrieve it from a partial, noisy query pattern:
+Store an autoassociation in memory, then retrieve it from a partial, noisy query pattern:
 
 
 **Code**
