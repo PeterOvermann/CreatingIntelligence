@@ -7,17 +7,18 @@ See also: [Quickstart](quickstart.md)
 
 
 
-## PyPI built distribution
-
+## Install the built distribution
 
 
 ```python
 pip install creating-intelligence
 ```
 
+Release information: https://pypi.org/project/creating-intelligence/
+
+
 
 ## Build from source
-
 
 
 ```bash
