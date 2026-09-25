@@ -7,7 +7,7 @@ See also: [Quickstart](quickstart.md)
 
 
 
-## PyPI source distribution
+## PyPI built distribution
 
 
 
@@ -24,6 +24,8 @@ pip install creating-intelligence
 git clone https://github.com/peterovermann/creatingintelligence
 creatingintelligence/src/python/setup.sh
 ```
+
+Building the package from source requires a C development environment.
 
 
 ## Optional components
