@@ -33,6 +33,9 @@ pip install creating-intelligence
 
 ### Development Setup
 
+Building the package from source requires a C development environment to compile
+the topological associative memory kernel as a Python extension.
+
 On Unix, Linux, BSD, and macOS, run
 
 ```bash
@@ -45,10 +48,7 @@ On Windows, run
 src/python/setup.bat
 ```
 
-
-This will create a Python virtual environment and build the *creating-intelligence* package. The package includes a high-performance memory backend written in Standard C, and an alternative native Python backend.
-
-Run the following command to build the standalone memory CLI and test program from the zero-dependency Standard C source:
+Build the standalone memory CLI and test programs from the zero-dependency Standard C source:
 
 ```bash
 make -C src/c/
@@ -56,16 +56,16 @@ make -C src/c/
 
 ### Getting Started
 
-Run this:
 
 ```bash
 python3 experiments/hello-world/hello-world.py 
 ```
 
+See also: https://creatingintelligence.org/docs/quickstart.html
 
 ### Testing
 
-To test the circuit package (and indirectly the memory backend), run
+Test the circuit package (and indirectly the memory backend):
 
 ```bash
 python3 experiments/circuit-tests/run.py
