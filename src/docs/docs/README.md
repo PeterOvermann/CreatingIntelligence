@@ -11,9 +11,8 @@ It is used for modeling and simulating spiking neural networks that transmit spa
 
 ## Getting started
 
-[Installation instructions](install.md)
-
-[Quickstart guide](quickstart.md)
+- [Installation](installation.md)
+- [Quickstart](quickstart.md)
 
 
 ## Software architecture
