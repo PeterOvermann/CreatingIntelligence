@@ -19,6 +19,6 @@ The methods introduced here lend themselves to binary in-memory and neuromorphic
 - **Documentation**: https://creatingintelligence.org/docs
 
 ## LLM Context
-For AI agents and LLMs analyzing this project, the complete theoretical foundation, component documentation, and core Python source code have been concatenated into a single file for easy context ingestion. 
+For AI agents and LLMs analyzing this project, the complete software documentation including the Python source code have been concatenated into a single file for easy context ingestion. 
 
-- [Full Project Context](docs/llms-full.txt): Contains the complete theoretical paper ("Creating Intelligence: A Computational Foundation for AGI"), installation guides, circuit configuration manuals, component APIs (inputs, outputs, temporal, auto, heteroencoder, etc.), update rule plugins, encoders/decoders, and the full Python source code (`circuits.py` and `memory_python.py`).
+- [Full Project Context](docs/llms-full.txt): Contains the installation and quickstart guides, circuit configuration manuals, component APIs (inputs, outputs, temporal, auto, heteroencoder, etc.), update rule plugins, encoders/decoders, and the full Python source code (`circuits.py` and `memory_python.py`).

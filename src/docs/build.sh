@@ -130,7 +130,7 @@ py_dir = sys.argv[2]
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     content = f.read()
 
-def replacer(match):
+def replacer_func(match):
     py_file = match.group(1)
     target = match.group(2)
     py_path = os.path.join(py_dir, py_file)
@@ -148,8 +148,24 @@ def replacer(match):
     except Exception as e:
         return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
 
+def replacer_file(match):
+    py_file = match.group(1)
+    py_path = os.path.join(py_dir, py_file)
+    
+    try:
+        with open(py_path, "r", encoding="utf-8") as pf:
+            code = pf.read()
+        return f"```python\n{code.strip()}\n```"
+    except Exception as e:
+        return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
+
 # Match exactly: *from [filename.py] insert [target]*
-print(re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer, content))
+content = re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer_func, content)
+
+# Match exactly: *insert [filename.py]*
+content = re.sub(r'\*insert\s+([a-zA-Z0-9_.-]+)\*', replacer_file, content)
+
+print(content)
 EOF
 
 # 5. Process Content Files
