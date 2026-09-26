@@ -21,14 +21,6 @@ PY_SRC_DIR="$SCRIPT_DIR/../python/creating_intelligence"
 mkdir -p "$DEST_DIR"
 > "$OUT_FILE"
 
-# 1. Append the manuscript (ci.txt) at the very top
-if [ -f "$SCRIPT_DIR/llms-ci.txt" ]; then
-    echo -e "# Source: Creating Intelligence (Manuscript)\n" >> "$OUT_FILE"
-    cat "$SCRIPT_DIR/llms-ci.txt" >> "$OUT_FILE"
-    echo -e "\n\n" >> "$OUT_FILE"
-else
-    echo "Warning: llms-ci.txt not found next to the build script in $SCRIPT_DIR"
-fi
 
 # Generate Python Snippet Preprocessor
 cat << 'EOF' > /tmp/inject_snippets.py
@@ -38,7 +30,7 @@ py_dir = sys.argv[2]
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     content = f.read()
 
-def replacer(match):
+def replacer_func(match):
     py_file = match.group(1)
     target = match.group(2)
     py_path = os.path.join(py_dir, py_file)
@@ -56,8 +48,24 @@ def replacer(match):
     except Exception as e:
         return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
 
-# Replace the insertion markers with the actual code snippets
-print(re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer, content))
+def replacer_file(match):
+    py_file = match.group(1)
+    py_path = os.path.join(py_dir, py_file)
+    
+    try:
+        with open(py_path, "r", encoding="utf-8") as pf:
+            code = pf.read()
+        return f"```python\n{code.strip()}\n```"
+    except Exception as e:
+        return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
+
+# Match exactly: *from [filename.py] insert [target]*
+content = re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer_func, content)
+
+# Match exactly: *insert [filename.py]*
+content = re.sub(r'\*insert\s+([a-zA-Z0-9_.-]+)\*', replacer_file, content)
+
+print(content)
 EOF
 
 # 2. Process and append README.md
@@ -90,17 +98,5 @@ else
     echo "Warning: _sidebar.md not found in $SRC."
 fi
 
-# 4. Append full Python source files
-for py_file in "circuits.py" "memory_python.py"; do
-    full_py_path="$PY_SRC_DIR/$py_file"
-    if [ -f "$full_py_path" ]; then
-        echo -e "# Source: $py_file (Full Source)\n" >> "$OUT_FILE"
-        echo -e "\`\`\`python" >> "$OUT_FILE"
-        cat "$full_py_path" >> "$OUT_FILE"
-        echo -e "\n\`\`\`\n\n" >> "$OUT_FILE"
-    else
-        echo "Warning: $py_file not found in$PY_SRC_DIR."
-    fi
-done
 
 echo "Successfully generated combined documentation at $OUT_FILE"
