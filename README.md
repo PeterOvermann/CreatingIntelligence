@@ -21,6 +21,7 @@ The methods introduced here lend themselves to binary in-memory and neuromorphic
 * Documentation: https://creatingintelligence.org/docs
 * LLM Context (documentation for AI chat uploads): https://creatingintelligence.org/llms-full.txt
 * E-Book PDF: https://creatingintelligence.org/CreatingIntelligence.pdf
+* Release information: https://pypi.org/project/creating-intelligence/
 * Preprint: https://arxiv.org/abs/2606.31819
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
 * Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
@@ -47,19 +48,19 @@ See also: https://creatingintelligence.org/docs/quickstart.html
 Building the package from source requires a C development environment to compile
 the topological associative memory kernel as a Python extension.
 
-On Unix, Linux, BSD, and macOS, run
+On Unix, Linux, BSD, and macOS:
 
 ```bash
 src/python/setup.sh
 ```
 
-On Windows, run
+On Windows:
 
 ```bash
 src/python/setup.bat
 ```
 
-Build the standalone memory CLI and test programs from the zero-dependency Standard C source:
+Build the standalone memory (command line interface and test program) from the zero-dependency C source:
 
 ```bash
 make -C src/c/
@@ -73,7 +74,7 @@ Test the circuit package (and indirectly the memory backend):
 python3 experiments/circuit-tests/run.py
 ```
 
-Test the topological associative memory backend (storage capacity, retrieval accuracy, and I/O performance) with
+Test the memory backend (storage capacity, retrieval accuracy, and I/O performance) with
 
 ```bash
 python3 experiments/memory-tests/run.py
