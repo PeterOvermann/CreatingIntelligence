@@ -9,11 +9,14 @@ This is a software framework for cognitive computing, based on hyperdimensional 
 
 It is used for modeling and simulating spiking neural networks that transmit sparse discrete codes between instances of Topological Associative Memory. In this framework, mathematical sets are the fundamental datatype, representing either Sparse Distributed Representations (SDRs) or Sparse Holographic Representations (SHRs).
 
+## LLM-ready text
+
+Download [llms-full.txt](https://creatingintelligence.org/llms-full.txt) to manually upload the manuscript, this documentation, and the source code into an AI chat context window.
+
 ## Getting started
 
 - [Installation](installation.md)
 - [Quickstart](quickstart.md)
-
 
 ## Software architecture
 
