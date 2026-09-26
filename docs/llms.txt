@@ -1,0 +1,24 @@
+# Creating Intelligence
+
+**A Computational Foundation for AGI**
+
+This project aims to build a computational theory of mind based on a new theory of hyperdimensional computing (HDC), entirely departing from neural-network-based connectionist models which rely on matrix calculations and continuous weights.
+
+In this model, the mind performs computations on sparse binary data. The fundamental data structures are Sparse Distributed Representations (SDRs) for perceptual information and Sparse Holographic Representations (SHRs) for symbols.
+
+The centerpiece of this project is Topological Associative Memory — a newly discovered associative memory for sparse data, serving as the computational kernel that models the brain's core algorithm. A software frontend for modeling and simulating neural circuits and pathways complements the memory backend.
+
+The methods introduced here lend themselves to binary in-memory and neuromorphic computating, opening a new route toward synthetic intelligence that does not rely on GPU acceleration.
+
+
+
+## Links
+- **GitHub**: https://github.com/peterovermann/creatingintelligence
+- **PyPI**: https://pypi.org/project/creating-intelligence/
+- **Website**: https://creatingintelligence.org/
+- **Documentation**: https://creatingintelligence.org/docs
+
+## LLM Context
+For AI agents and LLMs analyzing this project, the complete theoretical foundation, component documentation, and core Python source code have been concatenated into a single file for easy context ingestion. 
+
+- [Full Project Context](docs/llms-full.txt): Contains the complete theoretical paper ("Creating Intelligence: A Computational Foundation for AGI"), installation guides, circuit configuration manuals, component APIs (inputs, outputs, temporal, auto, heteroencoder, etc.), update rule plugins, encoders/decoders, and the full Python source code (`circuits.py` and `memory_python.py`).
