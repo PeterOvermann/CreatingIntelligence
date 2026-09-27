@@ -22,6 +22,11 @@
         top: 40px;
         padding-top: 15px;
         width: 300px; 
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
       .sidebar-icon {
         display: inline-block;
@@ -96,6 +101,7 @@
       code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
     </style>
 </head>
+
 <body>
   <div class="menubar">
     <a href="../index.html" class="menu-item-1">Creating Intelligence</a>
@@ -292,6 +298,20 @@ class="sidebar-icon">π</span>permutation</a></li>
         div.textContent = el.textContent;
         pre.replaceWith(div);
     });
+  </script>
+
+  <!-- Sidebar Scroll Persistence -->
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        const savedScroll = sessionStorage.getItem('sidebarScrollPosition');
+        if (savedScroll !== null) {
+            sidebar.scrollTop = parseInt(savedScroll, 10);
+        }
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('sidebarScrollPosition', sidebar.scrollTop);
+        });
+    }
   </script>
 </body>
 </html>
