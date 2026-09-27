@@ -3,7 +3,7 @@ SOURCE CODE
 
 # Circuits
 
-## Python source
+## Python source code
 
 
 *insert circuits.py*

@@ -11,10 +11,27 @@ Components are the fundamental building blocks of circuits, representing statefu
 
 See also: https://creatingintelligence.org/#circuits
 
+
+## List of all circuit components
+
+| Component | Functionality |
+|:---------------------|:----------------------------------------------------------------------|
+| [`input`](input.md) & [`output`](output.md) | Gateway components that connect to the circuit's function interface, reducing multisets to sets by default while optionally loading encoder or decoder plugins.  |
+| [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
+| [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
+| [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
+| [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
+| [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
+| [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |
+| [`heteroencoder`](heteroencoder.md) | Hetero-associative memory for unsupervised learning that maps similar sets to stable SHRs on the fly, generating and learning new unique tokens for unknown inputs.  |
+
+
+
 ## Details and properties
 
-- Data flow components, such as [`delay`](#delay.md), control the temporal integration of data over multiple timesteps.
-- Memory components, such as [`auto`](#auto.md) or [`temporal`](#temporal.md), encapsulate a topological associative memory instance.
+- Data flow components, such as [`delay`](delay.md), control the temporal integration of data over multiple timesteps.
+- Memory components, such as [`auto`](auto.md) or [`temporal`](temporal.md), encapsulate a topological associative memory instance.
+- Excitatory signals are processed as positive integers, whereas inhibitory signals are processed as negative integers.
 - Circuit components generally maintain a state across multiple execution cycles, whereas pathways are strictly stateless.
 - The functionality of components can be extended via a standardized plugin mechanism.
 - This framework supports the seamless integration of user-defined, custom components and plugins.
@@ -56,7 +73,7 @@ in multiple `send` parameters.
 <img width="130" alt="image" src="img/input_output.png"><br>
 
 
-Lists of slot numbers denote disjoint blocks. Here the [`delay`](#delay) component
+Lists of slot numbers denote disjoint blocks. Here the [`delay`](delay.md) component
 receives and sends two disjoint set partitions:
 
 ```json
@@ -118,34 +135,27 @@ into its input:
 <img width="240" alt="image" src="img/delay_feedback.png"><br>
 
 
-## Pathway tagging
+
+## Encoders, decoders, and update rules
+
+Plugins extend the functionality of base circuit components while inheriting their properties and hyperparameters. 
+Update rule plugins govern state updates in [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components to control temporal integration and associative behavior.
+The [`input`](input.md) and [`output`](output.md) components can be extended with encoder and decoder plugins, respectively.
 
 
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "output", 
-		"receive": [{"slot": 1, "tags": ["permute"]}]}
-  ]}
-```
-
-<img width="130" alt="image" src="img/input_output_permute.png"><br>
+| Plugin Type | Implementations |
+|:---------------------|:----------------------------------------------------------------------|
+| Encoders & decoders | [`codec`](codec.md) maps symbolic tokens to random SHRs using a globally shared lexicon based on auto-associative pattern matching. [`category`](category.md) encodes integers 0 to K-1 as non-overlapping SHRs. [`binning`](binning.md) clusters similar SDRs into categorized bins based on matching thresholds.  |
+| Vector encoders | [`vectorencoder`](vectorencoder.md) projects dense vectors into hyperdimensional space using sparse binary matrices and kWTA. [`flyhash`](flyhash.md) applies the classic flyhash algorithm to achieve similar SDR mapping for real-valued vectors. |
+| Base update rules | [`replacement`](replacement.md) entirely substitutes the previous state with new data, bypassing capacity limits. [`augmentation`](augmentation.md) computes the multiset aggregation of signals, which converges incrementally to a stable state equivalent to a deduplicated set union. |
+| Subtractive rules | [`residual`](residual.md) removes the retrieved pattern from the memory’s state to leave only novel elements for anomaly detection. [`difference`](difference.md) applies a symmetric multiset difference to enable generative retrieval behavior. [`complement`](complement.md) removes the current incoming signal from the state entirely. |
+| Filtering & sequence rules | [`coincidence`](coincidence.md) retains only matching elements between query and retrieved patterns. [`permutation`](permutation.md) replaces the temporal state with its permutation before augmenting it with current signals, thereby preserving sequence order in temporal tracking. |
 
 
-## Plugins
 
-The functionality of circuit components may be extended via a standardized
-plugin mechanism. Plugins use the exact same programming interface as components.
-This framework includes a library of generic plugins and seamlessly integrates
-user-defined, custom plugin modules.
-
-Note that plugins inherit the properties and options specified for the 
-enclosing circuit component.
-
-In the following example, the [`input`](#input.md) component loads an encoder plugin,
-the [`delay`](#delay.md) component is extended via an update rule plugin, and the 
-[`output`](#output.md) component uses a decoder plugin.
+In the following example, the [`input`](input.md) component loads an encoder plugin,
+the [`delay`](delay.md) component is extended via an update rule plugin, and the 
+[`output`](output.md) component uses a decoder plugin.
 
 
 

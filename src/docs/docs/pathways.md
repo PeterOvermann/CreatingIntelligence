@@ -30,7 +30,7 @@ See also: https://creatingintelligence.org/#circuits
 |:------------|:----------------------------------------|
 | `slot`	  |   integer slot number, linking to an upstream component |  
 | `tags`      |   list of signal flow modifiers | 
-| `gating`    |   temporal multiplexing, specified by a list of 0s and 1s |
+| `gating`    |  implements  temporal multiplexing, specified by a recurring array of 0s and 1s, to close or open paths at specific intervals aligned with the global clock  |
 
 
 ## Pathway tagging
@@ -103,12 +103,12 @@ start simultaneously with the global clock.
 
 | Tag   | Display | Description |
 |:------------|:-----:|:----------------------------------------|
-| `multiset` | blue arrow    |  enable multiset signals |
-| `inhibit` | red arrow    |  enable inhibitory multiset signals |
-| `permute` | π   |  applies a permutation unique to the path|
-| `rate_limit` | R   |  limits the population to the path's default population |
-| `threshold` | T   |  clears signals below default population |
-| `noise` | ~   |  generates random noise if signal is non-empty, else clears the path |
+| `multiset` | blue arrow    |  enables multiset signals |
+| `inhibit` | red arrow    | enables multiset signals, flips positive elements to negative (inhibitory) elements |
+| `permute` | π   |  applies a permutation unique to the specified path |
+| `rate_limit` | R   |  caps the population at the path's default population |
+| `threshold` | T   |  clears signals that fall below the path's default population |
+| `noise` | ~   |  generates random noise if signal is non-empty, otherwise clearing the path |
 
 
 This pathway conveys multisets:
@@ -144,14 +144,14 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 
 | Tag   | Display | Description |
 |:------------|:-----:|:----------------------------------------|
-| `veto` |  X    |  clears all paths if any X path is non-empty | 
-| `mandatory` |  *   |  clears all paths if any * path is empty | 
-| `priority` |  !   |  clears all non-! paths if any ! path is non-empty |
-| `dependency` |  &    |  clears & paths if any non-& path is empty (AND) |
-| `fallback` | &#124;   |  clears &#124; paths if any non-&#124; path is non-empty (NOR) |
-| `barrier` | =  |  clears = paths if any = path is empty |
-| `kwta_excitatory` | K  |  top-K excitatory (positive) signals |
-| `kwta_absolute` | k   |  top-k signals (total saliency) |
+| `veto` |  X    |  clears all paths if a veto path is non-empty | 
+| `mandatory` |  *   |  clears all paths if a mandatory path is empty | 
+| `priority` |  !   |  clears all non-priority paths if a priority path is non-empty |
+| `dependency` |  &    |  clears dependency paths if any non-dependency path is empty (AND) |
+| `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
+| `barrier` | =  |  clears barrier paths if any barrier path is empty |
+| `kwta_excitatory` | K  |  filters for top-K excitatory  signals, with K taken to be the path's default population |
+| `kwta_absolute` | k   |  filteres for top-k signals based on total saliency, with k taken to be the path's default population |
 
 
 In this circuit, to paths are merged via kWTA:

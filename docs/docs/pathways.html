@@ -225,8 +225,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         <tr>
         <td style="text-align: left;"><code>gating</code></td>
-        <td style="text-align: left;">temporal multiplexing, specified
-        by a list of 0s and 1s</td>
+        <td style="text-align: left;">implements temporal multiplexing,
+        specified by a recurring array of 0s and 1s, to close or open
+        paths at specific intervals aligned with the global clock</td>
         </tr>
         </tbody>
         </table>
@@ -289,37 +290,37 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tr>
         <td style="text-align: left;"><code>multiset</code></td>
         <td style="text-align: center;">blue arrow</td>
-        <td style="text-align: left;">enable multiset signals</td>
+        <td style="text-align: left;">enables multiset signals</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>inhibit</code></td>
         <td style="text-align: center;">red arrow</td>
-        <td style="text-align: left;">enable inhibitory multiset
-        signals</td>
+        <td style="text-align: left;">enables multiset signals, flips
+        positive elements to negative (inhibitory) elements</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>permute</code></td>
         <td style="text-align: center;">π</td>
         <td style="text-align: left;">applies a permutation unique to
-        the path</td>
+        the specified path</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>rate_limit</code></td>
         <td style="text-align: center;">R</td>
-        <td style="text-align: left;">limits the population to the
-        path’s default population</td>
+        <td style="text-align: left;">caps the population at the path’s
+        default population</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>threshold</code></td>
         <td style="text-align: center;">T</td>
-        <td style="text-align: left;">clears signals below default
-        population</td>
+        <td style="text-align: left;">clears signals that fall below the
+        path’s default population</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>noise</code></td>
         <td style="text-align: center;">~</td>
         <td style="text-align: left;">generates random noise if signal
-        is non-empty, else clears the path</td>
+        is non-empty, otherwise clearing the path</td>
         </tr>
         </tbody>
         </table>
@@ -361,50 +362,51 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tr>
         <td style="text-align: left;"><code>veto</code></td>
         <td style="text-align: center;">X</td>
-        <td style="text-align: left;">clears all paths if any X path is
+        <td style="text-align: left;">clears all paths if a veto path is
         non-empty</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>mandatory</code></td>
         <td style="text-align: center;">*</td>
-        <td style="text-align: left;">clears all paths if any * path is
-        empty</td>
+        <td style="text-align: left;">clears all paths if a mandatory
+        path is empty</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>priority</code></td>
         <td style="text-align: center;">!</td>
-        <td style="text-align: left;">clears all non-! paths if any !
-        path is non-empty</td>
+        <td style="text-align: left;">clears all non-priority paths if a
+        priority path is non-empty</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>dependency</code></td>
         <td style="text-align: center;">&amp;</td>
-        <td style="text-align: left;">clears &amp; paths if any
-        non-&amp; path is empty (AND)</td>
+        <td style="text-align: left;">clears dependency paths if any
+        non-dependency path is empty (AND)</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>fallback</code></td>
         <td style="text-align: center;">|</td>
-        <td style="text-align: left;">clears | paths if any non-| path
-        is non-empty (NOR)</td>
+        <td style="text-align: left;">clears fallback paths if any
+        non-fallback path is non-empty (NOR)</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>barrier</code></td>
         <td style="text-align: center;">=</td>
-        <td style="text-align: left;">clears = paths if any = path is
-        empty</td>
+        <td style="text-align: left;">clears barrier paths if any
+        barrier path is empty</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>kwta_excitatory</code></td>
         <td style="text-align: center;">K</td>
-        <td style="text-align: left;">top-K excitatory (positive)
-        signals</td>
+        <td style="text-align: left;">filters for top-K excitatory
+        signals, with K taken to be the path’s default population</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>kwta_absolute</code></td>
         <td style="text-align: center;">k</td>
-        <td style="text-align: left;">top-k signals (total
-        saliency)</td>
+        <td style="text-align: left;">filteres for top-k signals based
+        on total saliency, with k taken to be the path’s default
+        population</td>
         </tr>
         </tbody>
         </table>
