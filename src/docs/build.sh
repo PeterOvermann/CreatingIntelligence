@@ -34,8 +34,8 @@ PY_SRC_DIR="$SCRIPT_DIR/../python/creating_intelligence"
 mkdir -p "$DEST"
 cp -r "$SRC/img" "$DEST/" 2>/dev/null
 
-# 2. Extract CSS
-awk '/<style>/{flag=1; next} /<\/style>/{flag=0} flag' "$SRC/index.html" > "$DEST/style.css"
+# 2. (obsolete)
+
 
 # 3. Generate Sidebar HTML
 # Rewrites markdown links to HTML, and wraps leading symbols before &emsp; in a fixed-width span
@@ -54,7 +54,7 @@ cat << 'EOF' > /tmp/template.html
   <!-- Load base Docsify theme -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
   <!-- Load extracted custom styles -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style-docs.css">
   <!-- Static Layout Fixes -->
     <style>
       .content {
