@@ -125,7 +125,7 @@ a:not([href]) {
 .menu-group {
     display: flex;
     justify-content: flex-end;
-    width: 800px; /* Exact width of the content box (600 text + 100 padding + 100 padding) */
+    width: 740px; /* Exact width of the content box (600 text + 70 padding + 70 padding) */
     margin-left: 40px; /* Matches the left margin of .markdown-section */
     flex-shrink: 0;
 }
