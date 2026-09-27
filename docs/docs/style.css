@@ -55,29 +55,32 @@
 	      left: 300px !important;  /* sidebar width */
 	    }
 
-		.sidebar-nav a {
+		.sidebar .sidebar-nav ul li a {
 		    color: #4c566a;
 		    text-decoration: none;
-		    font-weight: bold;
+		    font-weight: bold !important;
 		    font-size: 0.95em;
 		    display: block;
-		    transition: color 0.2s ease;
+		    transition: color 0.2s ease, text-decoration-color 0.2s ease !important;
+		    overflow: visible !important;
+		    white-space: normal !important;
 		}
 
-		.sidebar-nav ul ul a {
-		    font-weight: normal;
+		.sidebar .sidebar-nav ul ul li a {
+		    font-weight: normal !important;
 		    font-size: 0.85em;
 		    color: #4c566a;
 		}
 
-		.sidebar-nav a:hover {
-		    color: #4c566a; 
-		    text-decoration: underline;
-		    text-decoration-color: #ebcb8b;
-		    text-decoration-thickness: 2px; 
-		    text-underline-offset: 3px; 
-		}
-							
+		.sidebar .sidebar-nav ul li a:hover {
+		    color: #5e81ac !important; 
+		    text-decoration: underline !important;
+		    text-decoration-color: #ebcb8b !important;
+		    text-decoration-thickness: 2px !important; 
+		    text-underline-offset: 3px !important; 
+		    border-bottom: none !important;
+		}		
+		
 		/* Adds space above the entire top-level category block */
 		/* Increased specificity to override the general list item margin */
 		.sidebar .sidebar-nav > ul > li {
