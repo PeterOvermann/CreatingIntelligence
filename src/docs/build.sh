@@ -69,6 +69,11 @@ cat << 'EOF' > /tmp/template.html
         top: 40px;
         padding-top: 15px;
         width: 300px; 
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none;
       }
       .sidebar-icon {
         display: inline-block;
@@ -80,6 +85,7 @@ cat << 'EOF' > /tmp/template.html
       $highlighting-css$
     </style>
 </head>
+
 <body>
   <div class="menubar">
     <a href="../index.html" class="menu-item-1">Creating Intelligence</a>
@@ -122,9 +128,25 @@ cat << 'EOF' >> /tmp/template.html
         pre.replaceWith(div);
     });
   </script>
+
+  <!-- Sidebar Scroll Persistence -->
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        const savedScroll = sessionStorage.getItem('sidebarScrollPosition');
+        if (savedScroll !== null) {
+            sidebar.scrollTop = parseInt(savedScroll, 10);
+        }
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('sidebarScrollPosition', sidebar.scrollTop);
+        });
+    }
+  </script>
 </body>
 </html>
 EOF
+
+
 
 # 4.5 Generate Python Snippet Preprocessor (Shared)
 cat << 'EOF' > /tmp/inject_snippets.py
