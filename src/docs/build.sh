@@ -23,6 +23,10 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd)"
 TARGET_NAME=$(basename "$1")
 DEST="$PROJECT_ROOT/docs/$TARGET_NAME"
 
+# Define LLM output targets based on the dynamic target name
+LLM_DEST_DIR="$PROJECT_ROOT/docs"
+LLM_OUT_FILE="$LLM_DEST_DIR/llms-${TARGET_NAME}.txt"
+
 # Define Python sources directory
 PY_SRC_DIR="$SCRIPT_DIR/../python/creating_intelligence"
 
@@ -122,7 +126,7 @@ cat << 'EOF' >> /tmp/template.html
 </html>
 EOF
 
-# 4.5 Generate Python Snippet Preprocessor
+# 4.5 Generate Python Snippet Preprocessor (Shared)
 cat << 'EOF' > /tmp/inject_snippets.py
 import sys, re, os, ast
 
@@ -168,7 +172,7 @@ content = re.sub(r'\*insert\s+([a-zA-Z0-9_.-]+)\*', replacer_file, content)
 print(content)
 EOF
 
-# 5. Process Content Files
+# 5. Process Content Files for HTML Documentation
 for file in "$SRC"/*.md; do
     filename=$(basename "$file")
     
@@ -194,3 +198,40 @@ for file in "$SRC"/*.md; do
 done
 
 echo "Site generated in $DEST"
+
+# 6. Process LLM Text Generation
+mkdir -p "$LLM_DEST_DIR"
+> "$LLM_OUT_FILE"
+
+# Process and append README.md
+if [ -f "$SRC/README.md" ]; then
+    echo -e "# Source: README.md\n" >> "$LLM_OUT_FILE"
+    python3 /tmp/inject_snippets.py "$SRC/README.md" "$PY_SRC_DIR" >> "$LLM_OUT_FILE"
+    echo -e "\n\n" >> "$LLM_OUT_FILE"
+else
+    echo "Warning: README.md not found in $SRC"
+fi
+
+# Extract markdown filenames and process them sequentially
+if [ -f "$SRC/_sidebar.md" ]; then
+    FILES=$(sed -n 's/.*(\([^)]*\.md\)).*/\1/p' "$SRC/_sidebar.md")
+    
+    for file in $FILES; do
+        if [ "$file" = "README.md" ]; then
+            continue
+        fi
+        
+        if [ -f "$SRC/$file" ]; then
+            echo -e "# Source: $file\n" >> "$LLM_OUT_FILE"
+            python3 /tmp/inject_snippets.py "$SRC/$file" "$PY_SRC_DIR" >> "$LLM_OUT_FILE"
+            echo -e "\n\n" >> "$LLM_OUT_FILE"
+        else
+            echo "Warning: $file listed in _sidebar.md but not found in $SRC."
+        fi
+    done
+else
+    echo "Warning: _sidebar.md not found in $SRC."
+fi
+
+echo "LLM context generated in $LLM_OUT_FILE"
+
