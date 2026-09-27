@@ -181,14 +181,6 @@ a:not([href]) {
     margin-top: 15px;
 }
 
-.sidebar-nav a {
-    color: #4c566a;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.95em;
-    display: block;
-    transition: color 0.2s ease;
-}
 
 .sidebar-nav ul ul {
     padding-left: 15px;
@@ -205,12 +197,22 @@ a:not([href]) {
     color: #4c566a;
 }
 
+.sidebar-nav a {
+    color: #4c566a;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.95em;
+    display: block;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
 .sidebar-nav a:hover {
     color: #5e81ac;
     text-decoration: underline;
     text-decoration-color: #ebcb8b;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
 }
-
 .content {
     margin-left: 300px;
     padding-top: 40px; 
