@@ -151,7 +151,17 @@ a:not([href]) {
     padding: 30px 20px;
     z-index: 999;
     box-sizing: border-box; 
+    /* Firefox */
+    scrollbar-width: none;
+    /* IE and Edge */
+    -ms-overflow-style: none;
 }
+
+/* Chrome, Safari, and Opera */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
 
 .sidebar-nav::before {
     content: "Contents";
