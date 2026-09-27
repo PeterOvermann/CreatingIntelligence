@@ -19,7 +19,7 @@ The methods introduced here lend themselves to binary in-memory and neuromorphic
 
 * Website: https://creatingintelligence.org
 * Documentation: https://creatingintelligence.org/docs
-* LLM Context (documentation for AI chat uploads): https://creatingintelligence.org/llms-full.txt
+* Documentation for LLMs and AI agents: https://creatingintelligence.org/llms-docs.txt
 * E-Book PDF: https://creatingintelligence.org/CreatingIntelligence.pdf
 * Release information: https://pypi.org/project/creating-intelligence/
 * Preprint: https://arxiv.org/abs/2606.31819

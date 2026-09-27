@@ -11,7 +11,7 @@ It is used for modeling and simulating spiking neural networks that transmit spa
 
 ## LLM-ready documentation
 
-Download [llms-full.txt](https://creatingintelligence.org/llms-full.txt) to manually upload this documentation into an AI chat context window.
+Download [llms-docs.txt](https://creatingintelligence.org/llms-full.txt) to manually upload this documentation into an AI chat context window.
 
 ## Getting started
 
