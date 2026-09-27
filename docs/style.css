@@ -148,7 +148,7 @@ a:not([href]) {
     overflow-y: auto;
     background-color: #ffffff;
     border-right: 1px solid #d8dee9; /* Nord4 */
-    padding: 30px 20px;
+    padding: 15px 20px 30px 20px;
     z-index: 999;
     box-sizing: border-box; 
     /* Firefox */
@@ -162,15 +162,38 @@ a:not([href]) {
     display: none;
 }
 
-
-.sidebar-nav::before {
-    content: "Contents";
-    display: block;
-    font-size: 1.5em; 
-    font-weight: normal; 
-    color: #2e3440;
-    margin-bottom: 20px; 
+.sidebar h1.app-name {
+    text-align: left;
+    margin: 0 0 20px 0;
+    padding: 0;
+    font-size: 1.5em;
 }
+
+.sidebar h1.app-name::before {
+    display: none;
+}
+
+.sidebar h1.app-name a {
+    color: #2e3440;
+    text-decoration: none;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.sidebar h1.app-name a:hover {
+    color: #5e81ac;
+    text-decoration: underline;
+    text-decoration-color: #ebcb8b;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.sidebar-icon {
+  display: inline-block;
+  width: 1.5em;
+  text-align: center;
+  margin-right: 0.25em;
+}
+
 .sidebar-nav ul {
     list-style: none;
     padding: 0;
@@ -181,14 +204,13 @@ a:not([href]) {
     margin-top: 15px;
 }
 
-
 .sidebar-nav ul ul {
     padding-left: 15px;
     margin-top: 5px;
 }
 
 .sidebar-nav ul ul li {
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 .sidebar-nav ul ul a {
@@ -206,6 +228,14 @@ a:not([href]) {
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
+.sidebar-nav a.active {
+  color: #5e81ac;
+  text-decoration: underline;
+  text-decoration-color: #ebcb8b;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 .sidebar-nav a:hover {
     color: #5e81ac;
     text-decoration: underline;
@@ -213,16 +243,17 @@ a:not([href]) {
     text-decoration-thickness: 2px;
     text-underline-offset: 3px;
 }
+
 .content {
     margin-left: 300px;
-    padding-top: 40px; 
+    padding-top: 40px;
     min-height: 100vh;
 }
 
 .markdown-section {
     max-width: 600px; 
     margin: 40px auto 40px 40px; 
-    padding: 100px; 
+    padding: 30px 70px;
     background-color: #ffffff;
     border-radius: 8px;
     box-sizing: content-box; 
@@ -242,12 +273,12 @@ a:not([href]) {
    ========================================================================== */
 
 header#title-block-header {
-	background: linear-gradient(135deg, #eceff4 0%, #d8dee9 100%);
-	padding: 40px 20px;
-	margin: -100px -100px 40px -100px; 
-	border-radius: 8px 8px 0 0;
-	border-bottom: 2px solid #ebcb8b; /* Nord13 yellow */
-	text-align: center;
+    background: linear-gradient(135deg, #eceff4 0%, #d8dee9 100%);
+    padding: 40px 20px;
+    margin: -30px -70px 40px -70px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid #ebcb8b;
+    text-align: center;
 }
 
 header#title-block-header h1.title {
@@ -315,8 +346,37 @@ h1:not(.title)::before {
 	box-shadow: none;
 }
 
+/* Hide the paper cut ONLY on the very first H1 (the docs page title) */
+.markdown-section h1:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.markdown-section h1:first-of-type::before {
+    display: none;
+}
+
 h2 {
 	margin-top: 0em;
+}
+
+/* Apply the paper cut to H2s for docs pages */
+.markdown-section h2 {
+    position: relative;
+    margin-top: 2.0em; 
+    padding-top: 3.0em; 
+    font-size: 1.5em; 
+}
+
+.markdown-section h2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -70px;
+    width: calc(100% + 140px);
+    height: 25px;
+    background-color: #eceff4; 
+    box-shadow: none;
 }
 
 h3 {
@@ -513,6 +573,11 @@ pre code {
 		left: -25px;
 		width: calc(100% + 50px);
 	}
+    /* Fix mobile papercut bleed */
+    .markdown-section h2::before {
+        left: -20px;
+        width: calc(100% + 40px);
+    }
 }
 
 /* =============================================================================

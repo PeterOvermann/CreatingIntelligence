@@ -51,36 +51,12 @@ cat << 'EOF' > /tmp/template.html
   <meta charset="UTF-8">
   <title>$if(title)$$title$$else$Creating Intelligence &mdash; Documentation$endif$</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Load base Docsify theme -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+
   <!-- Load extracted custom styles -->
-  <link rel="stylesheet" href="../style-docs.css">
+  <link rel="stylesheet" href="../style.css">
   <!-- Static Layout Fixes -->
     <style>
-      .content {
-        overflow-y: auto;
-        height: calc(100vh - 40px);
-        top: 40px;
-        left: 300px;
-      }
-      .sidebar {
-        overflow-y: auto;
-        height: calc(100vh - 40px);
-        top: 40px;
-        padding-top: 15px;
-        width: 300px; 
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-      .sidebar::-webkit-scrollbar {
-        display: none;
-      }
-      .sidebar-icon {
-        display: inline-block;
-        width: 1.5em;
-        text-align: center;
-        margin-right: 0.25em;
-      }
+
       /* Inject Pandoc Syntax Highlighting CSS */
       $highlighting-css$
     </style>
@@ -142,6 +118,17 @@ cat << 'EOF' >> /tmp/template.html
         });
     }
   </script>
+  
+  <script>
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+  </script>
+  
+   
 </body>
 </html>
 EOF
