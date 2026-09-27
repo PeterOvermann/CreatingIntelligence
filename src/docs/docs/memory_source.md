@@ -4,10 +4,10 @@ SOURCE CODE
 # Memory
 
 
-The following is a literal implementation of the Topological Associative Memory algorithm.
+The following is a reference implementation of the Topological Associative Memory algorithm. This native Python version illustrates the mechanics of the memory core and its programming interface, serving as a baseline for experimental and derived algorithms.
 
-Note that the package by default uses a C extension which provides a 10x performance improvement,
-compared with this native Python version.
+By default, the package uses a C extension rather than this native code, delivering a 10x performance improvement.
+
 
 See also: https://creatingintelligence.org/#the-core-algorithm
 
