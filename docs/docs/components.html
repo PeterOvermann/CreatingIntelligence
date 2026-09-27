@@ -184,15 +184,98 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p>See also: <a
         href="https://creatingintelligence.org/#circuits"
         class="uri">https://creatingintelligence.org/#circuits</a></p>
+        <h2 id="list-of-all-circuit-components">List of all circuit
+        components</h2>
+        <table>
+        <colgroup>
+        <col style="width: 23%" />
+        <col style="width: 76%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th style="text-align: left;">Component</th>
+        <th style="text-align: left;">Functionality</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td style="text-align: left;"><a
+        href="input.html"><code>input</code></a> &amp; <a
+        href="output.html"><code>output</code></a></td>
+        <td style="text-align: left;">Gateway components that connect to
+        the circuit’s function interface, reducing multisets to sets by
+        default while optionally loading encoder or decoder
+        plugins.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="delay.html"><code>delay</code></a> &amp; <a
+        href="noise.html"><code>noise</code></a></td>
+        <td style="text-align: left;"><a
+        href="delay.html"><code>delay</code></a> defers incoming signals
+        by one cycle and integrates them temporally based on update
+        rules; <a href="noise.html"><code>noise</code></a> generates
+        pseudo-random sparse sets without requiring input blocks.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="circuit.html"><code>circuit</code></a></td>
+        <td style="text-align: left;">Embeds nested circuits locally via
+        the <code>file</code> plugin or globally via the
+        <code>shared</code> registry plugin.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="auto.html"><code>auto</code></a></td>
+        <td style="text-align: left;">Auto-associative memory that
+        incrementally learns at each cycle, applying update rules to
+        manage how the retrieved pattern interacts with query
+        pattern.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="temporal.html"><code>temporal</code></a></td>
+        <td style="text-align: left;">Temporal associative memory that
+        maps temporal states to incoming inputs, automatically learning
+        higher-order sequences on the fly when predictions fail.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="associator.html"><code>associator</code></a></td>
+        <td style="text-align: left;">Hetero-associative memory for
+        supervised learning that resolves multiset and inhibitory input,
+        trains when the label input block is non-empty, and infers when
+        the label block is empty.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="predictor.html"><code>predictor</code></a></td>
+        <td style="text-align: left;">Hetero-associative memory for
+        predictive learning that associates data from the previous cycle
+        with the current label.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="heteroencoder.html"><code>heteroencoder</code></a></td>
+        <td style="text-align: left;">Hetero-associative memory for
+        unsupervised learning that maps similar sets to stable SHRs on
+        the fly, generating and learning new unique tokens for unknown
+        inputs.</td>
+        </tr>
+        </tbody>
+        </table>
         <h2 id="details-and-properties">Details and properties</h2>
         <ul>
         <li>Data flow components, such as <a
-        href="#delay.html"><code>delay</code></a>, control the temporal
+        href="delay.html"><code>delay</code></a>, control the temporal
         integration of data over multiple timesteps.</li>
         <li>Memory components, such as <a
-        href="#auto.html"><code>auto</code></a> or <a
-        href="#temporal.html"><code>temporal</code></a>, encapsulate a
+        href="auto.html"><code>auto</code></a> or <a
+        href="temporal.html"><code>temporal</code></a>, encapsulate a
         topological associative memory instance.</li>
+        <li>Excitatory signals are processed as positive integers,
+        whereas inhibitory signals are processed as negative
+        integers.</li>
         <li>Circuit components generally maintain a state across
         multiple execution cycles, whereas pathways are strictly
         stateless.</li>
@@ -270,7 +353,7 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/input_output.png"><br></p>
         <p>Lists of slot numbers denote disjoint blocks. Here the <a
-        href="#delay"><code>delay</code></a> component receives and
+        href="delay.html"><code>delay</code></a> component receives and
         sends two disjoint set partitions:</p>
         <div class="sourceCode" id="cb2"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
@@ -314,37 +397,101 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/delay_feedback.png"><br></p>
-        <h2 id="pathway-tagging">Pathway tagging</h2>
+        <h2 id="encoders-decoders-and-update-rules">Encoders, decoders,
+        and update rules</h2>
+        <p>Plugins extend the functionality of base circuit components
+        while inheriting their properties and hyperparameters. Update
+        rule plugins govern state updates in <a
+        href="auto.html"><code>auto</code></a>, <a
+        href="delay.html"><code>delay</code></a>, and <a
+        href="temporal.html"><code>temporal</code></a> components to
+        control temporal integration and associative behavior. The <a
+        href="input.html"><code>input</code></a> and <a
+        href="output.html"><code>output</code></a> components can be
+        extended with encoder and decoder plugins, respectively.</p>
+        <table>
+        <colgroup>
+        <col style="width: 23%" />
+        <col style="width: 76%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th style="text-align: left;">Plugin Type</th>
+        <th style="text-align: left;">Implementations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td style="text-align: left;">Encoders &amp; decoders</td>
+        <td style="text-align: left;"><a
+        href="codec.html"><code>codec</code></a> maps symbolic tokens to
+        random SHRs using a globally shared lexicon based on
+        auto-associative pattern matching. <a
+        href="category.html"><code>category</code></a> encodes integers
+        0 to K-1 as non-overlapping SHRs. <a
+        href="binning.html"><code>binning</code></a> clusters similar
+        SDRs into categorized bins based on matching thresholds.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;">Vector encoders</td>
+        <td style="text-align: left;"><a
+        href="vectorencoder.html"><code>vectorencoder</code></a>
+        projects dense vectors into hyperdimensional space using sparse
+        binary matrices and kWTA. <a
+        href="flyhash.html"><code>flyhash</code></a> applies the classic
+        flyhash algorithm to achieve similar SDR mapping for real-valued
+        vectors.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;">Base update rules</td>
+        <td style="text-align: left;"><a
+        href="replacement.html"><code>replacement</code></a> entirely
+        substitutes the previous state with new data, bypassing capacity
+        limits. <a
+        href="augmentation.html"><code>augmentation</code></a> computes
+        the multiset aggregation of signals, which converges
+        incrementally to a stable state equivalent to a deduplicated set
+        union.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;">Subtractive rules</td>
+        <td style="text-align: left;"><a
+        href="residual.html"><code>residual</code></a> removes the
+        retrieved pattern from the memory’s state to leave only novel
+        elements for anomaly detection. <a
+        href="difference.html"><code>difference</code></a> applies a
+        symmetric multiset difference to enable generative retrieval
+        behavior. <a href="complement.html"><code>complement</code></a>
+        removes the current incoming signal from the state
+        entirely.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;">Filtering &amp; sequence
+        rules</td>
+        <td style="text-align: left;"><a
+        href="coincidence.html"><code>coincidence</code></a> retains
+        only matching elements between query and retrieved patterns. <a
+        href="permutation.html"><code>permutation</code></a> replaces
+        the temporal state with its permutation before augmenting it
+        with current signals, thereby preserving sequence order in
+        temporal tracking.</td>
+        </tr>
+        </tbody>
+        </table>
+        <p>In the following example, the <a
+        href="input.html"><code>input</code></a> component loads an
+        encoder plugin, the <a href="delay.html"><code>delay</code></a>
+        component is extended via an update rule plugin, and the <a
+        href="output.html"><code>output</code></a> component uses a
+        decoder plugin.</p>
         <div class="sourceCode" id="cb6"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;permute&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
-        <p><img width="130" alt="image" src="img/input_output_permute.png"><br></p>
-        <h2 id="plugins">Plugins</h2>
-        <p>The functionality of circuit components may be extended via a
-        standardized plugin mechanism. Plugins use the exact same
-        programming interface as components. This framework includes a
-        library of generic plugins and seamlessly integrates
-        user-defined, custom plugin modules.</p>
-        <p>Note that plugins inherit the properties and options
-        specified for the enclosing circuit component.</p>
-        <p>In the following example, the <a
-        href="#input.html"><code>input</code></a> component loads an
-        encoder plugin, the <a href="#delay.html"><code>delay</code></a>
-        component is extended via an update rule plugin, and the <a
-        href="#output.html"><code>output</code></a> component uses a
-        decoder plugin.</p>
-        <div class="sourceCode" id="cb7"><pre
-        class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;delay&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;latch&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;capacity&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;delay&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;latch&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;capacity&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/plugins.png"><br></p>
         <p>As shown in the example above, plugins typically modify the
         visual appearance of components in circuit schematics.</p>
@@ -352,14 +499,14 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p>In circuit schematics, you can customize individual
         components’ <code>label</code>, <code>color</code>,
         <code>fill</code>, and <code>size</code> properties:</p>
-        <div class="sourceCode" id="cb8"><pre
-        class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;A&quot;</span><span class="fu">,</span> <span class="dt">&quot;color&quot;</span><span class="fu">:</span> <span class="dv">11</span><span class="fu">,</span> <span class="dt">&quot;size&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;B&quot;</span><span class="fu">,</span> <span class="dt">&quot;fill&quot;</span><span class="fu">:</span> <span class="dv">15</span><span class="fu">,</span> <span class="dt">&quot;size&quot;</span><span class="fu">:</span> <span class="dv">12</span><span class="fu">}</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;A&quot;</span><span class="fu">,</span> <span class="dt">&quot;color&quot;</span><span class="fu">:</span> <span class="dv">11</span><span class="fu">,</span> <span class="dt">&quot;size&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;B&quot;</span><span class="fu">,</span> <span class="dt">&quot;fill&quot;</span><span class="fu">:</span> <span class="dv">15</span><span class="fu">,</span> <span class="dt">&quot;size&quot;</span><span class="fu">:</span> <span class="dv">12</span><span class="fu">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/components_style.png"><br></p>
       </article>
     </section>
