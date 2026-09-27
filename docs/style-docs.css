@@ -245,7 +245,7 @@ body {
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.05s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .menubar a:hover {
