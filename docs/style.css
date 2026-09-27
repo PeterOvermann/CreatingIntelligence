@@ -760,3 +760,19 @@ pre code {
       word-break: break-word;
   }
 }
+
+
+/* Left-align images and add top padding exclusively in the docs section */
+article.markdown-section img {
+    margin-left: 0;
+    margin-top: 40px; 
+}
+
+article.markdown-section figure {
+    margin-left: 0;
+    text-align: left;
+}
+
+article.markdown-section figcaption {
+    margin-left: 0;
+}
