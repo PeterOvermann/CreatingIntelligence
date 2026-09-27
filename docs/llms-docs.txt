@@ -1990,7 +1990,7 @@ Temporal associative memory component.
 |:------------|:-----:|:----------------------------------------|
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
-| `plugin`	    | `replacement` | update rule, governing the temporal integration logic |  
+| `plugin`	    | [`replacement`](replacement.md) | update rule, governing the temporal integration logic |  
 | `latch`	    | false | whether to skip the update if the input is empty |  
 | `threshold`     | 0    |  clear input if relative population is below threshold |
 | `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
@@ -2006,8 +2006,8 @@ Use standard [style options](components.md) to customize the component's appeara
 
 ## Temporal associative memory with replacement update
 
-The [`temporal`](temporal.md) component applies the `replacement` update rule by default.
-At every execution cycle, it replaces the internal state with the current input,
+The `temporal` component applies the [`replacement`](replacement.md) update rule by default.
+At every timestep, it replaces its internal state with the current input,
 bypassing the `capacity` setting. This mechanism directly associates
 each signal to the subsequent signal.
 
@@ -2027,7 +2027,7 @@ each signal to the subsequent signal.
 
 ## Temporal associative memory with difference update
 
-Used as a plugin for the [`temporal`](temporal.md) component, the `difference` 
+The [`difference`](difference.md) 
 update rule replaces the internal state with 
 the symmetric multiset difference of the state and the incoming signal.
 
@@ -2061,8 +2061,8 @@ the symmetric multiset difference of the state and the incoming signal.
 
 ## Temporal associative memory with state augmentation
 
-Used as a plugin for the [`temporal`](temporal.md) component, `augmentation` 
-aggregates an orderless state representing prior inputs.
+The  [`augmentation`](augmentation.md) update rule plugin
+aggregates an orderless temporal state.
 
 
 ```json
@@ -2081,8 +2081,7 @@ aggregates an orderless state representing prior inputs.
 
 ## Temporal associative memory with state permutation
 
-Used as a plugin for the [`temporal`](temporal.md) component, `permutation` 
-aggregates a state that preservers the order of prior inputs.
+The [`permutation`](permutation.md) update rule plugin accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
 
 
 ```json

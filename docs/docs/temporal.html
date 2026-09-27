@@ -204,7 +204,8 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         <tr>
         <td style="text-align: left;"><code>plugin</code></td>
-        <td style="text-align: center;"><code>replacement</code></td>
+        <td style="text-align: center;"><a
+        href="replacement.html"><code>replacement</code></a></td>
         <td style="text-align: left;">update rule, governing the
         temporal integration logic</td>
         </tr>
@@ -253,12 +254,12 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2
         id="temporal-associative-memory-with-replacement-update">Temporal
         associative memory with replacement update</h2>
-        <p>The <a href="temporal.html"><code>temporal</code></a>
-        component applies the <code>replacement</code> update rule by
-        default. At every execution cycle, it replaces the internal
-        state with the current input, bypassing the
-        <code>capacity</code> setting. This mechanism directly
-        associates each signal to the subsequent signal.</p>
+        <p>The <code>temporal</code> component applies the <a
+        href="replacement.html"><code>replacement</code></a> update rule
+        by default. At every timestep, it replaces its internal state
+        with the current input, bypassing the <code>capacity</code>
+        setting. This mechanism directly associates each signal to the
+        subsequent signal.</p>
         <div class="sourceCode" id="cb1"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
@@ -270,11 +271,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2
         id="temporal-associative-memory-with-difference-update">Temporal
         associative memory with difference update</h2>
-        <p>Used as a plugin for the <a
-        href="temporal.html"><code>temporal</code></a> component, the
-        <code>difference</code> update rule replaces the internal state
-        with the symmetric multiset difference of the state and the
-        incoming signal.</p>
+        <p>The <a href="difference.html"><code>difference</code></a>
+        update rule replaces the internal state with the symmetric
+        multiset difference of the state and the incoming signal.</p>
         <div class="sourceCode" id="cb2"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
@@ -299,10 +298,8 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2
         id="temporal-associative-memory-with-state-augmentation">Temporal
         associative memory with state augmentation</h2>
-        <p>Used as a plugin for the <a
-        href="temporal.html"><code>temporal</code></a> component,
-        <code>augmentation</code> aggregates an orderless state
-        representing prior inputs.</p>
+        <p>The <a href="augmentation.html"><code>augmentation</code></a>
+        update rule plugin aggregates an orderless temporal state.</p>
         <div class="sourceCode" id="cb4"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
@@ -315,10 +312,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2
         id="temporal-associative-memory-with-state-permutation">Temporal
         associative memory with state permutation</h2>
-        <p>Used as a plugin for the <a
-        href="temporal.html"><code>temporal</code></a> component,
-        <code>permutation</code> aggregates a state that preservers the
-        order of prior inputs.</p>
+        <p>The <a href="permutation.html"><code>permutation</code></a>
+        update rule plugin accumulates a temporal state by iteratively
+        permuting it at every timestep, encoding the ordering of prior
+        inputs.</p>
         <div class="sourceCode" id="cb5"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
