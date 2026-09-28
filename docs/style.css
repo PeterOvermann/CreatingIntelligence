@@ -126,7 +126,7 @@ a:not([href]) {
     display: flex;
     justify-content: flex-end;
     width: 740px; /* Exact width of the content box (600 text + 70 padding + 70 padding) */
-    margin-left: 40px; /* Matches the left margin of .markdown-section */
+    margin-left: 25px; /* Matches the left margin of .markdown-section */
     flex-shrink: 0;
 }
 
@@ -252,7 +252,7 @@ a:not([href]) {
 
 .markdown-section {
     max-width: 600px; 
-    margin: 40px auto 40px 40px; 
+    margin: 25px 0px 40px 25px; 
     padding: 30px 70px;
     background-color: #ffffff;
     border-radius: 8px;
@@ -529,7 +529,7 @@ pre code {
    MOBILE RESPONSIVENESS
    ========================================================================== */
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1090px) {
     .menubar {
         justify-content: space-between;
     }
