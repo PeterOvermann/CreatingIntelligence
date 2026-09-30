@@ -148,7 +148,7 @@ The `augmentation` rule completes the input while retaining non-matching element
 ## Auto-associative memory with coincidence update
 
 As a plugin for the [`auto`](auto.md) component, the `coincidence` update rule
-retaining the matching elements between the query and the retrieved pattern.
+retains the matching elements between the query and the retrieved pattern.
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},

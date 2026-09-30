@@ -115,7 +115,7 @@ See also: [Installation](installation.md)
 ## Circuits frontend
 
 
-Circuit configurations are specified by a either a Python dictionary or the equivalent JSON string:
+Circuit configurations are specified by either a Python dictionary or the equivalent JSON string:
 
 
 ```json
@@ -259,7 +259,7 @@ Properties of the output dictionary:
 | `clear` |   destructor function  |
 
 This framework includes multiple, functionally equivalent implementations of the 
-Topological Associative Memory backend  By default, a performance-optimized  version
+Topological Associative Memory backend.  By default, a performance-optimized  version
 written in Standard C is used. Switch to a native Python 
  backend  by setting this environment variable:
 
@@ -723,10 +723,10 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
 | `barrier` | =  |  clears barrier paths if any barrier path is empty |
 | `kwta_excitatory` | K  |  filters for top-K excitatory  signals, with K taken to be the path's default population |
-| `kwta_absolute` | k   |  filteres for top-k signals based on total saliency, with k taken to be the path's default population |
+| `kwta_absolute` | k   |  filters for top-k signals based on total saliency, with k taken to be the path's default population |
 
 
-In this circuit, to paths are merged via kWTA:
+In this circuit, two paths are merged via kWTA:
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
@@ -1832,7 +1832,7 @@ The `augmentation` rule completes the input while retaining non-matching element
 ## Auto-associative memory with coincidence update
 
 As a plugin for the [`auto`](auto.md) component, the `coincidence` update rule
-retaining the matching elements between the query and the retrieved pattern.
+retains the matching elements between the query and the retrieved pattern.
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
@@ -1971,15 +1971,16 @@ Temporal associative memory component.
 
 ## Details and properties
 
-- Learns the association of the temporal state with the current input.
+- Learns the association of the previous state with the current input.
+- Predicts the next input based on the current state.
 - Automatically learns if the previous prediction was incorrect.
 - A closed feedback loop enables generative behavior.
-- Predicts the next input based on the state.
-- Supports temporal integration of signals across evaluation cycles, governed by
- update rule plugins.
-- Uses update rule plugins to control the mechanics of state updates.
-- Supports the same set of update rules for temporal integration as the [`delay`](delay.md) component.
+- Uses update rule plugins to control the mechanics of temporal integration.
+- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
+- With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
+- Supports the same set of update rules as the [`delay`](delay.md) component.
 - Controls sparsity through stochastic subsampling mechanisms.  
+- Represents the integrated state as a multiset.
 - Supports multiple input or output blocks.
 
 
@@ -2242,7 +2243,7 @@ See also: https://creatingintelligence.org/#supervised-learning
 - Training is triggered if the label input is non-empty.
 - Inference is triggered by an empty label input.
 - Sends the inferred label.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>
@@ -2350,7 +2351,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Learns if the prediction does not match the subsequent input.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>
@@ -2479,7 +2480,7 @@ See also: https://creatingintelligence.org/#heteroencoder
 - Has no input for a teaching signal.
 - Generates and learns a unique output SHR when encountering unknown input.
 - May receive block-coded input.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>
@@ -3100,7 +3101,7 @@ The [`delay`](delay.md) component applying the `permutation` update rule:
 ## Temporal associative memory with state permutation
 
 Used as a plugin for the [`temporal`](temporal.md) component, `permutation` 
-aggregates a state that preservers the order of prior inputs.
+aggregates a state that preserves the order of prior inputs.
 
 
 ```json
@@ -4460,11 +4461,11 @@ def permutation(config):
 
 
 """
-Auto-associative memory component .
+Auto-associative memory component.
 
 Note: There is a wide range of possible learning, subsampling, retrieval
-and update rules for auto-associative memory . This prototype captures the
-geneneric cases . Modify as needed .
+and update rules for auto-associative memory. This prototype captures the
+generic cases -- modify as needed.
 """
 
 
@@ -4573,10 +4574,10 @@ def auto(config):
 
 
 """
-Temporal-associative memory component .
-Learns higher-order sequences on the fly and predicts the next token .
-A hybrid between auto-associative and hetero-associative architectures .
-Uses the same temporal integration parametrization as "delay" .
+Temporal-associative memory component.
+Learns higher-order sequences on the fly and predicts the next token.
+A hybrid between auto-associative and hetero-associative architectures.
+Uses the same temporal integration parametrization as "delay".
 """
 
 

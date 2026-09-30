@@ -9,7 +9,7 @@ See also: [Installation](installation.md)
 ## Circuits frontend
 
 
-Circuit configurations are specified by a either a Python dictionary or the equivalent JSON string:
+Circuit configurations are specified by either a Python dictionary or the equivalent JSON string:
 
 
 ```json
@@ -153,7 +153,7 @@ Properties of the output dictionary:
 | `clear` |   destructor function  |
 
 This framework includes multiple, functionally equivalent implementations of the 
-Topological Associative Memory backend  By default, a performance-optimized  version
+Topological Associative Memory backend.  By default, a performance-optimized  version
 written in Standard C is used. Switch to a native Python 
  backend  by setting this environment variable:
 

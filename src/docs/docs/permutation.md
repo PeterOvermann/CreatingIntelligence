@@ -42,7 +42,7 @@ The [`delay`](delay.md) component applying the `permutation` update rule:
 ## Temporal associative memory with state permutation
 
 Used as a plugin for the [`temporal`](temporal.md) component, `permutation` 
-aggregates a state that preservers the order of prior inputs.
+aggregates a state that preserves the order of prior inputs.
 
 
 ```json
