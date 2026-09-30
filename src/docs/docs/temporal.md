@@ -10,15 +10,16 @@ Temporal associative memory component.
 
 ## Details and properties
 
-- Learns the association of the temporal state with the current input.
+- Learns the association of the previous state with the current input.
+- Predicts the next input based on the current state.
 - Automatically learns if the previous prediction was incorrect.
 - A closed feedback loop enables generative behavior.
-- Predicts the next input based on the state.
-- Supports temporal integration of signals across evaluation cycles, governed by
- update rule plugins.
-- Uses update rule plugins to control the mechanics of state updates.
-- Supports the same set of update rules for temporal integration as the [`delay`](delay.md) component.
+- Uses update rule plugins to control the mechanics of temporal integration.
+- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
+- With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
+- Supports the same set of update rules as the [`delay`](delay.md) component.
 - Controls sparsity through stochastic subsampling mechanisms.  
+- Represents the integrated state as a multiset.
 - Supports multiple input or output blocks.
 
 

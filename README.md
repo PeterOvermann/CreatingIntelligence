@@ -45,16 +45,15 @@ See also: https://creatingintelligence.org/docs/quickstart.html
 
 ### Development Setup
 
-Building the package from source requires a C development environment to compile
-the topological associative memory kernel as a Python extension.
+Building the Python package from source requires a C development environment to compile the topological associative memory kernel as a C extension.
 
-On Unix, Linux, BSD, and macOS:
+Unix, Linux, BSD, and macOS:
 
 ```bash
 src/python/setup.sh
 ```
 
-On Windows:
+Windows:
 
 ```bash
 src/python/setup.bat
@@ -74,13 +73,13 @@ Test the circuit package (and indirectly the memory backend):
 python3 experiments/circuit-tests/run.py
 ```
 
-Test the memory backend (storage capacity, retrieval accuracy, and I/O performance) with
+Test the memory backend (storage capacity, retrieval accuracy, and I/O performance):
 
 ```bash
 python3 experiments/memory-tests/run.py
 ```
 
-or as a stand-alone C binary with
+Test the stand-alone C memory backend:
 
 ```bash
 src/c/build/memorytest
