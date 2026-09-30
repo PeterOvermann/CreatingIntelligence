@@ -87,7 +87,8 @@ Memory[config_Association] :=
 			
 				(* Step 5: Select (kWTA with threshold T(T-1)/2) *)
 				(* The first element of a negative Ordering is the index 
-					of the k-th largest value. Use this for the threshold check. *)
+					of the k-th largest value. 
+					Use this for the threshold check. *)
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
 				
 				(* Step 6: Threshold check. *)
