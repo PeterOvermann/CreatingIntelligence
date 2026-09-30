@@ -153,13 +153,12 @@ class="sidebar-icon">π</span>permutation</a></li>
       <article class="markdown-section">
         <p>SOURCE CODE</p>
         <h1 id="memory">Memory</h1>
-        <p>The following is a reference implementation of the
-        Topological Associative Memory algorithm. This native Python
-        version illustrates the mechanics of the memory core and its
-        programming interface, serving as a baseline for experimental
-        and derived algorithms.</p>
+        <p>The reference implementation of the Topological Associative
+        Memory algorithm illustrates the mechanics of the memory core
+        and its programming interface, serving as a baseline for
+        experimental and derived algorithms.</p>
         <p>By default, the package uses a C extension rather than this
-        native code, delivering a 10x performance improvement.</p>
+        native code, delivering a 10x speedup.</p>
         <p>See also: <a
         href="https://creatingintelligence.org/#the-core-algorithm"
         class="uri">https://creatingintelligence.org/#the-core-algorithm</a></p>
@@ -295,6 +294,116 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;memorycount&quot;</span>: memorycount,</span>
 <span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;backend&quot;</span>: <span class="st">&quot;python&quot;</span></span>
 <span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+        <h2 id="mathematica-source-code">Mathematica source code</h2>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode mathematica"><code class="sourceCode mathematica"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Memory<span class="op">[</span><span class="at">config_</span>Association<span class="op">]</span> <span class="ex">:=</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Module</span><span class="op">[</span> <span class="op">{</span>mem <span class="ex">=</span> &lt;<span class="sc">||</span>&gt;<span class="op">,</span> NA<span class="op">,</span> PA<span class="op">,</span> NB<span class="op">,</span> PB<span class="op">,</span> <span class="fu">T</span> <span class="ex">=</span> <span class="dv">1</span><span class="op">,</span> capacity<span class="op">,</span> zero<span class="op">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        store<span class="op">,</span> retrieve<span class="op">,</span> <span class="fu">clear</span><span class="op">,</span> memorycount<span class="op">},</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>NA<span class="op">,</span> PA<span class="op">}</span> <span class="ex">=</span> config<span class="op">[</span><span class="st">&quot;A_parameters&quot;</span><span class="op">]</span>;</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span>NB<span class="op">,</span> PB<span class="op">}</span> <span class="ex">=</span> config<span class="op">[</span><span class="st">&quot;B_parameters&quot;</span><span class="op">]</span>;</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">If</span><span class="op">[</span> ! <span class="fu">MatchQ</span><span class="op">[{</span>NA<span class="op">,</span> PA<span class="op">,</span> NB<span class="op">,</span> PB<span class="op">},</span> <span class="op">{</span><span class="at">__</span>Integer<span class="op">}],</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">Message</span><span class="op">[</span>Memory::params<span class="op">,</span> config<span class="op">]]</span>;   </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* Memory capacity, needed for default threshold calculation. *)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        capacity <span class="ex">=</span> <span class="fu">If</span><span class="op">[</span>NA <span class="ex">==</span> NB &amp;&amp; PA <span class="ex">==</span> PB<span class="op">,</span> </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Log</span><span class="op">[</span><span class="fl">2.0</span><span class="op">]</span> NA (NA <span class="sc">-</span> <span class="dv">1</span>) (NA <span class="sc">-</span> <span class="dv">2</span>) <span class="sc">/</span> (PA (PA <span class="sc">-</span> <span class="dv">1</span>) (PA <span class="sc">-</span> <span class="dv">2</span>))<span class="op">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Log</span><span class="op">[</span><span class="fl">2.0</span><span class="op">]</span> NA (NA <span class="sc">-</span> <span class="dv">1</span>) NB <span class="sc">/</span> (PA (PA <span class="sc">-</span> <span class="dv">1</span>) PB)<span class="op">]</span>;</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* Default pattern matching threshold. *)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">While</span><span class="op">[</span><span class="fu">T</span> &lt; PA &amp;&amp; capacity<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">Binomial</span><span class="op">[</span>PA<span class="op">,</span> <span class="fu">T</span><span class="op">]</span> <span class="sc">*</span> <span class="fu">Binomial</span><span class="op">[</span>NA<span class="sc">-</span>PA<span class="op">,</span> PA<span class="sc">-</span><span class="fu">T</span><span class="op">]</span> <span class="sc">/</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Binomial</span><span class="op">[</span>NA<span class="op">,</span> PA<span class="op">]</span> &gt;<span class="ex">=</span> <span class="dv">1</span><span class="op">,</span> <span class="fu">T</span><span class="sc">++</span><span class="op">]</span>;</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* User-defined (scaled) threshold . *)</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">If</span><span class="op">[</span>KeyExistsQ<span class="op">[</span>config<span class="op">,</span> <span class="st">&quot;threshold&quot;</span><span class="op">]</span> &amp;&amp; <span class="fu">NumberQ</span><span class="op">[</span>config<span class="op">[</span><span class="st">&quot;threshold&quot;</span><span class="op">]],</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="fu">T</span> <span class="ex">=</span> <span class="fu">Round</span><span class="op">[</span>config<span class="op">[</span><span class="st">&quot;threshold&quot;</span><span class="op">]</span> <span class="sc">*</span> PA<span class="op">]]</span>;</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">If</span><span class="op">[</span><span class="fu">T</span> &lt; <span class="dv">2</span><span class="op">,</span> <span class="fu">T</span> <span class="ex">=</span> <span class="dv">2</span><span class="op">]</span>;</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        zero <span class="ex">=</span> Developer`ToPackedArray<span class="op">[</span><span class="fu">ConstantArray</span><span class="op">[</span><span class="dv">0</span><span class="op">,</span> NB<span class="op">]]</span>;</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* Store hetero-association A -&gt; B in memory. *)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        store<span class="op">[</span><span class="at">A_</span>List<span class="op">]</span> <span class="ex">:=</span> store<span class="op">[</span><span class="fu">A</span><span class="op">,</span> <span class="fu">A</span><span class="op">]</span>;</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* Store A -&gt; B in memory. *)</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        store<span class="op">[</span><span class="at">A_</span>List<span class="op">,</span> <span class="at">B_</span>List<span class="op">]</span> <span class="ex">:=</span> <span class="fu">Module</span><span class="op">[{</span><span class="fu">v</span><span class="op">,</span> sub2<span class="op">},</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            <span class="co">(* Step 1: Expansion coding. *)</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            sub2 <span class="ex">=</span> <span class="fu">Subsets</span><span class="op">[</span><span class="fu">A</span><span class="op">,</span> <span class="op">{</span><span class="dv">2</span><span class="op">}]</span>;</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            <span class="co">(* Step 2: Memory update. *)</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            <span class="fu">v</span> <span class="ex">=</span> zero; <span class="fu">v</span><span class="op">[[</span><span class="fu">B</span><span class="op">]]</span> <span class="ex">=</span> <span class="dv">1</span>; </span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>            (mem<span class="op">[</span>#<span class="op">]</span> <span class="ex">=</span> <span class="fu">BitOr</span><span class="op">[</span>Lookup<span class="op">[</span>mem<span class="op">,</span> Key<span class="op">[</span>#<span class="op">],</span> zero<span class="op">],</span> <span class="fu">v</span><span class="op">]</span>)&amp; <span class="sc">/</span>@ sub2; </span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>            <span class="op">]</span>;</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="co">(* Memory retrieval. *)</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        retrieve<span class="op">[</span><span class="at">A_</span>List<span class="op">]</span> <span class="ex">:=</span> </span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>            <span class="fu">Module</span><span class="op">[</span> <span class="op">{</span><span class="fu">X</span><span class="op">,</span> <span class="fu">P</span><span class="op">,</span> <span class="fu">Y</span><span class="op">,</span> <span class="fu">R</span><span class="op">,</span> Ri<span class="op">,</span> sub2<span class="op">,</span> <span class="fu">v</span><span class="op">,</span> <span class="fu">t</span><span class="op">,</span> <span class="fu">w</span><span class="op">,</span> ws<span class="op">,</span> <span class="fu">h</span><span class="op">,</span> cutoff<span class="op">},</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>            <span class="co">(* Step 1: Initialize. *)</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="fu">X</span> <span class="ex">=</span> <span class="fu">A</span>; </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            <span class="fu">While</span><span class="op">[</span> <span class="cn">True</span><span class="op">,</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 2: Threshold check.  *)</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>                <span class="fu">If</span><span class="op">[</span> (<span class="fu">P</span> <span class="ex">=</span> <span class="fu">Length</span><span class="op">[</span><span class="fu">X</span><span class="op">]</span>) &lt; <span class="fu">T</span><span class="op">,</span> <span class="fu">Return</span><span class="op">[{}]]</span>; </span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 3: Expansion coding. *)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>                sub2 <span class="ex">=</span> <span class="fu">Subsets</span><span class="op">[</span><span class="fu">Range</span><span class="op">[</span><span class="fu">P</span><span class="op">],</span> <span class="op">{</span><span class="dv">2</span><span class="op">}]</span>;</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 4: Aggregate. *)</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>                Ri <span class="ex">=</span> <span class="fu">ConstantArray</span><span class="op">[</span><span class="dv">0</span><span class="op">,</span> <span class="op">{</span><span class="fu">P</span><span class="op">,</span> NB<span class="op">}]</span>;</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>                (<span class="fu">v</span> <span class="ex">=</span> Lookup<span class="op">[</span>mem<span class="op">,</span> Key<span class="op">[{</span><span class="fu">X</span><span class="op">[[</span>#<span class="dv">1</span><span class="op">]],</span> <span class="fu">X</span><span class="op">[[</span>#<span class="dv">2</span><span class="op">]]}],</span> zero<span class="op">]</span>; </span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>                        Ri<span class="op">[[</span>#<span class="dv">1</span><span class="op">]]</span> <span class="sc">+</span><span class="ex">=</span> <span class="fu">v</span>; Ri<span class="op">[[</span>#<span class="dv">2</span><span class="op">]]</span> <span class="sc">+</span><span class="ex">=</span> <span class="fu">v</span>) &amp; @@@ sub2;</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>                <span class="fu">R</span> <span class="ex">=</span> (<span class="fu">Plus</span> @@ Ri) <span class="sc">/</span> <span class="dv">2</span>; </span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 5: Select (kWTA with threshold T(T-1)/2) *)</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* The first element of a negative Ordering is the index </span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="co">                    of the k-th largest value. </span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">                    Use this for the threshold check. *)</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>                <span class="fu">t</span> <span class="ex">=</span> <span class="fu">Max</span><span class="op">[</span><span class="dv">1</span><span class="op">,</span> <span class="fu">R</span><span class="op">[[</span><span class="fu">First</span> @ <span class="fu">Ordering</span><span class="op">[</span><span class="fu">R</span><span class="op">,</span> <span class="sc">-</span>PB<span class="op">]]]]</span>;</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 6: Threshold check. *)</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>                <span class="fu">If</span><span class="op">[</span> <span class="fu">t</span> &lt; <span class="fu">T</span> (<span class="fu">T</span> <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span><span class="op">,</span> <span class="fu">Return</span><span class="op">[{}]]</span>; </span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>                <span class="fu">Y</span> <span class="ex">=</span> <span class="fu">Sort</span><span class="op">[</span><span class="fu">Pick</span><span class="op">[</span><span class="fu">Range</span><span class="op">[</span>NB<span class="op">],</span> <span class="fu">UnitStep</span><span class="op">[</span><span class="fu">R</span> <span class="sc">-</span> <span class="fu">t</span><span class="op">],</span> <span class="dv">1</span><span class="op">]]</span>;</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 7: Per-element weights. *)</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>                <span class="fu">w</span> <span class="ex">=</span> <span class="fu">Total</span> <span class="sc">/</span>@ Ri<span class="op">[[</span><span class="cn">All</span><span class="op">,</span> <span class="fu">Y</span><span class="op">]]</span>;</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 8: Convergence test.  *)</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>                ws <span class="ex">=</span> <span class="fu">Sort</span><span class="op">[</span><span class="fu">w</span><span class="op">]</span>; </span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>                <span class="fu">h</span> <span class="ex">=</span> <span class="fu">P</span>;</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>                <span class="fu">While</span><span class="op">[</span> (cutoff <span class="ex">=</span> ws<span class="op">[[</span><span class="sc">-</span><span class="fu">h</span><span class="op">]]</span>) &lt; <span class="fu">Length</span><span class="op">[</span><span class="fu">Y</span><span class="op">]</span> <span class="sc">*</span> (<span class="fu">h</span> <span class="sc">-</span> <span class="dv">1</span>)<span class="op">,</span> <span class="sc">--</span><span class="fu">h</span><span class="op">]</span>;</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>                <span class="fu">If</span><span class="op">[</span> <span class="fu">h</span> &lt; <span class="fu">T</span><span class="op">,</span> <span class="fu">Return</span><span class="op">[{}]]</span>;         </span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 9: Refine. *)</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>                <span class="fu">X</span> <span class="ex">=</span> <span class="fu">Pick</span><span class="op">[</span><span class="fu">X</span><span class="op">,</span> # &gt;<span class="ex">=</span> cutoff &amp; <span class="sc">/</span>@ <span class="fu">w</span><span class="op">]</span>;</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Handle edge case. *)</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>                <span class="fu">If</span><span class="op">[</span><span class="fu">h</span> <span class="ex">===</span> <span class="fu">T</span> &amp;&amp;  <span class="fu">h</span> &lt; <span class="fu">Length</span><span class="op">[</span><span class="fu">X</span><span class="op">],</span> <span class="fu">X</span> <span class="ex">=</span> <span class="op">{}</span>; <span class="fu">Return</span><span class="op">[{}]]</span>;</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Finished if X has converged. *)</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>                <span class="fu">If</span><span class="op">[</span><span class="fu">Length</span><span class="op">[</span><span class="fu">X</span><span class="op">]</span> <span class="ex">==</span> <span class="fu">P</span><span class="op">,</span> <span class="fu">Return</span><span class="op">[</span><span class="fu">Y</span><span class="op">]]</span>; </span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>                <span class="co">(* Step 10: Iterate.  *)</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>                <span class="op">]</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>            <span class="op">]</span>;</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="fu">clear</span> <span class="ex">:=</span> (mem <span class="ex">=</span> &lt;<span class="sc">||</span>&gt;;);</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>        memorycount <span class="ex">:=</span> <span class="fu">Total</span><span class="op">[</span>Values<span class="op">[</span>mem<span class="op">],</span> <span class="dv">2</span><span class="op">]</span>;</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        &lt;<span class="sc">|</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;A_parameters&quot;</span> <span class="ot">-&gt;</span> <span class="op">{</span>NA<span class="op">,</span> PA<span class="op">},</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;B_parameters&quot;</span> <span class="ot">-&gt;</span> <span class="op">{</span>NB<span class="op">,</span> PB<span class="op">},</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;T&quot;</span> <span class="ot">-&gt;</span> <span class="fu">T</span><span class="op">,</span> <span class="co">(* Absolute pattern matching threshold. *)</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;store&quot;</span> <span class="ot">-&gt;</span> store<span class="op">,</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;retrieve&quot;</span> <span class="ot">-&gt;</span> retrieve<span class="op">,</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;clear&quot;</span> :&gt; <span class="fu">clear</span><span class="op">,</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;memorycount&quot;</span> :&gt; memorycount<span class="op">,</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;backend&quot;</span> <span class="ot">-&gt;</span> <span class="st">&quot;Reference&quot;</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>        <span class="sc">|</span>&gt;</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>        <span class="op">]</span></span></code></pre></div>
       </article>
     </section>
   </main>
