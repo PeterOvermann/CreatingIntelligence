@@ -20,7 +20,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Learns if the prediction does not match the subsequent input.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>

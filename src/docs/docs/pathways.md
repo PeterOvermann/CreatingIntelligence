@@ -151,10 +151,10 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
 | `barrier` | =  |  clears barrier paths if any barrier path is empty |
 | `kwta_excitatory` | K  |  filters for top-K excitatory  signals, with K taken to be the path's default population |
-| `kwta_absolute` | k   |  filteres for top-k signals based on total saliency, with k taken to be the path's default population |
+| `kwta_absolute` | k   |  filters for top-k signals based on total saliency, with k taken to be the path's default population |
 
 
-In this circuit, to paths are merged via kWTA:
+In this circuit, two paths are merged via kWTA:
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},

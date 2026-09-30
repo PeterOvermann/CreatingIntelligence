@@ -19,7 +19,7 @@ See also: https://creatingintelligence.org/#heteroencoder
 - Has no input for a teaching signal.
 - Generates and learns a unique output SHR when encountering unknown input.
 - May receive block-coded input.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>

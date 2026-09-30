@@ -18,7 +18,7 @@ See also: https://creatingintelligence.org/#supervised-learning
 - Training is triggered if the label input is non-empty.
 - Inference is triggered by an empty label input.
 - Sends the inferred label.
-- Resolves multiset and inibitory input prior to processing.
+- Resolves multiset and inhibitory input prior to processing.
 
 
 <br>

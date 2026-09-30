@@ -753,11 +753,11 @@ def permutation(config):
 
 
 """
-Auto-associative memory component .
+Auto-associative memory component.
 
 Note: There is a wide range of possible learning, subsampling, retrieval
-and update rules for auto-associative memory . This prototype captures the
-geneneric cases . Modify as needed .
+and update rules for auto-associative memory. This prototype captures the
+generic cases -- modify as needed.
 """
 
 
@@ -866,10 +866,10 @@ def auto(config):
 
 
 """
-Temporal-associative memory component .
-Learns higher-order sequences on the fly and predicts the next token .
-A hybrid between auto-associative and hetero-associative architectures .
-Uses the same temporal integration parametrization as "delay" .
+Temporal-associative memory component.
+Learns higher-order sequences on the fly and predicts the next token.
+A hybrid between auto-associative and hetero-associative architectures.
+Uses the same temporal integration parametrization as "delay".
 """
 
 

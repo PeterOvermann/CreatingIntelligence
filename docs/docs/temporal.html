@@ -157,22 +157,25 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p>Temporal associative memory component.</p>
         <h2 id="details-and-properties">Details and properties</h2>
         <ul>
-        <li>Learns the association of the temporal state with the
+        <li>Learns the association of the previous state with the
         current input.</li>
+        <li>Predicts the next input based on the current state.</li>
         <li>Automatically learns if the previous prediction was
         incorrect.</li>
         <li>A closed feedback loop enables generative behavior.</li>
-        <li>Predicts the next input based on the state.</li>
+        <li>Uses update rule plugins to control the mechanics of
+        temporal integration.</li>
         <li>Supports temporal integration of signals across evaluation
         cycles, governed by update rule plugins.</li>
-        <li>Uses update rule plugins to control the mechanics of state
-        updates.</li>
-        <li>Supports the same set of update rules for temporal
-        integration as the <a href="delay.html"><code>delay</code></a>
-        component.</li>
+        <li>With the <a
+        href="permutation.html"><code>permutation</code></a> update
+        rule, the temporal order of inputs is preserved.</li>
+        <li>Supports the same set of update rules as the <a
+        href="delay.html"><code>delay</code></a> component.</li>
         <li>Controls sparsity through stochastic subsampling
         mechanisms.<br />
         </li>
+        <li>Represents the integrated state as a multiset.</li>
         <li>Supports multiple input or output blocks.</li>
         </ul>
         <p><br></p>
