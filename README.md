@@ -45,7 +45,7 @@ See also: https://creatingintelligence.org/docs/quickstart.html
 
 ### Development Setup
 
-Building the Python package from source requires a C development environment to compile the topological associative memory kernel as a C extension.
+Building the Python package from source requires a development environment to compile the topological associative memory kernel as a C extension.
 
 Unix, Linux, BSD, and macOS:
 
@@ -87,7 +87,7 @@ src/c/build/memorytest
 
 ### Mathematica
 
-A Mathematica version, functionally equivalent to the Python package, is available [here](src/mathematica).
+A Mathematica implementation, functionally equivalent to the Python package, is available [here](src/mathematica).
 
 
 
