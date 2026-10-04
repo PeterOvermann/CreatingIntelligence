@@ -40,7 +40,8 @@
   - [flyhash](flyhash.md)
   
 - **SOURCE CODE** 
-  - [Circuits](circuits_source.md)
-  - [Memory](memory_source.md)
+  - [Python](python.md)
+  - [Mathematica](mathematica.md)
+  - [C](c.md)
 
  

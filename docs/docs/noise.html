@@ -5,12 +5,8 @@
   <title>Creating Intelligence &mdash; Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Load extracted custom styles -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Static Layout Fixes -->
     <style>
-
-      /* Inject Pandoc Syntax Highlighting CSS */
       html { -webkit-text-size-adjust: 100%; }
       pre > code.sourceCode { white-space: pre; position: relative; }
       pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -143,8 +139,9 @@ class="sidebar-icon">π</span>permutation</a></li>
 </ul></li>
 <li><strong>SOURCE CODE</strong>
 <ul>
-<li><a href="circuits_source.html">Circuits</a></li>
-<li><a href="memory_source.html">Memory</a></li>
+<li><a href="python.html">Python</a></li>
+<li><a href="mathematica.html">Mathematica</a></li>
+<li><a href="c.html">C</a></li>
 </ul></li>
 </ul>
       </div>
@@ -204,33 +201,16 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/inhibit_noise.png"><br></p>
         <h2 id="source-code">Source code</h2>
-        <div class="sourceCode" id="cb3"><pre
-        class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> noise(config):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    n, p <span class="op">=</span> config.get(<span class="st">&quot;send_blocks&quot;</span>, [[<span class="dv">0</span>, <span class="dv">0</span>]])[<span class="dv">0</span>]</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(<span class="op">*</span>blocks):</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sorted</span>(</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                rng.choice(<span class="bu">range</span>(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>p,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist()),</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;input&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;~&quot;</span>, <span class="st">&quot;fill&quot;</span>: <span class="dv">13</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">18</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+        <!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
+        <p><em>from circuits.py insert noise</em></p>
       </article>
     </section>
   </main>
   
-  <!-- Mermaid Support -->
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
     mermaid.initialize({ startOnLoad: true });
     
-    // Map Pandoc's codeblock output to Mermaid's expected DOM structure
     document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
         const pre = el.parentElement;
         const div = document.createElement('div');
@@ -240,7 +220,6 @@ class="sidebar-icon">π</span>permutation</a></li>
     });
   </script>
 
-  <!-- Sidebar Scroll Persistence -->
   <script>
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
@@ -262,7 +241,5 @@ class="sidebar-icon">π</span>permutation</a></li>
       }
     });
   </script>
-  
-   
 </body>
 </html>

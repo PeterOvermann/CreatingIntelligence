@@ -27,8 +27,8 @@ DEST="$PROJECT_ROOT/docs/$TARGET_NAME"
 LLM_DEST_DIR="$PROJECT_ROOT/docs"
 LLM_OUT_FILE="$LLM_DEST_DIR/llms-${TARGET_NAME}.txt"
 
-# Define Python sources directory
-PY_SRC_DIR="$SCRIPT_DIR/../python/creating_intelligence"
+# Define the base directory for source code inclusion
+BASE_SRC_DIR="$SCRIPT_DIR/.."
 
 # 1. Create target directories and migrate assets
 mkdir -p "$DEST"
@@ -38,7 +38,6 @@ cp -r "$SRC/img" "$DEST/" 2>/dev/null
 
 
 # 3. Generate Sidebar HTML
-# Rewrites markdown links to HTML, and wraps leading symbols before &emsp; in a fixed-width span
 sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' "$SRC/_sidebar.md" | \
 sed -E 's/\[([^&]+)&emsp;/\[<span class="sidebar-icon">\1<\/span>/g' > /tmp/sidebar_temp.md
 pandoc /tmp/sidebar_temp.md -o /tmp/sidebar.html
@@ -52,12 +51,8 @@ cat << 'EOF' > /tmp/template.html
   <title>$if(title)$$title$$else$Creating Intelligence &mdash; Documentation$endif$</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Load extracted custom styles -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Static Layout Fixes -->
     <style>
-
-      /* Inject Pandoc Syntax Highlighting CSS */
       $highlighting-css$
     </style>
 </head>
@@ -77,7 +72,6 @@ cat << 'EOF' > /tmp/template.html
       <div class="sidebar-nav">
 EOF
 
-# Inject the compiled sidebar directly into the template
 cat /tmp/sidebar.html >> /tmp/template.html
 
 cat << 'EOF' >> /tmp/template.html
@@ -90,12 +84,10 @@ cat << 'EOF' >> /tmp/template.html
     </section>
   </main>
   
-  <!-- Mermaid Support -->
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
     mermaid.initialize({ startOnLoad: true });
     
-    // Map Pandoc's codeblock output to Mermaid's expected DOM structure
     document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
         const pre = el.parentElement;
         const div = document.createElement('div');
@@ -105,7 +97,6 @@ cat << 'EOF' >> /tmp/template.html
     });
   </script>
 
-  <!-- Sidebar Scroll Persistence -->
   <script>
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
@@ -127,26 +118,23 @@ cat << 'EOF' >> /tmp/template.html
       }
     });
   </script>
-  
-   
 </body>
 </html>
 EOF
 
-
-
-# 4.5 Generate Python Snippet Preprocessor (Shared)
+# 4.5 Generate Snippet Preprocessor (Shared)
 cat << 'EOF' > /tmp/inject_snippets.py
 import sys, re, os, ast
 
-py_dir = sys.argv[2]
+base_dir = sys.argv[2]
+
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     content = f.read()
 
 def replacer_func(match):
-    py_file = match.group(1)
-    target = match.group(2)
-    py_path = os.path.join(py_dir, py_file)
+    rel_path = match.group(1).strip()
+    target = match.group(2).strip()
+    py_path = os.path.join(base_dir, rel_path)
     
     try:
         with open(py_path, "r", encoding="utf-8") as pf:
@@ -157,26 +145,35 @@ def replacer_func(match):
                 snippet = ast.get_source_segment(code, node)
                 return f"```python\n{snippet}\n```"
                 
-        return f"<!-- Target '{target}' not found in {py_file} -->\n{match.group(0)}"
+        return f"<!-- Target '{target}' not found in {rel_path} -->\n{match.group(0)}"
     except Exception as e:
-        return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
+        return f"<!-- Error processing {rel_path}: {e} -->\n{match.group(0)}"
 
 def replacer_file(match):
-    py_file = match.group(1)
-    py_path = os.path.join(py_dir, py_file)
+    rel_path = match.group(1).strip()
+    src_path = os.path.join(base_dir, rel_path)
+    
+    if rel_path.endswith(".py"):
+        lang = "python"
+    elif rel_path.endswith(".m"):
+        lang = "mathematica"
+    elif rel_path.endswith(".c") or rel_path.endswith(".h"):
+        lang = "c"
+    else:
+        lang = ""
     
     try:
-        with open(py_path, "r", encoding="utf-8") as pf:
+        with open(src_path, "r", encoding="utf-8") as pf:
             code = pf.read()
-        return f"```python\n{code.strip()}\n```"
+        return f"```{lang}\n{code.strip()}\n```"
     except Exception as e:
-        return f"<!-- Error processing {py_file}: {e} -->\n{match.group(0)}"
+        return f"<!-- Error processing {rel_path}: {e} -->\n{match.group(0)}"
 
-# Match exactly: *from [filename.py] insert [target]*
-content = re.sub(r'\*from\s+([a-zA-Z0-9_.-]+)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer_func, content)
+# Match: *from [relative/filepath.py] insert [target]*
+content = re.sub(r'\*from\s+(.+?)\s+insert\s+([a-zA-Z0-9_]+)\*', replacer_func, content)
 
-# Match exactly: *insert [filename.py]*
-content = re.sub(r'\*insert\s+([a-zA-Z0-9_.-]+)\*', replacer_file, content)
+# Match: *insert [relative/filepath]*
+content = re.sub(r'\*insert\s+(.+?)\*', replacer_file, content)
 
 print(content)
 EOF
@@ -185,21 +182,17 @@ EOF
 for file in "$SRC"/*.md; do
     filename=$(basename "$file")
     
-    # Exclude the raw sidebar source from page generation
     if [ "$filename" = "_sidebar.md" ]; then
         continue
     fi
     
-    # Route README.md to index.html, and map all other .md files to .html
     if [ "$filename" = "README.md" ]; then
         outname="index.html"
     else
         outname="${filename%.md}.html"
     fi
     
-    # Inject python snippets, rewrite internal links, and compile with Pandoc
-    # The autolink_bare_uris extension converts plain URLs to links
-    python3 /tmp/inject_snippets.py "$file" "$PY_SRC_DIR" | \
+    python3 /tmp/inject_snippets.py "$file" "$BASE_SRC_DIR" | \
     sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' | \
     pandoc -f markdown+autolink_bare_uris -t html \
         --template=/tmp/template.html \
@@ -212,16 +205,14 @@ echo "Site generated in $DEST"
 mkdir -p "$LLM_DEST_DIR"
 > "$LLM_OUT_FILE"
 
-# Process and append README.md
 if [ -f "$SRC/README.md" ]; then
     echo -e "# Source: README.md\n" >> "$LLM_OUT_FILE"
-    python3 /tmp/inject_snippets.py "$SRC/README.md" "$PY_SRC_DIR" >> "$LLM_OUT_FILE"
+    python3 /tmp/inject_snippets.py "$SRC/README.md" "$BASE_SRC_DIR" >> "$LLM_OUT_FILE"
     echo -e "\n\n" >> "$LLM_OUT_FILE"
 else
     echo "Warning: README.md not found in $SRC"
 fi
 
-# Extract markdown filenames and process them sequentially
 if [ -f "$SRC/_sidebar.md" ]; then
     FILES=$(sed -n 's/.*(\([^)]*\.md\)).*/\1/p' "$SRC/_sidebar.md")
     
@@ -232,7 +223,7 @@ if [ -f "$SRC/_sidebar.md" ]; then
         
         if [ -f "$SRC/$file" ]; then
             echo -e "# Source: $file\n" >> "$LLM_OUT_FILE"
-            python3 /tmp/inject_snippets.py "$SRC/$file" "$PY_SRC_DIR" >> "$LLM_OUT_FILE"
+            python3 /tmp/inject_snippets.py "$SRC/$file" "$BASE_SRC_DIR" >> "$LLM_OUT_FILE"
             echo -e "\n\n" >> "$LLM_OUT_FILE"
         else
             echo "Warning: $file listed in _sidebar.md but not found in $SRC."
@@ -243,4 +234,3 @@ else
 fi
 
 echo "LLM context generated in $LLM_OUT_FILE"
-

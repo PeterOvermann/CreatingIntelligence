@@ -5,12 +5,8 @@
   <title>Creating Intelligence &mdash; Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Load extracted custom styles -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Static Layout Fixes -->
     <style>
-
-      /* Inject Pandoc Syntax Highlighting CSS */
       html { -webkit-text-size-adjust: 100%; }
       pre > code.sourceCode { white-space: pre; position: relative; }
       pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -143,8 +139,9 @@ class="sidebar-icon">π</span>permutation</a></li>
 </ul></li>
 <li><strong>SOURCE CODE</strong>
 <ul>
-<li><a href="circuits_source.html">Circuits</a></li>
-<li><a href="memory_source.html">Memory</a></li>
+<li><a href="python.html">Python</a></li>
+<li><a href="mathematica.html">Mathematica</a></li>
+<li><a href="c.html">C</a></li>
 </ul></li>
 </ul>
       </div>
@@ -302,12 +299,10 @@ class="sidebar-icon">π</span>permutation</a></li>
     </section>
   </main>
   
-  <!-- Mermaid Support -->
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
     mermaid.initialize({ startOnLoad: true });
     
-    // Map Pandoc's codeblock output to Mermaid's expected DOM structure
     document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
         const pre = el.parentElement;
         const div = document.createElement('div');
@@ -317,7 +312,6 @@ class="sidebar-icon">π</span>permutation</a></li>
     });
   </script>
 
-  <!-- Sidebar Scroll Persistence -->
   <script>
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
@@ -339,7 +333,5 @@ class="sidebar-icon">π</span>permutation</a></li>
       }
     });
   </script>
-  
-   
 </body>
 </html>
