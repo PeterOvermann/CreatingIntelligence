@@ -933,8 +933,27 @@ This uses the [`flyhash`](flyhash.md) encoder:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert input*
+```python
+def input(config):
+    """
+    At the beginning of each cycle, external input is pushed
+    into the input's send slots. Input nodes have no "receive" slots.
+    The callback function serves as an optional encoder/preprocessing plugin.
+    """
+    pluginconfig = config.copy()
+    if "send_blocks" in config and config["send_blocks"]:
+        pluginconfig["hyperparameters"] = config["send_blocks"][0]
+
+    plugin_factory = config.get("plugin")
+
+    if callable(plugin_factory):
+        plugin = plugin_factory(pluginconfig)
+    else:
+        # Default Identity function
+        plugin = {"function": lambda x: x}
+
+    return plugin | {"size": 10, "checks": ["input", "oneout"]}
+```
 
 
 
@@ -1049,8 +1068,27 @@ same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert output*
+```python
+def output(config):
+    """
+    At the end of each cycle, the output's input edges are read out.
+    Output nodes have no "send" slots.
+    The callback function serves as an optional decoder/postprocessing plugin.
+    """
+    pluginconfig = config.copy()
+    if "receive_blocks" in config and config["receive_blocks"]:
+        pluginconfig["hyperparameters"] = config["receive_blocks"][0]
+
+    plugin_factory = config.get("plugin")
+
+    if callable(plugin_factory):
+        plugin = plugin_factory(pluginconfig)
+    else:
+        # Default Identity function
+        plugin = {"function": lambda x: x}
+
+    return plugin | {"size": 10, "checks": ["output", "oneinp"]}
+```
 
 
 
@@ -1241,8 +1279,97 @@ The accumulated state retains information about the order within the temporal se
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert delay*
+```python
+def delay(config):
+    plugin_factory = config.get("plugin", replacement)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            replacement)
+
+    plugin = plugin_factory(config)
+
+    if plugin_factory is replacement:
+        plugin.pop("label", None)
+        
+    dims1 = [b[0] for b in config.get("receive_blocks", [])]
+    dims2 = [b[0] for b in config.get("send_blocks", [])]
+    pop = sum(b[1] for b in config.get("receive_blocks", []))
+
+    threshold_factor = config.get("threshold", 0.0)
+    absthreshold = round(threshold_factor * pop)
+
+    rate_limit_factor = config.get("rate_limit", float('inf'))
+    absratelimit = round(
+        rate_limit_factor *
+        pop) if rate_limit_factor != float('inf') else float('inf')
+
+    decay = config.get("decay", 0.0)
+    capacity_factor = config.get("capacity", 1.0)
+    abscapacity = round(capacity_factor * pop)
+    decimation = config.get("decimate", 1.0)
+    latch = config.get("latch", False)
+
+    Xstate = []
+
+    def f(*blocks):
+        nonlocal Xstate
+        X = multiset_block_join(list(blocks), dims1)
+
+        # Enforce minimum population
+        if len(X) < absthreshold:
+            X = []
+
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
+
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=abscapacity,
+                    replace=False).tolist())
+
+        # Temporal integration via update rules
+        if not (latch and len(X) == 0):
+            Xstate = plugin["updaterule"](X, Xstate)
+
+        # Proportional multiset subsampling applied to output
+        Xdec = Xstate
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(
+                rng.choice(
+                    Xdec,
+                    size=sample_size,
+                    replace=False).tolist())
+
+        return tuple(multiset_block_split(Xdec, dims2))
+
+    result = dict(plugin)
+
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout", "totaldim"],
+        "fill": 13
+    })
+    return result
+```
 
 
 
@@ -1313,8 +1440,24 @@ Use an inhibitory pathway to make the noise subtractive:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert noise*
+```python
+def noise(config):
+    n, p = config.get("send_blocks", [[0, 0]])[0]
+
+    def f(*blocks):
+        return (
+            sorted(
+                rng.choice(range(1, n + 1),
+                    size=p,
+                    replace=False).tolist()),
+        )
+
+    return {
+        "function": f,
+        "checks": ["input", "oneout"],
+        "label": "~", "fill": 13, "size": 18
+    }
+```
 
 
 
@@ -1423,16 +1566,117 @@ match the parameters of its inbound and outbound slots.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert circuit*
+```python
+def circuit(config):
+    """
+    Embedded circuit component.
+    Multiple circuit components can reference the same embedded instance.
+    """
+    plugin_factory = config.get("plugin", shared)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(sys.modules[__name__], plugin_factory, shared)
+
+    plugin = plugin_factory(config)
+    if not plugin:
+        return {}
+
+    params = [plugin.get("receive_blocks", []), plugin.get("send_blocks", [])]
+
+    if [config.get("receive_blocks", []), config.get(
+            "send_blocks", [])] != params:
+        raise ValueError(
+            f"Hyperparameters of embedded circuit do not match: {params}")
+
+    def f(*blocks):
+        return plugin["function"](*blocks)
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout"],
+        "shape": "square", "size": 9
+    })
+
+    return result
+```
 
 ### Plugins
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert shared*
+```python
+def shared(config):
+    """Plug-in for embedding a precompiled circuit."""
+    name = config.get("name")
+    if not name:
+        raise ValueError(
+            f"Missing 'name' property in shared circuit: {config}")
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert file*
+    sub = circuit_registry.get(name)
+    if not sub:
+        raise ValueError(f"Unknown circuit '{name}'.")
+
+    result = dict(sub)
+    result["label"] = name
+    result.pop("clear", None)
+
+    return result
+```
+
+```python
+def file(config):
+    file_path = config.get("name")
+    if not file_path:
+        raise CircuitError(f"Missing 'name' property in {config}")
+
+    if not file_path.endswith(".json"):
+        file_path += ".json"
+
+    # Search current working directory first, then sys.path
+    search_paths = [""] + sys.path
+
+    full_path = None
+    for base in search_paths:
+        target = os.path.join(base, file_path) if base else file_path
+        if os.path.exists(target):
+            full_path = target
+            break
+
+    if not full_path:
+        raise CircuitError(
+            f"File '{file_path}' not found in current directory or sys.path.")
+
+    with open(full_path, "r") as f:
+        circ_expr = json.load(f)
+
+    # Rescale hyperparameters of embedded circuit
+    scale = config.get("scale")
+    default_hp = circ_expr.get("hyperparameters", {}).get("default")
+
+    if (isinstance(scale, (list, tuple)) and len(scale) == 2 and
+            isinstance(default_hp, (list, tuple)) and len(default_hp) == 2):
+
+        # Calculate separate scaling factors
+        rescale_factor_n = scale[0] / default_hp[0]
+        rescale_factor_p = scale[1] / default_hp[1]
+
+        # Apply scaling to all hyperparameters in the embedded circuit
+        for k, v in circ_expr["hyperparameters"].items():
+            if isinstance(v, (list, tuple)) and len(v) == 2:
+                circ_expr["hyperparameters"][k] = [
+                    round(v[0] * rescale_factor_n),
+                    round(v[1] * rescale_factor_p)
+                ]
+
+    # Compile the imported circuit
+    sub = Circuit(circ_expr)
+
+    # Extract up to 5 characters from the filename for the label
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
+    sub["label"] = base_name[:5]
+
+    return sub
+```
 
 
 
@@ -1607,8 +1851,110 @@ retains the matching elements between the query and the retrieved pattern.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert auto*
+```python
+def auto(config):
+    plugin_factory = config.get("plugin", replacement)
+
+    if isinstance(plugin_factory, str):
+        # Resolve string name to function dynamically
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            replacement)
+
+    plugin = plugin_factory(config)
+
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+
+    # params = Plus @@ config["receive_blocks"] (Sums Ns and Ps respectively)
+    params = [sum(b[0] for b in receive_blocks), sum(b[1]
+                                                     for b in receive_blocks)]
+    pop = params[1] if len(params) > 1 else 0
+
+    rate_limit_factor = config.get("rate_limit", float('inf'))
+    absratelimit = round(
+        rate_limit_factor *
+        pop) if rate_limit_factor != float('inf') else float('inf')
+
+    decimation = config.get("decimate", 1.0)
+
+    # Learning thresholds
+    min_val = pop
+    max_val = pop
+    learn_val = config.get("learn", False)
+
+    if isinstance(learn_val, (int, float)) and not isinstance(learn_val, bool):
+        min_val = max_val = round(learn_val * pop)
+    elif isinstance(learn_val, (list, tuple)) and len(learn_val) == 2:
+        min_val = round(learn_val[0] * pop)
+        max_val = round(learn_val[1] * pop)
+
+    # Memory with identical input and output parameters
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params,
+        "B_parameters": params
+    })
+
+    # Memory backend
+    M = Memory(m_config)
+
+    def f(*blocks):
+        # Join partitions and apply inhibition
+        A = resolve_block_join_normal(list(blocks), dims)
+        X = A
+
+        # Limit the rate of incoming positives
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        # Proportional decimation
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(X))
+            Xdec = sorted(
+                rng.choice(
+                    X,
+                    size=sample_size,
+                    replace=False).tolist())
+        else:
+            Xdec = X
+
+        # Always learn if "learn" is True
+        if learn_val is True:
+            M["store"](A)
+
+        # Memory retrieval with decimated and rate-limited input state
+        Y = M["retrieve"](Xdec)
+
+        # Learn input A if retrieval fails and it falls within thresholds
+        if not Y and min_val <= len(A) <= max_val:
+            if learn_val is not True:
+                M["store"](A)
+            Y = A
+
+        X_out = plugin["updaterule"](Y, X)
+        X_out = sorted(list(set(X_out)))
+
+        return tuple(multiset_block_split(X_out, dims))
+
+    # Merge plugin attributes, component defaults, and Memory closures (e.g.,
+    # "clear")
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout", "ident"],
+        "shape": "square", "fill": 8
+    })
+    result.update(M)
+
+    return result
+```
 
 
 
@@ -1758,8 +2104,117 @@ The [`permutation`](permutation.md) update rule plugin accumulates a temporal st
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert temporal*
+```python
+def temporal(config):
+    plugin_factory = config.get("plugin", replacement)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            replacement)
+
+    plugin = plugin_factory(config)
+
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+
+    params = [sum(b[0] for b in receive_blocks), sum(b[1]
+                                                     for b in receive_blocks)]
+    pop = params[1] if len(params) > 1 else 0
+
+    threshold_factor = config.get("threshold", 0.0)
+    absthreshold = round(threshold_factor * pop)
+
+    rate_limit_factor = config.get("rate_limit", float('inf'))
+    absratelimit = round(
+        rate_limit_factor *
+        pop) if rate_limit_factor != float('inf') else float('inf')
+
+    decay = config.get("decay", 0.0)
+    capacity_factor = config.get("capacity", 1.0)
+    abscapacity = round(capacity_factor * pop)
+    decimation = config.get("decimate", 1.0)
+    latch = config.get("latch", False)
+
+    # Memory with identical input and output parameters
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params,
+        "B_parameters": params
+    })
+
+    M = Memory(m_config)
+    Xstate = []
+    prediction = []
+
+    def f(*blocks):
+        nonlocal Xstate, prediction
+        X = multiset_block_join(list(blocks), dims)
+
+        # Enforce minimum population
+        if len(X) < absthreshold:
+            X = []
+
+        # Rate limiting equally applies to positive and negative elements
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
+
+        # Learn state -> current input if prediction was incorrect.
+        if prediction != X:
+            M["store"](resolve_normal(Xstate), resolve_normal(X))
+
+        # Multiset subsampling applied to previous state
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=abscapacity,
+                    replace=False).tolist())
+
+        # Temporal integration via update rules
+        if not (latch and len(X) == 0):
+            Xstate = plugin["updaterule"](X, Xstate)
+
+        # Proportional multiset subsampling applied to the integrated state
+        Xdec = Xstate
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(
+                rng.choice(
+                    Xdec,
+                    size=sample_size,
+                    replace=False).tolist())
+
+        # Predict next token
+        prediction = M["retrieve"](resolve_normal(Xdec))
+
+        return tuple(multiset_block_split(prediction, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout", "ident"],
+        "shape": "square", "fill": 14
+    })
+    result.update(M)
+
+    return result
+```
 
 
 
@@ -1829,8 +2284,47 @@ A basic supervised learning setup using hetero-associative memory:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert associator*
+```python
+def associator(config):
+    """
+    Vanilla hetero-associative node for supervised learning A -> B.
+    B is the first input argument. 
+    A is given by the rest of the input arguments.
+    Can be block-coded. Always learns if B != [].
+    """
+    receive_blocks = config.get("receive_blocks", [])
+    Adims = [b[0] for b in receive_blocks[1:]]
+
+    params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
+                    for b in receive_blocks[1:])]
+    params_B = receive_blocks[0]
+
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params_A,
+        "B_parameters": params_B
+    })
+
+    M = Memory(m_config)
+
+    def f(B, *blocks):
+        X = resolve_block_join_normal(list(blocks), Adims)
+        Y = resolve_normal(B)
+
+        if not Y:
+            return (M["retrieve"](X),)
+
+        M["store"](X, Y)
+        return ([],)
+
+    result = {
+        "function": f,
+        "checks": ["dimfirst", "oneout"],
+        "shape": "square", "fill": 11, "size": 18, "label": "▶●"
+    }
+    result.update(M)
+    return result
+```
 
 
 
@@ -1898,8 +2392,67 @@ A basic setup for predictive learning with hetero-associative memory:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert predictor*
+```python
+def predictor(config):
+    """
+    Generates a prediction based on the current input (slot #1) 
+    and context (slots #2,...).
+    Automatically learns the correct prediction in the following cycle.
+    """
+    receive_blocks = config.get("receive_blocks", [])
+    itemconfig = receive_blocks[0]
+    contextconfig = receive_blocks[1:]
+
+    # Extract decimation parameter, defaulting to 1.0
+    decimation = config.get("decimate", 1.0)
+
+    params_A = [sum(b[0] for b in contextconfig), sum(b[1]
+                    for b in contextconfig)]
+    params_B = itemconfig
+
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params_A,
+        "B_parameters": params_B
+    })
+
+    M = Memory(m_config)
+    X = []
+    prediction = []
+
+    def f(item, *blocks):
+        nonlocal X, prediction
+        Y = resolve_normal(item)
+
+        if prediction != X:
+            M["store"](X, Y)
+
+        X = resolve_block_join_normal(
+            list(blocks), [b[0] for b in contextconfig])
+
+        # Apply stochastic subsampling to X before retrieval
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(X))
+            Xdec = sorted(
+                rng.choice(
+                    X,
+                    size=sample_size,
+                    replace=False).tolist())
+        else:
+            Xdec = X
+
+        prediction = M["retrieve"](Xdec)
+
+        return (prediction,)
+
+    result = {
+        "function": f,
+        "checks": ["dimfirst", "oneout"],
+        "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
+    }
+    result.update(M)
+    return result
+```
 
 
 
@@ -1968,8 +2521,51 @@ A simple hetero-encoding circuit:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert heteroencoder*
+```python
+def heteroencoder(config):
+    """
+    Heteroencoder A -> B. A may be partitioned. Has no input for B.
+    """
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+
+    params_A = [sum(b[0] for b in receive_blocks), sum(b[1]
+                    for b in receive_blocks)]
+    params_B = config.get("send_blocks", [[0, 0]])[0]
+
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params_A,
+        "B_parameters": params_B
+    })
+
+    M = Memory(m_config)
+
+    def f(*blocks):
+        X = resolve_block_join_normal(list(blocks), dims)
+        Y = M["retrieve"](X)
+
+        if not Y:
+            n, p = params_B
+            Y = sorted(
+                rng.choice(
+                    range(1, n + 1),
+                    size=p, replace=False).tolist())
+
+        M["store"](X, Y)
+        return (Y,)
+
+    result = {
+        "function": f,
+        "checks": ["arginp", "oneout"],
+        "shape": "square",
+        "fill": 11,
+        "size": 18,
+        "label": "◀▶"
+    }
+    result.update(M)
+    return result
+```
 
 
 
@@ -2065,8 +2661,10 @@ each signal to the subsequent signal.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert replacement*
+```python
+def replacement(config):
+    return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
+```
 
 
 
@@ -2120,8 +2718,11 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert residual*
+```python
+def residual(config):
+    return {"updaterule": lambda y, x: resolve_graded(
+        multiset([x, [-i for i in y]])), "label": "▲", "size": 18}
+```
 
 
 
@@ -2200,8 +2801,11 @@ the symmetric multiset difference of the state and the incoming signal.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert difference*
+```python
+def difference(config):
+    return {"updaterule": lambda y, x: sorted(
+        [abs(i) for i in multiset([y, [-i for i in x]])]), "label": "△", "size": 20}
+```
 
 
 
@@ -2282,8 +2886,11 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert complement*
+```python
+def complement(config):
+    return {"updaterule": lambda y, x: resolve_graded(
+        multiset([y, [-i for i in x]])), "label": "▽", "size": 20}
+```
 
 
 
@@ -2378,8 +2985,11 @@ aggregates an orderless state representing prior inputs.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert augmentation*
+```python
+def augmentation(config):
+    return {"updaterule": lambda y, x: multiset(
+        [y, x]), "label": "∪", "size": 14}
+```
 
 
 
@@ -2432,8 +3042,17 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert coincidence*
+```python
+def coincidence(config):
+    def multiset_intersection(y, x):
+        counts_y = Counter(y)
+        counts_x = Counter(x)
+        res = []
+        for k, v in counts_y.items():
+            res.extend([k] * min(v, counts_x.get(k, 0)))
+        return sorted(res)
+    return {"updaterule": multiset_intersection, "label": "∩", "size": 14}
+```
 
 
 
@@ -2504,8 +3123,22 @@ aggregates a state that preserves the order of prior inputs.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert permutation*
+```python
+def permutation(config):
+    dims = sum(b[0] for b in config.get("receive_blocks", []))
+    dim = dims if dims else 0
+    perm = rng.choice(
+        range(1, dim + 1),
+        size = dim,
+        replace=False).tolist() if dim > 0 else []
+
+    def updaterule(y, x):
+        mapped_x = sorted([(1 if i > 0 else -1 if i < 0 else 0)
+                          * perm[abs(i) - 1] for i in x if i != 0])
+        return multiset([y, mapped_x])
+
+    return {"updaterule": updaterule, "label": "π", "size": 16}
+```
 
 
 
@@ -2562,8 +3195,69 @@ mirroring the input.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert codec*
+```python
+def codec(config):
+    """General-purpose SHR encoder/decoder for symbolic expressions."""
+
+    # Extract hyperparameters from config
+    hyperparameters = config.get("hyperparameters", [0, 0])
+    n, p = hyperparameters[0], hyperparameters[1]
+    lex_key = (n, p)
+
+    # Initialize global hash table if missing for these dimensions
+    if lex_key not in circuit_codec_lexicon:
+        circuit_codec_lexicon[lex_key] = {None: []}
+
+    lex = circuit_codec_lexicon[lex_key]
+
+    # Use auto-associative pattern matching threshold
+    T = matching_threshold((n, p), (n, p))
+
+    def f(expr):
+        # Encoding logic
+        if config.get("component") == "input":
+            if isinstance(expr, list):
+                # Bundle multiple tokens
+                bundled = []
+                for e in expr:
+                    res = f(e)
+                    if res:
+                        bundled.extend(res)
+                return sorted(list(set(bundled)))
+
+            if expr not in lex:
+                # 1-based indexing for native arrays
+                sampled = rng.choice(range(1, n + 1), size=p, replace=False)
+                lex[expr] = sorted(sampled.tolist())
+
+            return lex[expr]
+
+        # Decoding logic
+        if not expr:
+            return None
+
+        overlaps = {k: len(set(v).intersection(expr))
+                    for k, v in lex.items() if k is not None}
+
+        result = [k for k, overlap in overlaps.items() if overlap >= T]
+
+        if len(result) == 0:
+            return None
+        elif len(result) == 1:
+            return result[0]
+        else:
+            return sorted(result)
+
+    def clear():
+        lex.clear()
+        lex[None] = []
+
+    return {
+        "label": "SYM",
+        "function": f,
+        "clear": clear
+    }
+```
 
 
 
@@ -2623,8 +3317,70 @@ and subsequently decodes the internal representation, mirroring the input.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert category*
+```python
+def category(config):
+    hyperparameters = config.get("hyperparameters", [0, 0])
+    n, p = hyperparameters[0], hyperparameters[1]
+
+    K = config.get("categories", n // p if p > 0 else 0)
+    if K * p > n:
+        raise ValueError(
+            f"Encoder requires dimension {K * p} or greater.")
+
+    partitionsize = n // K if K > 0 else 0
+
+    lex_key = (n, p, K)
+
+    if lex_key not in circuit_category_lexicon:
+        circuit_category_lexicon[lex_key] = {None: []}
+
+    lex = circuit_category_lexicon[lex_key]
+    T = matching_threshold((n, p), (n, p))
+    
+    def f(expr):
+        if config.get("component") == "input":
+            if not isinstance(expr, int) or expr < 0 or expr >= K:
+                return []
+
+            if expr not in lex:
+                # 1-based indexing for native arrays
+                start = partitionsize * expr + 1
+                end = start + partitionsize
+                lex[expr] = list(range(start, end))
+
+            pool = lex[expr]
+            sample_size = min(p, len(pool))
+            return sorted(
+                rng.choice(
+                    pool,
+                    size=sample_size,
+                    replace=False).tolist())
+
+        if not expr:
+            return None
+
+        overlaps = {k: len(set(v).intersection(expr))
+                    for k, v in lex.items() if k is not None}
+
+        result = [k for k, overlap in overlaps.items() if overlap >= T]
+
+        if len(result) == 0:
+            return None
+        elif len(result) == 1:
+            return result[0]
+        else:
+            return sorted(result)
+
+    def clear():
+        lex.clear()
+        lex[None] = []
+
+    return {
+        "label": "CAT",
+        "function": f,
+        "clear": clear
+    }
+```
 
 
 
@@ -2671,8 +3427,49 @@ The following circuit classifies SDRs, returning bin numbers 1,2,...
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert binning*
+```python
+def binning(config):
+    hyperparameters = config.get("hyperparameters", [0, 0])
+    n, p = hyperparameters[0], hyperparameters[1]
+    lex_key = (n, p)
+
+    if lex_key not in circuit_binning_lexicon:
+        circuit_binning_lexicon[lex_key] = {None: []}
+
+    lex = circuit_binning_lexicon[lex_key]
+    T = matching_threshold((n, p), (n, p))
+
+    if config.get("component") == "input":
+        raise ValueError("binning cannot be used as an encoder.")
+
+    def f(expr):
+        if not expr:
+            return 0
+
+        overlaps = {k: len(set(v).intersection(expr))
+                    for k, v in lex.items() if k is not None}
+
+        bins = [k for k, overlap in overlaps.items() if overlap >= T]
+
+        if len(bins) == 0:
+            new_bin = len(lex)
+            lex[new_bin] = expr
+            return new_bin
+        elif len(bins) == 1:
+            return bins[0]
+        else:
+            return sorted(bins)
+
+    def clear():
+        lex.clear()
+        lex[None] = []
+
+    return {
+        "label": "BIN",
+        "function": f,
+        "clear": clear
+    }
+```
 
 
 
@@ -2725,8 +3522,62 @@ The following circuit encodes dense vectors as SDRs.
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert vectorencoder*
+```python
+def vectorencoder(config):
+    hyperparameters = config.get("hyperparameters", [0, 0])
+    n, p = hyperparameters[0], hyperparameters[1]
+    key = (n, p)
+
+    if key not in circuit_vectorencoder_matrices:
+        circuit_vectorencoder_matrices[key] = {}
+
+    R = circuit_vectorencoder_matrices[key]
+
+    if config.get("component") == "output":
+        raise ValueError("vectorencoder cannot be used as a decoder.")
+
+    def f(lst):
+        if not isinstance(lst, list):
+            lst = list(lst)
+        d = len(lst)
+        if p <= 0 or d == 0:
+            return []
+
+        sparsity = config.get("sparsity", float(1.0 / math.sqrt(d)))
+
+        if d not in R:
+            num_ones = round(n * d * sparsity)
+            flat_indices = rng.choice(n * d, size=num_ones, replace=False)
+            rows = flat_indices // d
+            cols = flat_indices % d
+            vals = np.ones(num_ones)
+
+            R[d] = sp.csr_matrix((vals, (rows, cols)), shape=(n, d))
+
+        matrix = R[d]
+        vec = matrix.dot(np.array(lst))
+
+        min_val, max_val = np.min(vec), np.max(vec)
+        span = max_val - min_val
+        scale = max(abs(min_val), abs(max_val))
+        tolerance = 1e-10
+
+        if scale == 0 or span <= tolerance * scale:
+            return []
+
+        k = min(p, len(vec))
+        top_k_indices = np.argsort(vec)[-k:]
+        return sorted((top_k_indices + 1).tolist())
+
+    def clear():
+        R.clear()
+
+    return {
+        "label": "VEC",
+        "function": f,
+        "clear": clear
+    }
+```
 
 
 
@@ -2774,8 +3625,69 @@ The following circuit encodes dense vectors as SDRs:
 
 ## Source code
 
-<!-- Error processing circuits.py: [Errno 2] No such file or directory: '/Users/overmann/Documents/Development/CI/src/docs/../circuits.py' -->
-*from circuits.py insert flyhash*
+```python
+def flyhash(config):
+    hyperparameters = config.get("hyperparameters", [0, 0])
+    n, p = hyperparameters[0], hyperparameters[1]
+    key = (n, p)
+
+    if key not in circuit_flyhash_matrices:
+        circuit_flyhash_matrices[key] = {}
+        circuit_flyhash_resting[key] = {}
+
+    R = circuit_flyhash_matrices[key]
+    restingpotential = circuit_flyhash_resting[key]
+
+    sparsity = config.get("sparsity", 0.1)
+
+    if config.get("component") == "output":
+        raise ValueError("flyhash cannot be used as a decoder.")
+
+    def f(lst):
+        if not isinstance(lst, list):
+            lst = list(lst)
+        d = len(lst)
+        if p <= 0 or d == 0:
+            return []
+
+        arr = np.array(lst)
+        centeredlist = arr - np.mean(arr)
+        tolerance = 1e-10
+
+        if d not in R:
+            c = max(1, round(d * sparsity))
+
+            rows = np.repeat(np.arange(n), c)
+            cols = np.concatenate(
+                [rng.choice(d, size=c, replace=False) for _ in range(n)])
+            vals = np.ones(n * c)
+
+            R[d] = sp.csr_matrix((vals, (rows, cols)), shape=(n, d))
+            restingpotential[d] = rng.uniform(0, tolerance * 0.01, size=n)
+
+        vec = R[d].dot(centeredlist) + restingpotential[d]
+
+        min_val, max_val = np.min(vec), np.max(vec)
+        span = max_val - min_val
+        scale = max(abs(min_val), abs(max_val))
+
+        if scale == 0 or span <= tolerance * scale:
+            return []
+
+        k = min(p, len(vec))
+        top_k_indices = np.argsort(vec)[-k:]
+        return sorted((top_k_indices + 1).tolist())
+
+    def clear():
+        R.clear()
+        restingpotential.clear()
+
+    return {
+        "label": "FLY",
+        "function": f,
+        "clear": clear
+    }
+```
 
 
 

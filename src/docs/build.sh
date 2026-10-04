@@ -134,7 +134,7 @@ with open(sys.argv[1], "r", encoding="utf-8") as f:
 def replacer_func(match):
     rel_path = match.group(1).strip()
     target = match.group(2).strip()
-    py_path = os.path.join(base_dir, rel_path)
+    py_path = os.path.join(base_dir, "python", "creating_intelligence", rel_path)
     
     try:
         with open(py_path, "r", encoding="utf-8") as pf:
