@@ -560,6 +560,7 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Bpopulation	= pb;
 	
 	self->T = matching_threshold(na, pa, nb, pb);	// Absolute pattern matching threshold
+	self->fraction = 0.0;							// Relative threshold disabled
 
 	self->M = (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
@@ -582,6 +583,16 @@ void 	Memory_set_threshold (Memory *self, int t)	// Override default threshold
 int 	Memory_get_threshold (Memory *self)	// Recall threshold
 	{
 	return self->T;
+	}
+
+void 	Memory_set_fraction (Memory *self, double f)	// Relative threshold
+	{
+	self->fraction = f;
+	}
+
+double 	Memory_get_fraction (Memory *self)
+	{
+	return self->fraction;
 	}
 
 
@@ -681,8 +692,6 @@ static void kwta (int k, int ny, int *r, int threshold, Set *y)
 	}
 
 
-
-
 // 	Memory retrieval with query set A. Stores result in Y.
 
 Set* Memory_read (Memory *self, Set *A, Set *Y)
@@ -695,6 +704,18 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	// Step 1: Initialize.
 	Set *X = self->X;
 	Set_copy(X, A);
+
+	// Per-query threshold Tq = max(T, ceil(fraction * |A|)).
+	// The offset guards against floating-point round-up.
+	// Integer ceiling avoids a dependency on libm.
+	int Tq = self->T;
+	if (self->fraction > 0.0)
+		{
+		double v = self->fraction * A->p - 1e-9;
+		int c = (int) v;
+		if (v > c) c++;
+		if (c > Tq) Tq = c;
+		}
 
 	// Shortcut
 	int ny = self->Bdimension;
@@ -726,7 +747,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 
 		// Step 2: Threshold check.
 		int P = X->p;
-		if (P < self->T)
+		if (P < Tq)
 			break; // Y->p = 0 at this point.
 
 		// Initialize total and per-element response vectors.
@@ -776,8 +797,8 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		int K = self->Bpopulation; // The K for KWTA.
 
 		
-		// Use T(T-1)/2 as response threshold.
-		kwta(K, ny, R, self->T * (self->T - 1)/2, Y);
+		// Use Tq(Tq-1)/2 as response threshold.
+		kwta(K, ny, R, Tq * (Tq - 1)/2, Y);
 		
 		// Step 6: Threshold check.
 		if (Y->p == 0) {X->p = 0; break;}
@@ -799,7 +820,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		while (Ws[P - h] < Y->p * (h - 1)) --h;
 		int cutoff = Ws[P - h];
 		
-		if (h < self->T)
+		if (h < Tq)
 			{ Y->p = X->p = 0; break; }
 		
 		// Step 9: Refine.
@@ -809,7 +830,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 			if (W[i] >= cutoff) X->a[X->p++] = X->a[i];
 	
 		// Edge case:
-		if (h == self->T && h < X->p) 
+		if (h == Tq && h < X->p) 
 			{ Y->p = X->p = 0; break; }
 			
 		if (X->p == P) break; // Success. X has converged.

@@ -27,7 +27,7 @@ See "Memory Reference.nb" for a plain reference implementation.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
 		store, retrieve, clear, memorycount, accumulate},
 			
 		{NA, PA} = config["A_parameters"];
@@ -50,6 +50,12 @@ Memory[config_Association] :=
 			T = Round[config["threshold"] * PA]];
 			
 		If[T < 2, T = 2];
+
+		(* Optional relative threshold: Fraction of the query population 
+			that must match (1 = all input bits). Absent or 0 keeps 
+			the fixed threshold T. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			fraction = config["fraction"]];
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
@@ -86,12 +92,16 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[{X = A, P, Y, R, vals, valsY, t, w, ws, h, cutoff},
+			Module[{X = A, P, Y, R, vals, valsY, t, w, ws, h, cutoff, Tq},
+			
+			(* Per-query threshold, at least the fixed threshold T. 
+				The offset guards against floating-point round-up. *)
+			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
 			
 			While[True,
 			
 				P = Length[X];
-				If[P < T, Return[{}]];
+				If[P < Tq, Return[{}]];
 
 				(* Bulk native lookup returning a 2D packed C-array *)
 				vals = Lookup[mem, Subsets[X, {2}], zero];
@@ -100,7 +110,7 @@ Memory[config_Association] :=
 				R = Total[vals];
 
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
-				If[t < T (T - 1) / 2, Return[{}]];
+				If[t < Tq (Tq - 1) / 2, Return[{}]];
 
 				Y = Pick[Range[NB], UnitStep[R - t], 1];
 
@@ -114,11 +124,11 @@ Memory[config_Association] :=
 				h = P;
 				While[(cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[h < T, Return[{}]];
+				If[h < Tq, Return[{}]];
 
 				X = Pick[X, UnitStep[w - cutoff], 1];
 
-				If[h === T && h < Length[X], Return[{}]];
+				If[h === Tq && h < Length[X], Return[{}]];
 				If[Length[X] == P, Return[Y]];
 				]
 			];	
@@ -130,6 +140,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> fraction,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

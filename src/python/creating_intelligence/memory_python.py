@@ -43,6 +43,10 @@ def Memory(config: dict) -> dict:
     
     T = max(2, T)
 
+    # Optional relative threshold: fraction of the query population that must
+    # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
+    fraction = config.get("fraction") or 0.0
+
     # Initialize enclosed memory dictionary and zero array
     mem = {}
     zero = np.zeros(NB + 1, dtype=np.int8)
@@ -65,9 +69,12 @@ def Memory(config: dict) -> dict:
     def retrieve(A):
         X = list(A)  
 
+        # Per-query threshold, at least the fixed threshold T
+        Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
+
         while True:
             P = len(X)
-            if P < T:
+            if P < Tq:
                 return []
 
             Ri = np.zeros((P, NB + 1), dtype=np.int32)
@@ -86,7 +93,7 @@ def Memory(config: dict) -> dict:
             t_val = sorted_R[-PB] if PB <= len(sorted_R) else sorted_R[0]
             t = max(1, t_val)
 
-            if t < (T * (T - 1)) / 2:
+            if t < (Tq * (Tq - 1)) / 2:
                 return []
             
             Y = [i for i in range(1, NB + 1) if R[i] >= t]
@@ -98,13 +105,13 @@ def Memory(config: dict) -> dict:
             while h > 0 and ws[-h] < len(Y) * (h - 1):
                 h -= 1
 
-            if h < T:
+            if h < Tq:
                 return []
 
             cutoff = ws[-h]
             new_X = [X[i] for i in range(P) if w[i] >= cutoff]
 
-            if h == T and h < len(new_X):
+            if h == Tq and h < len(new_X):
                 return []
 
             if len(new_X) == P:
@@ -128,4 +135,3 @@ def Memory(config: dict) -> dict:
         "memorycount": memorycount,
         "backend": "python"
     }
-    

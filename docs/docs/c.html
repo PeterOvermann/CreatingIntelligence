@@ -150,6 +150,10 @@ class="sidebar-icon">π</span>permutation</a></li>
       <article class="markdown-section">
         <p>SOURCE CODE</p>
         <h1 id="standard-c">Standard C</h1>
+        <p>A zero-dependency, performance-optimized implementation of
+        the Topological Associative Memory kernel.</p>
+        <p>The Python package uses this code to build the memory backend
+        as a C extension.</p>
         <h2 id="memory.h">memory.h</h2>
         <div class="sourceCode" id="cb1"><pre
         class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// -------------------------------------------------------------------------- //</span></span>
@@ -233,30 +237,38 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> T<span class="op">;</span>                              <span class="co">//  Pattern patching threshold</span></span>
 <span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    Set <span class="op">*</span>X<span class="op">;</span>                             <span class="co">//  Matching elements from last memory retrieval.</span></span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> Memory<span class="op">;</span></span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="co">//  Constructor</span></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>Memory <span class="op">*</span>Memory_new <span class="op">(</span><span class="dt">int</span> na<span class="op">,</span> <span class="dt">int</span> pa<span class="op">,</span> <span class="dt">int</span> nb<span class="op">,</span> <span class="dt">int</span> pb<span class="op">);</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> fraction<span class="op">;</span>                    <span class="co">//  Relative pattern matching threshold: fraction of</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>                                        <span class="co">//  the query population that must match</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>                                        <span class="co">//  (0 = fixed threshold T only, 1 = all elements)</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> Memory<span class="op">;</span></span>
 <span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="co">//  Pattern matching threshold</span></span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_set_threshold <span class="op">(</span>Memory<span class="op">*,</span> <span class="dt">int</span><span class="op">);</span></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>  Memory_get_threshold <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="co">//  Constructor</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>Memory <span class="op">*</span>Memory_new <span class="op">(</span><span class="dt">int</span> na<span class="op">,</span> <span class="dt">int</span> pa<span class="op">,</span> <span class="dt">int</span> nb<span class="op">,</span> <span class="dt">int</span> pb<span class="op">);</span></span>
 <span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="co">//  Destructor</span></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_free <span class="op">(</span>Memory<span class="op">*);</span></span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="co">//  Store A -&gt; B</span></span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_write <span class="op">(</span>Memory<span class="op">*,</span> Set<span class="op">*</span>A<span class="op">,</span> Set<span class="op">*</span>B<span class="op">);</span></span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="co">//  Retrieve Y with query pattern A</span></span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>Set <span class="op">*</span>Memory_read <span class="op">(</span>Memory<span class="op">*,</span> Set<span class="op">*</span>A<span class="op">,</span> Set<span class="op">*</span>Y<span class="op">);</span></span>
-<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="co">// Number of &quot;1&quot; bits in memory</span></span>
-<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="dt">int64_t</span> Memory_count <span class="op">(</span>Memory<span class="op">*);</span></span>
-<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>                                    </span>
-<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="co">// End of file</span></span></code></pre></div>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="co">//  Pattern matching threshold</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_set_threshold <span class="op">(</span>Memory<span class="op">*,</span> <span class="dt">int</span><span class="op">);</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>  Memory_get_threshold <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="co">//  Relative pattern matching threshold (fraction of the query population)</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>   Memory_set_fraction <span class="op">(</span>Memory<span class="op">*,</span> <span class="dt">double</span><span class="op">);</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> Memory_get_fraction <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="co">//  Destructor</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_free <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="co">//  Store A -&gt; B</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_write <span class="op">(</span>Memory<span class="op">*,</span> Set<span class="op">*</span>A<span class="op">,</span> Set<span class="op">*</span>B<span class="op">);</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="co">//  Retrieve Y with query pattern A</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>Set <span class="op">*</span>Memory_read <span class="op">(</span>Memory<span class="op">*,</span> Set<span class="op">*</span>A<span class="op">,</span> Set<span class="op">*</span>Y<span class="op">);</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="co">// Number of &quot;1&quot; bits in memory</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="dt">int64_t</span> Memory_count <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>                                    </span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="co">// End of file</span></span></code></pre></div>
         <h2 id="memory.c">memory.c</h2>
         <div class="sourceCode" id="cb2"><pre
         class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// -------------------------------------------------------------------------- //</span></span>
@@ -821,277 +833,298 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb2-560"><a href="#cb2-560" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>Bpopulation   <span class="op">=</span> pb<span class="op">;</span></span>
 <span id="cb2-561"><a href="#cb2-561" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb2-562"><a href="#cb2-562" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>T <span class="op">=</span> matching_threshold<span class="op">(</span>na<span class="op">,</span> pa<span class="op">,</span> nb<span class="op">,</span> pb<span class="op">);</span>   <span class="co">// Absolute pattern matching threshold</span></span>
-<span id="cb2-563"><a href="#cb2-563" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-564"><a href="#cb2-564" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>M <span class="op">=</span> <span class="op">(</span>byte<span class="op">***)</span> calloc<span class="op">(</span>PAGE_COUNT<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span> byte<span class="op">**));</span></span>
-<span id="cb2-565"><a href="#cb2-565" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-566"><a href="#cb2-566" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>X <span class="op">=</span> Set_new<span class="op">(</span>na<span class="op">);</span>                          <span class="co">// Matching elements in memory retrieval</span></span>
-<span id="cb2-567"><a href="#cb2-567" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-568"><a href="#cb2-568" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> self<span class="op">;</span></span>
-<span id="cb2-569"><a href="#cb2-569" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-570"><a href="#cb2-570" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-571"><a href="#cb2-571" aria-hidden="true" tabindex="-1"></a><span class="co">// Pattern matching threshold note: We always use the auto-associative value (based on the capacity</span></span>
-<span id="cb2-572"><a href="#cb2-572" aria-hidden="true" tabindex="-1"></a><span class="co">// of an auto-associative memory). For most hyperparameter configurations it is identical to the</span></span>
-<span id="cb2-573"><a href="#cb2-573" aria-hidden="true" tabindex="-1"></a><span class="co">// hetero-associative threshold, and in rare cases larger by one. It&#39;s always safe to use the larger</span></span>
-<span id="cb2-574"><a href="#cb2-574" aria-hidden="true" tabindex="-1"></a><span class="co">// threshold. Furthermore, for SDR-processing heteroassociations often the threshold is user-defined.</span></span>
-<span id="cb2-575"><a href="#cb2-575" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-563"><a href="#cb2-563" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>fraction <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span>                           <span class="co">// Relative threshold disabled</span></span>
+<span id="cb2-564"><a href="#cb2-564" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-565"><a href="#cb2-565" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>M <span class="op">=</span> <span class="op">(</span>byte<span class="op">***)</span> calloc<span class="op">(</span>PAGE_COUNT<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span> byte<span class="op">**));</span></span>
+<span id="cb2-566"><a href="#cb2-566" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-567"><a href="#cb2-567" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>X <span class="op">=</span> Set_new<span class="op">(</span>na<span class="op">);</span>                          <span class="co">// Matching elements in memory retrieval</span></span>
+<span id="cb2-568"><a href="#cb2-568" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-569"><a href="#cb2-569" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> self<span class="op">;</span></span>
+<span id="cb2-570"><a href="#cb2-570" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-571"><a href="#cb2-571" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-572"><a href="#cb2-572" aria-hidden="true" tabindex="-1"></a><span class="co">// Pattern matching threshold note: We always use the auto-associative value (based on the capacity</span></span>
+<span id="cb2-573"><a href="#cb2-573" aria-hidden="true" tabindex="-1"></a><span class="co">// of an auto-associative memory). For most hyperparameter configurations it is identical to the</span></span>
+<span id="cb2-574"><a href="#cb2-574" aria-hidden="true" tabindex="-1"></a><span class="co">// hetero-associative threshold, and in rare cases larger by one. It&#39;s always safe to use the larger</span></span>
+<span id="cb2-575"><a href="#cb2-575" aria-hidden="true" tabindex="-1"></a><span class="co">// threshold. Furthermore, for SDR-processing heteroassociations often the threshold is user-defined.</span></span>
 <span id="cb2-576"><a href="#cb2-576" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-577"><a href="#cb2-577" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>    Memory_set_threshold <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> <span class="dt">int</span> t<span class="op">)</span>  <span class="co">// Override default threshold</span></span>
-<span id="cb2-578"><a href="#cb2-578" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-579"><a href="#cb2-579" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>T <span class="op">=</span> t<span class="op">;</span></span>
-<span id="cb2-580"><a href="#cb2-580" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-581"><a href="#cb2-581" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-582"><a href="#cb2-582" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>     Memory_get_threshold <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span> <span class="co">// Recall threshold</span></span>
-<span id="cb2-583"><a href="#cb2-583" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-584"><a href="#cb2-584" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> self<span class="op">-&gt;</span>T<span class="op">;</span></span>
-<span id="cb2-585"><a href="#cb2-585" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-586"><a href="#cb2-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-577"><a href="#cb2-577" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-578"><a href="#cb2-578" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>    Memory_set_threshold <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> <span class="dt">int</span> t<span class="op">)</span>  <span class="co">// Override default threshold</span></span>
+<span id="cb2-579"><a href="#cb2-579" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-580"><a href="#cb2-580" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>T <span class="op">=</span> t<span class="op">;</span></span>
+<span id="cb2-581"><a href="#cb2-581" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-582"><a href="#cb2-582" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-583"><a href="#cb2-583" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>     Memory_get_threshold <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span> <span class="co">// Recall threshold</span></span>
+<span id="cb2-584"><a href="#cb2-584" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-585"><a href="#cb2-585" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> self<span class="op">-&gt;</span>T<span class="op">;</span></span>
+<span id="cb2-586"><a href="#cb2-586" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-587"><a href="#cb2-587" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-588"><a href="#cb2-588" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_free <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span></span>
+<span id="cb2-588"><a href="#cb2-588" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>    Memory_set_fraction <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> <span class="dt">double</span> f<span class="op">)</span>    <span class="co">// Relative threshold</span></span>
 <span id="cb2-589"><a href="#cb2-589" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-590"><a href="#cb2-590" aria-hidden="true" tabindex="-1"></a>    byte<span class="op">***</span> m <span class="op">=</span> self<span class="op">-&gt;</span>M<span class="op">;</span></span>
-<span id="cb2-591"><a href="#cb2-591" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> PAGE_COUNT<span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb2-592"><a href="#cb2-592" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>m<span class="op">[</span>i<span class="op">])</span></span>
-<span id="cb2-593"><a href="#cb2-593" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
-<span id="cb2-594"><a href="#cb2-594" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Free all the individual byte arrays (Level 3) inside this page</span></span>
-<span id="cb2-595"><a href="#cb2-595" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> PAGE_SIZE<span class="op">;</span> j<span class="op">++)</span> </span>
-<span id="cb2-596"><a href="#cb2-596" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span></span>
-<span id="cb2-597"><a href="#cb2-597" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>m<span class="op">[</span>i<span class="op">][</span>j<span class="op">])</span> free<span class="op">(</span>m<span class="op">[</span>i<span class="op">][</span>j<span class="op">]);</span></span>
-<span id="cb2-598"><a href="#cb2-598" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
-<span id="cb2-599"><a href="#cb2-599" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Now free the page itself (Level 2)</span></span>
-<span id="cb2-600"><a href="#cb2-600" aria-hidden="true" tabindex="-1"></a>            free<span class="op">(</span>m<span class="op">[</span>i<span class="op">]);</span></span>
-<span id="cb2-601"><a href="#cb2-601" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span>   </span>
-<span id="cb2-602"><a href="#cb2-602" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb2-603"><a href="#cb2-603" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">);</span></span>
-<span id="cb2-604"><a href="#cb2-604" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>self<span class="op">);</span></span>
-<span id="cb2-605"><a href="#cb2-605" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-606"><a href="#cb2-606" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-607"><a href="#cb2-607" aria-hidden="true" tabindex="-1"></a><span class="dt">int64_t</span> Memory_count <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span></span>
-<span id="cb2-608"><a href="#cb2-608" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-609"><a href="#cb2-609" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> memorycount<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> self<span class="op">-&gt;</span>Bdimension<span class="op">);</span></span>
-<span id="cb2-610"><a href="#cb2-610" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-611"><a href="#cb2-611" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-612"><a href="#cb2-612" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_write <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> Set <span class="op">*</span>A<span class="op">,</span> Set <span class="op">*</span>B<span class="op">)</span></span>
-<span id="cb2-613"><a href="#cb2-613" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-614"><a href="#cb2-614" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-615"><a href="#cb2-615" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span> <span class="op">||</span> B<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb2-616"><a href="#cb2-616" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-617"><a href="#cb2-617" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">-&gt;</span>p<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span> <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> i<span class="op">;</span> j<span class="op">++</span> <span class="op">)</span></span>
-<span id="cb2-618"><a href="#cb2-618" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
-<span id="cb2-619"><a href="#cb2-619" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> addr <span class="op">=</span> A<span class="op">-&gt;</span>a<span class="op">[</span>j<span class="op">]</span> <span class="op">+</span> A<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]*(</span>A<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]-</span><span class="dv">1</span><span class="op">)</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb2-620"><a href="#cb2-620" aria-hidden="true" tabindex="-1"></a>        byte <span class="op">*</span>L <span class="op">=</span> bitpair_alloc<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> self<span class="op">-&gt;</span>Bdimension<span class="op">,</span> addr<span class="op">);</span></span>
-<span id="cb2-621"><a href="#cb2-621" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef FORGETTING</span></span>
-<span id="cb2-622"><a href="#cb2-622" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Stochastic decay, maintaining a density of 0.5 per hidden node.</span></span>
-<span id="cb2-623"><a href="#cb2-623" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-624"><a href="#cb2-624" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Count hidden node connections.</span></span>
-<span id="cb2-625"><a href="#cb2-625" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> nb <span class="op">=</span> self<span class="op">-&gt;</span>Bdimension<span class="op">;</span></span>
-<span id="cb2-626"><a href="#cb2-626" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> connections <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-627"><a href="#cb2-627" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> size <span class="op">=</span> <span class="op">(</span>nb <span class="op">+</span> <span class="dv">7</span><span class="op">)</span> <span class="op">/</span> <span class="dv">8</span><span class="op">;</span></span>
-<span id="cb2-628"><a href="#cb2-628" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> size<span class="op">;</span> k<span class="op">++)</span> connections <span class="op">+=</span> bitcount<span class="op">[</span>L<span class="op">[</span>k<span class="op">]];</span></span>
-<span id="cb2-629"><a href="#cb2-629" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-630"><a href="#cb2-630" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Stochastic memory decay, &quot;blindly&quot; clearing bits</span></span>
-<span id="cb2-631"><a href="#cb2-631" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>connections <span class="op">&gt;</span> nb<span class="op">/</span><span class="dv">2</span><span class="op">)</span></span>
-<span id="cb2-632"><a href="#cb2-632" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
-<span id="cb2-633"><a href="#cb2-633" aria-hidden="true" tabindex="-1"></a>            <span class="dt">int</span> attempts <span class="op">=</span> <span class="dv">2</span><span class="op">*(</span>connections <span class="op">+</span> A<span class="op">-&gt;</span>p <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">-</span> nb<span class="op">;</span></span>
-<span id="cb2-634"><a href="#cb2-634" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> a <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> a <span class="op">&lt;</span> attempts<span class="op">;</span> a<span class="op">++)</span></span>
-<span id="cb2-635"><a href="#cb2-635" aria-hidden="true" tabindex="-1"></a>                bit_clear<span class="op">(</span>L<span class="op">,</span> rand<span class="op">()</span> <span class="op">%</span> nb<span class="op">);</span></span>
-<span id="cb2-636"><a href="#cb2-636" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
-<span id="cb2-637"><a href="#cb2-637" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
-<span id="cb2-638"><a href="#cb2-638" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-639"><a href="#cb2-639" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> B<span class="op">-&gt;</span>p<span class="op">;</span> k<span class="op">++)</span></span>
-<span id="cb2-640"><a href="#cb2-640" aria-hidden="true" tabindex="-1"></a>            bit_set <span class="op">(</span>L<span class="op">,</span> <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">)</span>B<span class="op">-&gt;</span>a<span class="op">[</span>k<span class="op">]);</span> <span class="co">// Memory_delete would use bit_clear</span></span>
-<span id="cb2-641"><a href="#cb2-641" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb2-642"><a href="#cb2-642" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-643"><a href="#cb2-643" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-644"><a href="#cb2-644" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-645"><a href="#cb2-645" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-646"><a href="#cb2-646" aria-hidden="true" tabindex="-1"></a><span class="co">//  K-winners-takes-all</span></span>
-<span id="cb2-647"><a href="#cb2-647" aria-hidden="true" tabindex="-1"></a><span class="co">//  Finds the k-th rank value in response</span></span>
-<span id="cb2-648"><a href="#cb2-648" aria-hidden="true" tabindex="-1"></a><span class="co">//  Uses an O(N) percentile algorithm</span></span>
-<span id="cb2-649"><a href="#cb2-649" aria-hidden="true" tabindex="-1"></a><span class="co">//  This is faster than quicksort or quickselect</span></span>
-<span id="cb2-650"><a href="#cb2-650" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-651"><a href="#cb2-651" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> kwta <span class="op">(</span><span class="dt">int</span> k<span class="op">,</span> <span class="dt">int</span> ny<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>r<span class="op">,</span> <span class="dt">int</span> threshold<span class="op">,</span> Set <span class="op">*</span>y<span class="op">)</span></span>
-<span id="cb2-652"><a href="#cb2-652" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-653"><a href="#cb2-653" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Max response value</span></span>
-<span id="cb2-654"><a href="#cb2-654" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-655"><a href="#cb2-655" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++)</span> <span class="cf">if</span> <span class="op">(</span>max <span class="op">&lt;</span> r<span class="op">[</span>i<span class="op">])</span> max <span class="op">=</span> r<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb2-590"><a href="#cb2-590" aria-hidden="true" tabindex="-1"></a>    self<span class="op">-&gt;</span>fraction <span class="op">=</span> f<span class="op">;</span></span>
+<span id="cb2-591"><a href="#cb2-591" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-592"><a href="#cb2-592" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-593"><a href="#cb2-593" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span>  Memory_get_fraction <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span></span>
+<span id="cb2-594"><a href="#cb2-594" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-595"><a href="#cb2-595" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> self<span class="op">-&gt;</span>fraction<span class="op">;</span></span>
+<span id="cb2-596"><a href="#cb2-596" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-597"><a href="#cb2-597" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-598"><a href="#cb2-598" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-599"><a href="#cb2-599" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_free <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span></span>
+<span id="cb2-600"><a href="#cb2-600" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-601"><a href="#cb2-601" aria-hidden="true" tabindex="-1"></a>    byte<span class="op">***</span> m <span class="op">=</span> self<span class="op">-&gt;</span>M<span class="op">;</span></span>
+<span id="cb2-602"><a href="#cb2-602" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> PAGE_COUNT<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb2-603"><a href="#cb2-603" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>m<span class="op">[</span>i<span class="op">])</span></span>
+<span id="cb2-604"><a href="#cb2-604" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb2-605"><a href="#cb2-605" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Free all the individual byte arrays (Level 3) inside this page</span></span>
+<span id="cb2-606"><a href="#cb2-606" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> PAGE_SIZE<span class="op">;</span> j<span class="op">++)</span> </span>
+<span id="cb2-607"><a href="#cb2-607" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span></span>
+<span id="cb2-608"><a href="#cb2-608" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>m<span class="op">[</span>i<span class="op">][</span>j<span class="op">])</span> free<span class="op">(</span>m<span class="op">[</span>i<span class="op">][</span>j<span class="op">]);</span></span>
+<span id="cb2-609"><a href="#cb2-609" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb2-610"><a href="#cb2-610" aria-hidden="true" tabindex="-1"></a>            <span class="co">// Now free the page itself (Level 2)</span></span>
+<span id="cb2-611"><a href="#cb2-611" aria-hidden="true" tabindex="-1"></a>            free<span class="op">(</span>m<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb2-612"><a href="#cb2-612" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span>   </span>
+<span id="cb2-613"><a href="#cb2-613" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-614"><a href="#cb2-614" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">);</span></span>
+<span id="cb2-615"><a href="#cb2-615" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>self<span class="op">);</span></span>
+<span id="cb2-616"><a href="#cb2-616" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-617"><a href="#cb2-617" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-618"><a href="#cb2-618" aria-hidden="true" tabindex="-1"></a><span class="dt">int64_t</span> Memory_count <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">)</span></span>
+<span id="cb2-619"><a href="#cb2-619" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-620"><a href="#cb2-620" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> memorycount<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> self<span class="op">-&gt;</span>Bdimension<span class="op">);</span></span>
+<span id="cb2-621"><a href="#cb2-621" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-622"><a href="#cb2-622" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-623"><a href="#cb2-623" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_write <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> Set <span class="op">*</span>A<span class="op">,</span> Set <span class="op">*</span>B<span class="op">)</span></span>
+<span id="cb2-624"><a href="#cb2-624" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-625"><a href="#cb2-625" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-626"><a href="#cb2-626" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span> <span class="op">||</span> B<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb2-627"><a href="#cb2-627" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-628"><a href="#cb2-628" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> A<span class="op">-&gt;</span>p<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span> <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> i<span class="op">;</span> j<span class="op">++</span> <span class="op">)</span></span>
+<span id="cb2-629"><a href="#cb2-629" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb2-630"><a href="#cb2-630" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> addr <span class="op">=</span> A<span class="op">-&gt;</span>a<span class="op">[</span>j<span class="op">]</span> <span class="op">+</span> A<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]*(</span>A<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]-</span><span class="dv">1</span><span class="op">)</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-631"><a href="#cb2-631" aria-hidden="true" tabindex="-1"></a>        byte <span class="op">*</span>L <span class="op">=</span> bitpair_alloc<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> self<span class="op">-&gt;</span>Bdimension<span class="op">,</span> addr<span class="op">);</span></span>
+<span id="cb2-632"><a href="#cb2-632" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef FORGETTING</span></span>
+<span id="cb2-633"><a href="#cb2-633" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Stochastic decay, maintaining a density of 0.5 per hidden node.</span></span>
+<span id="cb2-634"><a href="#cb2-634" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-635"><a href="#cb2-635" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Count hidden node connections.</span></span>
+<span id="cb2-636"><a href="#cb2-636" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> nb <span class="op">=</span> self<span class="op">-&gt;</span>Bdimension<span class="op">;</span></span>
+<span id="cb2-637"><a href="#cb2-637" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> connections <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-638"><a href="#cb2-638" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> size <span class="op">=</span> <span class="op">(</span>nb <span class="op">+</span> <span class="dv">7</span><span class="op">)</span> <span class="op">/</span> <span class="dv">8</span><span class="op">;</span></span>
+<span id="cb2-639"><a href="#cb2-639" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> size<span class="op">;</span> k<span class="op">++)</span> connections <span class="op">+=</span> bitcount<span class="op">[</span>L<span class="op">[</span>k<span class="op">]];</span></span>
+<span id="cb2-640"><a href="#cb2-640" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-641"><a href="#cb2-641" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Stochastic memory decay, &quot;blindly&quot; clearing bits</span></span>
+<span id="cb2-642"><a href="#cb2-642" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>connections <span class="op">&gt;</span> nb<span class="op">/</span><span class="dv">2</span><span class="op">)</span></span>
+<span id="cb2-643"><a href="#cb2-643" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb2-644"><a href="#cb2-644" aria-hidden="true" tabindex="-1"></a>            <span class="dt">int</span> attempts <span class="op">=</span> <span class="dv">2</span><span class="op">*(</span>connections <span class="op">+</span> A<span class="op">-&gt;</span>p <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">-</span> nb<span class="op">;</span></span>
+<span id="cb2-645"><a href="#cb2-645" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> a <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> a <span class="op">&lt;</span> attempts<span class="op">;</span> a<span class="op">++)</span></span>
+<span id="cb2-646"><a href="#cb2-646" aria-hidden="true" tabindex="-1"></a>                bit_clear<span class="op">(</span>L<span class="op">,</span> rand<span class="op">()</span> <span class="op">%</span> nb<span class="op">);</span></span>
+<span id="cb2-647"><a href="#cb2-647" aria-hidden="true" tabindex="-1"></a>            <span class="op">};</span></span>
+<span id="cb2-648"><a href="#cb2-648" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span>
+<span id="cb2-649"><a href="#cb2-649" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-650"><a href="#cb2-650" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> B<span class="op">-&gt;</span>p<span class="op">;</span> k<span class="op">++)</span></span>
+<span id="cb2-651"><a href="#cb2-651" aria-hidden="true" tabindex="-1"></a>            bit_set <span class="op">(</span>L<span class="op">,</span> <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">)</span>B<span class="op">-&gt;</span>a<span class="op">[</span>k<span class="op">]);</span> <span class="co">// Memory_delete would use bit_clear</span></span>
+<span id="cb2-652"><a href="#cb2-652" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-653"><a href="#cb2-653" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-654"><a href="#cb2-654" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-655"><a href="#cb2-655" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-656"><a href="#cb2-656" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-657"><a href="#cb2-657" aria-hidden="true" tabindex="-1"></a>    <span class="dt">unsigned</span> <span class="dt">int</span> <span class="op">*</span>tally <span class="op">=</span> </span>
-<span id="cb2-658"><a href="#cb2-658" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> <span class="op">*)</span> calloc<span class="op">(</span>max <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">));</span></span>
-<span id="cb2-659"><a href="#cb2-659" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-660"><a href="#cb2-660" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span> tally<span class="op">[</span>r<span class="op">[</span>i<span class="op">]]</span> <span class="op">++;</span></span>
+<span id="cb2-657"><a href="#cb2-657" aria-hidden="true" tabindex="-1"></a><span class="co">//  K-winners-takes-all</span></span>
+<span id="cb2-658"><a href="#cb2-658" aria-hidden="true" tabindex="-1"></a><span class="co">//  Finds the k-th rank value in response</span></span>
+<span id="cb2-659"><a href="#cb2-659" aria-hidden="true" tabindex="-1"></a><span class="co">//  Uses an O(N) percentile algorithm</span></span>
+<span id="cb2-660"><a href="#cb2-660" aria-hidden="true" tabindex="-1"></a><span class="co">//  This is faster than quicksort or quickselect</span></span>
 <span id="cb2-661"><a href="#cb2-661" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-662"><a href="#cb2-662" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Find the k-th largest value in response (k = Bpopulation)</span></span>
-<span id="cb2-663"><a href="#cb2-663" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> rankedmax <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> cumulative <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-664"><a href="#cb2-664" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-665"><a href="#cb2-665" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> max<span class="op">;</span> <span class="dv">0</span> <span class="op">&lt;</span> i<span class="op">;</span> i<span class="op">--</span> <span class="op">)</span></span>
-<span id="cb2-666"><a href="#cb2-666" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">((</span>cumulative <span class="op">+=</span> tally<span class="op">[</span>i<span class="op">])</span> <span class="op">&gt;=</span> k<span class="op">)</span></span>
-<span id="cb2-667"><a href="#cb2-667" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
-<span id="cb2-668"><a href="#cb2-668" aria-hidden="true" tabindex="-1"></a>            rankedmax <span class="op">=</span> i<span class="op">;</span> <span class="cf">break</span><span class="op">;</span></span>
-<span id="cb2-669"><a href="#cb2-669" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
-<span id="cb2-670"><a href="#cb2-670" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-671"><a href="#cb2-671" aria-hidden="true" tabindex="-1"></a>    y<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-672"><a href="#cb2-672" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-673"><a href="#cb2-673" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>rankedmax <span class="op">&gt;=</span> threshold <span class="op">)</span></span>
-<span id="cb2-674"><a href="#cb2-674" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb2-675"><a href="#cb2-675" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>r<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;=</span> rankedmax<span class="op">)</span> y<span class="op">-&gt;</span>a<span class="op">[</span>y<span class="op">-&gt;</span>p<span class="op">++]</span> <span class="op">=</span> i<span class="op">;</span></span>
-<span id="cb2-676"><a href="#cb2-676" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb2-677"><a href="#cb2-677" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Assertion</span></span>
-<span id="cb2-678"><a href="#cb2-678" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="dv">0</span> <span class="op">&lt;</span> y<span class="op">-&gt;</span>p <span class="op">&amp;&amp;</span> y<span class="op">-&gt;</span>p <span class="op">&lt;</span> k<span class="op">)</span> printf<span class="op">(</span><span class="st">&quot;assertion failure: y-&gt;p = </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> y<span class="op">-&gt;</span>p<span class="op">);</span></span>
-<span id="cb2-679"><a href="#cb2-679" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-680"><a href="#cb2-680" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>tally<span class="op">);</span></span>
-<span id="cb2-681"><a href="#cb2-681" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-682"><a href="#cb2-682" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-683"><a href="#cb2-683" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-684"><a href="#cb2-684" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-685"><a href="#cb2-685" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-686"><a href="#cb2-686" aria-hidden="true" tabindex="-1"></a><span class="co">//  Memory retrieval with query set A. Stores result in Y.</span></span>
-<span id="cb2-687"><a href="#cb2-687" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-688"><a href="#cb2-688" aria-hidden="true" tabindex="-1"></a>Set<span class="op">*</span> Memory_read <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> Set <span class="op">*</span>A<span class="op">,</span> Set <span class="op">*</span>Y<span class="op">)</span></span>
-<span id="cb2-689"><a href="#cb2-689" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
-<span id="cb2-690"><a href="#cb2-690" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Autocorrect potential user error.</span></span>
-<span id="cb2-691"><a href="#cb2-691" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>self<span class="op">-&gt;</span>T <span class="op">&lt;</span> <span class="dv">2</span><span class="op">)</span> self<span class="op">-&gt;</span>T <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb2-692"><a href="#cb2-692" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-693"><a href="#cb2-693" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Initialize dynamic data structures that depend on the population of A.</span></span>
+<span id="cb2-662"><a href="#cb2-662" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">void</span> kwta <span class="op">(</span><span class="dt">int</span> k<span class="op">,</span> <span class="dt">int</span> ny<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>r<span class="op">,</span> <span class="dt">int</span> threshold<span class="op">,</span> Set <span class="op">*</span>y<span class="op">)</span></span>
+<span id="cb2-663"><a href="#cb2-663" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-664"><a href="#cb2-664" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Max response value</span></span>
+<span id="cb2-665"><a href="#cb2-665" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-666"><a href="#cb2-666" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++)</span> <span class="cf">if</span> <span class="op">(</span>max <span class="op">&lt;</span> r<span class="op">[</span>i<span class="op">])</span> max <span class="op">=</span> r<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb2-667"><a href="#cb2-667" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-668"><a href="#cb2-668" aria-hidden="true" tabindex="-1"></a>    <span class="dt">unsigned</span> <span class="dt">int</span> <span class="op">*</span>tally <span class="op">=</span> </span>
+<span id="cb2-669"><a href="#cb2-669" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span> <span class="op">*)</span> calloc<span class="op">(</span>max <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-670"><a href="#cb2-670" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-671"><a href="#cb2-671" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span> tally<span class="op">[</span>r<span class="op">[</span>i<span class="op">]]</span> <span class="op">++;</span></span>
+<span id="cb2-672"><a href="#cb2-672" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-673"><a href="#cb2-673" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Find the k-th largest value in response (k = Bpopulation)</span></span>
+<span id="cb2-674"><a href="#cb2-674" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> rankedmax <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> cumulative <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-675"><a href="#cb2-675" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-676"><a href="#cb2-676" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> max<span class="op">;</span> <span class="dv">0</span> <span class="op">&lt;</span> i<span class="op">;</span> i<span class="op">--</span> <span class="op">)</span></span>
+<span id="cb2-677"><a href="#cb2-677" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">((</span>cumulative <span class="op">+=</span> tally<span class="op">[</span>i<span class="op">])</span> <span class="op">&gt;=</span> k<span class="op">)</span></span>
+<span id="cb2-678"><a href="#cb2-678" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb2-679"><a href="#cb2-679" aria-hidden="true" tabindex="-1"></a>            rankedmax <span class="op">=</span> i<span class="op">;</span> <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb2-680"><a href="#cb2-680" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb2-681"><a href="#cb2-681" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-682"><a href="#cb2-682" aria-hidden="true" tabindex="-1"></a>    y<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-683"><a href="#cb2-683" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-684"><a href="#cb2-684" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>rankedmax <span class="op">&gt;=</span> threshold <span class="op">)</span></span>
+<span id="cb2-685"><a href="#cb2-685" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> ny<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb2-686"><a href="#cb2-686" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>r<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;=</span> rankedmax<span class="op">)</span> y<span class="op">-&gt;</span>a<span class="op">[</span>y<span class="op">-&gt;</span>p<span class="op">++]</span> <span class="op">=</span> i<span class="op">;</span></span>
+<span id="cb2-687"><a href="#cb2-687" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-688"><a href="#cb2-688" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Assertion</span></span>
+<span id="cb2-689"><a href="#cb2-689" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="dv">0</span> <span class="op">&lt;</span> y<span class="op">-&gt;</span>p <span class="op">&amp;&amp;</span> y<span class="op">-&gt;</span>p <span class="op">&lt;</span> k<span class="op">)</span> printf<span class="op">(</span><span class="st">&quot;assertion failure: y-&gt;p = </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> y<span class="op">-&gt;</span>p<span class="op">);</span></span>
+<span id="cb2-690"><a href="#cb2-690" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-691"><a href="#cb2-691" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>tally<span class="op">);</span></span>
+<span id="cb2-692"><a href="#cb2-692" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-693"><a href="#cb2-693" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-694"><a href="#cb2-694" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-695"><a href="#cb2-695" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Step 1: Initialize.</span></span>
-<span id="cb2-696"><a href="#cb2-696" aria-hidden="true" tabindex="-1"></a>    Set <span class="op">*</span>X <span class="op">=</span> self<span class="op">-&gt;</span>X<span class="op">;</span></span>
-<span id="cb2-697"><a href="#cb2-697" aria-hidden="true" tabindex="-1"></a>    Set_copy<span class="op">(</span>X<span class="op">,</span> A<span class="op">);</span></span>
-<span id="cb2-698"><a href="#cb2-698" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-699"><a href="#cb2-699" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Shortcut</span></span>
-<span id="cb2-700"><a href="#cb2-700" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> ny <span class="op">=</span> self<span class="op">-&gt;</span>Bdimension<span class="op">;</span></span>
+<span id="cb2-695"><a href="#cb2-695" aria-hidden="true" tabindex="-1"></a><span class="co">//  Memory retrieval with query set A. Stores result in Y.</span></span>
+<span id="cb2-696"><a href="#cb2-696" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-697"><a href="#cb2-697" aria-hidden="true" tabindex="-1"></a>Set<span class="op">*</span> Memory_read <span class="op">(</span>Memory <span class="op">*</span>self<span class="op">,</span> Set <span class="op">*</span>A<span class="op">,</span> Set <span class="op">*</span>Y<span class="op">)</span></span>
+<span id="cb2-698"><a href="#cb2-698" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb2-699"><a href="#cb2-699" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Autocorrect potential user error.</span></span>
+<span id="cb2-700"><a href="#cb2-700" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>self<span class="op">-&gt;</span>T <span class="op">&lt;</span> <span class="dv">2</span><span class="op">)</span> self<span class="op">-&gt;</span>T <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
 <span id="cb2-701"><a href="#cb2-701" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-702"><a href="#cb2-702" aria-hidden="true" tabindex="-1"></a>    <span class="co">//  Allocate weight arrays Ri, W and Ws, with sizes depending on |X|.</span></span>
-<span id="cb2-703"><a href="#cb2-703" aria-hidden="true" tabindex="-1"></a>    <span class="co">//  R and Ri must be re-initialized to zero in each iteration.</span></span>
-<span id="cb2-704"><a href="#cb2-704" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-705"><a href="#cb2-705" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Response per input element</span></span>
-<span id="cb2-706"><a href="#cb2-706" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>Ri <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> ny <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-702"><a href="#cb2-702" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Initialize dynamic data structures that depend on the population of A.</span></span>
+<span id="cb2-703"><a href="#cb2-703" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-704"><a href="#cb2-704" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Step 1: Initialize.</span></span>
+<span id="cb2-705"><a href="#cb2-705" aria-hidden="true" tabindex="-1"></a>    Set <span class="op">*</span>X <span class="op">=</span> self<span class="op">-&gt;</span>X<span class="op">;</span></span>
+<span id="cb2-706"><a href="#cb2-706" aria-hidden="true" tabindex="-1"></a>    Set_copy<span class="op">(</span>X<span class="op">,</span> A<span class="op">);</span></span>
 <span id="cb2-707"><a href="#cb2-707" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-708"><a href="#cb2-708" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Total response vector</span></span>
-<span id="cb2-709"><a href="#cb2-709" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>R <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>ny <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
-<span id="cb2-710"><a href="#cb2-710" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-711"><a href="#cb2-711" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Each bit&#39;s contribution to B</span></span>
-<span id="cb2-712"><a href="#cb2-712" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>W  <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
-<span id="cb2-713"><a href="#cb2-713" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-714"><a href="#cb2-714" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sorted version of the above</span></span>
-<span id="cb2-715"><a href="#cb2-715" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>Ws <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
-<span id="cb2-716"><a href="#cb2-716" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-717"><a href="#cb2-717" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Memory bitvector size in bytes</span></span>
-<span id="cb2-718"><a href="#cb2-718" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> size <span class="op">=</span> <span class="op">(</span>ny <span class="op">+</span> <span class="dv">7</span><span class="op">)</span> <span class="op">/</span> <span class="dv">8</span><span class="op">;</span></span>
-<span id="cb2-719"><a href="#cb2-719" aria-hidden="true" tabindex="-1"></a>    <span class="co">// An array with 8x the length of the memory bitvector</span></span>
-<span id="cb2-720"><a href="#cb2-720" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint64_t</span> <span class="op">*</span>memx8 <span class="op">=</span> <span class="op">(</span><span class="dt">uint64_t</span><span class="op">*)</span> malloc<span class="op">(</span>size <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">uint64_t</span><span class="op">));</span></span>
-<span id="cb2-721"><a href="#cb2-721" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-722"><a href="#cb2-722" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The main loop. Iterate to find a matching pattern X -&gt; Y.</span></span>
-<span id="cb2-723"><a href="#cb2-723" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
-<span id="cb2-724"><a href="#cb2-724" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
-<span id="cb2-725"><a href="#cb2-725" aria-hidden="true" tabindex="-1"></a>        Y<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-726"><a href="#cb2-726" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-727"><a href="#cb2-727" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 2: Threshold check.</span></span>
-<span id="cb2-728"><a href="#cb2-728" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> P <span class="op">=</span> X<span class="op">-&gt;</span>p<span class="op">;</span></span>
-<span id="cb2-729"><a href="#cb2-729" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>P <span class="op">&lt;</span> self<span class="op">-&gt;</span>T<span class="op">)</span></span>
-<span id="cb2-730"><a href="#cb2-730" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span><span class="op">;</span> <span class="co">// Y-&gt;p = 0 at this point.</span></span>
+<span id="cb2-708"><a href="#cb2-708" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Per-query threshold Tq = max(T, ceil(fraction * |A|)).</span></span>
+<span id="cb2-709"><a href="#cb2-709" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The offset guards against floating-point round-up.</span></span>
+<span id="cb2-710"><a href="#cb2-710" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Integer ceiling avoids a dependency on libm.</span></span>
+<span id="cb2-711"><a href="#cb2-711" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> Tq <span class="op">=</span> self<span class="op">-&gt;</span>T<span class="op">;</span></span>
+<span id="cb2-712"><a href="#cb2-712" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>self<span class="op">-&gt;</span>fraction <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span></span>
+<span id="cb2-713"><a href="#cb2-713" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb2-714"><a href="#cb2-714" aria-hidden="true" tabindex="-1"></a>        <span class="dt">double</span> v <span class="op">=</span> self<span class="op">-&gt;</span>fraction <span class="op">*</span> A<span class="op">-&gt;</span>p <span class="op">-</span> <span class="fl">1e-9</span><span class="op">;</span></span>
+<span id="cb2-715"><a href="#cb2-715" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> c <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">)</span> v<span class="op">;</span></span>
+<span id="cb2-716"><a href="#cb2-716" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>v <span class="op">&gt;</span> c<span class="op">)</span> c<span class="op">++;</span></span>
+<span id="cb2-717"><a href="#cb2-717" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>c <span class="op">&gt;</span> Tq<span class="op">)</span> Tq <span class="op">=</span> c<span class="op">;</span></span>
+<span id="cb2-718"><a href="#cb2-718" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-719"><a href="#cb2-719" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-720"><a href="#cb2-720" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Shortcut</span></span>
+<span id="cb2-721"><a href="#cb2-721" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> ny <span class="op">=</span> self<span class="op">-&gt;</span>Bdimension<span class="op">;</span></span>
+<span id="cb2-722"><a href="#cb2-722" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-723"><a href="#cb2-723" aria-hidden="true" tabindex="-1"></a>    <span class="co">//  Allocate weight arrays Ri, W and Ws, with sizes depending on |X|.</span></span>
+<span id="cb2-724"><a href="#cb2-724" aria-hidden="true" tabindex="-1"></a>    <span class="co">//  R and Ri must be re-initialized to zero in each iteration.</span></span>
+<span id="cb2-725"><a href="#cb2-725" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-726"><a href="#cb2-726" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Response per input element</span></span>
+<span id="cb2-727"><a href="#cb2-727" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>Ri <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> ny <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-728"><a href="#cb2-728" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-729"><a href="#cb2-729" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Total response vector</span></span>
+<span id="cb2-730"><a href="#cb2-730" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>R <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>ny <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
 <span id="cb2-731"><a href="#cb2-731" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-732"><a href="#cb2-732" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Initialize total and per-element response vectors.</span></span>
-<span id="cb2-733"><a href="#cb2-733" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-734"><a href="#cb2-734" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny <span class="op">*</span> P<span class="op">;</span> k<span class="op">++)</span> Ri<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-735"><a href="#cb2-735" aria-hidden="true" tabindex="-1"></a>                        </span>
-<span id="cb2-736"><a href="#cb2-736" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-737"><a href="#cb2-737" aria-hidden="true" tabindex="-1"></a>        byte<span class="op">*</span> bytevector <span class="op">=</span> <span class="op">(</span>byte<span class="op">*)</span> memx8<span class="op">;</span> <span class="co">// Has length ny</span></span>
-<span id="cb2-738"><a href="#cb2-738" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-739"><a href="#cb2-739" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 3: Expansion coding.</span></span>
-<span id="cb2-740"><a href="#cb2-740" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-741"><a href="#cb2-741" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span></span>
-<span id="cb2-742"><a href="#cb2-742" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> i<span class="op">;</span> j<span class="op">++)</span></span>
-<span id="cb2-743"><a href="#cb2-743" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span></span>
-<span id="cb2-744"><a href="#cb2-744" aria-hidden="true" tabindex="-1"></a>                <span class="dt">unsigned</span> <span class="dt">int</span> addr <span class="op">=</span> X<span class="op">-&gt;</span>a<span class="op">[</span>j<span class="op">]</span> <span class="op">+</span> X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]*(</span>X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]-</span><span class="dv">1</span><span class="op">)</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb2-745"><a href="#cb2-745" aria-hidden="true" tabindex="-1"></a>                byte<span class="op">*</span> L <span class="op">=</span> bitpair_address<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> addr<span class="op">);</span></span>
-<span id="cb2-746"><a href="#cb2-746" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb2-747"><a href="#cb2-747" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>L<span class="op">)</span> <span class="co">// Null pointer if this address has not been written to</span></span>
-<span id="cb2-748"><a href="#cb2-748" aria-hidden="true" tabindex="-1"></a>                    <span class="op">{</span></span>
-<span id="cb2-749"><a href="#cb2-749" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> size<span class="op">;</span> k<span class="op">++)</span></span>
-<span id="cb2-750"><a href="#cb2-750" aria-hidden="true" tabindex="-1"></a>                    memx8<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> bits_to_bytes<span class="op">[</span>L<span class="op">[</span>k<span class="op">]];</span></span>
-<span id="cb2-751"><a href="#cb2-751" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-752"><a href="#cb2-752" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Step 4: Aggregate.</span></span>
-<span id="cb2-753"><a href="#cb2-753" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Add  byte vectors to the weight vectors of both bits.</span></span>
-<span id="cb2-754"><a href="#cb2-754" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Separate loops is faster than one combined loop.</span></span>
-<span id="cb2-755"><a href="#cb2-755" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">int</span> <span class="op">*</span>w<span class="op">;</span></span>
-<span id="cb2-756"><a href="#cb2-756" aria-hidden="true" tabindex="-1"></a>                                </span>
-<span id="cb2-757"><a href="#cb2-757" aria-hidden="true" tabindex="-1"></a>                    w <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> j<span class="op">;</span></span>
-<span id="cb2-758"><a href="#cb2-758" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> w<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> bytevector<span class="op">[</span>k<span class="op">];</span></span>
-<span id="cb2-759"><a href="#cb2-759" aria-hidden="true" tabindex="-1"></a>                    w <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> i<span class="op">;</span></span>
-<span id="cb2-760"><a href="#cb2-760" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> w<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> bytevector<span class="op">[</span>k<span class="op">];</span></span>
-<span id="cb2-761"><a href="#cb2-761" aria-hidden="true" tabindex="-1"></a>                    <span class="op">}</span></span>
-<span id="cb2-762"><a href="#cb2-762" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
-<span id="cb2-763"><a href="#cb2-763" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb2-764"><a href="#cb2-764" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Overall response vector.</span></span>
-<span id="cb2-765"><a href="#cb2-765" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb2-766"><a href="#cb2-766" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
-<span id="cb2-767"><a href="#cb2-767" aria-hidden="true" tabindex="-1"></a>            <span class="dt">int</span> <span class="op">*</span>q <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> i<span class="op">;</span></span>
-<span id="cb2-768"><a href="#cb2-768" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> q<span class="op">[</span>k<span class="op">];</span></span>
-<span id="cb2-769"><a href="#cb2-769" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
-<span id="cb2-770"><a href="#cb2-770" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-771"><a href="#cb2-771" aria-hidden="true" tabindex="-1"></a>        <span class="co">// All values are even numbers, as each element pair contributed twice.</span></span>
-<span id="cb2-772"><a href="#cb2-772" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Divide by 2 to compensate for this double counting.</span></span>
-<span id="cb2-773"><a href="#cb2-773" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">/=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb2-774"><a href="#cb2-774" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-775"><a href="#cb2-775" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 5: Select (KWTA with threshold T(T-1)/2)</span></span>
-<span id="cb2-776"><a href="#cb2-776" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> K <span class="op">=</span> self<span class="op">-&gt;</span>Bpopulation<span class="op">;</span> <span class="co">// The K for KWTA.</span></span>
-<span id="cb2-777"><a href="#cb2-777" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-778"><a href="#cb2-778" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-779"><a href="#cb2-779" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Use T(T-1)/2 as response threshold.</span></span>
-<span id="cb2-780"><a href="#cb2-780" aria-hidden="true" tabindex="-1"></a>        kwta<span class="op">(</span>K<span class="op">,</span> ny<span class="op">,</span> R<span class="op">,</span> self<span class="op">-&gt;</span>T <span class="op">*</span> <span class="op">(</span>self<span class="op">-&gt;</span>T <span class="op">-</span> <span class="dv">1</span><span class="op">)/</span><span class="dv">2</span><span class="op">,</span> Y<span class="op">);</span></span>
-<span id="cb2-781"><a href="#cb2-781" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-782"><a href="#cb2-782" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 6: Threshold check.</span></span>
-<span id="cb2-783"><a href="#cb2-783" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>Y<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;}</span></span>
-<span id="cb2-784"><a href="#cb2-784" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-785"><a href="#cb2-785" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 7: Per-element weights.</span></span>
-<span id="cb2-786"><a href="#cb2-786" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span> W<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-787"><a href="#cb2-787" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-788"><a href="#cb2-788" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> Y<span class="op">-&gt;</span>p<span class="op">;</span> k<span class="op">++)</span></span>
-<span id="cb2-789"><a href="#cb2-789" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb2-790"><a href="#cb2-790" aria-hidden="true" tabindex="-1"></a>                W<span class="op">[</span>i<span class="op">]</span> <span class="op">+=</span> Ri<span class="op">[</span>ny <span class="op">*</span> i <span class="op">+</span> Y<span class="op">-&gt;</span>a<span class="op">[</span>k<span class="op">]];</span></span>
-<span id="cb2-791"><a href="#cb2-791" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb2-792"><a href="#cb2-792" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 8: Convergence test.</span></span>
-<span id="cb2-793"><a href="#cb2-793" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-794"><a href="#cb2-794" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Find the max number h of elements that contribute at least h - 1</span></span>
-<span id="cb2-795"><a href="#cb2-795" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Using qsort has no performance penality in this routine.</span></span>
-<span id="cb2-796"><a href="#cb2-796" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span> Ws<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> W<span class="op">[</span>i<span class="op">];</span></span>
-<span id="cb2-797"><a href="#cb2-797" aria-hidden="true" tabindex="-1"></a>        qsort<span class="op">(</span>Ws<span class="op">,</span> P<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">),</span> ucmpfunc<span class="op">);</span>   </span>
-<span id="cb2-798"><a href="#cb2-798" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> h <span class="op">=</span> P<span class="op">;</span></span>
-<span id="cb2-799"><a href="#cb2-799" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="op">(</span>Ws<span class="op">[</span>P <span class="op">-</span> h<span class="op">]</span> <span class="op">&lt;</span> Y<span class="op">-&gt;</span>p <span class="op">*</span> <span class="op">(</span>h <span class="op">-</span> <span class="dv">1</span><span class="op">))</span> <span class="op">--</span>h<span class="op">;</span></span>
-<span id="cb2-800"><a href="#cb2-800" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> cutoff <span class="op">=</span> Ws<span class="op">[</span>P <span class="op">-</span> h<span class="op">];</span></span>
-<span id="cb2-801"><a href="#cb2-801" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-802"><a href="#cb2-802" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>h <span class="op">&lt;</span> self<span class="op">-&gt;</span>T<span class="op">)</span></span>
-<span id="cb2-803"><a href="#cb2-803" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> Y<span class="op">-&gt;</span>p <span class="op">=</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
-<span id="cb2-804"><a href="#cb2-804" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-805"><a href="#cb2-805" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 9: Refine.</span></span>
-<span id="cb2-806"><a href="#cb2-806" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-807"><a href="#cb2-807" aria-hidden="true" tabindex="-1"></a>        X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb2-808"><a href="#cb2-808" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span>  <span class="co">// drop elements inline</span></span>
-<span id="cb2-809"><a href="#cb2-809" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>W<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;=</span> cutoff<span class="op">)</span> X<span class="op">-&gt;</span>a<span class="op">[</span>X<span class="op">-&gt;</span>p<span class="op">++]</span> <span class="op">=</span> X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">];</span></span>
-<span id="cb2-810"><a href="#cb2-810" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-811"><a href="#cb2-811" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Edge case:</span></span>
-<span id="cb2-812"><a href="#cb2-812" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>h <span class="op">==</span> self<span class="op">-&gt;</span>T <span class="op">&amp;&amp;</span> h <span class="op">&lt;</span> X<span class="op">-&gt;</span>p<span class="op">)</span> </span>
-<span id="cb2-813"><a href="#cb2-813" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> Y<span class="op">-&gt;</span>p <span class="op">=</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
-<span id="cb2-814"><a href="#cb2-814" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb2-815"><a href="#cb2-815" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>X<span class="op">-&gt;</span>p <span class="op">==</span> P<span class="op">)</span> <span class="cf">break</span><span class="op">;</span> <span class="co">// Success. X has converged.</span></span>
-<span id="cb2-816"><a href="#cb2-816" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-817"><a href="#cb2-817" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 10: Iterate</span></span>
-<span id="cb2-818"><a href="#cb2-818" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
-<span id="cb2-819"><a href="#cb2-819" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-820"><a href="#cb2-820" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Free locally allocated data.</span></span>
-<span id="cb2-821"><a href="#cb2-821" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>R<span class="op">);</span></span>
-<span id="cb2-822"><a href="#cb2-822" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>Ri<span class="op">);</span></span>
-<span id="cb2-823"><a href="#cb2-823" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>W<span class="op">);</span></span>
-<span id="cb2-824"><a href="#cb2-824" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>Ws<span class="op">);</span></span>
-<span id="cb2-825"><a href="#cb2-825" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>memx8<span class="op">);</span></span>
-<span id="cb2-826"><a href="#cb2-826" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-827"><a href="#cb2-827" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>Y<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// self-&gt;X exposes the matching elements.</span></span>
-<span id="cb2-828"><a href="#cb2-828" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y<span class="op">;</span></span>
-<span id="cb2-829"><a href="#cb2-829" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-830"><a href="#cb2-830" aria-hidden="true" tabindex="-1"></a>                </span>
-<span id="cb2-831"><a href="#cb2-831" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb2-832"><a href="#cb2-832" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-833"><a href="#cb2-833" aria-hidden="true" tabindex="-1"></a><span class="co">// End of file</span></span></code></pre></div>
+<span id="cb2-732"><a href="#cb2-732" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Each bit&#39;s contribution to B</span></span>
+<span id="cb2-733"><a href="#cb2-733" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>W  <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-734"><a href="#cb2-734" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-735"><a href="#cb2-735" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Sorted version of the above</span></span>
+<span id="cb2-736"><a href="#cb2-736" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>Ws <span class="op">=</span> <span class="op">(</span><span class="dt">int</span> <span class="op">*)</span> malloc<span class="op">(</span>A<span class="op">-&gt;</span>p <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-737"><a href="#cb2-737" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-738"><a href="#cb2-738" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Memory bitvector size in bytes</span></span>
+<span id="cb2-739"><a href="#cb2-739" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> size <span class="op">=</span> <span class="op">(</span>ny <span class="op">+</span> <span class="dv">7</span><span class="op">)</span> <span class="op">/</span> <span class="dv">8</span><span class="op">;</span></span>
+<span id="cb2-740"><a href="#cb2-740" aria-hidden="true" tabindex="-1"></a>    <span class="co">// An array with 8x the length of the memory bitvector</span></span>
+<span id="cb2-741"><a href="#cb2-741" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint64_t</span> <span class="op">*</span>memx8 <span class="op">=</span> <span class="op">(</span><span class="dt">uint64_t</span><span class="op">*)</span> malloc<span class="op">(</span>size <span class="op">*</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">uint64_t</span><span class="op">));</span></span>
+<span id="cb2-742"><a href="#cb2-742" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-743"><a href="#cb2-743" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The main loop. Iterate to find a matching pattern X -&gt; Y.</span></span>
+<span id="cb2-744"><a href="#cb2-744" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb2-745"><a href="#cb2-745" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb2-746"><a href="#cb2-746" aria-hidden="true" tabindex="-1"></a>        Y<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-747"><a href="#cb2-747" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-748"><a href="#cb2-748" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 2: Threshold check.</span></span>
+<span id="cb2-749"><a href="#cb2-749" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> P <span class="op">=</span> X<span class="op">-&gt;</span>p<span class="op">;</span></span>
+<span id="cb2-750"><a href="#cb2-750" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>P <span class="op">&lt;</span> Tq<span class="op">)</span></span>
+<span id="cb2-751"><a href="#cb2-751" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span><span class="op">;</span> <span class="co">// Y-&gt;p = 0 at this point.</span></span>
+<span id="cb2-752"><a href="#cb2-752" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-753"><a href="#cb2-753" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Initialize total and per-element response vectors.</span></span>
+<span id="cb2-754"><a href="#cb2-754" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-755"><a href="#cb2-755" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny <span class="op">*</span> P<span class="op">;</span> k<span class="op">++)</span> Ri<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-756"><a href="#cb2-756" aria-hidden="true" tabindex="-1"></a>                        </span>
+<span id="cb2-757"><a href="#cb2-757" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-758"><a href="#cb2-758" aria-hidden="true" tabindex="-1"></a>        byte<span class="op">*</span> bytevector <span class="op">=</span> <span class="op">(</span>byte<span class="op">*)</span> memx8<span class="op">;</span> <span class="co">// Has length ny</span></span>
+<span id="cb2-759"><a href="#cb2-759" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-760"><a href="#cb2-760" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 3: Expansion coding.</span></span>
+<span id="cb2-761"><a href="#cb2-761" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-762"><a href="#cb2-762" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++</span> <span class="op">)</span></span>
+<span id="cb2-763"><a href="#cb2-763" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> i<span class="op">;</span> j<span class="op">++)</span></span>
+<span id="cb2-764"><a href="#cb2-764" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span></span>
+<span id="cb2-765"><a href="#cb2-765" aria-hidden="true" tabindex="-1"></a>                <span class="dt">unsigned</span> <span class="dt">int</span> addr <span class="op">=</span> X<span class="op">-&gt;</span>a<span class="op">[</span>j<span class="op">]</span> <span class="op">+</span> X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]*(</span>X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">]-</span><span class="dv">1</span><span class="op">)</span> <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-766"><a href="#cb2-766" aria-hidden="true" tabindex="-1"></a>                byte<span class="op">*</span> L <span class="op">=</span> bitpair_address<span class="op">(</span>self<span class="op">-&gt;</span>M<span class="op">,</span> addr<span class="op">);</span></span>
+<span id="cb2-767"><a href="#cb2-767" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-768"><a href="#cb2-768" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="op">(</span>L<span class="op">)</span> <span class="co">// Null pointer if this address has not been written to</span></span>
+<span id="cb2-769"><a href="#cb2-769" aria-hidden="true" tabindex="-1"></a>                    <span class="op">{</span></span>
+<span id="cb2-770"><a href="#cb2-770" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> size<span class="op">;</span> k<span class="op">++)</span></span>
+<span id="cb2-771"><a href="#cb2-771" aria-hidden="true" tabindex="-1"></a>                    memx8<span class="op">[</span>k<span class="op">]</span> <span class="op">=</span> bits_to_bytes<span class="op">[</span>L<span class="op">[</span>k<span class="op">]];</span></span>
+<span id="cb2-772"><a href="#cb2-772" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-773"><a href="#cb2-773" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Step 4: Aggregate.</span></span>
+<span id="cb2-774"><a href="#cb2-774" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Add  byte vectors to the weight vectors of both bits.</span></span>
+<span id="cb2-775"><a href="#cb2-775" aria-hidden="true" tabindex="-1"></a>                    <span class="co">// Separate loops is faster than one combined loop.</span></span>
+<span id="cb2-776"><a href="#cb2-776" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">int</span> <span class="op">*</span>w<span class="op">;</span></span>
+<span id="cb2-777"><a href="#cb2-777" aria-hidden="true" tabindex="-1"></a>                                </span>
+<span id="cb2-778"><a href="#cb2-778" aria-hidden="true" tabindex="-1"></a>                    w <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> j<span class="op">;</span></span>
+<span id="cb2-779"><a href="#cb2-779" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> w<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> bytevector<span class="op">[</span>k<span class="op">];</span></span>
+<span id="cb2-780"><a href="#cb2-780" aria-hidden="true" tabindex="-1"></a>                    w <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> i<span class="op">;</span></span>
+<span id="cb2-781"><a href="#cb2-781" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> w<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> bytevector<span class="op">[</span>k<span class="op">];</span></span>
+<span id="cb2-782"><a href="#cb2-782" aria-hidden="true" tabindex="-1"></a>                    <span class="op">}</span></span>
+<span id="cb2-783"><a href="#cb2-783" aria-hidden="true" tabindex="-1"></a>                <span class="op">}</span></span>
+<span id="cb2-784"><a href="#cb2-784" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-785"><a href="#cb2-785" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Overall response vector.</span></span>
+<span id="cb2-786"><a href="#cb2-786" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb2-787"><a href="#cb2-787" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb2-788"><a href="#cb2-788" aria-hidden="true" tabindex="-1"></a>            <span class="dt">int</span> <span class="op">*</span>q <span class="op">=</span> Ri <span class="op">+</span> ny <span class="op">*</span> i<span class="op">;</span></span>
+<span id="cb2-789"><a href="#cb2-789" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">+=</span> q<span class="op">[</span>k<span class="op">];</span></span>
+<span id="cb2-790"><a href="#cb2-790" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb2-791"><a href="#cb2-791" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-792"><a href="#cb2-792" aria-hidden="true" tabindex="-1"></a>        <span class="co">// All values are even numbers, as each element pair contributed twice.</span></span>
+<span id="cb2-793"><a href="#cb2-793" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Divide by 2 to compensate for this double counting.</span></span>
+<span id="cb2-794"><a href="#cb2-794" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> ny<span class="op">;</span> k<span class="op">++)</span> R<span class="op">[</span>k<span class="op">]</span> <span class="op">/=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb2-795"><a href="#cb2-795" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-796"><a href="#cb2-796" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 5: Select (KWTA with threshold T(T-1)/2)</span></span>
+<span id="cb2-797"><a href="#cb2-797" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> K <span class="op">=</span> self<span class="op">-&gt;</span>Bpopulation<span class="op">;</span> <span class="co">// The K for KWTA.</span></span>
+<span id="cb2-798"><a href="#cb2-798" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-799"><a href="#cb2-799" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-800"><a href="#cb2-800" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Use Tq(Tq-1)/2 as response threshold.</span></span>
+<span id="cb2-801"><a href="#cb2-801" aria-hidden="true" tabindex="-1"></a>        kwta<span class="op">(</span>K<span class="op">,</span> ny<span class="op">,</span> R<span class="op">,</span> Tq <span class="op">*</span> <span class="op">(</span>Tq <span class="op">-</span> <span class="dv">1</span><span class="op">)/</span><span class="dv">2</span><span class="op">,</span> Y<span class="op">);</span></span>
+<span id="cb2-802"><a href="#cb2-802" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-803"><a href="#cb2-803" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 6: Threshold check.</span></span>
+<span id="cb2-804"><a href="#cb2-804" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>Y<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;}</span></span>
+<span id="cb2-805"><a href="#cb2-805" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-806"><a href="#cb2-806" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 7: Per-element weights.</span></span>
+<span id="cb2-807"><a href="#cb2-807" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span> W<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-808"><a href="#cb2-808" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-809"><a href="#cb2-809" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> Y<span class="op">-&gt;</span>p<span class="op">;</span> k<span class="op">++)</span></span>
+<span id="cb2-810"><a href="#cb2-810" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb2-811"><a href="#cb2-811" aria-hidden="true" tabindex="-1"></a>                W<span class="op">[</span>i<span class="op">]</span> <span class="op">+=</span> Ri<span class="op">[</span>ny <span class="op">*</span> i <span class="op">+</span> Y<span class="op">-&gt;</span>a<span class="op">[</span>k<span class="op">]];</span></span>
+<span id="cb2-812"><a href="#cb2-812" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-813"><a href="#cb2-813" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 8: Convergence test.</span></span>
+<span id="cb2-814"><a href="#cb2-814" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-815"><a href="#cb2-815" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Find the max number h of elements that contribute at least h - 1</span></span>
+<span id="cb2-816"><a href="#cb2-816" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Using qsort has no performance penality in this routine.</span></span>
+<span id="cb2-817"><a href="#cb2-817" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span> Ws<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> W<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb2-818"><a href="#cb2-818" aria-hidden="true" tabindex="-1"></a>        qsort<span class="op">(</span>Ws<span class="op">,</span> P<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">unsigned</span> <span class="dt">int</span><span class="op">),</span> ucmpfunc<span class="op">);</span>   </span>
+<span id="cb2-819"><a href="#cb2-819" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> h <span class="op">=</span> P<span class="op">;</span></span>
+<span id="cb2-820"><a href="#cb2-820" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="op">(</span>Ws<span class="op">[</span>P <span class="op">-</span> h<span class="op">]</span> <span class="op">&lt;</span> Y<span class="op">-&gt;</span>p <span class="op">*</span> <span class="op">(</span>h <span class="op">-</span> <span class="dv">1</span><span class="op">))</span> <span class="op">--</span>h<span class="op">;</span></span>
+<span id="cb2-821"><a href="#cb2-821" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> cutoff <span class="op">=</span> Ws<span class="op">[</span>P <span class="op">-</span> h<span class="op">];</span></span>
+<span id="cb2-822"><a href="#cb2-822" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-823"><a href="#cb2-823" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>h <span class="op">&lt;</span> Tq<span class="op">)</span></span>
+<span id="cb2-824"><a href="#cb2-824" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> Y<span class="op">-&gt;</span>p <span class="op">=</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb2-825"><a href="#cb2-825" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-826"><a href="#cb2-826" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 9: Refine.</span></span>
+<span id="cb2-827"><a href="#cb2-827" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-828"><a href="#cb2-828" aria-hidden="true" tabindex="-1"></a>        X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-829"><a href="#cb2-829" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> P<span class="op">;</span> i<span class="op">++)</span>  <span class="co">// drop elements inline</span></span>
+<span id="cb2-830"><a href="#cb2-830" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>W<span class="op">[</span>i<span class="op">]</span> <span class="op">&gt;=</span> cutoff<span class="op">)</span> X<span class="op">-&gt;</span>a<span class="op">[</span>X<span class="op">-&gt;</span>p<span class="op">++]</span> <span class="op">=</span> X<span class="op">-&gt;</span>a<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb2-831"><a href="#cb2-831" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-832"><a href="#cb2-832" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Edge case:</span></span>
+<span id="cb2-833"><a href="#cb2-833" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>h <span class="op">==</span> Tq <span class="op">&amp;&amp;</span> h <span class="op">&lt;</span> X<span class="op">-&gt;</span>p<span class="op">)</span> </span>
+<span id="cb2-834"><a href="#cb2-834" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> Y<span class="op">-&gt;</span>p <span class="op">=</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb2-835"><a href="#cb2-835" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-836"><a href="#cb2-836" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>X<span class="op">-&gt;</span>p <span class="op">==</span> P<span class="op">)</span> <span class="cf">break</span><span class="op">;</span> <span class="co">// Success. X has converged.</span></span>
+<span id="cb2-837"><a href="#cb2-837" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-838"><a href="#cb2-838" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Step 10: Iterate</span></span>
+<span id="cb2-839"><a href="#cb2-839" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-840"><a href="#cb2-840" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-841"><a href="#cb2-841" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Free locally allocated data.</span></span>
+<span id="cb2-842"><a href="#cb2-842" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>R<span class="op">);</span></span>
+<span id="cb2-843"><a href="#cb2-843" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>Ri<span class="op">);</span></span>
+<span id="cb2-844"><a href="#cb2-844" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>W<span class="op">);</span></span>
+<span id="cb2-845"><a href="#cb2-845" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>Ws<span class="op">);</span></span>
+<span id="cb2-846"><a href="#cb2-846" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>memx8<span class="op">);</span></span>
+<span id="cb2-847"><a href="#cb2-847" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-848"><a href="#cb2-848" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>Y<span class="op">-&gt;</span>p <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> X<span class="op">-&gt;</span>p <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// self-&gt;X exposes the matching elements.</span></span>
+<span id="cb2-849"><a href="#cb2-849" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y<span class="op">;</span></span>
+<span id="cb2-850"><a href="#cb2-850" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-851"><a href="#cb2-851" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb2-852"><a href="#cb2-852" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-853"><a href="#cb2-853" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-854"><a href="#cb2-854" aria-hidden="true" tabindex="-1"></a><span class="co">// End of file</span></span></code></pre></div>
       </article>
     </section>
   </main>

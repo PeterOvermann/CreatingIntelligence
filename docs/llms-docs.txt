@@ -2791,6 +2791,7 @@ SOURCE CODE
 
 ## circuits.py
 
+See also: https://creatingintelligence.org/index.html#circuits
 
 ```python
 """
@@ -4701,6 +4702,7 @@ def Circuit(expr):
     name = expr.get("options", {}).get("name")
     if name is not None:
         dispatch["name"] = name
+        circuit_registry[name] = dispatch
 
     return dispatch
 ```
@@ -4708,9 +4710,9 @@ def Circuit(expr):
 
 ## memory_python.py 
 
-The reference implementation of the Topological Associative Memory algorithm illustrates the mechanics of the memory core and its programming interface, serving as a baseline for experimental and derived algorithms.
+This reference implementation of the Topological Associative Memory algorithm illustrates the mechanics of the memory core and its programming interface, serving as a baseline for experimental and derived algorithms.
 
-
+See also: https://creatingintelligence.org/index.html#the-core-algorithm
 
 ```python
 """
@@ -4758,6 +4760,10 @@ def Memory(config: dict) -> dict:
     
     T = max(2, T)
 
+    # Optional relative threshold: fraction of the query population that must
+    # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
+    fraction = config.get("fraction") or 0.0
+
     # Initialize enclosed memory dictionary and zero array
     mem = {}
     zero = np.zeros(NB + 1, dtype=np.int8)
@@ -4780,9 +4786,12 @@ def Memory(config: dict) -> dict:
     def retrieve(A):
         X = list(A)  
 
+        # Per-query threshold, at least the fixed threshold T
+        Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
+
         while True:
             P = len(X)
-            if P < T:
+            if P < Tq:
                 return []
 
             Ri = np.zeros((P, NB + 1), dtype=np.int32)
@@ -4801,7 +4810,7 @@ def Memory(config: dict) -> dict:
             t_val = sorted_R[-PB] if PB <= len(sorted_R) else sorted_R[0]
             t = max(1, t_val)
 
-            if t < (T * (T - 1)) / 2:
+            if t < (Tq * (Tq - 1)) / 2:
                 return []
             
             Y = [i for i in range(1, NB + 1) if R[i] >= t]
@@ -4813,13 +4822,13 @@ def Memory(config: dict) -> dict:
             while h > 0 and ws[-h] < len(Y) * (h - 1):
                 h -= 1
 
-            if h < T:
+            if h < Tq:
                 return []
 
             cutoff = ws[-h]
             new_X = [X[i] for i in range(P) if w[i] >= cutoff]
 
-            if h == T and h < len(new_X):
+            if h == Tq and h < len(new_X):
                 return []
 
             if len(new_X) == P:
@@ -4848,7 +4857,8 @@ def Memory(config: dict) -> dict:
 
 ## memory_c_ffi.py 
 
-By default, the package uses a C extension rather than this native code, delivering a 10x speedup.
+By default, the package uses this C extension as the memory backend, which is an order of magnitude faster than
+the reference implementation.
 
 
 ```python
@@ -4909,6 +4919,12 @@ lib.Memory_set_threshold.restype = None
 lib.Memory_get_threshold.argtypes = [ctypes.c_void_p]
 lib.Memory_get_threshold.restype = ctypes.c_int
 
+lib.Memory_set_fraction.argtypes = [ctypes.c_void_p, ctypes.c_double]
+lib.Memory_set_fraction.restype = None
+
+lib.Memory_get_fraction.argtypes = [ctypes.c_void_p]
+lib.Memory_get_fraction.restype = ctypes.c_double
+
 lib.Memory_count.argtypes = [ctypes.c_void_p]
 lib.Memory_count.restype = ctypes.c_int64
 
@@ -4933,6 +4949,10 @@ def Memory(config: dict) -> dict:
         scaled_threshold = round(config.get("threshold") * PA)
         lib.Memory_set_threshold(M, scaled_threshold) 
         
+    # Push optional relative threshold (fraction of the query population).
+    if config.get("fraction") is not None:
+        lib.Memory_set_fraction(M, float(config.get("fraction")))
+
     # Retrieve final absolute threshold from C backend.
     T = lib.Memory_get_threshold(M) 
 
@@ -5003,6 +5023,8 @@ SOURCE CODE
 
 
 ## Circuits.m
+
+See also: https://creatingintelligence.org/index.html#circuits
 
 
 ```mathematica
@@ -7006,6 +7028,7 @@ ImportExport`RegisterImport["Circuit", ImportCircuitHook];
 
 ## Memory Reference.m
 
+See also: https://creatingintelligence.org/index.html#the-core-algorithm
 
 
 ```mathematica
@@ -7035,10 +7058,9 @@ See "Memory Native.nb" for a performance-optimized version.
 *)
 
 
-
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -7062,6 +7084,12 @@ Memory[config_Association] :=
 			
 		If[T < 2, T = 2];
 
+		(* Optional relative threshold: Fraction of the query population 
+			that must match (1 = all input bits). Absent or 0 keeps 
+			the fixed threshold T. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			fraction = config["fraction"]];
+
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
 		(* Store hetero-association A -> B in memory. *)
@@ -7079,13 +7107,17 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff},
+			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff, Tq},
 			(* Step 1: Initialize. *)
 			X = A; 
 			
+			(* Per-query threshold, at least the fixed threshold T. 
+				The offset guards against floating-point round-up. *)
+			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
+			
 			While[ True,
 				(* Step 2: Threshold check.  *)
-				If[ (P = Length[X]) < T, Return[{}]]; 
+				If[ (P = Length[X]) < Tq, Return[{}]]; 
 			
 				(* Step 3: Expansion coding. *)
 				sub2 = Subsets[Range[P], {2}];
@@ -7103,7 +7135,7 @@ Memory[config_Association] :=
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
 				
 				(* Step 6: Threshold check. *)
-				If[ t < T (T - 1) / 2, Return[{}]]; 
+				If[ t < Tq (Tq - 1) / 2, Return[{}]]; 
 				Y = Sort[Pick[Range[NB], UnitStep[R - t], 1]];
 			
 				(* Step 7: Per-element weights. *)
@@ -7114,13 +7146,13 @@ Memory[config_Association] :=
 				h = P;
 				While[ (cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[ h < T, Return[{}]]; 		
+				If[ h < Tq, Return[{}]]; 		
 				
 				(* Step 9: Refine. *)
 				X = Pick[X, # >= cutoff & /@ w];
 				
 				(* Handle edge case. *)
-				If[h === T &&  h < Length[X], X = {}; Return[{}]];
+				If[h === Tq &&  h < Length[X], X = {}; Return[{}]];
 				
 				(* Finished if X has converged. *)
 				If[Length[X] == P, Return[Y]]; 
@@ -7136,6 +7168,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> fraction,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -7145,11 +7178,14 @@ Memory[config_Association] :=
 		]
 
 
+
 Memory::params  = "Invalid hyperparameters: `1`";
 ```
 
 
 ## Memory Mathematica.m
+
+This is a performance-optimized, native Mathematica implementation.
 
 ```mathematica
 (* ::Package:: *)
@@ -7181,7 +7217,7 @@ See "Memory Reference.nb" for a plain reference implementation.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
 		store, retrieve, clear, memorycount, accumulate},
 			
 		{NA, PA} = config["A_parameters"];
@@ -7204,6 +7240,12 @@ Memory[config_Association] :=
 			T = Round[config["threshold"] * PA]];
 			
 		If[T < 2, T = 2];
+
+		(* Optional relative threshold: Fraction of the query population 
+			that must match (1 = all input bits). Absent or 0 keeps 
+			the fixed threshold T. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			fraction = config["fraction"]];
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
@@ -7240,12 +7282,16 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[{X = A, P, Y, R, vals, valsY, t, w, ws, h, cutoff},
+			Module[{X = A, P, Y, R, vals, valsY, t, w, ws, h, cutoff, Tq},
+			
+			(* Per-query threshold, at least the fixed threshold T. 
+				The offset guards against floating-point round-up. *)
+			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
 			
 			While[True,
 			
 				P = Length[X];
-				If[P < T, Return[{}]];
+				If[P < Tq, Return[{}]];
 
 				(* Bulk native lookup returning a 2D packed C-array *)
 				vals = Lookup[mem, Subsets[X, {2}], zero];
@@ -7254,7 +7300,7 @@ Memory[config_Association] :=
 				R = Total[vals];
 
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
-				If[t < T (T - 1) / 2, Return[{}]];
+				If[t < Tq (Tq - 1) / 2, Return[{}]];
 
 				Y = Pick[Range[NB], UnitStep[R - t], 1];
 
@@ -7268,11 +7314,11 @@ Memory[config_Association] :=
 				h = P;
 				While[(cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[h < T, Return[{}]];
+				If[h < Tq, Return[{}]];
 
 				X = Pick[X, UnitStep[w - cutoff], 1];
 
-				If[h === T && h < Length[X], Return[{}]];
+				If[h === Tq && h < Length[X], Return[{}]];
 				If[Length[X] == P, Return[Y]];
 				]
 			];	
@@ -7284,6 +7330,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> fraction,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -7296,7 +7343,11 @@ Memory[config_Association] :=
 Memory::params  = "Invalid hyperparameters: `1`";
 ```
 
+
 ## Memory FFI.m
+
+This version uses the C extension via Mathematica's foreign-function interface.
+
 
 ```mathematica
 (* ::Package:: *)
@@ -7325,8 +7376,10 @@ Uses the Standard C backend implementation of topological associative memory.
 
 Memory[config_Association] :=
 
-	Module[ {M, NA, PA, NB, PB, T, new, setthreshold, getthreshold,
-			   memory, read, write, store, retrieve, free, clear, memorycount},
+	Module[ 
+		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setfraction,
+		getfraction, memory, read, write, store, retrieve, 
+		free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
 			{"CInt", "CInt", "CInt", "CInt"} -> "OpaqueRawPointer"];
@@ -7336,6 +7389,12 @@ Memory[config_Association] :=
 
 		getthreshold = ForeignFunctionLoad["TAM", "TAMgetthreshold", 
 			{"OpaqueRawPointer"} -> "CInt"];
+
+		setfraction = ForeignFunctionLoad["TAM", "TAMsetfraction", 
+			{"OpaqueRawPointer", "CDouble"} -> "Void"];
+
+		getfraction = ForeignFunctionLoad["TAM", "TAMgetfraction", 
+			{"OpaqueRawPointer"} -> "CDouble"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
 			{"OpaqueRawPointer"} -> "CInt"];
@@ -7362,6 +7421,11 @@ Memory[config_Association] :=
 		(* Push user-defined (scaled) threshold. *)
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
 			setthreshold[M, Round[config["threshold"] * PA]]];
+
+		(* Push optional relative threshold (fraction of the query population). 
+			N[] converts exact numbers such as 9/10 or 1 to machine reals. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			setfraction[M, N[config["fraction"]]]];
 
 		(* Get final threshold. *)
 		T = getthreshold[M];
@@ -7391,6 +7455,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> getfraction[M],
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -7400,7 +7465,78 @@ Memory[config_Association] :=
 		]
 
 
+
 Memory::params  = "Invalid hyperparameters: `1`";
+```
+
+```c
+// Standard C
+
+#include "WolframLibrary.h"
+#include <stdlib.h>
+
+#include "memory.h"
+
+// Mathematica foreign-function interface (FFI) for the memory library.
+// The functions named TAM.. are linked into Mathematica. 
+
+DLLEXPORT void* TAMnew(int Adim, int Apop, int Bdim, int Bpop) 
+	{ return (void*) Memory_new (Adim, Apop, Bdim, Bpop);}
+
+DLLEXPORT void TAMsetthreshold (void *m, int t)
+	{ Memory_set_threshold((Memory*) m, t); }
+
+DLLEXPORT int TAMgetthreshold(void *m)
+	{ return Memory_get_threshold( (Memory*) m); }
+
+DLLEXPORT void TAMsetfraction (void *m, double f)
+	{ Memory_set_fraction((Memory*) m, f); }
+
+DLLEXPORT double TAMgetfraction(void *m)
+	{ return Memory_get_fraction( (Memory*) m); }
+
+
+DLLEXPORT int TAMmemory(void *m)
+	{ return Memory_count ( (Memory*) m); }
+
+DLLEXPORT void TAMfree(void *m) 
+	{ Memory_free((Memory*) m); }
+				
+DLLEXPORT void TAMwrite(void *m, int *Abits, int Apop, int *Bbits, int Bpop)
+	{
+	Memory *M = (Memory*) m;
+	
+	Set *A = Set_new(M->Adimension);
+	Set *B = Set_new(M->Bdimension);
+	
+	// Decrement to convert to zero-based numbering.
+	A->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;
+	B->p = Bpop; for (int i = 0; i < Bpop; i++) B->a[i] = Bbits[i] - 1;
+
+	Memory_write(M, A, B);
+
+	Set_free(A);
+	Set_free(B);
+	}
+
+DLLEXPORT void TAMread(void *m, int *Abits, int Apop, int *Bbits, int *Bpop)
+	{
+	Memory *M = (Memory*) m;
+	
+	Set *A = Set_new(M->Adimension); 
+	Set *B = Set_new(M->Bdimension);
+	
+	// Convert A to 0-based numbering.
+	A->p = Apop; for (int i = 0; i < Apop; i++) A->a[i] = Abits[i] - 1;
+
+	Memory_read(M, A, B);
+
+	// Convert B to 1-based numbering. B can be a an empty list.
+	*Bpop = B->p; for (int i = 0; i < B->p; i++) Bbits[i] = B->a[i] + 1;
+	
+	Set_free(A);
+	Set_free(B);
+	}
 ```
 
 
@@ -7413,6 +7549,10 @@ SOURCE CODE
 
 # Standard C
 
+
+A zero-dependency, performance-optimized implementation of the Topological Associative Memory kernel.
+
+The Python package uses this code to build the memory backend as a C extension. 
 
 
 
@@ -7500,6 +7640,10 @@ typedef struct
 	int T;								//	Pattern patching threshold
 	
 	Set *X;								//	Matching elements from last memory retrieval.
+
+	double fraction;					//	Relative pattern matching threshold: fraction of
+										//	the query population that must match
+										//	(0 = fixed threshold T only, 1 = all elements)
 	} Memory;
 
 
@@ -7509,6 +7653,10 @@ Memory *Memory_new (int na, int pa, int nb, int pb);
 //	Pattern matching threshold
 void Memory_set_threshold (Memory*, int);
 int  Memory_get_threshold (Memory*);
+
+//	Relative pattern matching threshold (fraction of the query population)
+void   Memory_set_fraction (Memory*, double);
+double Memory_get_fraction (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);
@@ -8093,6 +8241,7 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Bpopulation	= pb;
 	
 	self->T = matching_threshold(na, pa, nb, pb);	// Absolute pattern matching threshold
+	self->fraction = 0.0;							// Relative threshold disabled
 
 	self->M = (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
@@ -8115,6 +8264,16 @@ void 	Memory_set_threshold (Memory *self, int t)	// Override default threshold
 int 	Memory_get_threshold (Memory *self)	// Recall threshold
 	{
 	return self->T;
+	}
+
+void 	Memory_set_fraction (Memory *self, double f)	// Relative threshold
+	{
+	self->fraction = f;
+	}
+
+double 	Memory_get_fraction (Memory *self)
+	{
+	return self->fraction;
 	}
 
 
@@ -8214,8 +8373,6 @@ static void kwta (int k, int ny, int *r, int threshold, Set *y)
 	}
 
 
-
-
 // 	Memory retrieval with query set A. Stores result in Y.
 
 Set* Memory_read (Memory *self, Set *A, Set *Y)
@@ -8228,6 +8385,18 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	// Step 1: Initialize.
 	Set *X = self->X;
 	Set_copy(X, A);
+
+	// Per-query threshold Tq = max(T, ceil(fraction * |A|)).
+	// The offset guards against floating-point round-up.
+	// Integer ceiling avoids a dependency on libm.
+	int Tq = self->T;
+	if (self->fraction > 0.0)
+		{
+		double v = self->fraction * A->p - 1e-9;
+		int c = (int) v;
+		if (v > c) c++;
+		if (c > Tq) Tq = c;
+		}
 
 	// Shortcut
 	int ny = self->Bdimension;
@@ -8259,7 +8428,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 
 		// Step 2: Threshold check.
 		int P = X->p;
-		if (P < self->T)
+		if (P < Tq)
 			break; // Y->p = 0 at this point.
 
 		// Initialize total and per-element response vectors.
@@ -8309,8 +8478,8 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		int K = self->Bpopulation; // The K for KWTA.
 
 		
-		// Use T(T-1)/2 as response threshold.
-		kwta(K, ny, R, self->T * (self->T - 1)/2, Y);
+		// Use Tq(Tq-1)/2 as response threshold.
+		kwta(K, ny, R, Tq * (Tq - 1)/2, Y);
 		
 		// Step 6: Threshold check.
 		if (Y->p == 0) {X->p = 0; break;}
@@ -8332,7 +8501,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		while (Ws[P - h] < Y->p * (h - 1)) --h;
 		int cutoff = Ws[P - h];
 		
-		if (h < self->T)
+		if (h < Tq)
 			{ Y->p = X->p = 0; break; }
 		
 		// Step 9: Refine.
@@ -8342,7 +8511,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 			if (W[i] >= cutoff) X->a[X->p++] = X->a[i];
 	
 		// Edge case:
-		if (h == self->T && h < X->p) 
+		if (h == Tq && h < X->p) 
 			{ Y->p = X->p = 0; break; }
 			
 		if (X->p == P) break; // Success. X has converged.

@@ -24,10 +24,9 @@ See "Memory Native.nb" for a performance-optimized version.
 *)
 
 
-
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -51,6 +50,12 @@ Memory[config_Association] :=
 			
 		If[T < 2, T = 2];
 
+		(* Optional relative threshold: Fraction of the query population 
+			that must match (1 = all input bits). Absent or 0 keeps 
+			the fixed threshold T. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			fraction = config["fraction"]];
+
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
 		(* Store hetero-association A -> B in memory. *)
@@ -68,13 +73,17 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff},
+			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff, Tq},
 			(* Step 1: Initialize. *)
 			X = A; 
 			
+			(* Per-query threshold, at least the fixed threshold T. 
+				The offset guards against floating-point round-up. *)
+			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
+			
 			While[ True,
 				(* Step 2: Threshold check.  *)
-				If[ (P = Length[X]) < T, Return[{}]]; 
+				If[ (P = Length[X]) < Tq, Return[{}]]; 
 			
 				(* Step 3: Expansion coding. *)
 				sub2 = Subsets[Range[P], {2}];
@@ -92,7 +101,7 @@ Memory[config_Association] :=
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
 				
 				(* Step 6: Threshold check. *)
-				If[ t < T (T - 1) / 2, Return[{}]]; 
+				If[ t < Tq (Tq - 1) / 2, Return[{}]]; 
 				Y = Sort[Pick[Range[NB], UnitStep[R - t], 1]];
 			
 				(* Step 7: Per-element weights. *)
@@ -103,13 +112,13 @@ Memory[config_Association] :=
 				h = P;
 				While[ (cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[ h < T, Return[{}]]; 		
+				If[ h < Tq, Return[{}]]; 		
 				
 				(* Step 9: Refine. *)
 				X = Pick[X, # >= cutoff & /@ w];
 				
 				(* Handle edge case. *)
-				If[h === T &&  h < Length[X], X = {}; Return[{}]];
+				If[h === Tq &&  h < Length[X], X = {}; Return[{}]];
 				
 				(* Finished if X has converged. *)
 				If[Length[X] == P, Return[Y]]; 
@@ -125,6 +134,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> fraction,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -132,6 +142,7 @@ Memory[config_Association] :=
 			"backend" -> "Reference"
 		|>
 		]
+
 
 
 Memory::params  = "Invalid hyperparameters: `1`";

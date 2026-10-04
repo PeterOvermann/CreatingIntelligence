@@ -24,8 +24,10 @@ Uses the Standard C backend implementation of topological associative memory.
 
 Memory[config_Association] :=
 
-	Module[ {M, NA, PA, NB, PB, T, new, setthreshold, getthreshold,
-			   memory, read, write, store, retrieve, free, clear, memorycount},
+	Module[ 
+		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setfraction,
+		getfraction, memory, read, write, store, retrieve, 
+		free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
 			{"CInt", "CInt", "CInt", "CInt"} -> "OpaqueRawPointer"];
@@ -35,6 +37,12 @@ Memory[config_Association] :=
 
 		getthreshold = ForeignFunctionLoad["TAM", "TAMgetthreshold", 
 			{"OpaqueRawPointer"} -> "CInt"];
+
+		setfraction = ForeignFunctionLoad["TAM", "TAMsetfraction", 
+			{"OpaqueRawPointer", "CDouble"} -> "Void"];
+
+		getfraction = ForeignFunctionLoad["TAM", "TAMgetfraction", 
+			{"OpaqueRawPointer"} -> "CDouble"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
 			{"OpaqueRawPointer"} -> "CInt"];
@@ -61,6 +69,11 @@ Memory[config_Association] :=
 		(* Push user-defined (scaled) threshold. *)
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
 			setthreshold[M, Round[config["threshold"] * PA]]];
+
+		(* Push optional relative threshold (fraction of the query population). 
+			N[] converts exact numbers such as 9/10 or 1 to machine reals. *)
+		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
+			setfraction[M, N[config["fraction"]]]];
 
 		(* Get final threshold. *)
 		T = getthreshold[M];
@@ -90,6 +103,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
+			"fraction" -> getfraction[M],
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -97,6 +111,7 @@ Memory[config_Association] :=
 			"backend" -> "C_FFI"
 		|>
 		]
+
 
 
 Memory::params  = "Invalid hyperparameters: `1`";

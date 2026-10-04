@@ -55,6 +55,12 @@ lib.Memory_set_threshold.restype = None
 lib.Memory_get_threshold.argtypes = [ctypes.c_void_p]
 lib.Memory_get_threshold.restype = ctypes.c_int
 
+lib.Memory_set_fraction.argtypes = [ctypes.c_void_p, ctypes.c_double]
+lib.Memory_set_fraction.restype = None
+
+lib.Memory_get_fraction.argtypes = [ctypes.c_void_p]
+lib.Memory_get_fraction.restype = ctypes.c_double
+
 lib.Memory_count.argtypes = [ctypes.c_void_p]
 lib.Memory_count.restype = ctypes.c_int64
 
@@ -79,6 +85,10 @@ def Memory(config: dict) -> dict:
         scaled_threshold = round(config.get("threshold") * PA)
         lib.Memory_set_threshold(M, scaled_threshold) 
         
+    # Push optional relative threshold (fraction of the query population).
+    if config.get("fraction") is not None:
+        lib.Memory_set_fraction(M, float(config.get("fraction")))
+
     # Retrieve final absolute threshold from C backend.
     T = lib.Memory_get_threshold(M) 
 

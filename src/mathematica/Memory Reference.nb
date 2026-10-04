@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[     30606,        740]
-NotebookOptionsPosition[     28361,        680]
-NotebookOutlinePosition[     29402,        714]
-CellTagsIndexPosition[     29359,        711]
+NotebookDataLength[     32757,        792]
+NotebookOptionsPosition[     30512,        732]
+NotebookOutlinePosition[     31553,        766]
+CellTagsIndexPosition[     31510,        763]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -59,7 +59,8 @@ Cell[BoxData[
     FontWeight->"Regular",
     FontColor->GrayLevel[0]], "\n", "*)"}],
   FontSize->9]], "Code",
- CellLabel->"In[4]:=",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+ CellLabel->
+  "In[181]:=",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
 
 Cell[BoxData[
  RowBox[{
@@ -100,7 +101,8 @@ $UserBaseDirectory/Applications/Memory.m\>\"", ",", "\n", "          ",
             RowBox[{"0", ",", " ", "0"}], "}"}]}], "}"}]}]}], "]"}], "\n", 
       "  ", "}"}]}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
- CellLabel->"In[5]:=",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e"],
+ CellLabel->
+  "In[182]:=",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e"],
 
 Cell[BoxData[
  RowBox[{"(*", "\n", 
@@ -113,7 +115,8 @@ Cell[BoxData[
      "for", " ", "a", " ", "performance"}], "-", 
    RowBox[{"optimized", " ", 
     RowBox[{"version", "."}]}]}], "\n", "*)"}]], "Code",
- CellLabel->"In[6]:=",ExpressionUUID->"bdec8a3d-005c-496b-9189-c923ec9dce36"],
+ CellLabel->
+  "In[183]:=",ExpressionUUID->"bdec8a3d-005c-496b-9189-c923ec9dce36"],
 
 Cell[CellGroupData[{
 
@@ -122,10 +125,10 @@ Cell["Memory", "Subsection",
   True,ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b"],
 
 Cell[BoxData[
- RowBox[{"\n", 
+ RowBox[{
   RowBox[{
-   RowBox[{"Memory", "[", "config_Association", "]"}], " ", ":=", "\n", 
-   "\[IndentingNewLine]", "\t", 
+   RowBox[{"Memory", "[", "config_Association", "]"}], " ", ":=", "\n", "\n", 
+   "\t", 
    RowBox[{"Module", "[", " ", 
     RowBox[{
      RowBox[{"{", 
@@ -133,10 +136,11 @@ Cell[BoxData[
        RowBox[{"mem", " ", "=", " ", 
         RowBox[{"<|", "|>"}]}], ",", " ", "NA", ",", " ", "PA", ",", " ", 
        "NB", ",", " ", "PB", ",", " ", 
-       RowBox[{"T", " ", "=", " ", "1"}], ",", " ", "capacity", ",", " ", 
-       "zero", ",", "\n", "\t\t", "store", ",", " ", "retrieve", ",", " ", 
-       "clear", ",", " ", "memorycount"}], "}"}], ",", "\n", "\t\t\t", "\n", 
-     "\t\t", 
+       RowBox[{"T", " ", "=", " ", "1"}], ",", " ", 
+       RowBox[{"fraction", " ", "=", " ", "0"}], ",", " ", "capacity", ",", 
+       " ", "zero", ",", "\n", "\t\t", "store", ",", " ", "retrieve", ",", 
+       " ", "clear", ",", " ", "memorycount"}], "}"}], ",", "\n", "\t\t\t", 
+     "\n", "\t\t", 
      RowBox[{
       RowBox[{
        RowBox[{"{", 
@@ -243,6 +247,31 @@ Cell[BoxData[
        RowBox[{
         RowBox[{"T", " ", "<", " ", "2"}], ",", " ", 
         RowBox[{"T", " ", "=", " ", "2"}]}], "]"}], ";", "\n", "\n", "\t\t", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Optional", " ", "relative", " ", 
+        RowBox[{"threshold", ":", " ", 
+         RowBox[{
+         "Fraction", " ", "of", " ", "the", " ", "query", " ", "population", 
+          " ", "\n", "\t\t\t", "that", " ", "must", " ", "match", " ", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"1", " ", "=", " ", 
+             RowBox[{"all", " ", "input", " ", "bits"}]}], ")"}], ".", " ", 
+           "Absent"}], " ", "or", " ", "0", " ", "keeps", " ", "\n", "\t\t\t",
+           "the", " ", "fixed", " ", "threshold", " ", 
+          RowBox[{"T", "."}]}]}]}], " ", "*)"}], "\n", "\t\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"KeyExistsQ", "[", 
+          RowBox[{"config", ",", " ", "\"\<fraction\>\""}], "]"}], " ", "&&", 
+         " ", 
+         RowBox[{"NumberQ", "[", 
+          RowBox[{"config", "[", "\"\<fraction\>\"", "]"}], "]"}]}], ",", 
+        "\n", "\t\t\t", 
+        RowBox[{"fraction", " ", "=", " ", 
+         RowBox[{"config", "[", "\"\<fraction\>\"", "]"}]}]}], "]"}], ";", 
+      "\n", "\n", "\t\t", 
       RowBox[{"zero", " ", "=", " ", 
        RowBox[{"Developer`ToPackedArray", "[", 
         RowBox[{"ConstantArray", "[", 
@@ -317,8 +346,8 @@ Cell[BoxData[
           RowBox[{
           "X", ",", " ", "P", ",", " ", "Y", ",", " ", "R", ",", " ", "Ri", ",",
             " ", "sub2", ",", " ", "v", ",", " ", "t", ",", " ", "w", ",", 
-           " ", "ws", ",", " ", "h", ",", " ", "cutoff"}], "}"}], ",", 
-         "\[IndentingNewLine]", "\t\t\t", 
+           " ", "ws", ",", " ", "h", ",", " ", "cutoff", ",", " ", "Tq"}], 
+          "}"}], ",", "\n", "\t\t\t", 
          RowBox[{"(*", " ", 
           RowBox[{
            RowBox[{"Step", " ", "1"}], ":", " ", 
@@ -326,6 +355,27 @@ Cell[BoxData[
          RowBox[{
           RowBox[{"X", " ", "=", " ", "A"}], ";", " ", "\n", "\t\t\t", "\n", 
           "\t\t\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"Per", "-", 
+             RowBox[{"query", " ", "threshold"}]}], ",", " ", 
+            RowBox[{
+             RowBox[{
+             "at", " ", "least", " ", "the", " ", "fixed", " ", "threshold", " ", 
+              RowBox[{"T", ".", " ", "\n", "\t\t\t\t", "The"}], " ", "offset",
+               " ", "guards", " ", "against", " ", "floating"}], "-", 
+             RowBox[{"point", " ", "round"}], "-", 
+             RowBox[{"up", "."}]}]}], " ", "*)"}], "\n", "\t\t\t", 
+          RowBox[{"Tq", " ", "=", " ", 
+           RowBox[{"Max", "[", 
+            RowBox[{"T", ",", " ", 
+             RowBox[{"Ceiling", "[", 
+              RowBox[{
+               RowBox[{"fraction", " ", "*", " ", 
+                RowBox[{"Length", "[", "X", "]"}]}], " ", "-", " ", 
+               RowBox[{"10", "^", 
+                RowBox[{"-", "9"}]}]}], "]"}]}], "]"}]}], ";", "\n", "\t\t\t",
+           "\n", "\t\t\t", 
           RowBox[{"While", "[", " ", 
            RowBox[{"True", ",", "\n", "\t\t\t\t", 
             RowBox[{"(*", " ", 
@@ -340,7 +390,7 @@ Cell[BoxData[
                 RowBox[{"(", 
                  RowBox[{"P", " ", "=", " ", 
                   RowBox[{"Length", "[", "X", "]"}]}], ")"}], " ", "<", " ", 
-                "T"}], ",", " ", 
+                "Tq"}], ",", " ", 
                RowBox[{"Return", "[", 
                 RowBox[{"{", "}"}], "]"}]}], "]"}], ";", " ", "\n", "\t\t\t", 
              "\n", "\t\t\t\t", 
@@ -353,8 +403,8 @@ Cell[BoxData[
               RowBox[{"Subsets", "[", 
                RowBox[{
                 RowBox[{"Range", "[", "P", "]"}], ",", " ", 
-                RowBox[{"{", "2", "}"}]}], "]"}]}], ";", 
-             "\[IndentingNewLine]", "\t\t\t", "\n", "\t\t\t\t", 
+                RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\n", "\t\t\t", "\n",
+              "\t\t\t\t", 
              RowBox[{"(*", " ", 
               RowBox[{
                RowBox[{"Step", " ", "4"}], ":", " ", 
@@ -387,8 +437,8 @@ Cell[BoxData[
                  RowBox[{
                   RowBox[{"Ri", "[", 
                    RowBox[{"[", "#2", "]"}], "]"}], " ", "+=", " ", "v"}]}], 
-                ")"}], " ", "&"}], " ", "@@@", " ", "sub2"}], ";", 
-             "\[IndentingNewLine]", "\t\t\t\t", 
+                ")"}], " ", "&"}], " ", "@@@", " ", "sub2"}], ";", "\n", 
+             "\t\t\t\t", 
              RowBox[{"R", " ", "=", " ", 
               RowBox[{
                RowBox[{"(", 
@@ -433,10 +483,10 @@ Cell[BoxData[
              RowBox[{"If", "[", " ", 
               RowBox[{
                RowBox[{"t", " ", "<", " ", 
-                RowBox[{"T", " ", 
+                RowBox[{"Tq", " ", 
                  RowBox[{
                   RowBox[{"(", 
-                   RowBox[{"T", " ", "-", " ", "1"}], ")"}], " ", "/", " ", 
+                   RowBox[{"Tq", " ", "-", " ", "1"}], ")"}], " ", "/", " ", 
                   "2"}]}]}], ",", " ", 
                RowBox[{"Return", "[", 
                 RowBox[{"{", "}"}], "]"}]}], "]"}], ";", " ", "\n", 
@@ -466,8 +516,7 @@ Cell[BoxData[
               RowBox[{
                RowBox[{"Step", " ", "8"}], ":", " ", 
                RowBox[{"Convergence", " ", 
-                RowBox[{"test", "."}]}]}], "  ", "*)"}], 
-             "\[IndentingNewLine]", "\t\t\t\t", 
+                RowBox[{"test", "."}]}]}], "  ", "*)"}], "\n", "\t\t\t\t", 
              RowBox[{"ws", " ", "=", " ", 
               RowBox[{"Sort", "[", "w", "]"}]}], ";", " ", "\n", "\t\t\t\t", 
              RowBox[{"h", " ", "=", " ", "P"}], ";", "\n", "\t\t\t\t", 
@@ -487,7 +536,7 @@ Cell[BoxData[
                RowBox[{"--", "h"}]}], "]"}], ";", "\n", "\n", "\t\t\t\t", 
              RowBox[{"If", "[", " ", 
               RowBox[{
-               RowBox[{"h", " ", "<", " ", "T"}], ",", " ", 
+               RowBox[{"h", " ", "<", " ", "Tq"}], ",", " ", 
                RowBox[{"Return", "[", 
                 RowBox[{"{", "}"}], "]"}]}], "]"}], ";", " \t\t", "\n", 
              "\t\t\t\t", "\n", "\t\t\t\t", 
@@ -509,7 +558,7 @@ Cell[BoxData[
              RowBox[{"If", "[", 
               RowBox[{
                RowBox[{
-                RowBox[{"h", " ", "===", " ", "T"}], " ", "&&", "  ", 
+                RowBox[{"h", " ", "===", " ", "Tq"}], " ", "&&", "  ", 
                 RowBox[{"h", " ", "<", " ", 
                  RowBox[{"Length", "[", "X", "]"}]}]}], ",", " ", 
                RowBox[{
@@ -556,6 +605,8 @@ Cell[BoxData[
         RowBox[{"(*", " ", 
          RowBox[{"Absolute", " ", "pattern", " ", "matching", " ", 
           RowBox[{"threshold", "."}]}], " ", "*)"}], "\n", "\t\t\t", 
+        RowBox[{"\"\<fraction\>\"", " ", "->", " ", "fraction"}], ",", "\n", 
+        "\t\t\t", 
         RowBox[{"\"\<store\>\"", " ", "->", " ", "store"}], ",", "\n", 
         "\t\t\t", 
         RowBox[{"\"\<retrieve\>\"", " ", "->", " ", "retrieve"}], ",", "\n", 
@@ -565,9 +616,8 @@ Cell[BoxData[
         RowBox[{"\"\<memorycount\>\"", " ", ":>", " ", "memorycount"}], ",", 
         "\n", "\t\t\t", 
         RowBox[{"\"\<backend\>\"", " ", "->", " ", "\"\<Reference\>\""}]}], 
-       "\n", "\t\t", "|>"}]}]}], "\[IndentingNewLine]", "\t\t", 
-    "]"}]}]}]], "Code",
- CellLabel->"In[7]:=",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+       "\n", "\t\t", "|>"}]}]}], "\n", "\t\t", "]"}]}], "\n"}]], "Code",Expres\
+sionUUID->"f88c9bb6-8dcd-40ec-aa7a-ed700c6a1183"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -579,7 +629,8 @@ Cell[BoxData[
   RowBox[{
    RowBox[{"Memory", "::", "params"}], "  ", "=", 
    " ", "\"\<Invalid hyperparameters: `1`\>\""}], ";"}]], "Code",
- CellLabel->"In[8]:=",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+ CellLabel->
+  "In[186]:=",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -674,7 +725,8 @@ first.\>\"", "]"}], ";", "\n", "        ",
           " ", "source"}], "]"}]}], "\n", "    ", "]"}]}]}], "\n", "]"}], 
   ";"}]], "Code",
  InitializationCell->False,
- CellLabel->"In[9]:=",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170"]
+ CellLabel->
+  "In[187]:=",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170"]
 }, Open  ]]
 }, Open  ]]
 },
@@ -716,22 +768,22 @@ Notebook[{
 Cell[CellGroupData[{
 Cell[422, 15, 137, 2, 82, "Section",ExpressionUUID->"6507a60d-d7a6-4f4d-93d6-939d26161574",
  InitializationCell->True],
-Cell[562, 19, 1824, 42, 271, "Code",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
-Cell[2389, 63, 1667, 39, 23, "Input",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e",
+Cell[562, 19, 1829, 43, 271, "Code",ExpressionUUID->"5425daa4-6e3b-41e0-a625-66dc2e1395d3"],
+Cell[2394, 64, 1672, 40, 23, "Input",ExpressionUUID->"3055c467-ba9e-40a9-beea-d29ac82f8e5e",
  CellOpen->False],
-Cell[4059, 104, 536, 11, 158, "Code",ExpressionUUID->"bdec8a3d-005c-496b-9189-c923ec9dce36"],
+Cell[4069, 106, 541, 12, 158, "Code",ExpressionUUID->"bdec8a3d-005c-496b-9189-c923ec9dce36"],
 Cell[CellGroupData[{
-Cell[4620, 119, 113, 2, 66, "Subsection",ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b",
+Cell[4635, 122, 113, 2, 66, "Subsection",ExpressionUUID->"de7fdeff-8a5f-410d-aeff-40fd9ee0026b",
  InitializationCell->True],
-Cell[4736, 123, 19396, 446, 2585, "Code",ExpressionUUID->"8989dae4-703d-4e5e-b6d1-d51f5c1de4ab"]
+Cell[4751, 126, 21522, 493, 2844, "Code",ExpressionUUID->"f88c9bb6-8dcd-40ec-aa7a-ed700c6a1183"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[24169, 574, 85, 0, 66, "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
-Cell[24257, 576, 229, 5, 63, "Code",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
+Cell[26310, 624, 85, 0, 66, "Subsection",ExpressionUUID->"94c6417d-bd6a-45ea-9d3e-c96107be810c"],
+Cell[26398, 626, 234, 6, 63, "Code",ExpressionUUID->"e11707d0-434f-4c29-8eb9-4db390b95402"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[24523, 586, 86, 0, 66, "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
-Cell[24612, 588, 3721, 88, 680, "Code",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170",
+Cell[26669, 637, 86, 0, 66, "Subsection",ExpressionUUID->"a7db9f41-542d-425e-a292-4722fec2c964"],
+Cell[26758, 639, 3726, 89, 680, "Code",ExpressionUUID->"6f670fe4-d832-4db0-8bc3-5a310534b170",
  InitializationCell->False]
 }, Open  ]]
 }, Open  ]]
