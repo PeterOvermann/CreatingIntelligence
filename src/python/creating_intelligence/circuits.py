@@ -1906,5 +1906,6 @@ def Circuit(expr):
     name = expr.get("options", {}).get("name")
     if name is not None:
         dispatch["name"] = name
+        circuit_registry[name] = dispatch
 
     return dispatch
