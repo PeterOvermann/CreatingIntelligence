@@ -17,7 +17,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Associates the data from the previous execution cycle with the current label signal.
 - Typically used as readout node in reservoir architectures.
 - Receives the label from its first `receive` block and data from the remaining blocks.
-- Learns if the prediction does not match the subsequent input.
+- Always learns, also when the prediction was correct.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
 - Resolves multiset and inhibitory input prior to processing.

@@ -2350,7 +2350,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Associates the data from the previous execution cycle with the current label signal.
 - Typically used as readout node in reservoir architectures.
 - Receives the label from its first `receive` block and data from the remaining blocks.
-- Learns if the prediction does not match the subsequent input.
+- Always learns, also when the prediction was correct.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
 - Resolves multiset and inhibitory input prior to processing.
@@ -2424,8 +2424,7 @@ def predictor(config):
         nonlocal X, prediction
         Y = resolve_normal(item)
 
-        if prediction != X:
-            M["store"](X, Y)
+        M["store"](X, Y) # always learn
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -2543,6 +2542,11 @@ def heteroencoder(config):
 
     def f(*blocks):
         X = resolve_block_join_normal(list(blocks), dims)
+
+        # Empty input: no output, nothing to learn
+        if not X:
+            return ([],)
+
         Y = M["retrieve"](X)
 
         if not Y:
@@ -4756,6 +4760,11 @@ def heteroencoder(config):
 
     def f(*blocks):
         X = resolve_block_join_normal(list(blocks), dims)
+
+        # Empty input: no output, nothing to learn
+        if not X:
+            return ([],)
+
         Y = M["retrieve"](X)
 
         if not Y:
@@ -4811,8 +4820,7 @@ def predictor(config):
         nonlocal X, prediction
         Y = resolve_normal(item)
 
-        if prediction != X:
-            M["store"](X, Y)
+        M["store"](X, Y) # always learn
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -5686,6 +5694,10 @@ def Memory(config: dict) -> dict:
         if B is None:
             B = A
             
+        # Empty patterns store nothing
+        if not A or not B:
+            return            
+            
         v = zero.copy()
         v[B] = 1 
         
@@ -5698,7 +5710,6 @@ def Memory(config: dict) -> dict:
                 mem[key] = np.bitwise_or(mem[key], v)
 
     def retrieve(A):
-        X = list(A)  
 
         # Per-query threshold, at least the fixed threshold T
         Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
@@ -5886,7 +5897,7 @@ def Memory(config: dict) -> dict:
         # Store auto-association A -> A in memory if B is omitted.
         if B is None:
             B = A 
-        
+            
         if len(A) > 0 and len(B) > 0: 
             cset_A, _ref_A = _make_cset(A, NA)
             cset_B, _ref_B = _make_cset(B, NB)
@@ -6802,6 +6813,9 @@ heteroencoder[config_Association] :=
 	f[blocks__List] := Module[{X, Y},
 		X = ResolveBlockJoinNormal[{blocks}, dims];
 		
+		(* No input, nothing to learn. *)
+		If[X === {}, Return[{}]];
+		
 		Y = M["retrieve"][X];
 		
 		(* Generate new SHR encoding if retrieval fails. *)
@@ -6839,12 +6853,12 @@ predictor[config_Association] :=
 		"A_parameters" -> Plus @@ contextconfig,
 		"B_parameters" -> itemconfig   |> ]]; 
 	
-	f[item_List, blocks__List] := Module[{Xdec},
+	f[item_List, blocks__List] := Module[{Y, Xdec},
 	
+		Y = ResolveNormal[item];
 		(* State X from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
-		If[ prediction =!= X, 
-			M["store"][X, ResolveNormal[item]]];
+		M["store"][X, Y];
 		
 		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 

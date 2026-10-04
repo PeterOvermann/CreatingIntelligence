@@ -1046,6 +1046,11 @@ def heteroencoder(config):
 
     def f(*blocks):
         X = resolve_block_join_normal(list(blocks), dims)
+
+        # Empty input: no output, nothing to learn
+        if not X:
+            return ([],)
+
         Y = M["retrieve"](X)
 
         if not Y:
@@ -1101,8 +1106,7 @@ def predictor(config):
         nonlocal X, prediction
         Y = resolve_normal(item)
 
-        if prediction != X:
-            M["store"](X, Y)
+        M["store"](X, Y) # always learn
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])

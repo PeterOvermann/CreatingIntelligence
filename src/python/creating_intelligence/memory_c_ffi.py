@@ -107,7 +107,7 @@ def Memory(config: dict) -> dict:
         # Store auto-association A -> A in memory if B is omitted.
         if B is None:
             B = A 
-        
+            
         if len(A) > 0 and len(B) > 0: 
             cset_A, _ref_A = _make_cset(A, NA)
             cset_B, _ref_B = _make_cset(B, NB)

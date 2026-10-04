@@ -853,6 +853,9 @@ heteroencoder[config_Association] :=
 	f[blocks__List] := Module[{X, Y},
 		X = ResolveBlockJoinNormal[{blocks}, dims];
 		
+		(* No input, nothing to learn. *)
+		If[X === {}, Return[{}]];
+		
 		Y = M["retrieve"][X];
 		
 		(* Generate new SHR encoding if retrieval fails. *)
@@ -890,12 +893,12 @@ predictor[config_Association] :=
 		"A_parameters" -> Plus @@ contextconfig,
 		"B_parameters" -> itemconfig   |> ]]; 
 	
-	f[item_List, blocks__List] := Module[{Xdec},
+	f[item_List, blocks__List] := Module[{Y, Xdec},
 	
+		Y = ResolveNormal[item];
 		(* State X from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
-		If[ prediction =!= X, 
-			M["store"][X, ResolveNormal[item]]];
+		M["store"][X, Y];
 		
 		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 

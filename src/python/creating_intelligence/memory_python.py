@@ -55,6 +55,10 @@ def Memory(config: dict) -> dict:
         if B is None:
             B = A
             
+        # Empty patterns store nothing
+        if not A or not B:
+            return            
+            
         v = zero.copy()
         v[B] = 1 
         
@@ -67,7 +71,6 @@ def Memory(config: dict) -> dict:
                 mem[key] = np.bitwise_or(mem[key], v)
 
     def retrieve(A):
-        X = list(A)  
 
         # Per-query threshold, at least the fixed threshold T
         Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
