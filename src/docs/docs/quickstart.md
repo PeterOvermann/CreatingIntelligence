@@ -118,6 +118,7 @@ pprint(mem)
  'T': 7,
  'backend': 'c_ffi',
  'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
+ 'fraction': 0.0,
  'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
  'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
  'store': <function Memory.<locals>.store at 0x109a65d20>}
