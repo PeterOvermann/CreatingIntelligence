@@ -129,6 +129,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
+        "fraction": fraction,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

@@ -92,6 +92,9 @@ def Memory(config: dict) -> dict:
     # Retrieve final absolute threshold from C backend.
     T = lib.Memory_get_threshold(M) 
 
+    # Retrieve fraction parameter from C backend
+    fraction = lib.Memory_get_fraction(M) 
+
     def _make_cset(data_list, dimension):
         """Creates a CSet and holds the underlying array reference to prevent garbage collection."""
         length = len(data_list)
@@ -139,6 +142,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
+        "fraction": fraction,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

@@ -39,6 +39,8 @@ libmemory_ext = Extension(
         "Memory_new",
         "Memory_set_threshold",
         "Memory_get_threshold",
+        "Memory_set_fraction",
+        "Memory_get_fraction",
         "Memory_count",
         "Memory_free",
         "Memory_write",
