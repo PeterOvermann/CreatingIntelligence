@@ -147,6 +147,7 @@ Properties of the output dictionary:
 | `A_parameters`      |   input layer hyperparameters [N,P]  |
 | `B_parameters` |  output layer parameters  |
 | `T` |  retrieval pattern matching threshold   |
+| `fraction` | fraction of the query population that must match |
 | `store` |  write to memory  |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
