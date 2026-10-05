@@ -914,6 +914,68 @@ predictor[config_Association] :=
 	]
 
 
+(*
+Generates a prediction based on the current input (slot #1) 
+and context (slots #2,...).
+Automatically learns the correct prediction in the following cycle.
+To do so, the node remembers its context from the previous cycle.
+The "context" option sets how the context blocks are taken:
+"replace" (default) takes every input, so an empty block is empty;
+"hold" keeps each block at its last non-empty value, for receivers
+of event-driven senders that emit only on change.
+*)
+
+predictor[config_Association] := 
+		Module[ {f, M, X = {}, prediction = {}, decimation,
+						itemconfig, contextconfig, hold, held, clear},
+
+	decimation = Lookup[config, "decimate", 1];
+	itemconfig = First[config["receive_blocks"]];
+	(* Context may be partitioned *)
+	contextconfig = Rest[config["receive_blocks"]]; 
+	
+	(* Context: "replace" (take every input) or 
+					"hold" (keep last non-empty) *)
+	hold = Lookup[config, "context", "replace"];
+	If[ !MemberQ[{"replace", "hold"}, hold],
+		Message[Circuit::context, "predictor"]; Return[<||>]];
+	hold = (hold === "hold");
+	held = ConstantArray[{}, Length[contextconfig]];
+	
+	M = Memory[Join[config, <|
+		"A_parameters" -> Plus @@ contextconfig,
+		"B_parameters" -> itemconfig   |> ]]; 
+	
+	f[item_List, blocks__List] := Module[{Y, Xdec, ctx = {blocks}},
+	
+		Y = ResolveNormal[item];
+		(* State X from previous cycle *)
+		(* Always learn. Also when the prediction was correct. *)
+		M["store"][X, Y];
+		
+		(* Hold: an empty block keeps its last non-empty value *)
+		If[hold,
+			held = MapThread[If[#1 === {}, #2, #1]&, {ctx, held}];
+			ctx = held];
+		
+		X = ResolveBlockJoinNormal[ctx, First /@ contextconfig];
+
+		Xdec = Sort[RandomSample[X, Floor[decimation * Length[X]]]];
+		
+		prediction = M["retrieve"][Xdec]
+		]; 
+	
+	(* Clears the memory and the node's state, including held blocks *)
+	clear := (M["clear"]; X = {}; prediction = {};
+		held = ConstantArray[{}, Length[contextconfig]];);
+
+	Join[ <| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
+		"shape" -> "square", "fill" -> 11, "size" -> 18,
+		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M,
+		<| "clear" :> clear |>]
+	]
+
+
 (* 
 Random noise generator
 *)
@@ -1624,6 +1686,7 @@ Circuit::encoder   = "`1` cannot be used as a decoder.";
 Circuit::decoder   = "`1` cannot be used as an encoder.";
 Circuit::regress   = "Regression: output should match `1`.";
 Circuit::multiplex = "Malformed multiplex specification `1`.";
+Circuit::context   = "`1`: context must be \"replace\" or \"hold\".";
 
 
 (* 

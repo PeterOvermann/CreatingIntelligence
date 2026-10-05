@@ -1077,9 +1077,14 @@ def heteroencoder(config):
 
 def predictor(config):
     """
-    Generates a prediction based on the current input (slot #1) 
+    Generates a prediction based on the current input (slot #1)
     and context (slots #2,...).
     Automatically learns the correct prediction in the following cycle.
+
+    The context option sets how the context blocks are taken:
+    "replace" (default) takes every input, so an empty block is empty;
+    "hold" keeps each block at its last non-empty value, for receivers
+    of event-driven senders that emit only on change.
     """
     receive_blocks = config.get("receive_blocks", [])
     itemconfig = receive_blocks[0]
@@ -1087,6 +1092,13 @@ def predictor(config):
 
     # Extract decimation parameter, defaulting to 1.0
     decimation = config.get("decimate", 1.0)
+
+    # Context: "replace" (take every input) or "hold" (keep last non-empty)
+    context_mode = config.get("context", "replace")
+    if context_mode not in ("replace", "hold"):
+        raise CircuitError(
+            "predictor: context must be \"replace\" or \"hold\".")
+    hold = context_mode == "hold"
 
     params_A = [sum(b[0] for b in contextconfig), sum(b[1]
                     for b in contextconfig)]
@@ -1101,12 +1113,18 @@ def predictor(config):
     M = Memory(m_config)
     X = []
     prediction = []
+    held = [[] for _ in contextconfig]
 
     def f(item, *blocks):
-        nonlocal X, prediction
+        nonlocal X, prediction, held
         Y = resolve_normal(item)
 
         M["store"](X, Y) # always learn
+
+        # Hold: an empty block keeps its last non-empty value
+        if hold:
+            held = [b if b else h for b, h in zip(blocks, held)]
+            blocks = held
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -1126,12 +1144,19 @@ def predictor(config):
 
         return (prediction,)
 
+    def clear():
+        nonlocal X, prediction, held
+        M["clear"]()
+        X, prediction = [], []
+        held = [[] for _ in contextconfig]
+
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
         "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
     }
     result.update(M)
+    result["clear"] = clear
     return result
     
     
