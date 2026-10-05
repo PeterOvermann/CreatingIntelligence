@@ -1617,21 +1617,21 @@ def Circuit(expr):
         kwta_exc_tags = has_tag("kwta_excitatory")
         kwta_abs_tags = has_tag("kwta_absolute")
 
+        # Optional kWTA. Ranks elements by multiplicity across all paths
+        # (within-path counts of multiset paths included). Passes every
+        # element at or above the k-th highest count, ties included. With
+        # k or fewer distinct elements, all pass. Outputs a set.
         if any(kwta_exc_tags) or any(kwta_abs_tags):
             k = min(p["hyperparameters"][1] for p in paths)
             U = [i for i in merged if i > 0] if any(kwta_exc_tags) else merged
 
             tally = Counter(U)
-            if len(tally) >= k:
-                freqs = sorted(tally.values())
-                rankedmax = freqs[-k]
-                if rankedmax >= 2:
-                    merged = sorted(
-                        [val for val, count in tally.items() if count >= rankedmax])
-                else:
-                    merged = []
+            if len(tally) <= k:
+                merged = sorted(tally)
             else:
-                merged = []
+                kth = sorted(tally.values())[-k]
+                merged = sorted(
+                    [val for val, count in tally.items() if count >= kth])
 
         return merged
 

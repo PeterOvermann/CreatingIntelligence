@@ -1018,15 +1018,15 @@ Circuit`TagMap = <|
 "permute"         -> "\[Pi]", (* permuation, unique per pathway *)
 "noise"           -> "~", (* random noise if empty, else clear elements *)
 "rate_limit"      -> "R", (* stochastic rate limiting up to hyperparameter P *)
-"threshold"       -> "T", (* clearing data below hyperparameter population P *)
+"threshold"       -> "T", (* clears the merged signal below population P *)
 "veto"            -> "X", (* clears all paths if any X path is non-empty *)
 "mandatory"       -> "*", (* clears all paths if any * path is empty *)
 "priority"        -> "!", (* clears all non-! paths if any ! path is non-empty *) 
 "dependency"      -> "&", (* clears & paths if any non-& path is empty (AND) *)
 "fallback"        -> "|", (* clears | paths if any non-| path is non-empty (NOR) *)
 "barrier"         -> "=", (* clears = paths if any = path is empty *)
-"kwta_excitatory" -> "K", (* top-k of positives *)
-"kwta_absolute"   -> "k", (* top-k of all elements *)
+"kwta_excitatory" -> "K", (* top-k of positives by multiplicity, ties included *)
+"kwta_absolute"   -> "k", (* top-k of all elements by multiplicity, ties included *)
 "log"             -> "?", (* print log of path contents *)
 "show_slot"       -> "#", (* render slot number *)
 "show_dimension"  -> "$", (* render N *)
@@ -1307,7 +1307,7 @@ Circuit[expr_] := Module[
 
 		(* Thresholding. *)
 		If[tag["threshold"] && Length[x] < p, x = {}];
-
+		
 		(* Random noise if x = {}, else clear x *)
 		If[tag["noise"], x = If[x === {}, Sort[RandomSample[Range[n], p]], {}]];
 
@@ -1354,25 +1354,23 @@ Circuit[expr_] := Module[
 	
 		(* Optional kWTA. *) 
 		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
-			Module[{k, U, tally, rankedmax},
+			Module[{k, U, tally, kth},
+			k = Min[#["hyperparameters"][[2]] & /@ paths ];
+			U = If[Or @@ tags["kwta_excitatory"], Select[Positive][merged], merged];
+			tally = SortBy[Tally[U], Last];
+			merged = If[Length[tally] <= k,
+				Sort[First /@ tally],
+				kth = tally[[-k, 2]];
+				Sort[First /@ Select[tally, Last[#] >= kth &]]]
+			]
+		];
+
+		(* Optional thresholding of the merged signal, after kWTA. *)
+		If[Or @@ tags["threshold"] &&
+			Length[merged] < Min[#["hyperparameters"][[2]] & /@ paths ],
+			merged = {}];	
 			
-				k = Min[#["hyperparameters"][[2]] & /@ paths ];
-			
-				(* "K" forces excitatory only. 
-					"k" evaluates absolute saliency. *)
-				U = If[Or @@ tags["kwta_excitatory"], 
-					Select[Positive][merged], merged];
-			
-				tally = SortBy[Tally[U], Last];
-			
-				(* Force consensus: k elements must appear at least twice. *)
-				merged = {};
-				If[Length[tally] >= k, rankedmax = tally[[-k, 2]];
-					If[ rankedmax >= 2, merged = Sort[Select[tally, 
-						Last[#] >= rankedmax &][[All, 1]]]]]
-	   		]
-			];	
-				
+									
 		merged
 		];
 		

@@ -72,6 +72,8 @@ def Memory(config: dict) -> dict:
 
     def retrieve(A):
 
+        X = A
+        
         # Per-query threshold, at least the fixed threshold T
         Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
 

@@ -108,7 +108,7 @@ start simultaneously with the global clock.
 | `permute` | π   |  applies a permutation unique to the specified path |
 | `rate_limit` | R   |  caps the population at the path's default population |
 | `threshold` | T   |  clears signals that fall below the path's default population |
-| `noise` | ~   |  generates random noise if signal is non-empty, otherwise clearing the path |
+| `noise` | ~   |  generates random noise if signal is empty, otherwise clearing the path |
 
 
 This pathway conveys multisets:
@@ -150,11 +150,26 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 | `dependency` |  &    |  clears dependency paths if any non-dependency path is empty (AND) |
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
 | `barrier` | =  |  clears barrier paths if any barrier path is empty |
-| `kwta_excitatory` | K  |  filters for top-K excitatory  signals, with K taken to be the path's default population |
-| `kwta_absolute` | k   |  filters for top-k signals based on total saliency, with k taken to be the path's default population |
+| `kwta_excitatory` | K  |  passes the top-k excitatory elements ranked by multiplicity, ties included, with k taken to be the default population |
+| `kwta_absolute` | k   |  passes the top-k elements ranked by total saliency (multiplicity of excitatory and inhibitory elements), ties included, with k taken to be the default population |
 
 
-In this circuit, two paths are merged via kWTA:
+kWTA operates on the merged signal and also applies to a single path. If any
+path of a merge carries a kWTA tag, the whole merge is filtered. Each element
+is scored by its multiplicity summed over all merged paths: a set path
+contributes one count per element, a multiset path contributes its duplicate
+counts. All elements scoring at or above the k-th highest score pass, so ties
+at the threshold are included; with k or fewer distinct elements, all pass.
+k is the smallest default population among the merged paths. The output is a
+set: `kwta_excitatory` ignores inhibitory elements, while `kwta_absolute` may
+pass inhibitory winners as negative elements. kWTA applies no minimum score:
+a flat input passes unchanged. Thresholding or rate limiting the result is
+left to a downstream path or component.
+
+
+
+In this circuit, two paths are merged via kWTA. Elements present on both
+paths win; if the paths share no elements, their union passes.
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
@@ -169,6 +184,20 @@ In this circuit, two paths are merged via kWTA:
 ```
 
 <img width="240" alt="image" src="img/delay_kwta.png"><br>
+
+
+kWTA on a single multiset path selects the most frequent elements:
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "output", 
+		"receive": [{"slot": 1, "tags": ["multiset", "kwta_absolute"]}]}
+  ]}
+```
+
+<img width="130" alt="image" src="img/kwta_absolute.png"><br>
 
 
 ## Schematics rendering and data logging
@@ -211,6 +240,7 @@ at every evaluation cycle.
 	{"component": "output", "receive": [{"slot": 1, "tags": ["log"]}]}
   ]}
 ```
+
 <img width="130" alt="image" src="img/input_output_log.png"><br>
 
 

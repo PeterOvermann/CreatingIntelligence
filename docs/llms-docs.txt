@@ -682,7 +682,7 @@ start simultaneously with the global clock.
 | `permute` | π   |  applies a permutation unique to the specified path |
 | `rate_limit` | R   |  caps the population at the path's default population |
 | `threshold` | T   |  clears signals that fall below the path's default population |
-| `noise` | ~   |  generates random noise if signal is non-empty, otherwise clearing the path |
+| `noise` | ~   |  generates random noise if signal is empty, otherwise clearing the path |
 
 
 This pathway conveys multisets:
@@ -724,11 +724,26 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 | `dependency` |  &    |  clears dependency paths if any non-dependency path is empty (AND) |
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
 | `barrier` | =  |  clears barrier paths if any barrier path is empty |
-| `kwta_excitatory` | K  |  filters for top-K excitatory  signals, with K taken to be the path's default population |
-| `kwta_absolute` | k   |  filters for top-k signals based on total saliency, with k taken to be the path's default population |
+| `kwta_excitatory` | K  |  passes the top-k excitatory elements ranked by multiplicity, ties included, with k taken to be the default population |
+| `kwta_absolute` | k   |  passes the top-k elements ranked by total saliency (multiplicity of excitatory and inhibitory elements), ties included, with k taken to be the default population |
 
 
-In this circuit, two paths are merged via kWTA:
+kWTA operates on the merged signal and also applies to a single path. If any
+path of a merge carries a kWTA tag, the whole merge is filtered. Each element
+is scored by its multiplicity summed over all merged paths: a set path
+contributes one count per element, a multiset path contributes its duplicate
+counts. All elements scoring at or above the k-th highest score pass, so ties
+at the threshold are included; with k or fewer distinct elements, all pass.
+k is the smallest default population among the merged paths. The output is a
+set: `kwta_excitatory` ignores inhibitory elements, while `kwta_absolute` may
+pass inhibitory winners as negative elements. kWTA applies no minimum score:
+a flat input passes unchanged. Thresholding or rate limiting the result is
+left to a downstream path or component.
+
+
+
+In this circuit, two paths are merged via kWTA. Elements present on both
+paths win; if the paths share no elements, their union passes.
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
@@ -743,6 +758,20 @@ In this circuit, two paths are merged via kWTA:
 ```
 
 <img width="240" alt="image" src="img/delay_kwta.png"><br>
+
+
+kWTA on a single multiset path selects the most frequent elements:
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "output", 
+		"receive": [{"slot": 1, "tags": ["multiset", "kwta_absolute"]}]}
+  ]}
+```
+
+<img width="130" alt="image" src="img/kwta_absolute.png"><br>
 
 
 ## Schematics rendering and data logging
@@ -785,6 +814,7 @@ at every evaluation cycle.
 	{"component": "output", "receive": [{"slot": 1, "tags": ["log"]}]}
   ]}
 ```
+
 <img width="130" alt="image" src="img/input_output_log.png"><br>
 
 
@@ -5331,21 +5361,21 @@ def Circuit(expr):
         kwta_exc_tags = has_tag("kwta_excitatory")
         kwta_abs_tags = has_tag("kwta_absolute")
 
+        # Optional kWTA. Ranks elements by multiplicity across all paths
+        # (within-path counts of multiset paths included). Passes every
+        # element at or above the k-th highest count, ties included. With
+        # k or fewer distinct elements, all pass. Outputs a set.
         if any(kwta_exc_tags) or any(kwta_abs_tags):
             k = min(p["hyperparameters"][1] for p in paths)
             U = [i for i in merged if i > 0] if any(kwta_exc_tags) else merged
 
             tally = Counter(U)
-            if len(tally) >= k:
-                freqs = sorted(tally.values())
-                rankedmax = freqs[-k]
-                if rankedmax >= 2:
-                    merged = sorted(
-                        [val for val, count in tally.items() if count >= rankedmax])
-                else:
-                    merged = []
+            if len(tally) <= k:
+                merged = sorted(tally)
             else:
-                merged = []
+                kth = sorted(tally.values())[-k]
+                merged = sorted(
+                    [val for val, count in tally.items() if count >= kth])
 
         return merged
 
@@ -5711,6 +5741,8 @@ def Memory(config: dict) -> dict:
 
     def retrieve(A):
 
+        X = A
+        
         # Per-query threshold, at least the fixed threshold T
         Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
 
@@ -6978,15 +7010,15 @@ Circuit`TagMap = <|
 "permute"         -> "\[Pi]", (* permuation, unique per pathway *)
 "noise"           -> "~", (* random noise if empty, else clear elements *)
 "rate_limit"      -> "R", (* stochastic rate limiting up to hyperparameter P *)
-"threshold"       -> "T", (* clearing data below hyperparameter population P *)
+"threshold"       -> "T", (* clears the merged signal below population P *)
 "veto"            -> "X", (* clears all paths if any X path is non-empty *)
 "mandatory"       -> "*", (* clears all paths if any * path is empty *)
 "priority"        -> "!", (* clears all non-! paths if any ! path is non-empty *) 
 "dependency"      -> "&", (* clears & paths if any non-& path is empty (AND) *)
 "fallback"        -> "|", (* clears | paths if any non-| path is non-empty (NOR) *)
 "barrier"         -> "=", (* clears = paths if any = path is empty *)
-"kwta_excitatory" -> "K", (* top-k of positives *)
-"kwta_absolute"   -> "k", (* top-k of all elements *)
+"kwta_excitatory" -> "K", (* top-k of positives by multiplicity, ties included *)
+"kwta_absolute"   -> "k", (* top-k of all elements by multiplicity, ties included *)
 "log"             -> "?", (* print log of path contents *)
 "show_slot"       -> "#", (* render slot number *)
 "show_dimension"  -> "$", (* render N *)
@@ -7267,7 +7299,7 @@ Circuit[expr_] := Module[
 
 		(* Thresholding. *)
 		If[tag["threshold"] && Length[x] < p, x = {}];
-
+		
 		(* Random noise if x = {}, else clear x *)
 		If[tag["noise"], x = If[x === {}, Sort[RandomSample[Range[n], p]], {}]];
 
@@ -7314,25 +7346,23 @@ Circuit[expr_] := Module[
 	
 		(* Optional kWTA. *) 
 		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
-			Module[{k, U, tally, rankedmax},
+			Module[{k, U, tally, kth},
+			k = Min[#["hyperparameters"][[2]] & /@ paths ];
+			U = If[Or @@ tags["kwta_excitatory"], Select[Positive][merged], merged];
+			tally = SortBy[Tally[U], Last];
+			merged = If[Length[tally] <= k,
+				Sort[First /@ tally],
+				kth = tally[[-k, 2]];
+				Sort[First /@ Select[tally, Last[#] >= kth &]]]
+			]
+		];
+
+		(* Optional thresholding of the merged signal, after kWTA. *)
+		If[Or @@ tags["threshold"] &&
+			Length[merged] < Min[#["hyperparameters"][[2]] & /@ paths ],
+			merged = {}];	
 			
-				k = Min[#["hyperparameters"][[2]] & /@ paths ];
-			
-				(* "K" forces excitatory only. 
-					"k" evaluates absolute saliency. *)
-				U = If[Or @@ tags["kwta_excitatory"], 
-					Select[Positive][merged], merged];
-			
-				tally = SortBy[Tally[U], Last];
-			
-				(* Force consensus: k elements must appear at least twice. *)
-				merged = {};
-				If[Length[tally] >= k, rankedmax = tally[[-k, 2]];
-					If[ rankedmax >= 2, merged = Sort[Select[tally, 
-						Last[#] >= rankedmax &][[All, 1]]]]]
-	   		]
-			];	
-				
+									
 		merged
 		];
 		
