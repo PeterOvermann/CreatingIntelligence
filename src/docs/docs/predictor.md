@@ -18,7 +18,15 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Typically used as readout node in reservoir architectures.
 - Receives the label from its first `receive` block and data from the remaining blocks.
 - Always learns, also when the prediction was correct.
-- Optionally holds its data blocks. With `context` set to `hold`, each data block keeps its last non-empty value, so the component can read from event-driven senders that transmit only on change. The label is never held.
+- Optionally holds its data blocks. With `context` set to `hold`, each data block keeps
+  its last non-empty value, so the component can read from event-driven senders that
+  transmit only on change. The label is never held.
+- Holding works per receive block. Each block is replaced only by a non-empty input on
+  that block; a block that receives nothing keeps its own last value, independently of
+  the other blocks. Connect each event-driven sender to its own receive slot. If several
+  senders are merged into one slot (a bundled pathway), they form a single block: an
+  update from one sender then replaces the whole block, and the held contributions of the
+  other senders are lost.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
 - Resolves multiset and inhibitory input prior to processing.
@@ -32,7 +40,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  two or more input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
-| `context`     | `replace`    |  `replace` takes every data input, so an empty block is empty; `hold` keeps each data block at its last non-empty value  |
+| `context`     | `replace`    |  `replace` takes every data input, so an empty block is empty; `hold` keeps each data block at its last non-empty value (per receive block, independently)  |
 
 <br>
 

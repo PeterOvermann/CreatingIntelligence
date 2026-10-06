@@ -172,6 +172,14 @@ class="sidebar-icon">π</span>permutation</a></li>
         non-empty value, so the component can read from event-driven
         senders that transmit only on change. The label is never
         held.</li>
+        <li>Holding works per receive block. Each block is replaced only
+        by a non-empty input on that block; a block that receives
+        nothing keeps its own last value, independently of the other
+        blocks. Connect each event-driven sender to its own receive
+        slot. If several senders are merged into one slot (a bundled
+        pathway), they form a single block: an update from one sender
+        then replaces the whole block, and the held contributions of the
+        other senders are lost.</li>
         <li>A closed feedback loop enables generative prediction.</li>
         <li>Sends the inferred label.</li>
         <li>Resolves multiset and inhibitory input prior to
@@ -215,7 +223,8 @@ class="sidebar-icon">π</span>permutation</a></li>
         <td style="text-align: center;"><code>replace</code></td>
         <td style="text-align: left;"><code>replace</code> takes every
         data input, so an empty block is empty; <code>hold</code> keeps
-        each data block at its last non-empty value</td>
+        each data block at its last non-empty value (per receive block,
+        independently)</td>
         </tr>
         </tbody>
         </table>
