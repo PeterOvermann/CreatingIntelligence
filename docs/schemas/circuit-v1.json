@@ -5,6 +5,10 @@
   "description": "https://creatingintelligence.org",
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URI of the circuit schema."
+    },
     "version": {
       "type": "string",
       "description": "Version of the circuit format."
@@ -12,14 +16,6 @@
     "metadata": {
       "type": "object",
       "description": "Optional metadata for the circuit (name, author, description)."
-    },
-    "multiplex": {
-      "type": "array",
-      "description": "Temporal evaluation sequence (array of 0s and 1s).",
-      "items": {
-        "type": "integer",
-        "enum": [0, 1]
-      }
     },
     "hyperparameters": {
       "type": "object",
@@ -34,6 +30,28 @@
     "options": {
       "type": "object",
       "description": "Top-level configuration options.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Registry identifier, used for embedding circuits."
+        },
+        "multiplex": {
+          "type": "array",
+          "description": "Temporal evaluation sequence (array of 0s and 1s).",
+          "items": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        "latch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip evaluation cycles in which all input blocks are empty; the circuit's clock (gating, multiplex) advances only on input."
+        }
+      },
       "additionalProperties": true
     },
     "dataflow": {

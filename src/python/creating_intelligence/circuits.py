@@ -942,9 +942,8 @@ def temporal(config):
                     size=keep_size,
                     replace=False).tolist())
 
-        # Learn state -> current input if prediction was incorrect.
-        if prediction != X:
-            M["store"](resolve_normal(Xstate), resolve_normal(X))
+        # Always learn.
+        M["store"](resolve_normal(Xstate), resolve_normal(X))
 
         # Multiset subsampling applied to previous state
         if len(Xstate) > abscapacity:
@@ -1696,6 +1695,11 @@ def Circuit(expr):
         if len(x) != len(inputslots):
             raise ValueError(
                 f"Function arguments do not match input nodes: {inputslots}")
+
+        # Latch: skip the cycle (clock included) if all inputs are empty
+        if expr.get("options", {}).get("latch", False) is True and \
+                not any(x):
+            return [[] for _ in outputedges]
 
         multiplex = expr.get("options", {}).get("multiplex", [1])
         if not all(m in (0, 1) for m in multiplex):

@@ -93,7 +93,7 @@
 <li><a href="installation.html">Installation</a></li>
 <li><a href="quickstart.html">Quickstart</a></li>
 </ul></li>
-<li><strong>CIRCUIT CONFIGURATON</strong>
+<li><strong>CIRCUIT CONFIGURATION</strong>
 <ul>
 <li><a href="circuits.html">Circuits</a></li>
 <li><a href="components.html">Components</a></li>
@@ -148,7 +148,7 @@ class="sidebar-icon">π</span>permutation</a></li>
     </aside>
     <section class="content">
       <article class="markdown-section">
-        <p>CIRCUIT CONFIGURATON</p>
+        <p>CIRCUIT CONFIGURATION</p>
         <h1 id="circuits">Circuits</h1>
         <p>Within this framework, circuits represent networks of
         Topological Associative Memory instances encapsulated in circuit
@@ -182,6 +182,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         href="components.html">components</a> connected through
         stateless <a href="pathways.html">pathways</a>.</li>
         <li>Dataflow is synchronized, governed by a global clock.</li>
+        <li>A latched circuit advances its clock only on cycles with
+        input (see <a href="#latched-circuits">Latched
+        circuits</a>).</li>
         <li>At every time step, components process their current input
         and pass it into the output buffer.</li>
         <li>A circuit must include at least one input and one output
@@ -241,6 +244,11 @@ class="sidebar-icon">π</span>permutation</a></li>
         <td style="text-align: left;">temporal gating pattern, given as
         a list of 0s or 1s (optional)</td>
         </tr>
+        <tr>
+        <td style="text-align: left;"><code>latch</code></td>
+        <td style="text-align: left;">skip cycles in which all inputs
+        are empty (optional, default false)</td>
+        </tr>
         </tbody>
         </table>
         <h4 id="hyperparameters">hyperparameters</h4>
@@ -280,7 +288,7 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         <tr>
         <td style="text-align: left;"><code>plugin</code></td>
-        <td style="text-align: left;">plugin factor function name
+        <td style="text-align: left;">plugin factory function name
         (optional)</td>
         </tr>
         <tr>
@@ -295,6 +303,57 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         </tbody>
         </table>
+        <h2 id="latched-circuits">Latched circuits</h2>
+        <p>With the <code>latch</code> option, a circuit skips every
+        cycle in which all of its input blocks are empty (after input
+        encoding). Nothing is evaluated, the output blocks are empty,
+        and the circuit’s clock does not advance: delays, pathway gating
+        and the <code>multiplex</code> sequence only progress on cycles
+        with input. Inside a latched circuit, a sparse input stream
+        therefore has no gaps.</p>
+        <p>The option applies equally to a main circuit and to an <a
+        href="circuit.html">embedded circuit</a>, where the embedded
+        circuit’s own <code>options</code> decide.</p>
+        <p><strong>Code</strong></p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> creating_intelligence <span class="im">import</span> Circuit</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;options&quot;</span>: {<span class="st">&quot;latch&quot;</span>: <span class="va">True</span>},</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;hyperparameters&quot;</span>: {<span class="st">&quot;default&quot;</span>: [<span class="dv">1000</span>, <span class="dv">10</span>]},</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;dataflow&quot;</span>: [</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        {<span class="st">&quot;component&quot;</span>: <span class="st">&quot;input&quot;</span>, <span class="st">&quot;plugin&quot;</span>: <span class="st">&quot;codec&quot;</span>, <span class="st">&quot;send&quot;</span>: [<span class="dv">1</span>]},</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        {<span class="st">&quot;component&quot;</span>: <span class="st">&quot;delay&quot;</span>, <span class="st">&quot;send&quot;</span>: [<span class="dv">2</span>], <span class="st">&quot;receive&quot;</span>: [<span class="dv">1</span>]},</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        {<span class="st">&quot;component&quot;</span>: <span class="st">&quot;delay&quot;</span>, <span class="st">&quot;send&quot;</span>: [<span class="dv">3</span>], <span class="st">&quot;receive&quot;</span>: [<span class="dv">2</span>]},</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        {<span class="st">&quot;component&quot;</span>: <span class="st">&quot;output&quot;</span>, <span class="st">&quot;plugin&quot;</span>: <span class="st">&quot;codec&quot;</span>, <span class="st">&quot;receive&quot;</span>: [<span class="dv">2</span>]},</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        {<span class="st">&quot;component&quot;</span>: <span class="st">&quot;output&quot;</span>, <span class="st">&quot;plugin&quot;</span>: <span class="st">&quot;codec&quot;</span>, <span class="st">&quot;receive&quot;</span>: [<span class="dv">3</span>]}</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>circ <span class="op">=</span> Circuit(config)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> token <span class="kw">in</span> [<span class="st">&quot;a&quot;</span>, [], <span class="st">&quot;b&quot;</span>, [], [], <span class="st">&quot;c&quot;</span>, <span class="st">&quot;d&quot;</span>]:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(circ[<span class="st">&quot;function&quot;</span>](token))</span></code></pre></div>
+        <p><strong>Output</strong></p>
+        <pre class="text"><code>(&#39;a&#39;, None)
+(None, None)
+(&#39;b&#39;, &#39;a&#39;)
+(None, None)
+(None, None)
+(&#39;c&#39;, &#39;b&#39;)
+(&#39;d&#39;, &#39;c&#39;)</code></pre>
+        <p>The second output always holds the previous token, regardless
+        of the gaps between tokens. Without <code>latch</code>, the gaps
+        travel down the delay chain:</p>
+        <pre class="text"><code>(&#39;a&#39;, None)
+(None, &#39;a&#39;)
+(&#39;b&#39;, None)
+(None, &#39;b&#39;)
+(None, None)
+(&#39;c&#39;, None)
+(&#39;d&#39;, &#39;c&#39;)</code></pre>
+        <p>A latched circuit cannot run on internal feedback alone: a
+        circuit that generates output from empty input (for example, a
+        recurrent loop driven by its own feedback) must not be
+        latched.</p>
       </article>
     </section>
   </main>

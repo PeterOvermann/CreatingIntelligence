@@ -720,7 +720,8 @@ auto[config_Association] :=
 		]; 
 		
 		
-	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"}, 
+	Join[ plugin, <| "function" -> f, 
+		"checks" -> {"arginp", "argout", "ident"}, 
 	    "shape" -> "square", "fill" -> 8 |>, M]
 	]
 
@@ -775,9 +776,8 @@ temporal[config_Association] :=
 		If[decay > 0, Xstate = 
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 
-		(* Learn state -> current input if prediction was incorrect. *)
-		If[ prediction =!= X, 
-			M["store"][ResolveNormal[Xstate], ResolveNormal[X]]];
+		(* Always learn. *)
+		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
 
 		(* Multiset subsampling applied to previous state. *)
 		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
@@ -798,8 +798,9 @@ temporal[config_Association] :=
 		Sequence @@ MultisetBlockSplit[prediction, dims]
 		];
 
-	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "ident"},
-		"shape" -> "square", "fill" -> 14 |>]	
+	Join[ plugin, <| "function" -> f, 
+		"checks" -> {"arginp", "argout", "ident"},
+		"shape" -> "square", "fill" -> 14 |>, M]	
 	]
 
 
@@ -871,46 +872,6 @@ heteroencoder[config_Association] :=
 	Join[ <| "function" -> f, "checks" -> {"arginp", "oneout"}, 
 		"shape" -> "square",  "fill" -> 11,  "size" -> 18,
 		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]" |>, M]
-	]
-
-
-(*
-Generates a prediction based on the current input (slot #1) 
-and context (slots #2,...).
-Automatically learns the correct prediction in the following cycle.
-To do so, the node remembers its context from the previous cycle.
-*)
-
-predictor[config_Association] := 
-		Module[ {f, M, X = {}, prediction = {}, decimation,
-						itemconfig, contextconfig},
-
-	decimation = Lookup[config, "decimate", 1];
-	itemconfig = First[config["receive_blocks"]];
-	contextconfig = Rest[config["receive_blocks"]]; (* Context may be partitioned *)
-	
-	M = Memory[Join[config, <|
-		"A_parameters" -> Plus @@ contextconfig,
-		"B_parameters" -> itemconfig   |> ]]; 
-	
-	f[item_List, blocks__List] := Module[{Y, Xdec},
-	
-		Y = ResolveNormal[item];
-		(* State X from previous cycle *)
-		(* Always learn. Also when the prediction was correct. *)
-		M["store"][X, Y];
-		
-		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
-
-		Xdec = Sort[RandomSample[X, Floor[decimation * Length[X]]]];
-		
-		prediction = M["retrieve"][Xdec]
-		]; 
-
-
-	Join[ <| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
-		"shape" -> "square", "fill" -> 11, "size" -> 18,
-		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M]
 	]
 
 
@@ -1471,7 +1432,13 @@ Circuit[expr_] := Module[
 	
 		If[ Length[x] =!= Length[inputslots], 
 			Message[Circuit::sequence, inputslots]; Return[Sequence[]]];
-				
+		
+		(* Latch: skip the cycle (clock included) if all inputs are empty *)
+		If[ TrueQ[Lookup[Lookup[assoc, "options", <||>], "latch", False]] &&
+				AllTrue[x, # === {} &],
+			Return[ {} & /@ outputedges]
+			];		
+						
 		(* Multiplexed evaluation of encoded data *)
 		mult = Lookup[Lookup[assoc, "options", <||>], "multiplex", {1}];
 		

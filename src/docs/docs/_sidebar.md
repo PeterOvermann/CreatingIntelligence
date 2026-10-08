@@ -4,7 +4,7 @@
   - [Installation](installation.md)
   - [Quickstart](quickstart.md)
   
-- **CIRCUIT CONFIGURATON**
+- **CIRCUIT CONFIGURATION**
   - [Circuits](circuits.md)
   - [Components](components.md)
   - [Pathways](pathways.md)

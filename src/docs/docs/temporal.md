@@ -12,7 +12,7 @@ Temporal associative memory component.
 
 - Learns the association of the previous state with the current input.
 - Predicts the next input based on the current state.
-- Automatically learns if the previous prediction was incorrect.
+- Always learns, even when the prediction is correct. This may broaden the base temporal associations.
 - A closed feedback loop enables generative behavior.
 - Uses update rule plugins to control the mechanics of temporal integration.
 - Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
