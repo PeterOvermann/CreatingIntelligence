@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.17.0
+        uses: pypa/cibuildwheel@v3.1.1
         env:
           # Wheels are py3-none-<platform>, so one Python per platform is enough.
           # Building more would produce identical filenames, which cibuildwheel rejects.
