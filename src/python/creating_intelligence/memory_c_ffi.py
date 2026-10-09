@@ -14,28 +14,47 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 import ctypes
 import os
+import sys
 import importlib.machinery
 from pathlib import Path
 
-# Dynamically find the compiled extension file suffix (e.g., .cpython-311-darwin.so)
-ext_suffix = importlib.machinery.EXTENSION_SUFFIXES[0]
+def _candidate_paths():
+    """Yield possible locations of the compiled C library, most preferred first."""
+    # 1. Explicit override, e.g. MEMORY_LIB_PATH=/path/to/libmemory.so
+    override = os.environ.get("MEMORY_LIB_PATH")
+    if override:
+        yield Path(override)
 
-# Path where pip/setuptools places the compiled extension
-pkg_dir = Path(__file__).parent
-lib_path = pkg_dir / f"libmemory{ext_suffix}"
+    # 2. Extension built by pip/setuptools, under any suffix this interpreter
+    #    accepts (.cpython-312-x86_64-linux-gnu.so, .abi3.so, .cp312-win_amd64.pyd, ...)
+    pkg_dir = Path(__file__).resolve().parent
+    for suffix in importlib.machinery.EXTENSION_SUFFIXES:
+        yield pkg_dir / f"libmemory{suffix}"
 
-try:
-    # Attempt to load the pip-installed extension first
-    lib = ctypes.CDLL(str(lib_path))
-except OSError:
-    # Fallback to the legacy Makefile structure for local development without pip
-    fallback_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "c", "lib", "libmemory.dylib"))
-    try:
-        lib = ctypes.CDLL(fallback_path)
-    except OSError:
-        lib = ctypes.CDLL("../c/lib/libmemory.dylib")
-        
-        
+    # 3. Local development build from the C Makefile (<repo>/c/lib/)
+    if sys.platform == "darwin":
+        lib_name = "libmemory.dylib"
+    elif sys.platform == "win32":
+        lib_name = "libmemory.dll"
+    else:
+        lib_name = "libmemory.so"
+    yield pkg_dir.parent.parent / "c" / "lib" / lib_name
+
+
+def _load_library():
+    tried = []
+    for path in _candidate_paths():
+        if not path.is_file():
+            tried.append(f"  {path} (not found)")
+            continue
+        try:
+            return ctypes.CDLL(str(path))
+        except OSError as e:
+            tried.append(f"  {path} ({e})")
+    raise OSError("Could not load the C memory library. Tried:\n" + "\n".join(tried))
+
+
+lib = _load_library()        
         
 # Define the C 'Set' struct in Python.
 class CSet(ctypes.Structure):

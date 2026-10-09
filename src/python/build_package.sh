@@ -21,3 +21,5 @@ python3 -m pip install -q --upgrade pip build twine
 
 cd "$SCRIPT_DIR"
 python3 -m build --sdist > /dev/null
+
+tar -tzf dist/*.tar.gz | grep -q 'c_build/memory.c' || { echo "ERROR: sdist is missing C sources"; exit 1; }

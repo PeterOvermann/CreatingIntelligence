@@ -45,7 +45,6 @@ from collections import Counter
 import numpy as np
 import scipy.sparse as sp
 import networkx as nx
-import matplotlib.pyplot as plt
 from creating_intelligence import Memory
 
 
@@ -1727,6 +1726,8 @@ def Circuit(expr):
 
     def schematics(filename):
         """Generates a static PNG graph visualization of the circuit."""
+        from matplotlib.figure import Figure  # imported here: only needed for drawing
+
         G = nx.MultiDiGraph()
 
         # Build nodes
@@ -1810,8 +1811,6 @@ def Circuit(expr):
                 width=edge_width
             )
 
-        # Render graph
-        fig, ax = plt.subplots(figsize=(12, 8))
 
         # Create a clean graph for layout calculation
         G_layout = nx.MultiDiGraph()
@@ -1827,7 +1826,7 @@ def Circuit(expr):
         try:
             from networkx.drawing.nx_agraph import graphviz_layout
             pos = graphviz_layout(G_layout, prog='dot', args='-Grankdir=LR')
-        except ImportError:
+        except Exception:
             try:
                 from networkx.drawing.nx_pydot import pydot_layout
                 # PyDot wrapper drops the rankdir graph attribute.
@@ -1835,14 +1834,16 @@ def Circuit(expr):
                 # enforce Left-to-Right.
                 pos_tb = pydot_layout(G_layout, prog='dot')
                 pos = {n: (-y, x) for n, (x, y) in pos_tb.items()}
-            except ImportError:
+            except Exception:
                 print(
                     "Warning: Install 'pygraphviz' or 'pydot' (and OS-level Graphviz) for left-to-right layout.")
                 pos = nx.spring_layout(G_layout, seed=42)
-
+                
+                
         # Render graph on a slightly larger canvas
-        fig, ax = plt.subplots(figsize=(11, 7))
-
+        fig = Figure(figsize=(11, 7))
+        ax = fig.add_subplot()
+        
         # Draw edges individually to calculate curve routing for bidirectional
         # and parallel overlaps
         edges = G.edges(data=True, keys=True)
@@ -1916,11 +1917,11 @@ def Circuit(expr):
             ax=ax
         )
 
-        plt.axis('off')
-        plt.tight_layout()
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        plt.close(fig)
-
+        ax.axis('off')
+        fig.tight_layout()
+        fig.savefig(filename, dpi=300, bbox_inches='tight')
+        
+        
     def clear():
         for node in nodes.values():
             c = node.get("clear")

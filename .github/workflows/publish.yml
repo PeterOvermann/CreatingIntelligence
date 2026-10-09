@@ -9,14 +9,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # ubuntu-24.04-arm adds native Linux aarch64 wheels (Raspberry Pi, Graviton, ...)
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.17.0
         env:
-          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.11"
+          # Wheels are py3-none-<platform>, so one Python per platform is enough.
+          # Building more would produce identical filenames, which cibuildwheel rejects.
+          CIBW_BUILD: "cp312-*"
+          # 64-bit only; 32-bit systems fall back to the pure-Python backend.
+          CIBW_ARCHS_LINUX: "auto64"
+          CIBW_ARCHS_WINDOWS: "AMD64"
+          # macos-latest is Apple Silicon; cross-build Intel wheels as well.
+          CIBW_ARCHS_MACOS: "arm64 x86_64"
+          # The install never fails on a broken compile anymore, so make CI check
+          # that the C backend is actually inside the wheel and loads.
+          CIBW_TEST_COMMAND: >-
+            python -c "import creating_intelligence as ci;
+            assert ci.backend == 'c_ffi', ci.backend; print('C backend OK')"
         with:
           package-dir: ./src/python
 
@@ -35,10 +48,13 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install build dependencies
-        run: python -m pip install -q --upgrade pip build setuptools wheel
+        run: python -m pip install -q --upgrade pip build
       - name: Build sdist
         working-directory: ./src/python
         run: python -m build --sdist
+      - name: Check sdist ships the C sources
+        working-directory: ./src/python
+        run: tar -tzf dist/*.tar.gz | grep -q 'c_build/memory.c'
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:

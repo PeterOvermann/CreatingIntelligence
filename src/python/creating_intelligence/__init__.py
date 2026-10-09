@@ -1,24 +1,38 @@
 import os
 import importlib
 import logging
-from dotenv import load_dotenv
+import warnings
+
+import sys
+
+if sys.maxsize <= 2**32:
+    raise ImportError("creating-intelligence requires a 64-bit Python interpreter.")
+    
 
 logger = logging.getLogger(__name__)
-# Optional: Add a NullHandler to prevent warnings if the parent app doesn't configure logging
 logger.addHandler(logging.NullHandler())
 
-# Calculate absolute path to the repo root relative to this file
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-backend = os.environ.get("MEMORY_BACKEND", "c_ffi").lower()
-module_name = f".memory_{backend}"
+# MEMORY_BACKEND selects the backend explicitly ("c_ffi" or "python").
+# If unset, the fast C backend is tried first, with the pure-Python one as fallback.
+_requested = os.environ.get("MEMORY_BACKEND")
+backend = (_requested or "c_ffi").lower()
 
 try:
-    module = importlib.import_module(module_name, package=__name__)
-    Memory = module.Memory
-except (ImportError, OSError) as e:
-    raise ValueError(f"Backend '{backend}' failed to load: {e}")
-    
+    _module = importlib.import_module(f".memory_{backend}", package=__name__)
+except (ImportError, OSError, AttributeError) as e:
+    if _requested is None and backend == "c_ffi":
+        warnings.warn(
+            f"C memory backend unavailable, using the slower pure-Python backend. ({e})",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        backend = "python"
+        _module = importlib.import_module(".memory_python", package=__name__)
+    else:
+        raise ImportError(f"Backend '{backend}' failed to load: {e}") from e
+
+Memory = _module.Memory
+
 # Expose Circuit to the package namespace
 from .circuits import Circuit
 

@@ -14,6 +14,7 @@ on:
       - 'src/c/**'
       - '.github/workflows/build-test.yml'
   workflow_dispatch:
+
 jobs:
   test-build:
     runs-on: ${{ matrix.os }}
@@ -21,7 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.11", "3.12"]
+        # Oldest supported (match requires-python in pyproject.toml) and newest.
+        python-version: ["3.9", "3.14"]
 
     steps:
     - name: Checkout code
@@ -33,15 +35,56 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install build dependencies
-      run: python -m pip install -q --upgrade pip build setuptools wheel
+      run: python -m pip install -q --upgrade pip build
 
     - name: Build the sdist
       working-directory: ./src/python
       run: python -m build --sdist
 
+    - name: Check sdist ships the C sources
+      shell: bash
+      run: tar -tzf src/python/dist/*.tar.gz | grep -q 'c_build/memory.c'
+
     - name: Install from the generated sdist
       shell: bash
       run: python -m pip install src/python/dist/*.tar.gz
 
-    - name: Verify import
-      run: python -c "from creating_intelligence import memory_c_ffi"
+    - name: Verify the C backend is active
+      run: python -c "import creating_intelligence as ci; assert ci.backend == 'c_ffi', ci.backend; print('C backend OK')"
+
+  test-32bit-rejected:
+    # The package requires 64-bit Python; installing on 32-bit must fail cleanly.
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up 64-bit Python (to build the sdist)
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        architecture: x64
+
+    - name: Build the sdist
+      working-directory: ./src/python
+      run: |
+        python -m pip install -q --upgrade pip build
+        python -m build --sdist
+
+    - name: Set up 32-bit Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        architecture: x86
+
+    - name: Installing on 32-bit Python must fail with a clear message
+      shell: bash
+      run: |
+        python -c "import struct; bits = struct.calcsize('P') * 8; print(f'{bits}-bit Python'); assert bits == 32"
+        if python -m pip install src/python/dist/*.tar.gz > install.log 2>&1; then
+          cat install.log
+          echo "ERROR: package installed on 32-bit Python"
+          exit 1
+        fi
+        cat install.log
+        grep -q "requires a 64-bit Python" install.log
