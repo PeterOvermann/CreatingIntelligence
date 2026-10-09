@@ -13,8 +13,19 @@ The mind performs computations on sparse binary data using Sparse Distributed Re
 
 ### Installation
 
-
 ```bash
 pip install creating-intelligence
 ```
 
+
+#### Optional installations
+
+| Extra | Installs | Purpose |
+| ----- | -------- | ------- |
+| `viz` | `pydot` | Left-to-right layouts when drawing circuit diagrams |
+| `all` | every extra above | Everything optional in one step |
+
+```bash
+pip install "creating-intelligence[viz]"
+pip install "creating-intelligence[all]"
+```
