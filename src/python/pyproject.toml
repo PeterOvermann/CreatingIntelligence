@@ -36,6 +36,10 @@ dependencies = {file = ["requirements.txt"]}
 where = ["."]
 include = ["creating_intelligence*"]
 
+[project.optional-dependencies]
+viz = ["pydot>=1.4.2"]
+all = ["creating-intelligence[viz]"]
+
 [project.urls]
 Homepage = "https://creatingintelligence.org"
 Documentation = "https://creatingintelligence.org/docs"

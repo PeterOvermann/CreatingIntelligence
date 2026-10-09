@@ -1,6 +1,5 @@
 matplotlib>=3.5.0
 networkx>=2.8.0
 numpy>=1.21.0
-pydot>=1.4.2
 python-dotenv>=0.21.0
 scipy>=1.8.0
