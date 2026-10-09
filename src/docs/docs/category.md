@@ -12,7 +12,7 @@ See also: https://creatingintelligence.org/#sparse-holographic-representations
 ## Details and properties
 
 - Typically used for supervised learning.
-- Similar to [`codec`](#codec.md), but generates non-overlapping encodings.
+- Similar to [`codec`](codec.md), but generates non-overlapping encodings.
 - Encoder plugin for the [`input`](input.md) component.
 - Decoder plugin for the [`output`](output.md) component.
 - Encodes integers 0 to K-1 as non-overlapping SHRs.

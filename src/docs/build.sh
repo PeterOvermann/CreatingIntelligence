@@ -193,7 +193,7 @@ for file in "$SRC"/*.md; do
     fi
     
     python3 /tmp/inject_snippets.py "$file" "$BASE_SRC_DIR" | \
-    sed -E 's/\]\(\/?([^)]+)\.md\)/](\1.html)/g' | \
+    sed -E 's/\]\(\/?([^):#]+)\.md(#[^)]*)?\)/](\1.html\2)/g' | \
     pandoc -f markdown+autolink_bare_uris -t html \
         --template=/tmp/template.html \
         -o "$DEST/$outname"
@@ -203,7 +203,7 @@ echo "Site generated in $DEST"
 
 # 6. Process LLM Text Generation
 mkdir -p "$LLM_DEST_DIR"
-> "$LLM_OUT_FILE"
+echo -e "# Generated from main on $(date -u +%Y-%m-%d)\n" > "$LLM_OUT_FILE"
 
 if [ -f "$SRC/README.md" ]; then
     echo -e "# Source: README.md\n" >> "$LLM_OUT_FILE"

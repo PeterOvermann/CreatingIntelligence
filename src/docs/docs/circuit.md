@@ -17,7 +17,7 @@ See also: https://creatingintelligence.org/#circuits
 - Uses the `shared` plugin for embedding a shared circuit.
 - Uses the `file` plugin to create a local embedded circuit.
 - Exchanges sets or multisets with the embedded circuit.
-- The embedded circuit may use [`input`](#input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
+- The embedded circuit may use [`input`](input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
 
 <br>
 

@@ -1,3 +1,6 @@
+
+# __init__.py
+
 import os
 import importlib
 import logging
@@ -6,14 +9,14 @@ import warnings
 import sys
 
 if sys.maxsize <= 2**32:
-    raise ImportError("creating-intelligence requires a 64-bit Python interpreter.")
+    raise ImportError("creating-intelligence requires 64-bit Python.")
     
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 # MEMORY_BACKEND selects the backend explicitly ("c_ffi" or "python").
-# If unset, the fast C backend is tried first, with the pure-Python one as fallback.
+# If unset, the C backend is tried first, with the pure-Python one as fallback.
 _requested = os.environ.get("MEMORY_BACKEND")
 backend = (_requested or "c_ffi").lower()
 
@@ -22,7 +25,7 @@ try:
 except (ImportError, OSError, AttributeError) as e:
     if _requested is None and backend == "c_ffi":
         warnings.warn(
-            f"C memory backend unavailable, using the slower pure-Python backend. ({e})",
+            f"C memory backend unavailable, using the Python backend. ({e})",
             RuntimeWarning,
             stacklevel=2,
         )

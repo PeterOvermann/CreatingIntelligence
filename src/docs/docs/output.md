@@ -30,7 +30,7 @@ Use standard [style options](components.md) to customize the component's appeara
 ## Basic input and output
 
 This is the simplest possible circuit, routing signals directly from 
-the [`input`](#input.md) node to the `output` node.
+the [`input`](input.md) node to the `output` node.
 Multiset or inhibitory inputs are reduced to sets along the pathway.
 
 ```json
@@ -84,7 +84,7 @@ This circuit outputs a multiset:
 The `output` component supports decoder plugins that convert sets or multisets 
 to external data representations.
 
-The following circuit uses the [`codec`](#codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](#output.md) component uses the
+The following circuit uses the [`codec`](codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](output.md) component uses the
 same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 

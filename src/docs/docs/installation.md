@@ -6,7 +6,6 @@ GETTING STARTED
 See also: [Quickstart](quickstart.md)
 
 
-
 ## Install the built distribution
 
 
@@ -15,7 +14,6 @@ pip install creating-intelligence
 ```
 
 Release information: https://pypi.org/project/creating-intelligence/
-
 
 
 ## Build from source
@@ -28,6 +26,9 @@ creatingintelligence/src/python/setup.sh
 
 Building the package from source requires a C development environment.
 
+Without network access, the package can also be assembled from 
+[this documentation](../llms-docs.txt) alone; see 
+the instructions [here](python.md#local-build-without-pip).
 
 ## Optional components
 

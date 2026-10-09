@@ -1,3 +1,5 @@
+# Generated from main on 2026-10-09
+
 # Source: README.md
 
 
@@ -61,7 +63,6 @@ GETTING STARTED
 See also: [Quickstart](quickstart.md)
 
 
-
 ## Install the built distribution
 
 
@@ -70,7 +71,6 @@ pip install creating-intelligence
 ```
 
 Release information: https://pypi.org/project/creating-intelligence/
-
 
 
 ## Build from source
@@ -83,6 +83,9 @@ creatingintelligence/src/python/setup.sh
 
 Building the package from source requires a C development environment.
 
+Without network access, the package can also be assembled from 
+[this documentation](../llms-docs.txt) alone; see 
+the instructions [here](python.md#local-build-without-pip).
 
 ## Optional components
 
@@ -995,7 +998,7 @@ The following circuit transports multiset data including inhibitory signals. Not
 The `input` component supports encoder plugins that convert external data
 to sets. 
 
-The following circuit uses the [`codec`](#codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](#output.md) component uses the
+The following circuit uses the [`codec`](codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](output.md) component uses the
 same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 
@@ -1088,7 +1091,7 @@ Use standard [style options](components.md) to customize the component's appeara
 ## Basic input and output
 
 This is the simplest possible circuit, routing signals directly from 
-the [`input`](#input.md) node to the `output` node.
+the [`input`](input.md) node to the `output` node.
 Multiset or inhibitory inputs are reduced to sets along the pathway.
 
 ```json
@@ -1142,7 +1145,7 @@ This circuit outputs a multiset:
 The `output` component supports decoder plugins that convert sets or multisets 
 to external data representations.
 
-The following circuit uses the [`codec`](#codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](#output.md) component uses the
+The following circuit uses the [`codec`](codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](output.md) component uses the
 same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 
@@ -1579,7 +1582,7 @@ See also: https://creatingintelligence.org/#circuits
 - Uses the `shared` plugin for embedding a shared circuit.
 - Uses the `file` plugin to create a local embedded circuit.
 - Exchanges sets or multisets with the embedded circuit.
-- The embedded circuit may use [`input`](#input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
+- The embedded circuit may use [`input`](input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
 
 <br>
 
@@ -3410,7 +3413,7 @@ See also: https://creatingintelligence.org/#sparse-holographic-representations
 ## Details and properties
 
 - Typically used for supervised learning.
-- Similar to [`codec`](#codec.md), but generates non-overlapping encodings.
+- Similar to [`codec`](codec.md), but generates non-overlapping encodings.
 - Encoder plugin for the [`input`](input.md) component.
 - Decoder plugin for the [`output`](output.md) component.
 - Encodes integers 0 to K-1 as non-overlapping SHRs.
@@ -3886,7 +3889,6 @@ from collections import Counter
 import numpy as np
 import scipy.sparse as sp
 import networkx as nx
-import matplotlib.pyplot as plt
 from creating_intelligence import Memory
 
 
@@ -5568,6 +5570,8 @@ def Circuit(expr):
 
     def schematics(filename):
         """Generates a static PNG graph visualization of the circuit."""
+        from matplotlib.figure import Figure  # imported here: only needed for drawing
+
         G = nx.MultiDiGraph()
 
         # Build nodes
@@ -5651,8 +5655,6 @@ def Circuit(expr):
                 width=edge_width
             )
 
-        # Render graph
-        fig, ax = plt.subplots(figsize=(12, 8))
 
         # Create a clean graph for layout calculation
         G_layout = nx.MultiDiGraph()
@@ -5668,7 +5670,7 @@ def Circuit(expr):
         try:
             from networkx.drawing.nx_agraph import graphviz_layout
             pos = graphviz_layout(G_layout, prog='dot', args='-Grankdir=LR')
-        except ImportError:
+        except Exception:
             try:
                 from networkx.drawing.nx_pydot import pydot_layout
                 # PyDot wrapper drops the rankdir graph attribute.
@@ -5676,14 +5678,16 @@ def Circuit(expr):
                 # enforce Left-to-Right.
                 pos_tb = pydot_layout(G_layout, prog='dot')
                 pos = {n: (-y, x) for n, (x, y) in pos_tb.items()}
-            except ImportError:
+            except Exception:
                 print(
                     "Warning: Install 'pygraphviz' or 'pydot' (and OS-level Graphviz) for left-to-right layout.")
                 pos = nx.spring_layout(G_layout, seed=42)
-
+                
+                
         # Render graph on a slightly larger canvas
-        fig, ax = plt.subplots(figsize=(11, 7))
-
+        fig = Figure(figsize=(11, 7))
+        ax = fig.add_subplot()
+        
         # Draw edges individually to calculate curve routing for bidirectional
         # and parallel overlaps
         edges = G.edges(data=True, keys=True)
@@ -5757,11 +5761,11 @@ def Circuit(expr):
             ax=ax
         )
 
-        plt.axis('off')
-        plt.tight_layout()
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        plt.close(fig)
-
+        ax.axis('off')
+        fig.tight_layout()
+        fig.savefig(filename, dpi=300, bbox_inches='tight')
+        
+        
     def clear():
         for node in nodes.values():
             c = node.get("clear")
@@ -5962,28 +5966,47 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 import ctypes
 import os
+import sys
 import importlib.machinery
 from pathlib import Path
 
-# Dynamically find the compiled extension file suffix (e.g., .cpython-311-darwin.so)
-ext_suffix = importlib.machinery.EXTENSION_SUFFIXES[0]
+def _candidate_paths():
+    """Yield possible locations of the compiled C library, most preferred first."""
+    # 1. Explicit override, e.g. MEMORY_LIB_PATH=/path/to/libmemory.so
+    override = os.environ.get("MEMORY_LIB_PATH")
+    if override:
+        yield Path(override)
 
-# Path where pip/setuptools places the compiled extension
-pkg_dir = Path(__file__).parent
-lib_path = pkg_dir / f"libmemory{ext_suffix}"
+    # 2. Extension built by pip/setuptools, under any suffix this interpreter
+    #    accepts (.cpython-312-x86_64-linux-gnu.so, .abi3.so, .cp312-win_amd64.pyd, ...)
+    pkg_dir = Path(__file__).resolve().parent
+    for suffix in importlib.machinery.EXTENSION_SUFFIXES:
+        yield pkg_dir / f"libmemory{suffix}"
 
-try:
-    # Attempt to load the pip-installed extension first
-    lib = ctypes.CDLL(str(lib_path))
-except OSError:
-    # Fallback to the legacy Makefile structure for local development without pip
-    fallback_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "c", "lib", "libmemory.dylib"))
-    try:
-        lib = ctypes.CDLL(fallback_path)
-    except OSError:
-        lib = ctypes.CDLL("../c/lib/libmemory.dylib")
-        
-        
+    # 3. Local development build from the C Makefile (<repo>/c/lib/)
+    if sys.platform == "darwin":
+        lib_name = "libmemory.dylib"
+    elif sys.platform == "win32":
+        lib_name = "libmemory.dll"
+    else:
+        lib_name = "libmemory.so"
+    yield pkg_dir.parent.parent / "c" / "lib" / lib_name
+
+
+def _load_library():
+    tried = []
+    for path in _candidate_paths():
+        if not path.is_file():
+            tried.append(f"  {path} (not found)")
+            continue
+        try:
+            return ctypes.CDLL(str(path))
+        except OSError as e:
+            tried.append(f"  {path} ({e})")
+    raise OSError("Could not load the C memory library. Tried:\n" + "\n".join(tried))
+
+
+lib = _load_library()        
         
 # Define the C 'Set' struct in Python.
 class CSet(ctypes.Structure):
@@ -6098,6 +6121,77 @@ def Memory(config: dict) -> dict:
         "backend": "c_ffi"
     }
 ```
+
+## __init__.py 
+
+
+```python
+# __init__.py
+
+import os
+import importlib
+import logging
+import warnings
+
+import sys
+
+if sys.maxsize <= 2**32:
+    raise ImportError("creating-intelligence requires 64-bit Python.")
+    
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+# MEMORY_BACKEND selects the backend explicitly ("c_ffi" or "python").
+# If unset, the C backend is tried first, with the pure-Python one as fallback.
+_requested = os.environ.get("MEMORY_BACKEND")
+backend = (_requested or "c_ffi").lower()
+
+try:
+    _module = importlib.import_module(f".memory_{backend}", package=__name__)
+except (ImportError, OSError, AttributeError) as e:
+    if _requested is None and backend == "c_ffi":
+        warnings.warn(
+            f"C memory backend unavailable, using the Python backend. ({e})",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        backend = "python"
+        _module = importlib.import_module(".memory_python", package=__name__)
+    else:
+        raise ImportError(f"Backend '{backend}' failed to load: {e}") from e
+
+Memory = _module.Memory
+
+# Expose Circuit to the package namespace
+from .circuits import Circuit
+
+logger.debug(f"[System] Initializing Memory using '{backend}' backend.")
+
+__all__ = ['Circuit', 'Memory']
+```
+
+## Local build without pip
+
+To assemble a working package from [this documentation](../llms-docs.txt) alone (for instance in a sandbox without network access), save each code block under its section header, ignoring trailing whitespace in the headers:
+
+    creating_intelligence/__init__.py
+    creating_intelligence/circuits.py
+    creating_intelligence/memory_python.py
+    creating_intelligence/memory_c_ffi.py
+    c_build/memory.h          (from the C section)
+    c_build/memory.c          (from the C section)
+
+Then compile the C backend into the package directory:
+
+```bash
+gcc -O3 -shared -fPIC c_build/memory.c -o creating_intelligence/libmemory.so -lm
+```
+
+Run scripts from the directory containing `creating_intelligence/`. If compilation is not possible, the package falls back to the pure-Python backend automatically; set `MEMORY_BACKEND=python` to select it explicitly. 
+
+Requirements: 64-bit Python ≥ 3.9 with numpy, scipy, networkx and matplotlib.
+
 
 
 

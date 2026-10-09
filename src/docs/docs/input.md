@@ -103,7 +103,7 @@ The following circuit transports multiset data including inhibitory signals. Not
 The `input` component supports encoder plugins that convert external data
 to sets. 
 
-The following circuit uses the [`codec`](#codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](#output.md) component uses the
+The following circuit uses the [`codec`](codec.md) plugin which encodes symbolic tokens as random Sparse Holographic Representations (SHRs). Here, the [`output`](output.md) component uses the
 same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 
