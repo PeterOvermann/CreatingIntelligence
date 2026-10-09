@@ -4,9 +4,9 @@ SOURCE CODE
 # Standard C
 
 
-A zero-dependency, performance-optimized implementation of the Topological Associative Memory kernel.
+A zero-dependency, high-performance implementation of the Topological Associative Memory kernel.
 
-The Python package uses this code to build the memory backend as a C extension. 
+The Python and Mathematica packages use this implementation as a C extension. 
 
 
 
@@ -18,6 +18,7 @@ The Python package uses this code to build the memory backend as a C extension.
 ## memory.c 
 
 
-*insert c/memory.c*
+See the [GitHub](https://github.com/PeterOvermann/CreatingIntelligence) repository 
+for the full C sources.
 
 
