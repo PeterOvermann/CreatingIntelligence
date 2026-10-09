@@ -43,7 +43,7 @@ jobs:
 
     - name: Check sdist ships the C sources
       shell: bash
-      run: tar -tzf src/python/dist/*.tar.gz | grep -q 'c_build/memory.c'
+      run: tar -tzf src/python/dist/*.tar.gz | grep 'c_build/memory.c'
 
     - name: Install from the generated sdist
       shell: bash

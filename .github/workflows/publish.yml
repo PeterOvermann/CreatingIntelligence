@@ -54,7 +54,7 @@ jobs:
         run: python -m build --sdist
       - name: Check sdist ships the C sources
         working-directory: ./src/python
-        run: tar -tzf dist/*.tar.gz | grep -q 'c_build/memory.c'
+        run: tar -tzf dist/*.tar.gz | grep 'c_build/memory.c'
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
