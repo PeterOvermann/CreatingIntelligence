@@ -1010,7 +1010,8 @@ shared[config_Association] :=
 
 (* 
 Embedded circuit component.
-Multiple circuit components can reference the same embedded instance.
+Multiple circuit components can reference the same embedded instance
+through its "name" option.
 *)
 				
 circuit[config_Association] := 

@@ -60,6 +60,14 @@ Windows:
 src/python/setup.bat
 ```
 
+To build the package on Linux without installing it, run
+
+```bash
+src/python/dev_build.sh
+export PYTHONPATH="$PWD/src/python/build/local"
+```
+
+
 Build the standalone memory (command line interface and test program) from the zero-dependency C source:
 
 ```bash
