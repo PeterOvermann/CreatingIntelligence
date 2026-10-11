@@ -1463,6 +1463,8 @@ predictions.
 The biological equivalent of kWTA is lateral inhibition, where active neurons
 suppress their neighbors via inhibitory interneurons.
 
+In the context of associative memory, kWTA has a long history as a recall strategy. Graham and Willshaw (1995) showed that selecting the output units with the highest dendritic sums improves recall from a binary associative net presented with partial or noisy cues, and Gripon et al. (2016) compare this “winners-take-all” threshold with other retrieval dynamics for sparse associative memories. Topological memory uses the same selection step, applied to responses summed over pairs of input elements rather than over individual inputs. What follows the selection &mdash; steps 6 to 10 of the [memory retrieval algorithm](#retrieving-associations) &mdash; is specific to this framework: the iterative refinement of the input, which retains only the input elements that consistently support the selected output, and returns an empty result if no unique match emerges.
+
 
 
 <br>
@@ -1497,6 +1499,9 @@ where the individual components of both concepts intersect to 1.
 Formally, writing $A \to B$ to a memory $T_{ijk}$ (a rank-3 tensor) can be
 expressed by $T_{ijk} \gets T_{ijk} \lor (A_i A_j B_k)$ for all $i < j$ and all
 $k$.
+
+In the associative-memory literature, this structure is known as a third-order Willshaw model.
+
 
 The core function of memory retrieval from an input $A$ is equivalent to
 $B_k = ( \sum_{i<j} T_{ijk} A_i A_j )_{\top P_B}$.
@@ -1609,6 +1614,9 @@ $$C_\text{hetero} \approx \ln(2) \frac{ N_A (N_A-1)  N_B} { P_A (P_A-1) P_B }$$
 This formula shows that the sparsity of $A$ has a stronger impact on capacity
 than that of $B$, primarily due to the combinatorial expansion occurring from
 the input to the hidden layer.
+
+Topological memory belongs to the family of binary associative memories introduced by Willshaw, Buneman and Longuet-Higgins (1969), who showed that storage efficiency peaks at $\ln(2) \approx 69$ per cent of the theoretical maximum when half of the connections are set. Palm (1980) analysed the capacity in detail. Addressing memory sets by pairs of input elements makes topological memory a third-order version of this model. Löwe and Vermet (2026) prove storage scales of order $N^3/(\ln N)^3$ for third-order Willshaw memories, in the sense that a stored pattern is a fixed point of one-step threshold retrieval. Recovery from partial or noisy cues, which the retrieval algorithm discussed here addresses, is not covered by their analysis.
+
 
 The following plot shows the relationship between memory density and the number
 of stored SHRs. A configuration with $N = 1,000$ and $P = 10$ has a
@@ -1827,6 +1835,8 @@ For auto-associative memory, the threshold condition is given by
 
 $$\left( \ln(2) \frac{N (N - 1) (N - 2)}{P (P - 1) (P - 2)}\right)^2 \cdot \binom{P}{T} \binom{N - P}{P - T} \binom{N}{P}^{-1} < 1$$
  
+ 
+A closely related condition appears in the original analysis of the binary associative net by Willshaw, Buneman and Longuet-Higgins (1969). There, an output unit fires if all $P$ elements of a complete cue pattern connect to it. A unit that does not belong to the stored pattern reaches this threshold by chance with probability $\rho^P$, where $\rho$ is the memory density. Requiring the expected number of such spurious units, $N \rho^P$, to stay at one gives the largest number of patterns that can be stored without errors, and the optimal population $P = -\ln N / \ln \rho$. At the nominal density $\rho^* = 1/2$, this becomes $P = \ln N / \ln 2$, about 10 for $N = 1,000$. The threshold condition derived above follows the same logic, bounding the expected number of false matches below one, but applies it to partial matches of at least $T$ elements in a memory filled to its nominal capacity.
 
 
 <br> 
@@ -5242,6 +5252,10 @@ best match and rejects unknown inputs, this retrieval method always returns a
 raw statistical result, even for completely random inputs.
 
 
+Raw retrieval corresponds to the classical recall procedure of binary associative memories. Willshaw, Buneman and Longuet-Higgins (1969) activated the output units whose summed input reaches the number of active elements in a complete cue pattern. For partial or noisy cues, Graham and Willshaw (1995) instead select the output units with the highest summed input, which is the kWTA step used here. Since memory sets are addressed by pairs of input elements, the aggregated response $R$ is the local field of a third-order Willshaw memory as analysed by Löwe and Vermet (2026), with kWTA selection in place of their fixed threshold.
+
+
+
 # <a id="a-perspective-on-neuroscience">A Perspective on Neuroscience</a>
 
 ##### [Cerebellum](#cerebellum) • [Neocortex](#neocortex) • [The locus of learning and memory](#the-locus-of-learning-and-memory) • [The binding problem and short-term associative memory](#the-binding-problem-and-shortterm-associative-memory) • [An explanation for childhood amnesia](#an-explanation-for-childhood-amnesia) • [Step-wise response to threshold modulation](#stepwise-response-to-threshold-modulation) • [A neural equivalent of stochastic subsampling](#a-neural-equivalent-of-stochastic-subsampling) • [The signature of SHRs](#the-signature-of-shrs)
@@ -5809,6 +5823,27 @@ deep learning paradigm and the computationalist framework introduced in this wor
   address={Sydney, Australia}
 }
 
+@article{graham1995,
+  title={Improving Recall from an Associative Memory},
+  author={Graham, Bruce and Willshaw, David},
+  journal={Biological Cybernetics},
+  volume={72},
+  number={4},
+  pages={337--346},
+  year={1995}
+}
+
+@article{gripon2016,
+  title={A Comparative Study of Sparse Associative Memories},
+  author={Gripon, Vincent and Heusel, Judith and Löwe, Matthias and Vermet, Franck},
+  journal={Journal of Statistical Physics},
+  volume={164},
+  number={1},
+  pages={105--129},
+  year={2016}
+}
+
+
 @article{harvey1988,
   title={Quantitative Study of Granule and Purkinje Cells in the Cerebellar Cortex of the Rat},
   author={Harvey, R. J. and Napper, R. M. A.},
@@ -5878,6 +5913,17 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1998}
 }
 
+@article{loewe2026,
+  title={On Associative Neural Networks for Sparse Patterns with Large Capacities},
+  author={Löwe, Matthias and Vermet, Franck},
+  journal={Journal of Statistical Physics},
+  volume={193},
+  number={10},
+  pages={144},
+  year={2026},
+  note={arXiv:2603.26217}
+}
+
 @book{marr1982,
   title={Vision: A Computational Investigation into the Human Representation and Processing of Visual Information},
   author={Marr, David},
@@ -5943,6 +5989,14 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1988}
 }
 
+@article{palm1980,
+  title={On Associative Memory},
+  author={Palm, Günther},
+  journal={Biological Cybernetics},
+  volume={36},
+  pages={19--31},
+  year={1980}
+}
 
 @article{plate1995,
   title={Holographic Reduced Representations},
@@ -5973,6 +6027,17 @@ deep learning paradigm and the computationalist framework introduced in this wor
   pages={159--216},
   year={1990}
 }
+
+@article{willshaw1969,
+  title={Non-Holographic Associative Memory},
+  author={Willshaw, D. J. and Buneman, O. P. and Longuet-Higgins, H. C.},
+  journal={Nature},
+  volume={222},
+  pages={960--962},
+  year={1969}
+}
+
+
 ```
 
 
