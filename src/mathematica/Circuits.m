@@ -543,7 +543,8 @@ delay[config_Association] :=
 	(* Drop inputs below threshold population. *)
 	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
+	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
+		If[r === Infinity, Infinity, Round[pop * r]]];	
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
@@ -674,7 +675,8 @@ auto[config_Association] :=
 	pop  = Last[params];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit  = Round[Lookup[config, "rate_limit", Infinity] * pop];
+	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
+		If[r === Infinity, Infinity, Round[pop * r]]];
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
 	
@@ -746,7 +748,8 @@ temporal[config_Association] :=
 	(* Drop inputs below threshold population. *)
 	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit  = Round[pop * Lookup[config, "rate_limit", Infinity]];
+	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
+		If[r === Infinity, Infinity, Round[pop * r]]];
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
@@ -949,6 +952,20 @@ noise[config_Association] := Module[ {f},
 	<| "function" -> f, "checks" -> {"input", "oneout"}, "label" -> "~",
 		"fill" -> 13, "size" -> 18 |>
 	]	
+
+
+(* 
+Source of empty sets: a dummy input for receive slots that are 
+deliberately unconnected (unconnected receive slots are an error).
+*)
+
+empty[config_Association] := Module[ {f},
+
+	f[blocks___] := {}; 
+	
+	<| "function" -> f, "checks" -> {"input", "oneout"}, 
+		"label" -> "\[EmptySet]", "shape" -> "none", "size" -> 18 |>
+	]
 
 
 (* 

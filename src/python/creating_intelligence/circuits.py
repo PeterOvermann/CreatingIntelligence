@@ -1177,6 +1177,19 @@ def noise(config):
     }
 
 
+def empty(config):
+    """Source of empty sets: a dummy input for receive slots that are
+    deliberately unconnected (unconnected receive slots are an error)."""
+    def f(*blocks):
+        return ([],)
+
+    return {
+        "function": f,
+        "checks": ["input", "oneout"],
+        "label": "∅", "shape": "none", "size": 18
+    }
+
+
 def file(config):
     file_path = config.get("name")
     if not file_path:
@@ -1305,7 +1318,8 @@ circuit_messages = {
     "arginp": "{0}: Missing input.",
     "output": "No output slots allowed in {0}.",
     "oneout": "{0}: Expecting one output slot.",
-    "argout": "{0}: Missing output."
+    "argout": "{0}: Missing output.",
+    "unsent": "No sender for receive slot(s) {0}; use the 'empty' component for an empty input."
 }
 
 circuit_checks = {
@@ -1545,6 +1559,13 @@ def Circuit(expr):
     for edge in pathways.values():
         edge["from_node_id"] = links.get(edge.get("slot"), 0)
 
+    # Every receive slot needs a sender (use the "empty" component for a
+    # deliberately empty input); unconnected send slots are allowed.
+    unsent = sorted({str(e.get("slot")) for e in pathways.values()
+                     if not e["from_node_id"]})
+    if unsent:
+        raise CircuitError(circuit_messages["unsent"].format(", ".join(unsent)))
+
     def patheval(id_val):
         e = pathways[id_val]
         tags = set(e.get("tags", []))
@@ -1740,6 +1761,9 @@ def Circuit(expr):
             if node_data.get("shape") == "square":
                 shape = "s"
                 size_multiplier = 100
+            elif node_data.get("shape") == "none":
+                shape = None  # label only, no marker
+                size_multiplier = 100
             else:
                 shape = "o"  # Default Circle
                 size_multiplier = 180  # Scale circles up relative to squares
@@ -1867,7 +1891,7 @@ def Circuit(expr):
                 node_size=G.nodes[v]['size'],
                 # Instructs Matplotlib to calculate intersection for this
                 # specific shape
-                node_shape=G.nodes[v]['shape'],
+                node_shape=G.nodes[v]['shape'] or 'o',
                 connectionstyle=f'arc3,rad={rad}',
                 ax=ax
             )
@@ -1896,6 +1920,8 @@ def Circuit(expr):
 
         # Draw nodes
         for node, data in G.nodes(data=True):
+            if data['shape'] is None:
+                continue
             nx.draw_networkx_nodes(
                 G, pos, nodelist=[node],
                 node_color=data['fill_color'],
