@@ -8,6 +8,7 @@
   - [Circuits](circuits.md)
   - [Components](components.md)
   - [Pathways](pathways.md)
+  - [Design Principles](design_principles.md)
   
 - **CIRCUIT COMPONENTS**
   - [input](input.md)
