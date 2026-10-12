@@ -1,27 +1,31 @@
 # Creating Intelligence
 
-This research initiative aims to build a computational theory of mind based on a new theory of
-hyperdimensional computing (HDC), entirely departing from conventional neural networks, continuous weights,
-and matrix calculations. 
+This research initiative aims to build a computational theory of mind based on a
+new theory of hyperdimensional computing (HDC), entirely departing from
+conventional neural networks, continuous weights, and matrix calculations.
 
-In this model, the mind performs computations on sparse binary data. The fundamental
-data structures are Sparse Distributed Representations (SDRs) for perceptual information 
-and Sparse Holographic Representations (SHRs) for symbols. 
+In this model, the mind performs computations on sparse binary data. The
+fundamental data structures are Sparse Distributed Representations (SDRs) for
+perceptual information and Sparse Holographic Representations (SHRs) for symbols.
 
-The centerpiece of this project is Topological Associative Memory &mdash; a 
-newly discovered associative memory for sparse data, serving as the computational
-kernel that models the brain's core algorithm. A software frontend
-for modeling and simulating neural circuits and pathways complements the memory backend.
+The centerpiece of this project is Topological Associative Memory &mdash; a
+neural memory for sparse binary data with huge capacity and constant retrieval
+time. Memory retrieval functions on the basis of exact subset matching, which we
+propose to be the brain's core algorithm.
 
-The methods introduced here lend themselves to binary in-memory and neuromorphic computating, opening a new route toward synthetic intelligence that does not rely on GPU acceleration.
+This repository includes a software framework (the system layer) for modeling and
+simulating neural circuits based on the topological memory kernel.
 
+The methods introduced here lend themselves to binary in-memory and neuromorphic
+computating, opening a new route toward synthetic intelligence that does not rely
+on GPU acceleration.
 
 ### General Information
 
 * Website: https://creatingintelligence.org
 * Documentation: https://creatingintelligence.org/docs
 * Documentation for LLMs and AI agents: https://creatingintelligence.org/llms-docs.txt
-* E-Book PDF: https://creatingintelligence.org/CreatingIntelligence.pdf
+* Manuscript (PDF): https://creatingintelligence.org/CreatingIntelligence.pdf
 * Release information: https://pypi.org/project/creating-intelligence/
 * Preprint: https://arxiv.org/abs/2606.31819
 * Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
