@@ -902,7 +902,7 @@ for [circuits](circuits.md), [components](components.md) and
 See also: https://creatingintelligence.org/#circuits
 
 
-## Programs and circuits
+## Dataflow programming
 
 ### The circuit is the program
 
