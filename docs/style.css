@@ -384,6 +384,11 @@ h3 {
 	font-size: 1.4em;
 }
 
+article.markdown-section h3 {
+	font-size: 1.1em;
+}
+
+
 h4 {
 	margin-top: 0.8em;
 	margin-bottom: 0em;
