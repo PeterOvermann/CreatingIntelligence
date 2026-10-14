@@ -543,8 +543,7 @@ delay[config_Association] :=
 	(* Drop inputs below threshold population. *)
 	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
-		If[r === Infinity, Infinity, Round[pop * r]]];	
+	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims1] / pop]];	
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
@@ -675,8 +674,7 @@ auto[config_Association] :=
 	pop  = Last[params];
 
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
-		If[r === Infinity, Infinity, Round[pop * r]]];
+	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
 	
@@ -748,8 +746,7 @@ temporal[config_Association] :=
 	(* Drop inputs below threshold population. *)
 	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit = With[{r = Lookup[config, "rate_limit", Infinity]},
-		If[r === Infinity, Infinity, Round[pop * r]]];
+	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
@@ -1046,8 +1043,8 @@ circuit[config_Association] :=
 	(* Raw evaluation, bypassing encoding and decoding. *)
 	f[blocks__] := plugin["function"][blocks];
 	
-	Join[plugin, <| "function" -> f, "checks" -> {"arginp", "argout"}, 
-							"shape" -> "square", "size" -> 9|>]
+	Join[plugin, 
+		<| "function" -> f, "checks" -> {"arginp", "argout"},  "size" -> 9|>]
 	]					
 
 

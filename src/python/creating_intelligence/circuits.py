@@ -628,10 +628,12 @@ def delay(config):
     threshold_factor = config.get("threshold", 0.0)
     absthreshold = round(threshold_factor * pop)
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims1)
 
     decay = config.get("decay", 0.0)
     capacity_factor = config.get("capacity", 1.0)
@@ -781,10 +783,12 @@ def auto(config):
                                                      for b in receive_blocks)]
     pop = params[1] if len(params) > 1 else 0
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
 
     decimation = config.get("decimate", 1.0)
 
@@ -894,10 +898,12 @@ def temporal(config):
     threshold_factor = config.get("threshold", 0.0)
     absthreshold = round(threshold_factor * pop)
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
 
     decay = config.get("decay", 0.0)
     capacity_factor = config.get("capacity", 1.0)
@@ -1295,7 +1301,7 @@ def circuit(config):
     result.update({
         "function": f,
         "checks": ["arginp", "argout"],
-        "shape": "square", "size": 9
+        "size": 9
     })
 
     return result
