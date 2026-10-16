@@ -1,0 +1,25 @@
+# Creating Intelligence
+
+## Build instructions for LLMs and AI agents
+
+1. 	Clone https://github.com/PeterOvermann/CreatingIntelligence. 
+	The sources for the development build are: 
+	
+	src/c/memory.c
+	src/c/memory.h
+	src/python/creating_intelligence/__init__.py
+	src/python/creating_intelligence/circuits.py
+	src/python/creating_intelligence/memory_c_ffi.py
+	src/python/creating_intelligence/memory_python.py
+
+2. Run src/python/dev_build.sh. This is a development shortcut for Linux
+   sandboxes. It compiles memory.c as a shared library,
+   assembles the package in src/python/build/local, and smoke-tests both
+   backends. If it warns about missing dependencies, install them with
+   pip install -r src/python/requirements.txt --break-system-packages
+   and rerun. 
+   
+3. Use PYTHONPATH=src/python/build/local for everything you run. Don't
+   build through setup.py and don't create a venv. Rerun dev_build.sh
+   after any change to the C or Python sources (the build is a copy, not
+   editable).
