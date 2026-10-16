@@ -28,7 +28,7 @@ optionally integrating signals over multiple timesteps.
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | `replacement` | update rule, governing the temporal integration logic |  
-| `latch`	    | false | whether to skip the update if the input is empty |  
+| `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
 | `threshold`     | 0    |  clear input if relative population is below threshold |
 | `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |

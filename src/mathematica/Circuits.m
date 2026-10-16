@@ -815,6 +815,10 @@ temporal[config_Association] :=
 
 
 (*
+
+EXPERIMENTAL
+
+
 Chunking memory component.
 Same temporal integration as "temporal", but sends the chunk instead of the
 prediction. The state integrates the input as long as it is predicted; at a
@@ -825,7 +829,7 @@ Empty input gives empty output and leaves the component unchanged.
 
 chunker[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
-			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
+			absratelimit, abscapacity, latch, sigma, Xstate = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", permutation][config];
 
@@ -845,6 +849,10 @@ chunker[config_Association] :=
 	decimation = Lookup[config, "decimate", 1];
 	(* Latch option. *)
 	latch = Lookup[config, "latch", False];
+	
+	(* Start route: the first item of a chunk enters through its own fixed
+	   permutation, so that no chunk code is contained in a longer one. *)
+	sigma = RandomSample[Range[First[params]]];
 
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
@@ -875,9 +883,10 @@ chunker[config_Association] :=
 		M["store"][ResolveNormal[Xstate], Xnormal];
 
 		If[ prediction =!= Xnormal || Length[Xstate] >= abscapacity,
-			(* At a branch point or at capacity, emit chunk and reset state *)
+			(* At a branch point or at capacity, emit chunk and restart
+			   the state with the input on the start route. *)
 			chunk = ResolveNormal[Xstate];
-			Xstate = X,
+			Xstate = Sort[Sign[X] * sigma[[Abs[X]]]],
 			
 			(* Else: temporal integration via update rules. *)
 			If[ ! (latch && Length[X] == 0), 

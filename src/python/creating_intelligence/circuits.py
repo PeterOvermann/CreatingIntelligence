@@ -991,6 +991,156 @@ def temporal(config):
     return result
     
 
+def chunker(config):
+    """
+    
+    EXPERIMENTAL
+    
+    Chunking memory component (port of chunker.m).
+    Same temporal integration as "temporal", but emits the chunk instead of
+    the prediction: as long as the input is predicted, the state integrates
+    it and the output is empty. At a prediction error, or when the state
+    holds capacity items, the integrated state is sent as the completed
+    chunk and the state restarts with the input. The first item of a chunk
+    enters through a fixed permutation of its own (the start route), so
+    that no chunk code is contained in a longer one. Empty input gives
+    empty output and leaves the component unchanged (event-driven).
+    """
+    plugin_factory = config.get("plugin", permutation)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            permutation)
+
+    plugin = plugin_factory(config)
+
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+
+    params = [sum(b[0] for b in receive_blocks), sum(b[1]
+                                                     for b in receive_blocks)]
+    pop = params[1] if len(params) > 1 else 0
+
+    # Start route: the first item of a chunk enters through its own fixed
+    # permutation, so that no chunk code is contained in a longer one
+    sigma = rng.choice(
+        range(1, params[0] + 1),
+        size=params[0],
+        replace=False).tolist() if params[0] > 0 else []
+
+    def start(x):
+        return sorted((1 if i > 0 else -1) * sigma[abs(i) - 1]
+                      for i in x if i != 0)
+
+    # Drop inputs below threshold population
+    threshold_factor = config.get("threshold", 0.0)
+    absthreshold = round(threshold_factor * pop)
+
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
+
+    # Pre-integration decay (leak rate)
+    decay = config.get("decay", 0.0)
+    # Temporal capacity
+    capacity_factor = config.get("capacity", 1.0)
+    abscapacity = round(capacity_factor * pop)
+    # Proportional stochastic subsampling for memory query
+    decimation = config.get("decimate", 1.0)
+    latch = config.get("latch", False)
+
+    # Memory with identical input and output parameters
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params,
+        "B_parameters": params
+    })
+
+    M = Memory(m_config)
+    Xstate = []
+    prediction = []
+
+    def f(*blocks):
+        nonlocal Xstate, prediction
+        chunk = []
+        X = multiset_block_join(list(blocks), dims)
+
+        # Enforce minimum population
+        if len(X) < absthreshold:
+            X = []
+
+        # Empty input: empty output, no learning, no state update
+        if not X:
+            return tuple(multiset_block_split([], dims))
+
+        # Rate limiting equally applies to positive and negative elements
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
+
+        Xnormal = resolve_normal(X)
+
+        # Always learn.
+        M["store"](resolve_normal(Xstate), Xnormal)
+
+        if list(prediction) != Xnormal or len(Xstate) >= abscapacity:
+            # At a branch point or at capacity, emit chunk and restart
+            # the state with the input on the start route
+            chunk = resolve_normal(Xstate)
+            Xstate = start(X)
+        else:
+            # Else: temporal integration via update rules
+            if not (latch and len(X) == 0):
+                Xstate = plugin["updaterule"](X, Xstate)
+
+        # Proportional multiset subsampling applied to the integrated state,
+        # to break symmetry during retrieval
+        Xdec = Xstate
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(
+                rng.choice(
+                    Xdec,
+                    size=sample_size,
+                    replace=False).tolist())
+
+        # Predict next token
+        prediction = M["retrieve"](resolve_normal(Xdec))
+
+        return tuple(multiset_block_split(chunk, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "label": "[" + plugin.get("label", "") + "]",
+        "checks": ["arginp", "argout", "ident"],
+        "shape": "square", "fill": 14
+    })
+    result.update(M)
+
+    return result
+
+
+
+
 def associator(config):
     """
     Vanilla hetero-associative node for supervised learning A -> B.
