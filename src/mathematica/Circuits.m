@@ -818,12 +818,13 @@ temporal[config_Association] :=
 
 EXPERIMENTAL
 
-
 Chunking memory component.
 Same temporal integration as "temporal", but sends the chunk instead of the
 prediction. The state integrates the input as long as it is predicted; at a
 prediction error, or when the state holds capacity items, the state is sent
-as the completed chunk and restarts with the input.
+as the completed chunk and restarts with the input. The first item of a chunk
+enters through a fixed permutation of its own (the start route), so that no
+chunk code is contained in a longer one.
 Empty input gives empty output and leaves the component unchanged.
 *)
 
@@ -911,98 +912,6 @@ chunker[config_Association] :=
 		"checks" -> {"arginp", "argout", "ident"},
 		"shape" -> "square", "fill" -> 14 |>, M]	
 	]
-
-
-(*
-Chunking memory component.
-Segments the input stream into chunks at prediction errors.
-A temporal-associative memory whose state, the open chunk, restarts 
-when it fails to predict the input.
-
-Per input X (inhibitory elements are applied and dropped):
-
-  - Learn the association open chunk -> X.
-  - If X was predicted and the chunk is below capacity, extend the chunk:
-      chunk' = pi[chunk] + X
-  - Otherwise the chunk is complete, and X starts a new one:
-      chunk' = sigma[X]
-  - Predict the next input from the open chunk.
-
-Empty input changes nothing: the open chunk and its prediction are kept.
-This makes the component event-driven, for instance on a stream of chunk names.
-
-pi and sigma are fixed, instance-specific permutations. pi codes the position 
-of an item within the chunk; sigma anchors the start of the chunk, so that a 
-chunk is never contained in a longer one and exact queries stay unambiguous.
-
-Options:
-  "capacity"  maximum population of the open chunk, in units of the input
-              population (default 4). With inputs of constant population and
-              no overlap, this is the maximum number of items in a chunk.
-  "fraction", "threshold"  memory retrieval parameters, passed to Memory.
-              Use "fraction" -> 1.0 for exact queries.
-
-Sends two blocks, both in the joined input space:
-  1. the open chunk, and
-  2. the completed chunk (empty unless a chunk completed in this cycle).
-
-The component does not name chunks; names come from a downstream component,
-for instance a heteroencoder on the completed chunk.
-*)
-
-chunkerX[config_Association] := 
-	Module[ {f, M, dims, params, pop, dim, abscapacity, pi, sigma, 
-			chunk = {}, prediction = {}},
-
-	dims = First /@ config["receive_blocks"];
-	params = Plus @@ config["receive_blocks"];
-	{dim, pop} = params;
-	
-	(* Maximum population of the open chunk. *)
-	abscapacity = Round[pop * Lookup[config, "capacity", 4]];
-	
-	(* Fixed, instance-specific permutations: position (pi) and chunk start (sigma). *)
-	pi = RandomSample[Range[dim]];
-	sigma = RandomSample[Range[dim]];
-
-	(* Memory with identical input and output parameters. *)
-	M = Memory[Join[config, 
-		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
-
-
-	f[blocks__List] := Module[ {X, completed = {}},
-		
-		(* Join partitions and apply inhibition. *)
-		X = ResolveBlockJoinNormal[{blocks}, dims];
-		
-		If[X =!= {},
-		
-			(* Always learn: open chunk -> input. *)
-			M["store"][Union[chunk], X];
-			
-			If[X === prediction && Length[chunk] < abscapacity,
-				
-				(* Predicted: extend the chunk. 
-				   Kept as a multiset, so that its population counts the items. *)
-				chunk = Sort[Join[pi[[chunk]], X]],
-				
-				(* Prediction error or full chunk: the chunk is complete. *)
-				completed = Union[chunk];
-				chunk = Sort[sigma[[X]]]
-				];
-				
-			(* Predict the next input. *)
-			prediction = M["retrieve"][Union[chunk]]
-			];
-
-		Sequence @@ {Union[chunk], completed}
-		];
-
-	Join[ <| "function" -> f, 
-		"checks" -> {"arginp", "twoout", "totaldimout"},
-		"shape" -> "square", "label" -> "[\[Pi]]", "size" -> 16, "fill" -> 14 |>, M]	
-	]
-
 
 
 (* 
