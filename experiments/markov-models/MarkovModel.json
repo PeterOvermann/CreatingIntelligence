@@ -6,7 +6,7 @@
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [11]},
 
-	{"component": "delay", "send": [51], "receive": [[11, {"slot": 51, "tags": ["permute"]}]], "rate_limit": 6.0},
+	{"component": "delay", "send": [51], "receive": [[11, {"slot": 51, "tags": ["permute"]}]], "rate_limit": 6},
 
 	{"component": "predictor", "send": [101], "receive": [11, 51]},
 
