@@ -52,6 +52,7 @@ See also: https://creatingintelligence.org/#circuits
 | `fill`      |   background color (palette index 0 to 15)  | 
 | `size`      |   font size, given in points |
 | `color`     |   font color (palette index 0 to 15) |
+| `$comment`  |   notes for humans, ignored by the framework |
 
 
 ## Sending and receiving data
@@ -153,17 +154,15 @@ The [`input`](input.md) and [`output`](output.md) components can be extended wit
 
 
 
-In the following example, the [`input`](input.md) component loads an encoder plugin,
-the [`delay`](delay.md) component is extended via an update rule plugin, and the 
-[`output`](output.md) component uses a decoder plugin.
-
+In the following example, the [`input`](input.md) component loads the [`codec`](codec.md) plugin,
+the [`delay`](delay.md) component is extended via the [`augmentation`](augmentation.md) update rule plugin, and the [`output`](output.md) component uses the same encoder/decoder as the input.
 
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [1]},
-	{"component": "delay", "plugin": "latch", "send": [11], 
+	{"component": "delay", "plugin": "augmentation", "send": [11], 
 		"receive": [1], "capacity": 1},
 	{"component": "output", "plugin": "codec", "receive": [11]}
   ]}

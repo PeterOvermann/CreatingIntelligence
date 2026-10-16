@@ -1,4 +1,4 @@
-# Generated from main on 2026-10-14
+# Generated from main on 2026-10-16
 
 # Source: README.md
 
@@ -489,6 +489,7 @@ See also: https://creatingintelligence.org/#circuits
 | `fill`      |   background color (palette index 0 to 15)  | 
 | `size`      |   font size, given in points |
 | `color`     |   font color (palette index 0 to 15) |
+| `$comment`  |   notes for humans, ignored by the framework |
 
 
 ## Sending and receiving data
@@ -590,17 +591,15 @@ The [`input`](input.md) and [`output`](output.md) components can be extended wit
 
 
 
-In the following example, the [`input`](input.md) component loads an encoder plugin,
-the [`delay`](delay.md) component is extended via an update rule plugin, and the 
-[`output`](output.md) component uses a decoder plugin.
-
+In the following example, the [`input`](input.md) component loads the [`codec`](codec.md) plugin,
+the [`delay`](delay.md) component is extended via the [`augmentation`](augmentation.md) update rule plugin, and the [`output`](output.md) component uses the same encoder/decoder as the input.
 
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [1]},
-	{"component": "delay", "plugin": "latch", "send": [11], 
+	{"component": "delay", "plugin": "augmentation", "send": [11], 
 		"receive": [1], "capacity": 1},
 	{"component": "output", "plugin": "codec", "receive": [11]}
   ]}
@@ -1811,10 +1810,12 @@ def delay(config):
     threshold_factor = config.get("threshold", 0.0)
     absthreshold = round(threshold_factor * pop)
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims1)
 
     decay = config.get("decay", 0.0)
     capacity_factor = config.get("capacity", 1.0)
@@ -2382,10 +2383,12 @@ def auto(config):
                                                      for b in receive_blocks)]
     pop = params[1] if len(params) > 1 else 0
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
 
     decimation = config.get("decimate", 1.0)
 
@@ -2636,10 +2639,12 @@ def temporal(config):
     threshold_factor = config.get("threshold", 0.0)
     absthreshold = round(threshold_factor * pop)
 
-    rate_limit_factor = config.get("rate_limit", float('inf'))
-    absratelimit = round(
-        rate_limit_factor *
-        pop) if rate_limit_factor != float('inf') else float('inf')
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
 
     decay = config.get("decay", 0.0)
     capacity_factor = config.get("capacity", 1.0)
