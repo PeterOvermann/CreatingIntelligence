@@ -658,23 +658,25 @@ def delay(config):
                     size=absratelimit,
                     replace=False).tolist())
 
-        if decay > 0.0:
-            keep_size = math.floor((1.0 - decay) * len(Xstate))
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=keep_size,
-                    replace=False).tolist())
-
-        if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=abscapacity,
-                    replace=False).tolist())
-
-        # Temporal integration via update rules
+        # Latch: an empty input leaves the state unchanged
+        # (no decay, no capacity subsampling, no integration)
         if not (latch and len(X) == 0):
+            if decay > 0.0:
+                keep_size = math.floor((1.0 - decay) * len(Xstate))
+                Xstate = sorted(
+                    rng.choice(
+                        Xstate,
+                        size=keep_size,
+                        replace=False).tolist())
+
+            if len(Xstate) > abscapacity:
+                Xstate = sorted(
+                    rng.choice(
+                        Xstate,
+                        size=abscapacity,
+                        replace=False).tolist())
+
+            # Temporal integration via update rules
             Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to output
@@ -875,7 +877,6 @@ A hybrid between auto-associative and hetero-associative architectures.
 Uses the same temporal integration parametrization as "delay".
 """
 
-
 def temporal(config):
     plugin_factory = config.get("plugin", replacement)
 
@@ -938,28 +939,30 @@ def temporal(config):
                     size=absratelimit,
                     replace=False).tolist())
 
-        # Pre-integration stochastic decay
-        if decay > 0.0:
-            keep_size = math.floor((1.0 - decay) * len(Xstate))
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=keep_size,
-                    replace=False).tolist())
-
-        # Always learn.
-        M["store"](resolve_normal(Xstate), resolve_normal(X))
-
-        # Multiset subsampling applied to previous state
-        if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=abscapacity,
-                    replace=False).tolist())
-
-        # Temporal integration via update rules
+        # Latch: an empty input leaves the state unchanged
+        # (no decay, no capacity subsampling, no integration)
         if not (latch and len(X) == 0):
+            # Pre-integration stochastic decay
+            if decay > 0.0:
+                keep_size = math.floor((1.0 - decay) * len(Xstate))
+                Xstate = sorted(
+                    rng.choice(
+                        Xstate,
+                        size=keep_size,
+                        replace=False).tolist())
+
+            # Always learn.
+            M["store"](resolve_normal(Xstate), resolve_normal(X))
+
+            # Multiset subsampling applied to previous state
+            if len(Xstate) > abscapacity:
+                Xstate = sorted(
+                    rng.choice(
+                        Xstate,
+                        size=abscapacity,
+                        replace=False).tolist())
+
+            # Temporal integration via update rules
             Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to the integrated state

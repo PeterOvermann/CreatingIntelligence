@@ -565,16 +565,20 @@ delay[config_Association] :=
 		If[Length[X] > absratelimit, 
 			X = Sort[RandomSample[X, absratelimit]]]; 
 
-		(* Pre-integration stochastic decay. *)
-		If[decay > 0, Xstate = 
-			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
-
-		(* Multiset subsampling applied to previous state. *)
-		Xstate = Sort[RandomSample[Xstate, UpTo[abscapacity]]]; 
+		(* Latch: an empty input leaves the state unchanged
+		   (no decay, no capacity subsampling, no integration). *)
+		If[ ! (latch && Length[X] == 0),
 		
-		(* Temporal integration via update rules. *)
-		If[ ! (latch && Length[X] == 0), 
-			Xstate = plugin["updaterule"][X, Xstate]]; 
+			(* Pre-integration stochastic decay. *)
+			If[decay > 0, Xstate = 
+				Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+
+			(* Multiset subsampling applied to previous state. *)
+			Xstate = Sort[RandomSample[Xstate, UpTo[abscapacity]]]; 
+		
+			(* Temporal integration via update rules. *)
+			Xstate = plugin["updaterule"][X, Xstate]
+			]; 
 
 		(* Proportional multiset subsampling applied to output *)
 		Xdec = Xstate;
@@ -587,6 +591,7 @@ delay[config_Association] :=
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
 		"fill" -> 13 |>]	
 	]
+
 
 
 (* 
@@ -772,19 +777,23 @@ temporal[config_Association] :=
 		If[Length[X] > absratelimit, 
 			X = Sort[RandomSample[X, absratelimit]]]; 
 
-		(* Pre-integration stochastic decay. *)
-		If[decay > 0, Xstate = 
-			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
-
-		(* Always learn. *)
-		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
-
-		(* Multiset subsampling applied to previous state. *)
-		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+		(* Latch: an empty input leaves the state unchanged
+		   (no decay, no capacity subsampling, no integration). *)
+		If[ ! (latch && Length[X] == 0),
 		
-		(* Temporal integration via update rules. *)
-		If[ ! (latch && Length[X] == 0), 
-			Xstate = plugin["updaterule"][X, Xstate]]; 
+			(* Pre-integration stochastic decay. *)
+			If[decay > 0, Xstate = 
+				Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+
+			(* Always learn. *)
+			M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
+
+			(* Multiset subsampling applied to previous state. *)
+			Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+		
+			(* Temporal integration via update rules. *)
+			Xstate = plugin["updaterule"][X, Xstate]
+			]; 
 
 		(* Proportional multiset subsampling applied to the integrated state,
 		 to break symmetry during retrieval. *)
@@ -802,6 +811,189 @@ temporal[config_Association] :=
 		"checks" -> {"arginp", "argout", "ident"},
 		"shape" -> "square", "fill" -> 14 |>, M]	
 	]
+
+
+
+(*
+Chunking memory component.
+Same temporal integration as "temporal", but sends the chunk instead of the
+prediction. The state integrates the input as long as it is predicted; at a
+prediction error, or when the state holds capacity items, the state is sent
+as the completed chunk and restarts with the input.
+Empty input gives empty output and leaves the component unchanged.
+*)
+
+chunker[config_Association] := 
+	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
+			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
+
+	plugin = Lookup[config, "plugin", permutation][config];
+
+	dims = First /@ config["receive_blocks"];
+	params = Plus @@ config["receive_blocks"];
+	pop  = Last[params];
+	
+	(* Drop inputs below threshold population. *)
+	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
+	(* Limit size of query pattern. Default: unlimited. *)			
+	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
+	(* Pre-integration decay (leak rate). *)			
+	decay = Lookup[config, "decay", 0];
+	(* Temporal capacity, carry over from previous cycle. *)
+	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
+	(* Proportional stochastic subsampling for memory query. *)
+	decimation = Lookup[config, "decimate", 1];
+	(* Latch option. *)
+	latch = Lookup[config, "latch", False];
+
+	(* Memory with identical input and output parameters. *)
+	M = Memory[Join[config, 
+		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
+
+
+	f[blocks__List] := Module[ {X, Xnormal, chunk = {}},
+		
+		X = MultisetBlockJoin[ {blocks}, dims];
+		
+		(* Enforce minimum population. *)
+		If[Length[X] < absthreshold, X = {}];
+		
+		(* Empty input: empty output, no learning, no state update. *)
+		If[X =!= {}, 
+		
+		(* Rate limiting equally applies to positive and negative elements *)
+		If[Length[X] > absratelimit, 
+			X = Sort[RandomSample[X, absratelimit]]]; 
+
+		(* Pre-integration stochastic decay. *)
+		If[decay > 0, Xstate = 
+			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+
+		Xnormal = ResolveNormal[X];
+
+		(* Always learn. *)
+		M["store"][ResolveNormal[Xstate], Xnormal];
+
+		If[ prediction =!= Xnormal || Length[Xstate] >= abscapacity,
+			(* At a branch point or at capacity, emit chunk and reset state *)
+			chunk = ResolveNormal[Xstate];
+			Xstate = X,
+			
+			(* Else: temporal integration via update rules. *)
+			If[ ! (latch && Length[X] == 0), 
+				Xstate = plugin["updaterule"][X, Xstate]]
+			]; 
+
+		(* Proportional multiset subsampling applied to the integrated state,
+		 to break symmetry during retrieval. *)
+		Xdec = Xstate;
+		If[decimation < 1,  
+			Xdec = Sort[RandomSample[Xdec, Floor[decimation * Length[Xdec]]]]]; 
+
+		(* Predict next token. *)
+		prediction = M["retrieve"][ResolveNormal[Xdec]]
+		];
+
+		Sequence @@ MultisetBlockSplit[chunk, dims]
+		];
+
+	Join[ plugin, <| "function" -> f, 
+		"label" -> "["<> plugin["label"] <> "]",
+		"checks" -> {"arginp", "argout", "ident"},
+		"shape" -> "square", "fill" -> 14 |>, M]	
+	]
+
+
+(*
+Chunking memory component.
+Segments the input stream into chunks at prediction errors.
+A temporal-associative memory whose state, the open chunk, restarts 
+when it fails to predict the input.
+
+Per input X (inhibitory elements are applied and dropped):
+
+  - Learn the association open chunk -> X.
+  - If X was predicted and the chunk is below capacity, extend the chunk:
+      chunk' = pi[chunk] + X
+  - Otherwise the chunk is complete, and X starts a new one:
+      chunk' = sigma[X]
+  - Predict the next input from the open chunk.
+
+Empty input changes nothing: the open chunk and its prediction are kept.
+This makes the component event-driven, for instance on a stream of chunk names.
+
+pi and sigma are fixed, instance-specific permutations. pi codes the position 
+of an item within the chunk; sigma anchors the start of the chunk, so that a 
+chunk is never contained in a longer one and exact queries stay unambiguous.
+
+Options:
+  "capacity"  maximum population of the open chunk, in units of the input
+              population (default 4). With inputs of constant population and
+              no overlap, this is the maximum number of items in a chunk.
+  "fraction", "threshold"  memory retrieval parameters, passed to Memory.
+              Use "fraction" -> 1.0 for exact queries.
+
+Sends two blocks, both in the joined input space:
+  1. the open chunk, and
+  2. the completed chunk (empty unless a chunk completed in this cycle).
+
+The component does not name chunks; names come from a downstream component,
+for instance a heteroencoder on the completed chunk.
+*)
+
+chunkerX[config_Association] := 
+	Module[ {f, M, dims, params, pop, dim, abscapacity, pi, sigma, 
+			chunk = {}, prediction = {}},
+
+	dims = First /@ config["receive_blocks"];
+	params = Plus @@ config["receive_blocks"];
+	{dim, pop} = params;
+	
+	(* Maximum population of the open chunk. *)
+	abscapacity = Round[pop * Lookup[config, "capacity", 4]];
+	
+	(* Fixed, instance-specific permutations: position (pi) and chunk start (sigma). *)
+	pi = RandomSample[Range[dim]];
+	sigma = RandomSample[Range[dim]];
+
+	(* Memory with identical input and output parameters. *)
+	M = Memory[Join[config, 
+		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
+
+
+	f[blocks__List] := Module[ {X, completed = {}},
+		
+		(* Join partitions and apply inhibition. *)
+		X = ResolveBlockJoinNormal[{blocks}, dims];
+		
+		If[X =!= {},
+		
+			(* Always learn: open chunk -> input. *)
+			M["store"][Union[chunk], X];
+			
+			If[X === prediction && Length[chunk] < abscapacity,
+				
+				(* Predicted: extend the chunk. 
+				   Kept as a multiset, so that its population counts the items. *)
+				chunk = Sort[Join[pi[[chunk]], X]],
+				
+				(* Prediction error or full chunk: the chunk is complete. *)
+				completed = Union[chunk];
+				chunk = Sort[sigma[[X]]]
+				];
+				
+			(* Predict the next input. *)
+			prediction = M["retrieve"][Union[chunk]]
+			];
+
+		Sequence @@ {Union[chunk], completed}
+		];
+
+	Join[ <| "function" -> f, 
+		"checks" -> {"arginp", "twoout", "totaldimout"},
+		"shape" -> "square", "label" -> "[\[Pi]]", "size" -> 16, "fill" -> 14 |>, M]	
+	]
+
 
 
 (* 

@@ -290,14 +290,8 @@ language models. A fixed code that occurs in many stored patterns becomes a
 memory hub: its element pairs are written by every pattern and saturate, and
 the marker alone can exceed the matching threshold and pull up unrelated
 patterns or cause ties during memory retrieval. The same applies to any code shared by construction,
-such as position tags, length tags or depth codes. Better alternatives
-include:
+such as position tags, length tags or depth codes. 
 
-- marking the first item of a sequence by routing it through its own
-  permutation
-- detecting ends from the data, for example an empty retrieval or a failed
-  extension
-- using a unique label per structure rather than a shared marker
 
 ### Memory limits the size of bundles
 
