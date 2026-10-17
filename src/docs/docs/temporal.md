@@ -76,7 +76,8 @@ each signal to the subsequent signal.
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "replacement", "send": [11], "receive": [1]},
+	{"component": "temporal", "plugin": "replacement", 
+		"send": [11], "receive": [1]},
 	{"component": "output", "receive": [11]}
   ]}
 ```
