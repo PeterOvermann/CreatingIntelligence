@@ -513,21 +513,8 @@ output[config_Association] := Module[ {plugin, pluginconfig},
 	]
 
 
-(*
-The delay node encapsulates multiple functionalities:
-
-- signal delay
-- block coding and re-coding
-- proportional decimation (default: none)
-- rate limiting  (default: none)
-- temporal integration via internal capacity (default: none),
-    using the plugin mechanism for update rules.
-
-Multisets and inhibitory signals are handled transparently. 
-*)
-
 delay[config_Association] := 
-	Module[ {f, plugin, pluginfactory, pop, dims1, dims2, absthreshold, decay, decimation, 
+	Module[ {f, plugin, pluginfactory, pop, dims1, dims2, decay, decimation, 
 			absratelimit, abscapacity, latch, Xstate = {}},
 
 	pluginfactory = Lookup[config, "plugin", replacement];
@@ -540,8 +527,6 @@ delay[config_Association] :=
 
 	pop = Plus @@ Last /@ config["receive_blocks"];
 
-	(* Drop inputs below threshold population. *)
-	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims1] / pop]];	
 	(* Pre-integration decay (leak rate). *)			
@@ -557,9 +542,6 @@ delay[config_Association] :=
 	f[blocks__List] := Module[ {X, Xdec},
 		
 		X = MultisetBlockJoin[ {blocks}, dims1];
-		
-		(* Enforce minimum population. *)
-		If[Length[X] < absthreshold, X = {}];
 		
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 
@@ -591,7 +573,6 @@ delay[config_Association] :=
 	Join[ plugin, <| "function" -> f, "checks" -> {"arginp", "argout", "totaldim"},
 		"fill" -> 13 |>]	
 	]
-
 
 
 (* 
@@ -741,7 +722,7 @@ output and leaves the component unchanged (event-driven).
 *)
 
 temporal[config_Association] := 
-	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
+	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
 			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", permutation][config];
@@ -750,8 +731,6 @@ temporal[config_Association] :=
 	params = Plus @@ config["receive_blocks"];
 	pop  = Last[params];
 	
-	(* Drop inputs below threshold population. *)
-	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
 	(* Pre-integration decay (leak rate). *)			
@@ -771,10 +750,7 @@ temporal[config_Association] :=
 	f[blocks__List] := Module[ {X},
 		
 		X = MultisetBlockJoin[ {blocks}, dims];
-		
-		(* Enforce minimum population. *)
-		If[Length[X] < absthreshold, X = {}];
-		
+
 		(* Latch: empty input gives empty output, no learning, no state update. *)
 		If[X === {} && latch, Return[Unevaluated[Sequence @@ (({} &) /@ dims)]]];
 		
@@ -836,7 +812,7 @@ and goes to the update rule; the rest of the step is unchanged.
 *)
 
 chunker[config_Association] := 
-	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
+	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
 			absratelimit, abscapacity, latch, sigma, start, 
 			Xstate = {}, Xkey = {}, Xdec, prediction = {}},
 
@@ -846,8 +822,6 @@ chunker[config_Association] :=
 	params = Plus @@ config["receive_blocks"];
 	pop  = Last[params];
 	
-	(* Drop inputs below threshold population. *)
-	absthreshold = Round[pop * Lookup[config, "threshold", 0]];
 	(* Limit size of query pattern. Default: unlimited. *)			
 	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
 	(* Pre-integration decay (leak rate). *)			
@@ -875,9 +849,6 @@ chunker[config_Association] :=
 	f[blocks__List] := Module[ {X, Xnormal, chunk = {}},
 		
 		X = MultisetBlockJoin[ {blocks}, dims];
-		
-		(* Enforce minimum population. *)
-		If[Length[X] < absthreshold, X = {}];
 		
 		(* Latch: empty input gives empty output, no learning, no state update. *)
 		If[X === {} && latch, Return[Unevaluated[Sequence @@ (({} &) /@ dims)]]];
@@ -1782,7 +1753,7 @@ Circuit::encoder   = "`1` cannot be used as a decoder.";
 Circuit::decoder   = "`1` cannot be used as an encoder.";
 Circuit::regress   = "Regression: output should match `1`.";
 Circuit::multiplex = "Malformed multiplex specification `1`.";
-Circuit::context   = "`1`: context must be \"replace\" or \"hold\".";
+
 
 
 (* 

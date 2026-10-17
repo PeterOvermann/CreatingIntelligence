@@ -625,9 +625,6 @@ def delay(config):
     dims2 = [b[0] for b in config.get("send_blocks", [])]
     pop = sum(b[1] for b in config.get("receive_blocks", []))
 
-    threshold_factor = config.get("threshold", 0.0)
-    absthreshold = round(threshold_factor * pop)
-
     # Limit size of query pattern, relative to pop.
     # Default: total input dimension (no limit).
     if "rate_limit" in config:
@@ -646,10 +643,6 @@ def delay(config):
     def f(*blocks):
         nonlocal Xstate
         X = multiset_block_join(list(blocks), dims1)
-
-        # Enforce minimum population
-        if len(X) < absthreshold:
-            X = []
 
         if len(X) > absratelimit:
             X = sorted(
@@ -904,8 +897,6 @@ def temporal(config):
                                                      for b in receive_blocks)]
     pop = params[1] if len(params) > 1 else 0
 
-    threshold_factor = config.get("threshold", 0.0)
-    absthreshold = round(threshold_factor * pop)
 
     # Limit size of query pattern, relative to pop.
     # Default: total input dimension (no limit).
@@ -935,10 +926,6 @@ def temporal(config):
     def f(*blocks):
         nonlocal Xstate, prediction
         X = multiset_block_join(list(blocks), dims)
-
-        # Enforce minimum population
-        if len(X) < absthreshold:
-            X = []
 
         # Latch: empty input gives empty output, no learning, no state update
         if not X and latch:
@@ -1053,9 +1040,6 @@ def chunker(config):
         return sorted((1 if i > 0 else -1) * sigma[abs(i) - 1]
                       for i in x if i != 0)
 
-    # Drop inputs below threshold population
-    threshold_factor = config.get("threshold", 0.0)
-    absthreshold = round(threshold_factor * pop)
 
     # Limit size of query pattern, relative to pop.
     # Default: total input dimension (no limit).
@@ -1092,10 +1076,6 @@ def chunker(config):
         nonlocal Xstate, Xkey, prediction
         chunk = []
         X = multiset_block_join(list(blocks), dims)
-
-        # Enforce minimum population
-        if len(X) < absthreshold:
-            X = []
 
         # Latch: empty input gives empty output, no learning, no state update
         if not X and latch:

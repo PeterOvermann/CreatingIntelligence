@@ -1801,9 +1801,6 @@ def delay(config):
     dims2 = [b[0] for b in config.get("send_blocks", [])]
     pop = sum(b[1] for b in config.get("receive_blocks", []))
 
-    threshold_factor = config.get("threshold", 0.0)
-    absthreshold = round(threshold_factor * pop)
-
     # Limit size of query pattern, relative to pop.
     # Default: total input dimension (no limit).
     if "rate_limit" in config:
@@ -1822,10 +1819,6 @@ def delay(config):
     def f(*blocks):
         nonlocal Xstate
         X = multiset_block_join(list(blocks), dims1)
-
-        # Enforce minimum population
-        if len(X) < absthreshold:
-            X = []
 
         if len(X) > absratelimit:
             X = sorted(
@@ -2488,6 +2481,7 @@ Temporal associative memory component.
 - Uses update rule plugins to control the mechanics of temporal integration.
 - Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
 - With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
+- With `latch` (default), the component is event-driven, so empty cycles are skipped entirely.
 - Supports the same set of update rules as the [`delay`](delay.md) component.
 - Controls sparsity through stochastic subsampling mechanisms.  
 - Represents the integrated state as a multiset.
@@ -2502,11 +2496,10 @@ Temporal associative memory component.
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
-| `latch`	    | true | whether to pass empty inputs through without changing the state |  
-| `threshold`     | 0    |  clear input if relative population is below threshold |
+| `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
 | `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
-| `capacity`      | 1    | relative population carried over from previous state (bypassed with default `replacement` plugin) |
+| `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |
 
 <br>
@@ -2514,11 +2507,31 @@ Temporal associative memory component.
 Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
 
 
+## Temporal associative memory with state permutation
+
+The `temporal` component applies the [`permutation`](permutation.md) update rule by default.
+This mechanism accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", 
+		"send": [11], "receive": [1], "capacity": 2},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_permutation.png"><br>
+
+
+
 
 ## Temporal associative memory with replacement update
 
-The `temporal` component applies the [`replacement`](replacement.md) update rule by default.
-At every timestep, it replaces its internal state with the current input,
+With the [`replacement`](replacement.md) update rule, the current input
+replaces the internal state,
 bypassing the `capacity` setting. This mechanism directly associates
 each signal to the subsequent signal.
 
@@ -2527,7 +2540,7 @@ each signal to the subsequent signal.
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},
-	{"component": "temporal", "send": [11], "receive": [1]},
+	{"component": "temporal", "plugin": "replacement", "send": [11], "receive": [1]},
 	{"component": "output", "receive": [11]}
   ]}
 ```
@@ -2590,24 +2603,6 @@ aggregates an orderless temporal state.
 
 
 
-## Temporal associative memory with state permutation
-
-The [`permutation`](permutation.md) update rule plugin accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "permutation", 
-		"send": [11], "receive": [1], "capacity": 2},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_permutation.png"><br>
-
-
 
 
 ## Source code
@@ -2640,8 +2635,6 @@ def temporal(config):
                                                      for b in receive_blocks)]
     pop = params[1] if len(params) > 1 else 0
 
-    threshold_factor = config.get("threshold", 0.0)
-    absthreshold = round(threshold_factor * pop)
 
     # Limit size of query pattern, relative to pop.
     # Default: total input dimension (no limit).
@@ -2671,10 +2664,6 @@ def temporal(config):
     def f(*blocks):
         nonlocal Xstate, prediction
         X = multiset_block_join(list(blocks), dims)
-
-        # Enforce minimum population
-        if len(X) < absthreshold:
-            X = []
 
         # Latch: empty input gives empty output, no learning, no state update
         if not X and latch:
@@ -2872,15 +2861,6 @@ See also: https://creatingintelligence.org/#predictive-learning
 - Typically used as readout node in reservoir architectures.
 - Receives the label from its first `receive` block and data from the remaining blocks.
 - Always learns, also when the prediction was correct.
-- Optionally holds its data blocks. With `context` set to `hold`, each data block keeps
-  its last non-empty value, so the component can read from event-driven senders that
-  transmit only on change. The label is never held.
-- Holding works per receive block. Each block is replaced only by a non-empty input on
-  that block; a block that receives nothing keeps its own last value, independently of
-  the other blocks. Connect each event-driven sender to its own receive slot. If several
-  senders are merged into one slot (a bundled pathway), they form a single block: an
-  update from one sender then replaces the whole block, and the held contributions of the
-  other senders are lost.
 - A closed feedback loop enables generative prediction. 
 - Sends the inferred label.
 - Resolves multiset and inhibitory input prior to processing.
@@ -2894,7 +2874,6 @@ See also: https://creatingintelligence.org/#predictive-learning
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  two or more input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
-| `context`     | `replace`    |  `replace` takes every data input, so an empty block is empty; `hold` keeps each data block at its last non-empty value (per receive block, independently)  |
 
 <br>
 

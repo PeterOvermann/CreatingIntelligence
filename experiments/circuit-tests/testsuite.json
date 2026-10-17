@@ -1230,9 +1230,13 @@
         {
           "component": "delay",
           "send": [21],
-          "receive": [11],
-          "latch": true,
-          "threshold": 0.8
+          "receive": [
+            {
+              "slot": 11,
+              "tags": ["threshold"]
+            }
+          ],
+          "latch": true
         },
         {
           "component": "output",
