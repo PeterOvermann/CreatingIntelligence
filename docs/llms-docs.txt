@@ -1,4 +1,4 @@
-# Generated from main on 2026-10-16
+# Generated from main on 2026-10-17
 
 # Source: README.md
 
@@ -2501,8 +2501,8 @@ Temporal associative memory component.
 |:------------|:-----:|:----------------------------------------|
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
-| `plugin`	    | [`replacement`](replacement.md) | update rule, governing the temporal integration logic |  
-| `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
+| `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
+| `latch`	    | true | whether to pass empty inputs through without changing the state |  
 | `threshold`     | 0    |  clear input if relative population is below threshold |
 | `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
@@ -2614,14 +2614,22 @@ The [`permutation`](permutation.md) update rule plugin accumulates a temporal st
 
 ```python
 def temporal(config):
-    plugin_factory = config.get("plugin", replacement)
+    """
+    Temporal-associative memory component.
+    Learns higher-order sequences on the fly and predicts the next token.
+    A hybrid between auto-associative and hetero-associative architectures.
+    Uses the same temporal integration plugins and parameterization as
+    "delay". Default plugin: permutation. With latch (default), empty input
+    gives empty output and leaves the component unchanged (event-driven).
+    """
+    plugin_factory = config.get("plugin", permutation)
 
     if isinstance(plugin_factory, str):
         import sys
         plugin_factory = getattr(
             sys.modules[__name__],
             plugin_factory,
-            replacement)
+            permutation)
 
     plugin = plugin_factory(config)
 
@@ -2646,7 +2654,8 @@ def temporal(config):
     capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
-    latch = config.get("latch", False)
+    # Latch: empty input leaves the component unchanged
+    latch = config.get("latch", True)
 
     # Memory with identical input and output parameters
     m_config = dict(config)
@@ -2667,6 +2676,10 @@ def temporal(config):
         if len(X) < absthreshold:
             X = []
 
+        # Latch: empty input gives empty output, no learning, no state update
+        if not X and latch:
+            return tuple(multiset_block_split([], dims))
+
         # Rate limiting equally applies to positive and negative elements
         if len(X) > absratelimit:
             X = sorted(
@@ -2675,31 +2688,28 @@ def temporal(config):
                     size=absratelimit,
                     replace=False).tolist())
 
-        # Latch: an empty input leaves the state unchanged
-        # (no decay, no capacity subsampling, no integration)
-        if not (latch and len(X) == 0):
-            # Pre-integration stochastic decay
-            if decay > 0.0:
-                keep_size = math.floor((1.0 - decay) * len(Xstate))
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=keep_size,
-                        replace=False).tolist())
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
 
-            # Always learn.
-            M["store"](resolve_normal(Xstate), resolve_normal(X))
+        # Always learn.
+        M["store"](resolve_normal(Xstate), resolve_normal(X))
 
-            # Multiset subsampling applied to previous state
-            if len(Xstate) > abscapacity:
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=abscapacity,
-                        replace=False).tolist())
+        # Multiset subsampling applied to previous state
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=abscapacity,
+                    replace=False).tolist())
 
-            # Temporal integration via update rules
-            Xstate = plugin["updaterule"](X, Xstate)
+        # Temporal integration via update rules
+        Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to the integrated state
         Xdec = Xstate
@@ -2916,14 +2926,9 @@ A basic setup for predictive learning with hetero-associative memory:
 ```python
 def predictor(config):
     """
-    Generates a prediction based on the current input (slot #1)
+    Generates a prediction based on the current input (slot #1) 
     and context (slots #2,...).
     Automatically learns the correct prediction in the following cycle.
-
-    The context option sets how the context blocks are taken:
-    "replace" (default) takes every input, so an empty block is empty;
-    "hold" keeps each block at its last non-empty value, for receivers
-    of event-driven senders that emit only on change.
     """
     receive_blocks = config.get("receive_blocks", [])
     itemconfig = receive_blocks[0]
@@ -2931,13 +2936,6 @@ def predictor(config):
 
     # Extract decimation parameter, defaulting to 1.0
     decimation = config.get("decimate", 1.0)
-
-    # Context: "replace" (take every input) or "hold" (keep last non-empty)
-    context_mode = config.get("context", "replace")
-    if context_mode not in ("replace", "hold"):
-        raise CircuitError(
-            "predictor: context must be \"replace\" or \"hold\".")
-    hold = context_mode == "hold"
 
     params_A = [sum(b[0] for b in contextconfig), sum(b[1]
                     for b in contextconfig)]
@@ -2952,18 +2950,12 @@ def predictor(config):
     M = Memory(m_config)
     X = []
     prediction = []
-    held = [[] for _ in contextconfig]
 
     def f(item, *blocks):
-        nonlocal X, prediction, held
+        nonlocal X, prediction
         Y = resolve_normal(item)
 
         M["store"](X, Y) # always learn
-
-        # Hold: an empty block keeps its last non-empty value
-        if hold:
-            held = [b if b else h for b, h in zip(blocks, held)]
-            blocks = held
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -2983,19 +2975,12 @@ def predictor(config):
 
         return (prediction,)
 
-    def clear():
-        nonlocal X, prediction, held
-        M["clear"]()
-        X, prediction = [], []
-        held = [[] for _ in contextconfig]
-
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
         "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
     }
     result.update(M)
-    result["clear"] = clear
     return result
 ```
 

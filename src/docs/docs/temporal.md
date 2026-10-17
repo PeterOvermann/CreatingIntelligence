@@ -30,8 +30,8 @@ Temporal associative memory component.
 |:------------|:-----:|:----------------------------------------|
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
-| `plugin`	    | [`replacement`](replacement.md) | update rule, governing the temporal integration logic |  
-| `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
+| `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
+| `latch`	    | true | whether to pass empty inputs through without changing the state |  
 | `threshold`     | 0    |  clear input if relative population is below threshold |
 | `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |

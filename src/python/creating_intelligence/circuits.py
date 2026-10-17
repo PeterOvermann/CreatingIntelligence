@@ -878,14 +878,22 @@ Uses the same temporal integration parametrization as "delay".
 """
 
 def temporal(config):
-    plugin_factory = config.get("plugin", replacement)
+    """
+    Temporal-associative memory component.
+    Learns higher-order sequences on the fly and predicts the next token.
+    A hybrid between auto-associative and hetero-associative architectures.
+    Uses the same temporal integration plugins and parameterization as
+    "delay". Default plugin: permutation. With latch (default), empty input
+    gives empty output and leaves the component unchanged (event-driven).
+    """
+    plugin_factory = config.get("plugin", permutation)
 
     if isinstance(plugin_factory, str):
         import sys
         plugin_factory = getattr(
             sys.modules[__name__],
             plugin_factory,
-            replacement)
+            permutation)
 
     plugin = plugin_factory(config)
 
@@ -910,7 +918,8 @@ def temporal(config):
     capacity_factor = config.get("capacity", 1.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
-    latch = config.get("latch", False)
+    # Latch: empty input leaves the component unchanged
+    latch = config.get("latch", True)
 
     # Memory with identical input and output parameters
     m_config = dict(config)
@@ -931,6 +940,10 @@ def temporal(config):
         if len(X) < absthreshold:
             X = []
 
+        # Latch: empty input gives empty output, no learning, no state update
+        if not X and latch:
+            return tuple(multiset_block_split([], dims))
+
         # Rate limiting equally applies to positive and negative elements
         if len(X) > absratelimit:
             X = sorted(
@@ -939,31 +952,28 @@ def temporal(config):
                     size=absratelimit,
                     replace=False).tolist())
 
-        # Latch: an empty input leaves the state unchanged
-        # (no decay, no capacity subsampling, no integration)
-        if not (latch and len(X) == 0):
-            # Pre-integration stochastic decay
-            if decay > 0.0:
-                keep_size = math.floor((1.0 - decay) * len(Xstate))
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=keep_size,
-                        replace=False).tolist())
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
 
-            # Always learn.
-            M["store"](resolve_normal(Xstate), resolve_normal(X))
+        # Always learn.
+        M["store"](resolve_normal(Xstate), resolve_normal(X))
 
-            # Multiset subsampling applied to previous state
-            if len(Xstate) > abscapacity:
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=abscapacity,
-                        replace=False).tolist())
+        # Multiset subsampling applied to previous state
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=abscapacity,
+                    replace=False).tolist())
 
-            # Temporal integration via update rules
-            Xstate = plugin["updaterule"](X, Xstate)
+        # Temporal integration via update rules
+        Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to the integrated state
         Xdec = Xstate
@@ -998,13 +1008,21 @@ def chunker(config):
     
     Chunking memory component (port of chunker.m).
     Same temporal integration as "temporal", but emits the chunk instead of
-    the prediction: as long as the input is predicted, the state integrates
-    it and the output is empty. At a prediction error, or when the state
-    holds capacity items, the integrated state is sent as the completed
-    chunk and the state restarts with the input. The first item of a chunk
-    enters through a fixed permutation of its own (the start route), so
-    that no chunk code is contained in a longer one. Empty input gives
-    empty output and leaves the component unchanged (event-driven).
+    the prediction. Each input is integrated into the state, and the next
+    input is predicted from the state. The chunk closes as soon as its
+    continuation is open: when the prediction is not a single item (empty
+    or a superposition), or when the state holds capacity items, the state
+    is sent as the completed chunk, including the current input, and the
+    next input starts a new chunk. A completed chunk is thus sent one step
+    before the input that would have contradicted the prediction. If an
+    input contradicts a single-item prediction (a surprise), the state is
+    sent as the completed chunk without the input, and the input starts
+    the new chunk. The first item of a chunk enters through a fixed
+    permutation of its own (the start route), so that no chunk code is
+    contained in a longer one. With latch (default), empty input gives
+    empty output and leaves the component unchanged (event-driven). Without
+    latch, empty input skips the surprise test and goes to the update rule;
+    the rest of the step is unchanged.
     """
     plugin_factory = config.get("plugin", permutation)
 
@@ -1053,7 +1071,8 @@ def chunker(config):
     abscapacity = round(capacity_factor * pop)
     # Proportional stochastic subsampling for memory query
     decimation = config.get("decimate", 1.0)
-    latch = config.get("latch", False)
+    # Latch: empty input leaves the component unchanged
+    latch = config.get("latch", True)
 
     # Memory with identical input and output parameters
     m_config = dict(config)
@@ -1063,11 +1082,14 @@ def chunker(config):
     })
 
     M = Memory(m_config)
+    # Xstate: the open chunk (empty: none). Xkey: the state the last
+    # prediction was made from, the key for learning the next input.
     Xstate = []
+    Xkey = []
     prediction = []
 
     def f(*blocks):
-        nonlocal Xstate, prediction
+        nonlocal Xstate, Xkey, prediction
         chunk = []
         X = multiset_block_join(list(blocks), dims)
 
@@ -1075,8 +1097,8 @@ def chunker(config):
         if len(X) < absthreshold:
             X = []
 
-        # Empty input: empty output, no learning, no state update
-        if not X:
+        # Latch: empty input gives empty output, no learning, no state update
+        if not X and latch:
             return tuple(multiset_block_split([], dims))
 
         # Rate limiting equally applies to positive and negative elements
@@ -1099,17 +1121,19 @@ def chunker(config):
         Xnormal = resolve_normal(X)
 
         # Always learn.
-        M["store"](resolve_normal(Xstate), Xnormal)
+        M["store"](Xkey, Xnormal)
 
-        if list(prediction) != Xnormal or len(Xstate) >= abscapacity:
-            # At a branch point or at capacity, emit chunk and restart
-            # the state with the input on the start route
+        if not Xstate or (X and list(prediction) != Xnormal):
+            # No open chunk, or a surprise (the input contradicts a
+            # single-item prediction): emit the open chunk, if any, without
+            # the input, and start a new chunk with the input. Empty input
+            # (only without latch) is never a surprise: it goes to the
+            # update rule
             chunk = resolve_normal(Xstate)
             Xstate = start(X)
         else:
-            # Else: temporal integration via update rules
-            if not (latch and len(X) == 0):
-                Xstate = plugin["updaterule"](X, Xstate)
+            # Temporal integration via update rules
+            Xstate = plugin["updaterule"](X, Xstate)
 
         # Proportional multiset subsampling applied to the integrated state,
         # to break symmetry during retrieval
@@ -1124,6 +1148,16 @@ def chunker(config):
 
         # Predict next token
         prediction = M["retrieve"](resolve_normal(Xdec))
+        Xkey = resolve_normal(Xstate)
+
+        # Open continuation (not a single item) or capacity reached: emit
+        # the chunk including the input; the next input starts a new chunk.
+        # Not in a step that already emitted a chunk (surprise); then the
+        # new one-item chunk closes at the next input.
+        if not chunk and (len(prediction) != pop
+                          or len(Xstate) >= abscapacity):
+            chunk = resolve_normal(Xstate)
+            Xstate = []
 
         return tuple(multiset_block_split(chunk, dims))
 
@@ -1234,14 +1268,9 @@ def heteroencoder(config):
 
 def predictor(config):
     """
-    Generates a prediction based on the current input (slot #1)
+    Generates a prediction based on the current input (slot #1) 
     and context (slots #2,...).
     Automatically learns the correct prediction in the following cycle.
-
-    The context option sets how the context blocks are taken:
-    "replace" (default) takes every input, so an empty block is empty;
-    "hold" keeps each block at its last non-empty value, for receivers
-    of event-driven senders that emit only on change.
     """
     receive_blocks = config.get("receive_blocks", [])
     itemconfig = receive_blocks[0]
@@ -1249,13 +1278,6 @@ def predictor(config):
 
     # Extract decimation parameter, defaulting to 1.0
     decimation = config.get("decimate", 1.0)
-
-    # Context: "replace" (take every input) or "hold" (keep last non-empty)
-    context_mode = config.get("context", "replace")
-    if context_mode not in ("replace", "hold"):
-        raise CircuitError(
-            "predictor: context must be \"replace\" or \"hold\".")
-    hold = context_mode == "hold"
 
     params_A = [sum(b[0] for b in contextconfig), sum(b[1]
                     for b in contextconfig)]
@@ -1270,18 +1292,12 @@ def predictor(config):
     M = Memory(m_config)
     X = []
     prediction = []
-    held = [[] for _ in contextconfig]
 
     def f(item, *blocks):
-        nonlocal X, prediction, held
+        nonlocal X, prediction
         Y = resolve_normal(item)
 
         M["store"](X, Y) # always learn
-
-        # Hold: an empty block keeps its last non-empty value
-        if hold:
-            held = [b if b else h for b, h in zip(blocks, held)]
-            blocks = held
 
         X = resolve_block_join_normal(
             list(blocks), [b[0] for b in contextconfig])
@@ -1301,19 +1317,12 @@ def predictor(config):
 
         return (prediction,)
 
-    def clear():
-        nonlocal X, prediction, held
-        M["clear"]()
-        X, prediction = [], []
-        held = [[] for _ in contextconfig]
-
     result = {
         "function": f,
         "checks": ["dimfirst", "oneout"],
         "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
     }
     result.update(M)
-    result["clear"] = clear
     return result
     
     

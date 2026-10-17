@@ -736,13 +736,15 @@ Temporal-associative memory component.
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
 Uses the same temporal integration plugins and parameterization as "delay".
+Default plugin: permutation. With latch (default), empty input gives empty
+output and leaves the component unchanged (event-driven).
 *)
 
 temporal[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
 			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
 
-	plugin = Lookup[config, "plugin", replacement][config];
+	plugin = Lookup[config, "plugin", permutation][config];
 
 	dims = First /@ config["receive_blocks"];
 	params = Plus @@ config["receive_blocks"];
@@ -758,8 +760,8 @@ temporal[config_Association] :=
 	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
-	(* Latch option. *)
-	latch = Lookup[config, "latch", False];
+	(* Latch: empty input leaves the component unchanged. *)
+	latch = Lookup[config, "latch", True];
 
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
@@ -773,27 +775,25 @@ temporal[config_Association] :=
 		(* Enforce minimum population. *)
 		If[Length[X] < absthreshold, X = {}];
 		
+		(* Latch: empty input gives empty output, no learning, no state update. *)
+		If[X === {} && latch, Return[Unevaluated[Sequence @@ (({} &) /@ dims)]]];
+		
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 
 			X = Sort[RandomSample[X, absratelimit]]]; 
 
-		(* Latch: an empty input leaves the state unchanged
-		   (no decay, no capacity subsampling, no integration). *)
-		If[ ! (latch && Length[X] == 0),
-		
-			(* Pre-integration stochastic decay. *)
-			If[decay > 0, Xstate = 
-				Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+		(* Pre-integration stochastic decay. *)
+		If[decay > 0, Xstate = 
+			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 
-			(* Always learn. *)
-			M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
+		(* Always learn. *)
+		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
 
-			(* Multiset subsampling applied to previous state. *)
-			Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
-		
-			(* Temporal integration via update rules. *)
-			Xstate = plugin["updaterule"][X, Xstate]
-			]; 
+		(* Multiset subsampling applied to previous state. *)
+		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+	
+		(* Temporal integration via update rules. *)
+		Xstate = plugin["updaterule"][X, Xstate];
 
 		(* Proportional multiset subsampling applied to the integrated state,
 		 to break symmetry during retrieval. *)
@@ -813,24 +813,32 @@ temporal[config_Association] :=
 	]
 
 
-
 (*
 
 EXPERIMENTAL
 
 Chunking memory component.
 Same temporal integration as "temporal", but sends the chunk instead of the
-prediction. The state integrates the input as long as it is predicted; at a
-prediction error, or when the state holds capacity items, the state is sent
-as the completed chunk and restarts with the input. The first item of a chunk
-enters through a fixed permutation of its own (the start route), so that no
-chunk code is contained in a longer one.
-Empty input gives empty output and leaves the component unchanged.
+prediction. Each input is integrated into the state, and the next input is
+predicted from the state. The chunk closes as soon as its continuation is
+open: when the prediction is not a single item (empty or a superposition),
+or when the state holds capacity items, the state is sent as the completed
+chunk, including the current input, and the next input starts a new chunk.
+A completed chunk is thus sent one step before the input that would have
+contradicted the prediction. If an input contradicts a single-item
+prediction (a surprise), the state is sent as the completed chunk without
+the input, and the input starts the new chunk. The first item of a chunk
+enters through a fixed permutation of its own (the start route), so that
+no chunk code is contained in a longer one.
+With latch (default), empty input gives empty output and leaves the component
+unchanged (event-driven). Without latch, empty input skips the surprise test
+and goes to the update rule; the rest of the step is unchanged.
 *)
 
 chunker[config_Association] := 
 	Module[ {f, M, plugin, dims, params, pop, absthreshold, decay, decimation, 
-			absratelimit, abscapacity, latch, sigma, Xstate = {}, Xdec, prediction = {}},
+			absratelimit, abscapacity, latch, sigma, start, 
+			Xstate = {}, Xkey = {}, Xdec, prediction = {}},
 
 	plugin = Lookup[config, "plugin", permutation][config];
 
@@ -844,16 +852,20 @@ chunker[config_Association] :=
 	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
-	(* Temporal capacity, carry over from previous cycle. *)
+	(* Temporal capacity. *)
 	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
-	(* Latch option. *)
-	latch = Lookup[config, "latch", False];
+	(* Latch: empty input leaves the component unchanged. *)
+	latch = Lookup[config, "latch", True];
 	
 	(* Start route: the first item of a chunk enters through its own fixed
 	   permutation, so that no chunk code is contained in a longer one. *)
 	sigma = RandomSample[Range[First[params]]];
+	start[x_List] := Sort[Sign[x] * sigma[[Abs[x]]]];
+	
+	(* Xstate: the open chunk (empty: none). Xkey: the state the last
+	   prediction was made from, the key for learning the next input. *)
 
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
@@ -867,8 +879,8 @@ chunker[config_Association] :=
 		(* Enforce minimum population. *)
 		If[Length[X] < absthreshold, X = {}];
 		
-		(* Empty input: empty output, no learning, no state update. *)
-		If[X =!= {}, 
+		(* Latch: empty input gives empty output, no learning, no state update. *)
+		If[X === {} && latch, Return[Unevaluated[Sequence @@ (({} &) /@ dims)]]];
 		
 		(* Rate limiting equally applies to positive and negative elements *)
 		If[Length[X] > absratelimit, 
@@ -881,18 +893,20 @@ chunker[config_Association] :=
 		Xnormal = ResolveNormal[X];
 
 		(* Always learn. *)
-		M["store"][ResolveNormal[Xstate], Xnormal];
+		M["store"][Xkey, Xnormal];
 
-		If[ prediction =!= Xnormal || Length[Xstate] >= abscapacity,
-			(* At a branch point or at capacity, emit chunk and restart
-			   the state with the input on the start route. *)
+		If[ Xstate === {} || (X =!= {} && prediction =!= Xnormal),
+			(* No open chunk, or a surprise (the input contradicts a
+			   single-item prediction): emit the open chunk, if any, without
+			   the input, and start a new chunk with the input. Empty input
+			   (only without latch) is never a surprise: it goes to the
+			   update rule. *)
 			chunk = ResolveNormal[Xstate];
-			Xstate = Sort[Sign[X] * sigma[[Abs[X]]]],
+			Xstate = start[X],
 			
-			(* Else: temporal integration via update rules. *)
-			If[ ! (latch && Length[X] == 0), 
-				Xstate = plugin["updaterule"][X, Xstate]]
-			]; 
+			(* Temporal integration via update rules. *)
+			Xstate = plugin["updaterule"][X, Xstate]
+			];
 
 		(* Proportional multiset subsampling applied to the integrated state,
 		 to break symmetry during retrieval. *)
@@ -901,8 +915,18 @@ chunker[config_Association] :=
 			Xdec = Sort[RandomSample[Xdec, Floor[decimation * Length[Xdec]]]]]; 
 
 		(* Predict next token. *)
-		prediction = M["retrieve"][ResolveNormal[Xdec]]
-		];
+		prediction = M["retrieve"][ResolveNormal[Xdec]];
+		Xkey = ResolveNormal[Xstate];
+
+		(* Open continuation (not a single item) or capacity reached: emit
+		   the chunk including the input; the next input starts a new chunk.
+		   Not in a step that already emitted a chunk (surprise); then the
+		   new one-item chunk closes at the next input. *)
+		If[chunk === {} && 
+			(Length[prediction] != pop || Length[Xstate] >= abscapacity),
+			chunk = ResolveNormal[Xstate];
+			Xstate = {}
+			];
 
 		Sequence @@ MultisetBlockSplit[chunk, dims]
 		];
@@ -912,6 +936,7 @@ chunker[config_Association] :=
 		"checks" -> {"arginp", "argout", "ident"},
 		"shape" -> "square", "fill" -> 14 |>, M]	
 	]
+
 
 
 (* 
@@ -990,61 +1015,40 @@ Generates a prediction based on the current input (slot #1)
 and context (slots #2,...).
 Automatically learns the correct prediction in the following cycle.
 To do so, the node remembers its context from the previous cycle.
-The "context" option sets how the context blocks are taken:
-"replace" (default) takes every input, so an empty block is empty;
-"hold" keeps each block at its last non-empty value, for receivers
-of event-driven senders that emit only on change.
 *)
 
 predictor[config_Association] := 
 		Module[ {f, M, X = {}, prediction = {}, decimation,
-						itemconfig, contextconfig, hold, held, clear},
+						itemconfig, contextconfig},
 
 	decimation = Lookup[config, "decimate", 1];
 	itemconfig = First[config["receive_blocks"]];
-	(* Context may be partitioned *)
-	contextconfig = Rest[config["receive_blocks"]]; 
-	
-	(* Context: "replace" (take every input) or 
-					"hold" (keep last non-empty) *)
-	hold = Lookup[config, "context", "replace"];
-	If[ !MemberQ[{"replace", "hold"}, hold],
-		Message[Circuit::context, "predictor"]; Return[<||>]];
-	hold = (hold === "hold");
-	held = ConstantArray[{}, Length[contextconfig]];
+	contextconfig = Rest[config["receive_blocks"]]; (* Context may be partitioned *)
 	
 	M = Memory[Join[config, <|
 		"A_parameters" -> Plus @@ contextconfig,
 		"B_parameters" -> itemconfig   |> ]]; 
 	
-	f[item_List, blocks__List] := Module[{Y, Xdec, ctx = {blocks}},
+	f[item_List, blocks__List] := Module[{Y, Xdec},
 	
 		Y = ResolveNormal[item];
 		(* State X from previous cycle *)
 		(* Always learn. Also when the prediction was correct. *)
 		M["store"][X, Y];
 		
-		(* Hold: an empty block keeps its last non-empty value *)
-		If[hold,
-			held = MapThread[If[#1 === {}, #2, #1]&, {ctx, held}];
-			ctx = held];
-		
-		X = ResolveBlockJoinNormal[ctx, First /@ contextconfig];
+		X = ResolveBlockJoinNormal[ {blocks}, First /@ contextconfig];
 
 		Xdec = Sort[RandomSample[X, Floor[decimation * Length[X]]]];
 		
 		prediction = M["retrieve"][Xdec]
 		]; 
-	
-	(* Clears the memory and the node's state, including held blocks *)
-	clear := (M["clear"]; X = {}; prediction = {};
-		held = ConstantArray[{}, Length[contextconfig]];);
+
 
 	Join[ <| "function" -> f, "checks" -> {"dimfirst", "oneout"}, 
 		"shape" -> "square", "fill" -> 11, "size" -> 18,
-		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M,
-		<| "clear" :> clear |>]
+		"label" -> "\[FilledRightTriangle]\[FilledRightTriangle]" |>, M]
 	]
+
 
 
 (* 
