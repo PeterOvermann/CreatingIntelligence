@@ -114,7 +114,7 @@ removes the retrieved pattern from the query pattern, leaving only the novel ele
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},
-	{"component": "auto", "plugin": "residual", "send": [2], "receive": [1]},
+	{"component": "auto", "plugin": "complement", "send": [2], "receive": [1]},
 	{"component": "output", "receive": [2]}
   ]}
 ```
