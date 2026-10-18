@@ -240,7 +240,7 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    Set <span class="op">*</span>X<span class="op">;</span>                             <span class="co">//  Matching elements from last memory retrieval.</span></span>
 <span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> fraction<span class="op">;</span>                    <span class="co">//  Relative pattern matching threshold: fraction of</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> matching<span class="op">;</span>                    <span class="co">//  Relative pattern matching threshold: fraction of</span></span>
 <span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>                                        <span class="co">//  the query population that must match</span></span>
 <span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>                                        <span class="co">//  (0 = fixed threshold T only, 1 = all elements)</span></span>
 <span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> Memory<span class="op">;</span></span>
@@ -254,8 +254,8 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>  Memory_get_threshold <span class="op">(</span>Memory<span class="op">*);</span></span>
 <span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="co">//  Relative pattern matching threshold (fraction of the query population)</span></span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>   Memory_set_fraction <span class="op">(</span>Memory<span class="op">*,</span> <span class="dt">double</span><span class="op">);</span></span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> Memory_get_fraction <span class="op">(</span>Memory<span class="op">*);</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span>   Memory_set_matching <span class="op">(</span>Memory<span class="op">*,</span> <span class="dt">double</span><span class="op">);</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> Memory_get_matching <span class="op">(</span>Memory<span class="op">*);</span></span>
 <span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="co">//  Destructor</span></span>
 <span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Memory_free <span class="op">(</span>Memory<span class="op">*);</span></span>

@@ -33,8 +33,8 @@ Memory[config_Association] :=
 
 		(* Optional relative threshold (fraction of the query population).
 			CForm yields a C-readable real, e.g. "0.9", "1." or "1.e-6". *)
-		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
-			fopt = "-F"; F = ToString[CForm[N[config["fraction"]]]]];
+		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
+			fopt = "-M"; F = ToString[CForm[N[config["matching"]]]]];
 			
 		process = StartProcess[{FileNameJoin[ 
 			{$UserBaseDirectory, "SystemFiles", "LibraryResources", 
@@ -69,7 +69,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"fraction" -> Lookup[config, "fraction", 0.0],
+			"matching" -> Lookup[config, "matching", 0.0],
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

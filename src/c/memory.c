@@ -560,7 +560,7 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Bpopulation	= pb;
 	
 	self->T = matching_threshold(na, pa, nb, pb);	// Absolute pattern matching threshold
-	self->fraction = 0.0;							// Relative threshold disabled
+	self->matching = 0.0;							// Relative threshold disabled
 
 	self->M = (byte***) calloc(PAGE_COUNT, sizeof( byte**));
 	
@@ -585,14 +585,14 @@ int 	Memory_get_threshold (Memory *self)	// Recall threshold
 	return self->T;
 	}
 
-void 	Memory_set_fraction (Memory *self, double f)	// Relative threshold
+void 	Memory_set_matching (Memory *self, double f)	// Relative threshold
 	{
-	self->fraction = f;
+	self->matching = f;
 	}
 
-double 	Memory_get_fraction (Memory *self)
+double 	Memory_get_matching (Memory *self)
 	{
-	return self->fraction;
+	return self->matching;
 	}
 
 
@@ -705,13 +705,13 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	Set *X = self->X;
 	Set_copy(X, A);
 
-	// Per-query threshold Tq = max(T, ceil(fraction * |A|)).
+	// Per-query threshold Tq = max(T, ceil(matching * |A|)).
 	// The offset guards against floating-point round-up.
 	// Integer ceiling avoids a dependency on libm.
 	int Tq = self->T;
-	if (self->fraction > 0.0)
+	if (self->matching > 0.0)
 		{
-		double v = self->fraction * A->p - 1e-9;
+		double v = self->matching * A->p - 1e-9;
 		int c = (int) v;
 		if (v > c) c++;
 		if (c > Tq) Tq = c;

@@ -224,7 +224,7 @@ pprint(mem)
  'T': 7,
  'backend': 'c_ffi',
  'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
- 'fraction': 0.0,
+ 'matching': 0.0,
  'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
  'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
  'store': <function Memory.<locals>.store at 0x109a65d20>}
@@ -253,7 +253,7 @@ Properties of the output dictionary:
 | `A_parameters`      |   input layer hyperparameters [N,P]  |
 | `B_parameters` |  output layer parameters  |
 | `T` |  retrieval pattern matching threshold   |
-| `fraction` | fraction of the query population that must match |
+| `matching` | fraction of the query population that must match |
 | `store` |  write to memory  |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
@@ -1219,10 +1219,10 @@ relative `threshold` decides how much overlap counts as "the same". For
 example, it sets how far apart two color hues must be to receive different
 tokens.
 
-### Exact matching with `fraction` 1.0
+### Exact matching with `matching` 1.0
 
-The `fraction` option sets the share of the query population that must match.
-With `fraction` 1.0, every element of the query must be part of the match:
+The `matching` option sets the fraction of the query population that must match.
+With `matching` 1.0, every element of the query must be part of the match:
 the noise-removing iterations of the retrieval algorithm are skipped, and a
 query either matches as a whole or returns an empty result. This is typically
 used for heteroencoding combinations of symbolic tokens, such as bigrams or
@@ -4482,7 +4482,7 @@ def Memory(config: dict) -> dict:
 
     # Optional relative threshold: fraction of the query population that must
     # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
-    fraction = config.get("fraction") or 0.0
+    matching = config.get("matching") or 0.0
 
     # Initialize enclosed memory dictionary and zero array
     mem = {}
@@ -4512,7 +4512,7 @@ def Memory(config: dict) -> dict:
         X = A
         
         # Per-query threshold, at least the fixed threshold T
-        Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
+        Tq = max(T, math.ceil(matching * len(X) - 1e-9))
 
         while True:
             P = len(X)
@@ -4571,7 +4571,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "fraction": fraction,
+        "matching": matching,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,
@@ -4632,7 +4632,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, matching = 0, capacity, zero,
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -4659,8 +4659,8 @@ Memory[config_Association] :=
 		(* Optional relative threshold: Fraction of the query population 
 			that must match (1 = all input bits). Absent or 0 keeps 
 			the fixed threshold T. *)
-		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
-			fraction = config["fraction"]];
+		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
+			matching = config["matching"]];
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
@@ -4685,7 +4685,7 @@ Memory[config_Association] :=
 			
 			(* Per-query threshold, at least the fixed threshold T. 
 				The offset guards against floating-point round-up. *)
-			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
+			Tq = Max[T, Ceiling[matching * Length[X] - 10^-9]];
 			
 			While[ True,
 				(* Step 2: Threshold check.  *)
@@ -4740,7 +4740,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"fraction" -> fraction,
+			"matching" -> matching,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -4857,7 +4857,7 @@ typedef struct
 	
 	Set *X;								//	Matching elements from last memory retrieval.
 
-	double fraction;					//	Relative pattern matching threshold: fraction of
+	double matching;					//	Relative pattern matching threshold: fraction of
 										//	the query population that must match
 										//	(0 = fixed threshold T only, 1 = all elements)
 	} Memory;
@@ -4871,8 +4871,8 @@ void Memory_set_threshold (Memory*, int);
 int  Memory_get_threshold (Memory*);
 
 //	Relative pattern matching threshold (fraction of the query population)
-void   Memory_set_fraction (Memory*, double);
-double Memory_get_fraction (Memory*);
+void   Memory_set_matching (Memory*, double);
+double Memory_get_matching (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);

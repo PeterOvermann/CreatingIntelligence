@@ -26,7 +26,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, fraction = 0, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, matching = 0, capacity, zero,
 		store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -53,8 +53,8 @@ Memory[config_Association] :=
 		(* Optional relative threshold: Fraction of the query population 
 			that must match (1 = all input bits). Absent or 0 keeps 
 			the fixed threshold T. *)
-		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
-			fraction = config["fraction"]];
+		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
+			matching = config["matching"]];
 
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
@@ -79,7 +79,7 @@ Memory[config_Association] :=
 			
 			(* Per-query threshold, at least the fixed threshold T. 
 				The offset guards against floating-point round-up. *)
-			Tq = Max[T, Ceiling[fraction * Length[X] - 10^-9]];
+			Tq = Max[T, Ceiling[matching * Length[X] - 10^-9]];
 			
 			While[ True,
 				(* Step 2: Threshold check.  *)
@@ -134,7 +134,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"fraction" -> fraction,
+			"matching" -> matching,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

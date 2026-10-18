@@ -37,7 +37,7 @@ static void print_help(void)
 
 	printf("Command line options: \n");
 	printf("   -T <threshold>\n");
-	printf("   -F <fraction>\n\n");
+	printf("   -M <matching>\n\n");
 
 	printf("Store A -> B:\n");
 	printf("1 2 3 4 5 6 7 8 9 10 -> 11 12 13 14 15 16 17 18 19 20\n\n");
@@ -49,7 +49,7 @@ static void print_help(void)
 	printf("   threshold\n\n");
 
 	printf("Relative matching threshold\n");
-	printf("   fraction\n\n");
+	printf("   matching\n\n");
 
 	printf("Memory count (bits)\n");
 	printf("   memorycount\n\n");
@@ -96,16 +96,16 @@ int main(int argc, char *argv[])
 	
 	// Options, in any order:
 	// -T <threshold>	User-defined absolute activation threshold
-	// -F <fraction>	Relative threshold (fraction of the query population)
+	// -M <matching>	Relative threshold (fraction of the query population)
 	int pmin = 0;
-	double fraction = 0.0;
+	double matching = 0.0;
 	while (a + 2 < argc && argv[a + 1][0] == '-')
 		{
 		int ok = 0;
 		if (strcmp(argv[a + 1], "-T") == 0)
 			ok = sscanf( argv[a + 2], "%d", &pmin) == 1;
 		else if (strcmp(argv[a + 1], "-F") == 0)
-			ok = sscanf( argv[a + 2], "%lf", &fraction) == 1;
+			ok = sscanf( argv[a + 2], "%lf", &matching) == 1;
 		if (! ok)
 			{ print_help(); exit(1); }
 		a += 2;
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
    			*y	= Set_new(ny);
     	
 	if (pmin > 0) Memory_set_threshold (H, pmin);
-	if (fraction > 0.0) Memory_set_fraction (H, fraction);
+	if (matching > 0.0) Memory_set_matching (H, matching);
 	
 	while (	fgets(inputline, sizeof(inputline), stdin) != NULL)
 		{
@@ -138,8 +138,8 @@ int main(int argc, char *argv[])
 		else if ( strcmp(inputline, "threshold\n") == 0)
 			{ printf("%d\n", Memory_get_threshold(H)); fflush(stdout);}
 
-		else if ( strcmp(inputline, "fraction\n") == 0)
-			{ printf("%g\n", Memory_get_fraction(H)); fflush(stdout);}
+		else if ( strcmp(inputline, "matching\n") == 0)
+			{ printf("%g\n", Memory_get_matching(H)); fflush(stdout);}
 
 		else if ( strcmp(inputline, "quit\n") == 0)
 			return 0;

@@ -80,7 +80,7 @@ typedef struct
 	
 	Set *X;								//	Matching elements from last memory retrieval.
 
-	double fraction;					//	Relative pattern matching threshold: fraction of
+	double matching;					//	Relative pattern matching threshold: fraction of
 										//	the query population that must match
 										//	(0 = fixed threshold T only, 1 = all elements)
 	} Memory;
@@ -94,8 +94,8 @@ void Memory_set_threshold (Memory*, int);
 int  Memory_get_threshold (Memory*);
 
 //	Relative pattern matching threshold (fraction of the query population)
-void   Memory_set_fraction (Memory*, double);
-double Memory_get_fraction (Memory*);
+void   Memory_set_matching (Memory*, double);
+double Memory_get_matching (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);

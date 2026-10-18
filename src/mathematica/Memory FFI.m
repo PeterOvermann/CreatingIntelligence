@@ -25,8 +25,8 @@ Uses the Standard C backend implementation of topological associative memory.
 Memory[config_Association] :=
 
 	Module[ 
-		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setfraction,
-		getfraction, memory, read, write, store, retrieve, 
+		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setmatching,
+		getmatching, memory, read, write, store, retrieve, 
 		free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
@@ -38,10 +38,10 @@ Memory[config_Association] :=
 		getthreshold = ForeignFunctionLoad["TAM", "TAMgetthreshold", 
 			{"OpaqueRawPointer"} -> "CInt"];
 
-		setfraction = ForeignFunctionLoad["TAM", "TAMsetfraction", 
+		setmatching = ForeignFunctionLoad["TAM", "TAMsetmatching", 
 			{"OpaqueRawPointer", "CDouble"} -> "Void"];
 
-		getfraction = ForeignFunctionLoad["TAM", "TAMgetfraction", 
+		getmatching = ForeignFunctionLoad["TAM", "TAMgetmatching", 
 			{"OpaqueRawPointer"} -> "CDouble"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
@@ -73,7 +73,7 @@ Memory[config_Association] :=
 		(* Push optional relative threshold (fraction of the query population). 
 			N[] converts exact numbers such as 9/10 or 1 to machine reals. *)
 		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
-			setfraction[M, N[config["fraction"]]]];
+			setmatching[M, N[config["matching"]]]];
 
 		(* Get final threshold. *)
 		T = getthreshold[M];
@@ -103,7 +103,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"fraction" -> getfraction[M],
+			"matching" -> getmatching[M],
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

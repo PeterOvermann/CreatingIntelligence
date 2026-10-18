@@ -74,11 +74,11 @@ lib.Memory_set_threshold.restype = None
 lib.Memory_get_threshold.argtypes = [ctypes.c_void_p]
 lib.Memory_get_threshold.restype = ctypes.c_int
 
-lib.Memory_set_fraction.argtypes = [ctypes.c_void_p, ctypes.c_double]
-lib.Memory_set_fraction.restype = None
+lib.Memory_set_matching.argtypes = [ctypes.c_void_p, ctypes.c_double]
+lib.Memory_set_matching.restype = None
 
-lib.Memory_get_fraction.argtypes = [ctypes.c_void_p]
-lib.Memory_get_fraction.restype = ctypes.c_double
+lib.Memory_get_matching.argtypes = [ctypes.c_void_p]
+lib.Memory_get_matching.restype = ctypes.c_double
 
 lib.Memory_count.argtypes = [ctypes.c_void_p]
 lib.Memory_count.restype = ctypes.c_int64
@@ -105,14 +105,14 @@ def Memory(config: dict) -> dict:
         lib.Memory_set_threshold(M, scaled_threshold) 
         
     # Push optional relative threshold (fraction of the query population).
-    if config.get("fraction") is not None:
-        lib.Memory_set_fraction(M, float(config.get("fraction")))
+    if config.get("matching") is not None:
+        lib.Memory_set_matching(M, float(config.get("matching")))
 
     # Retrieve final absolute threshold from C backend.
     T = lib.Memory_get_threshold(M) 
 
     # Retrieve fraction parameter from C backend
-    fraction = lib.Memory_get_fraction(M) 
+    matching = lib.Memory_get_matching(M) 
 
     def _make_cset(data_list, dimension):
         """Creates a CSet and holds the underlying array reference to prevent garbage collection."""
@@ -161,7 +161,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "fraction": fraction,
+        "matching": matching,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

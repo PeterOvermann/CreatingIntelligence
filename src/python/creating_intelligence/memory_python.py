@@ -45,7 +45,7 @@ def Memory(config: dict) -> dict:
 
     # Optional relative threshold: fraction of the query population that must
     # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
-    fraction = config.get("fraction") or 0.0
+    matching = config.get("matching") or 0.0
 
     # Initialize enclosed memory dictionary and zero array
     mem = {}
@@ -75,7 +75,7 @@ def Memory(config: dict) -> dict:
         X = A
         
         # Per-query threshold, at least the fixed threshold T
-        Tq = max(T, math.ceil(fraction * len(X) - 1e-9))
+        Tq = max(T, math.ceil(matching * len(X) - 1e-9))
 
         while True:
             P = len(X)
@@ -134,7 +134,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "fraction": fraction,
+        "matching": matching,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

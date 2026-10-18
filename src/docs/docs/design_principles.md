@@ -327,10 +327,10 @@ relative `threshold` decides how much overlap counts as "the same". For
 example, it sets how far apart two color hues must be to receive different
 tokens.
 
-### Exact matching with `fraction` 1.0
+### Exact matching with `matching` 1.0
 
-The `fraction` option sets the share of the query population that must match.
-With `fraction` 1.0, every element of the query must be part of the match:
+The `matching` option sets the fraction of the query population that must match.
+With `matching` 1.0, every element of the query must be part of the match:
 the noise-removing iterations of the retrieval algorithm are skipped, and a
 query either matches as a whole or returns an empty result. This is typically
 used for heteroencoding combinations of symbolic tokens, such as bigrams or
