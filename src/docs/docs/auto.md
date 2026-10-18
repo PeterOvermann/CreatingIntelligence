@@ -107,7 +107,8 @@ This update rule enables generative behavior in auto-associative memory retrieva
 ## Auto-associative memory with complement update
 
 As a plugin for the [`auto`](auto.md) component, the `complement` update 
-removes the retrieved pattern from the query pattern, leaving only the novel elements.
+removes the query pattern from the retrieved pattern, 
+returning only the completed or predicted elements.
 
 
 ```json

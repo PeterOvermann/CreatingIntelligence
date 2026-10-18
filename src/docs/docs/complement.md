@@ -20,9 +20,10 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Auto-associative memory with complement update
 
-As a plugin for the [`auto`](auto.md) component, the `complement` update 
-removes the retrieved pattern from the query pattern, leaving only the novel elements.
-
+As a plugin for the [`auto`](auto.md) component, 
+the `complement` update rule
+removes the query pattern from the retrieved pattern, 
+returning only the completed or predicted elements.
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
