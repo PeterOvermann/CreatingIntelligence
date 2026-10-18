@@ -713,6 +713,82 @@ auto[config_Association] :=
 
 
 (*
+State transition memory component.
+
+Stores heteroassociations A -> B within a shared input/output space,
+taught by an explicit instructive signal (the teaching blocks).
+Retrieved patterns are valid queries, so iterated retrieval (via an
+external feedback path) produces learned trajectories.
+
+receive: k teaching blocks (B), followed by k query blocks (A).
+send:    k output blocks, matching the teaching and query blocks.
+
+If B is non-empty, store A -> B and use B as the retrieved value
+(teacher forcing). Otherwise retrieve Y from A.
+Returns updaterule[Y, A], split into blocks.
+*)
+
+transition[config_Association] :=
+	Module[ {f, plugin, k, dims, paramsA, paramsB, pop, M,
+		absratelimit, decimation},
+
+	(* Update rule *)
+	plugin = Lookup[config, "plugin", replacement][config];
+
+	k = Length[config["send_blocks"]];
+	dims = First /@ config["send_blocks"];
+
+	(* Memory hyperparameters: A from the query blocks, B from the
+	teaching blocks. The "paired" check guarantees matching dimensions. *)
+	paramsB = Plus @@ Take[config["receive_blocks"], k];
+	paramsA = Plus @@ Drop[config["receive_blocks"], k];
+	pop = Last[paramsA];
+
+	(* Limit size of query pattern. Applies to both storage and retrieval.
+	Default: unlimited. *)
+	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];
+
+	(* Proportional stochastic subsampling, applied to the query only. *)
+	decimation = Lookup[config, "decimate", 1];
+
+	M = Memory[Join[config,
+		<| "A_parameters" -> paramsA, "B_parameters" -> paramsB |> ]];
+
+	f[blocks__List] := Module[ {B, X, Y, Xdec},
+
+		(* Join partitions and apply inhibition. *)
+		B = ResolveBlockJoinNormal[Take[{blocks}, k], dims];
+		X = ResolveBlockJoinNormal[Drop[{blocks}, k], dims];
+
+		(* Limit the rate of incoming positives. *)
+		If[Length[X] > absratelimit,
+			X = Sort[RandomSample[X, absratelimit]]];
+
+		If[ B =!= {},
+			(* Instructed learning with teacher forcing: the teaching
+			signal takes the place of the retrieved pattern. *)
+			M["store"][X, B];
+			Y = B,
+
+			(* Note: Proportional decimation may result in an empty list. *)
+			Xdec = If[decimation < 1,
+				Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
+			Y = M["retrieve"][Xdec]
+			];
+
+		X = Union[plugin["updaterule"][Y, X]];
+
+		Sequence @@ MultisetBlockSplit[X, dims]
+		];
+
+	Join[ plugin, <| "function" -> f,
+		"checks" -> {"paired"},
+		"label" -> plugin["label"] <> "\[FilledCircle]",
+		"shape" -> "square", "fill" -> 14 |>, M]
+	]
+
+
+(*
 Temporal-associative memory component. 
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
@@ -1753,7 +1829,7 @@ Circuit::encoder   = "`1` cannot be used as a decoder.";
 Circuit::decoder   = "`1` cannot be used as an encoder.";
 Circuit::regress   = "Regression: output should match `1`.";
 Circuit::multiplex = "Malformed multiplex specification `1`.";
-
+Circuit::paired = "`1`: Expecting one teaching block and one query block per output block.";
 
 
 (* 
@@ -1773,6 +1849,9 @@ Circuit`check["arginp"]   = Positive[Length[#1]] &;
 Circuit`check["output"]   = #2 === {} &;
 Circuit`check["oneout"]   = Length[#2] === 1 &;
 Circuit`check["argout"]   = Positive[Length[#2]] &;
+Circuit`check["paired"] = (Positive[Length[#2]] &&
+	#1[[All,1]] === Join[#2[[All,1]], #2[[All,1]]]) &;
+
 
 
 (*

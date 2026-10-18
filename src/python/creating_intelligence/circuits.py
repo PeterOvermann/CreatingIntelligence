@@ -864,6 +864,120 @@ def auto(config):
 
 
 """
+State transition memory component.
+
+Stores heteroassociations A -> B within a shared input/output space,
+taught by an explicit instructive signal (the teaching blocks).
+Retrieved patterns are valid queries, so iterated retrieval (via an
+external feedback path) produces learned trajectories.
+"""
+
+
+def transition(config):
+    """
+    receive: k teaching blocks (B), followed by k query blocks (A).
+    send:    k output blocks, matching the teaching and query blocks.
+
+    If B is non-empty, store A -> B and use B as the retrieved value
+    (teacher forcing). Otherwise retrieve Y from A.
+    Returns updaterule(Y, A), split into blocks.
+    """
+    plugin_factory = config.get("plugin", replacement)
+
+    if isinstance(plugin_factory, str):
+        # Resolve string name to function dynamically
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            replacement)
+
+    plugin = plugin_factory(config)
+
+    send_blocks = config.get("send_blocks", [])
+    receive_blocks = config.get("receive_blocks", [])
+    k = len(send_blocks)
+    dims = [b[0] for b in send_blocks]
+
+    # Memory hyperparameters: A from the query blocks, B from the
+    # teaching blocks. The "paired" check guarantees matching dimensions.
+    teach_blocks = receive_blocks[:k]
+    query_blocks = receive_blocks[k:]
+    params_A = [sum(b[0] for b in query_blocks),
+                sum(b[1] for b in query_blocks)]
+    params_B = [sum(b[0] for b in teach_blocks),
+                sum(b[1] for b in teach_blocks)]
+    pop = params_A[1]
+
+    # Limit size of the query pattern, relative to pop. Applies to both
+    # storage and retrieval. Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
+
+    # Proportional stochastic subsampling, applied to the query only.
+    decimation = config.get("decimate", 1.0)
+
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params_A,
+        "B_parameters": params_B
+    })
+
+    # Memory backend
+    M = Memory(m_config)
+
+    def f(*blocks):
+        # Join partitions and apply inhibition
+        B = resolve_block_join_normal(list(blocks[:k]), dims)
+        X = resolve_block_join_normal(list(blocks[k:]), dims)
+
+        # Limit the rate of incoming positives
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        if B:
+            # Instructed learning with teacher forcing: the teaching
+            # signal takes the place of the retrieved pattern.
+            M["store"](X, B)
+            Y = B
+        else:
+            # Proportional decimation of the query
+            if decimation < 1.0:
+                sample_size = math.floor(decimation * len(X))
+                Xdec = sorted(
+                    rng.choice(
+                        X,
+                        size=sample_size,
+                        replace=False).tolist())
+            else:
+                Xdec = X
+
+            Y = M["retrieve"](Xdec)
+
+        X_out = plugin["updaterule"](Y, X)
+        X_out = sorted(list(set(X_out)))
+
+        return tuple(multiset_block_split(X_out, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "label": plugin.get("label", "") + "●",
+        "checks": ["paired"],
+        "shape": "square", "fill": 14
+    })
+    result.update(M)
+
+    return result
+
+
+"""
 Temporal-associative memory component.
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
@@ -1461,6 +1575,7 @@ circuit_messages = {
     "identdim": "{0}: Input and output dimensions must be identical.",
     "totaldim": "{0}: Total input and output dimensions must match.",
     "dimfirst": "{0}: Output must match first input slot.",
+    "paired": "{0}: Expecting one teaching block and one query block per output block.",
     "input": "No input slots allowed in {0}.",
     "oneinp": "Expecting one input slot in {0}.",
     "arginp": "{0}: Missing input.",
@@ -1479,6 +1594,8 @@ circuit_checks = {
         s: sum(b[0] for b in r) == sum(b[0] for b in s),
     "dimfirst": lambda r,
         s: len(r) > 0 and len(s) > 0 and r[0] == s[0],
+    "paired": lambda r,
+        s: len(s) > 0 and [b[0] for b in r] == 2 * [b[0] for b in s],
     "input": lambda r,
         s: len(r) == 0,
     "oneinp": lambda r,

@@ -17,6 +17,7 @@
   - [noise](noise.md)
   - [circuit](circuit.md)
   - [auto](auto.md)
+  - [transition](transition.md)
   - [temporal](temporal.md)
   - [associator](associator.md)
   - [predictor](predictor.md)

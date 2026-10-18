@@ -457,6 +457,7 @@ See also: https://creatingintelligence.org/#circuits
 | [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
 | [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
 | [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
+| [`transition`](transition.md) | State transition memory that learns heteroassociations within a shared space from a teaching signal, applying update rules to the retrieved or taught pattern.|
 | [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
 | [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
 | [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |
@@ -1631,7 +1632,7 @@ optionally integrating signals over multiple timesteps.
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | `replacement` | update rule, governing the temporal integration logic |  
 | `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
-| `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
+| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
 | `capacity`      | 1    | relative population carried over from previous state (bypassed with default `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |
@@ -2214,7 +2215,7 @@ underlying set of unique elements.
 | `receive`     |  *required*    |  same as `send`, with optional pathway tags |
 | `plugin`	    | `replacement` | auto-associative update rule |  
 | `threshold`     | *automatic*    |  relative auto-associative pattern matching threshold |
-| `rate_limit`    | infinite | subsample input if it exceeds the specified relative rate limit |    
+| `rate_limit`    | unlimited | subsample input if it exceeds the specified relative rate limit |    
 | `decimate`      | 1    | proportional stochastic decimation |
 | `learn`      | *P*   |  |
 
@@ -2460,6 +2461,209 @@ def auto(config):
 
 
 
+# Source: transition.md
+
+
+CIRCUIT COMPONENTS
+
+# transition
+
+<img width="240" alt="image" src="img/transition.png"><br>
+
+State transition memory component, learning heteroassociations within a shared representational space.
+
+
+See also: https://creatingintelligence.org/#state-transition-memory
+
+
+## Details and properties
+
+- Stores heteroassociations A → B, where A and B share the same representational space.
+- Receives the teaching signal B from the first half of its `receive` blocks, and the query A from the second half.
+- Learns A → B whenever the teaching signal is non-empty. In this case, the teaching signal takes the place of the retrieved pattern (teacher forcing).
+- Retrieves a pattern from memory if the teaching signal is empty.
+- Uses update rule plugins to control how the retrieved (or taught) pattern interacts with the query.
+- Retrieved patterns are valid queries: routed back through a feedback path, the component generates learned trajectories.
+- Controls sparsity through stochastic subsampling mechanisms.
+- Resolves multiset and inhibitory input prior to processing.
+- Supports multiple data blocks. Each output block requires a matching teaching block and a matching query block.
+
+<br>
+
+
+| Property        | Default | Description |
+|:------------|:-----:|:----------------------------------------|
+| `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
+| `receive`     |  *required*    |  teaching slots followed by query slots, each matching `send`, with optional pathway tags |
+| `plugin`	    | `replacement` | update rule |
+| `threshold`     | *automatic*    |  relative pattern matching threshold |
+| `rate_limit`    | unlimited | subsample the query if it exceeds the specified relative rate limit (applies to storage and retrieval) |
+| `decimate`      | 1    | proportional stochastic decimation, applied to the query during retrieval |
+
+<br>
+
+Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
+
+Note on matching thresholds: with the default threshold, a query consisting of a single symbolic token (SHR) can match a stored key that bundles several tokens. Where a transition must only fire on the complete key, for example a state combined with an input symbol, set `threshold` to 1.0.
+
+
+
+## State transitions with replacement update
+
+As the default update rule for the [`transition`](transition.md) component, `replacement`
+returns the retrieved pattern B. In a teaching cycle, it returns the teaching signal.
+
+In the following circuit, the first input provides the teaching signal and the second input the query. Storing the transitions A → B and B → C, then querying with A, returns B.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1], "label": "teach"},
+	{"component": "input", "send": [2], "label": "query"},
+	{"component": "transition", "plugin": "replacement",
+		"send": [11], "receive": [1, 2]},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/transition_replacement.png"><br>
+
+
+## State transitions with complement update
+
+As a plugin for the [`transition`](transition.md) component, the `complement`
+update rule removes the query pattern from the retrieved pattern, returning only the elements that the transition adds to the query. This matters where the target pattern overlaps with the query, for instance in production rules operating on bundles.
+
+The following circuit routes the output back to the query input, merging it with external input. Once a query starts the process, the circuit follows the stored transitions A → B → C → D cycle by cycle, and terminates when a state has no stored successor.
+
+The same feedback path supports learning: presenting A as the query and then B, C, D as consecutive teaching signals stores the entire chain, because each teaching cycle returns the taught pattern, which becomes the next query.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1], "label": "teach"},
+	{"component": "input", "send": [2], "label": "query"},
+	{"component": "transition", "plugin": "complement",
+		"send": [11], "receive": [1, [2, 11]]},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/transition_complement.png"><br>
+
+
+## Source code
+
+```python
+def transition(config):
+    """
+    receive: k teaching blocks (B), followed by k query blocks (A).
+    send:    k output blocks, matching the teaching and query blocks.
+
+    If B is non-empty, store A -> B and use B as the retrieved value
+    (teacher forcing). Otherwise retrieve Y from A.
+    Returns updaterule(Y, A), split into blocks.
+    """
+    plugin_factory = config.get("plugin", replacement)
+
+    if isinstance(plugin_factory, str):
+        # Resolve string name to function dynamically
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            replacement)
+
+    plugin = plugin_factory(config)
+
+    send_blocks = config.get("send_blocks", [])
+    receive_blocks = config.get("receive_blocks", [])
+    k = len(send_blocks)
+    dims = [b[0] for b in send_blocks]
+
+    # Memory hyperparameters: A from the query blocks, B from the
+    # teaching blocks. The "paired" check guarantees matching dimensions.
+    teach_blocks = receive_blocks[:k]
+    query_blocks = receive_blocks[k:]
+    params_A = [sum(b[0] for b in query_blocks),
+                sum(b[1] for b in query_blocks)]
+    params_B = [sum(b[0] for b in teach_blocks),
+                sum(b[1] for b in teach_blocks)]
+    pop = params_A[1]
+
+    # Limit size of the query pattern, relative to pop. Applies to both
+    # storage and retrieval. Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
+
+    # Proportional stochastic subsampling, applied to the query only.
+    decimation = config.get("decimate", 1.0)
+
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params_A,
+        "B_parameters": params_B
+    })
+
+    # Memory backend
+    M = Memory(m_config)
+
+    def f(*blocks):
+        # Join partitions and apply inhibition
+        B = resolve_block_join_normal(list(blocks[:k]), dims)
+        X = resolve_block_join_normal(list(blocks[k:]), dims)
+
+        # Limit the rate of incoming positives
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        if B:
+            # Instructed learning with teacher forcing: the teaching
+            # signal takes the place of the retrieved pattern.
+            M["store"](X, B)
+            Y = B
+        else:
+            # Proportional decimation of the query
+            if decimation < 1.0:
+                sample_size = math.floor(decimation * len(X))
+                Xdec = sorted(
+                    rng.choice(
+                        X,
+                        size=sample_size,
+                        replace=False).tolist())
+            else:
+                Xdec = X
+
+            Y = M["retrieve"](Xdec)
+
+        X_out = plugin["updaterule"](Y, X)
+        X_out = sorted(list(set(X_out)))
+
+        return tuple(multiset_block_split(X_out, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "label": plugin.get("label", "") + "●",
+        "checks": ["paired"],
+        "shape": "square", "fill": 14
+    })
+    result.update(M)
+
+    return result
+```
+
+
+
+
 # Source: temporal.md
 
 
@@ -2469,7 +2673,7 @@ CIRCUIT COMPONENTS
 
 <img width="240" alt="image" src="img/temporal.png"><br>
 
-Temporal associative memory component.
+Temporal-associative memory component.
 
 
 ## Details and properties
@@ -2497,7 +2701,7 @@ Temporal associative memory component.
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
 | `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
-| `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
+| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
 | `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |

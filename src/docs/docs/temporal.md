@@ -5,7 +5,7 @@ CIRCUIT COMPONENTS
 
 <img width="240" alt="image" src="img/temporal.png"><br>
 
-Temporal associative memory component.
+Temporal-associative memory component.
 
 
 ## Details and properties
@@ -33,7 +33,7 @@ Temporal associative memory component.
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
 | `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
-| `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
+| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
 | `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |

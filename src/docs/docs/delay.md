@@ -29,7 +29,7 @@ optionally integrating signals over multiple timesteps.
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
 | `plugin`	    | `replacement` | update rule, governing the temporal integration logic |  
 | `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
-| `rate_limit`    | infinite | subsample input if population exceeds the rate limit |    
+| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
 | `capacity`      | 1    | relative population carried over from previous state (bypassed with default `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |

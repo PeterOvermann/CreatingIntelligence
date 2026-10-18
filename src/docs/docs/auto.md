@@ -30,7 +30,7 @@ underlying set of unique elements.
 | `receive`     |  *required*    |  same as `send`, with optional pathway tags |
 | `plugin`	    | `replacement` | auto-associative update rule |  
 | `threshold`     | *automatic*    |  relative auto-associative pattern matching threshold |
-| `rate_limit`    | infinite | subsample input if it exceeds the specified relative rate limit |    
+| `rate_limit`    | unlimited | subsample input if it exceeds the specified relative rate limit |    
 | `decimate`      | 1    | proportional stochastic decimation |
 | `learn`      | *P*   |  |
 
