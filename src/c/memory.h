@@ -68,21 +68,20 @@ typedef uint8_t byte;
 //	Associative memory stores associations A -> B
 typedef struct
 	{
-	byte ***M;							//	Bit storage locations
+	byte ***M;				//	Bit storage locations
 			
-	int Adimension;						//	A hyperparameters
+	int Adimension;			//	A hyperparameters
 	int Apopulation;
 
-	int Bdimension;						//	B hyperparameters (same as A if auto-associative)
-	int Bpopulation;
+	int Bdimension;			//	B hyperparameters 
+	int Bpopulation;		// (same as A if auto-associative)
 	
-	int T;								//	Pattern patching threshold
+	int T;					//	Pattern matching threshold (absolute population)
 	
-	Set *X;								//	Matching elements from last memory retrieval.
+	Set *X;					//	Matching elements from last memory retrieval.
 
-	double matching;					//	Relative pattern matching threshold: fraction of
-										//	the query population that must match
-										//	(0 = fixed threshold T only, 1 = all elements)
+	double matching;		//	Relative matching threshold: 					//  fraction of the query population that must match
+							//	(0 = fixed threshold T only, 1 = all elements)
 	} Memory;
 
 
