@@ -12,7 +12,8 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Default plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
+- Default update rule for [`auto`](auto.md) and [`delay`](delay.md).
 - Bypasses the component's `capacity` setting.
 - Transparently handles multisets and inhibitory signals.
 

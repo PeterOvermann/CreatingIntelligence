@@ -13,7 +13,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
 - Transparently handles multisets and inhibitory signals.
 - Corresponds to the set complement after deduplication.
 

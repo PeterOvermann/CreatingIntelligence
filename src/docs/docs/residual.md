@@ -13,7 +13,7 @@ See also: https://creatingintelligence.org/#update-rules
 ## Details
 
 - Plugin for the [`auto`](auto.md) component.
-- Not applicable for temporal integration ([`delay`](delay.md) and  	[`temporal`](temporal.md)).
+- Not applicable for temporal integration ([`delay`](delay.md) and [`temporal`](temporal.md)).
 - Transparently handles multisets and inhibitory signals.
 - Corresponds to the set complement after deduplication.
 

@@ -12,7 +12,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
 - Computes the multiset aggregation of its inputs.
 - Corresponds to the set union after deduplication.
 
