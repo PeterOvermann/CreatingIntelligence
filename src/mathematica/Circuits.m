@@ -739,9 +739,9 @@ transition[config_Association] :=
 	dims = First /@ config["send_blocks"];
 
 	(* Memory hyperparameters: A from the query blocks, B from the
-	teaching blocks. The "paired" check guarantees matching dimensions. *)
-	paramsB = Plus @@ Take[config["receive_blocks"], k];
-	paramsA = Plus @@ Drop[config["receive_blocks"], k];
+	send blocks. The "paired" check guarantees matching dimensions. *)
+    paramsB = Plus @@ config["send_blocks"];
+    paramsA = Plus @@ Drop[config["receive_blocks"], k];
 	pop = Last[paramsA];
 
 	(* Limit size of query pattern. Applies to both storage and retrieval.

@@ -2584,13 +2584,17 @@ def transition(config):
     dims = [b[0] for b in send_blocks]
 
     # Memory hyperparameters: A from the query blocks, B from the
-    # teaching blocks. The "paired" check guarantees matching dimensions.
-    teach_blocks = receive_blocks[:k]
+    # output blocks. The "paired" check guarantees matching dimensions.
+    # Taking the populations of B from the output blocks lets an output
+    # block with population 0 exclude its block from storage and
+    # retrieval, e.g. the symbol block of a bipartite (state, symbol)
+    # query. The teaching blocks keep their own populations upstream.
     query_blocks = receive_blocks[k:]
     params_A = [sum(b[0] for b in query_blocks),
                 sum(b[1] for b in query_blocks)]
-    params_B = [sum(b[0] for b in teach_blocks),
-                sum(b[1] for b in teach_blocks)]
+    params_B = [sum(b[0] for b in send_blocks),
+                sum(b[1] for b in send_blocks)]
+                
     pop = params_A[1]
 
     # Limit size of the query pattern, relative to pop. Applies to both
