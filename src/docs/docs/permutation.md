@@ -28,7 +28,7 @@ The [`delay`](delay.md) component applying the `permutation` update rule:
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},
-	{"component": "delay", "plugin": "augmentation", 
+	{"component": "delay", "plugin": "permutation", 
 		"send": [11], "receive": [1], "capacity": 2, "decay": 0.15},
 	{"component": "output", "receive": [11]}
   ]}

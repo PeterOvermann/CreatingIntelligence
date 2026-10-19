@@ -2217,7 +2217,7 @@ underlying set of unique elements.
 | `threshold`     | *automatic*    |  relative auto-associative pattern matching threshold |
 | `rate_limit`    | unlimited | subsample input if it exceeds the specified relative rate limit |    
 | `decimate`      | 1    | proportional stochastic decimation |
-| `learn`      | *P*   |  |
+| `learn`      | 1   |  learning threshold or interval, given as scaling factors relative to the default population |
 
 <br>
 
@@ -3333,7 +3333,7 @@ component.
 
 ## Auto-associative memory with replacement update
 
-As the default update rule for the [`auto`](auto.md) component, `replacement` 
+As an update rule for the [`auto`](auto.md) component, `replacement` 
 substitutes the memory's state with the retrieved value.
 
 This is the classic auto-associative setup, most useful for pattern completion, denoising, and item stores. With this configuration, the auto-associative memory converges to a stable state. Stability is normally reached with just a single cycle because denoising iterations are already encapsulated within the memory retrieval algorithm.
@@ -3810,7 +3810,7 @@ The [`delay`](delay.md) component applying the `permutation` update rule:
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},
-	{"component": "delay", "plugin": "augmentation", 
+	{"component": "delay", "plugin": "permutation", 
 		"send": [11], "receive": [1], "capacity": 2, "decay": 0.15},
 	{"component": "output", "receive": [11]}
   ]}
@@ -4846,21 +4846,20 @@ typedef uint8_t byte;
 //	Associative memory stores associations A -> B
 typedef struct
 	{
-	byte ***M;							//	Bit storage locations
+	byte ***M;				//	Bit storage locations
 			
-	int Adimension;						//	A hyperparameters
+	int Adimension;			//	A hyperparameters
 	int Apopulation;
 
-	int Bdimension;						//	B hyperparameters (same as A if auto-associative)
-	int Bpopulation;
+	int Bdimension;			//	B hyperparameters 
+	int Bpopulation;		// (same as A if auto-associative)
 	
-	int T;								//	Pattern patching threshold
+	int T;					//	Pattern matching threshold (absolute population)
 	
-	Set *X;								//	Matching elements from last memory retrieval.
+	Set *X;					//	Matching elements from last memory retrieval.
 
-	double matching;					//	Relative pattern matching threshold: fraction of
-										//	the query population that must match
-										//	(0 = fixed threshold T only, 1 = all elements)
+	double matching;		//	Relative matching threshold: 					//  fraction of the query population that must match
+							//	(0 = fixed threshold T only, 1 = all elements)
 	} Memory;
 
 

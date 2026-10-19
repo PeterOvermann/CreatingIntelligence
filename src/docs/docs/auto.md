@@ -32,7 +32,7 @@ underlying set of unique elements.
 | `threshold`     | *automatic*    |  relative auto-associative pattern matching threshold |
 | `rate_limit`    | unlimited | subsample input if it exceeds the specified relative rate limit |    
 | `decimate`      | 1    | proportional stochastic decimation |
-| `learn`      | *P*   |  |
+| `learn`      | 1   |  learning threshold or interval, given as scaling factors relative to the default population |
 
 <br>
 

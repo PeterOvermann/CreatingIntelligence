@@ -38,7 +38,7 @@ component.
 
 ## Auto-associative memory with replacement update
 
-As the default update rule for the [`auto`](auto.md) component, `replacement` 
+As an update rule for the [`auto`](auto.md) component, `replacement` 
 substitutes the memory's state with the retrieved value.
 
 This is the classic auto-associative setup, most useful for pattern completion, denoising, and item stores. With this configuration, the auto-associative memory converges to a stable state. Stability is normally reached with just a single cycle because denoising iterations are already encapsulated within the memory retrieval algorithm.
