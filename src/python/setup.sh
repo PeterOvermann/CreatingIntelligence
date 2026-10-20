@@ -35,6 +35,15 @@ fi
 
 source "$VENV_PATH/bin/activate"
 
+# Remove compiled memory libraries left by earlier builds. The loader tries
+# version-specific names (libmemory.cpython-314-darwin.so) before the plain
+# libmemory.so that setup.py builds, so a stale library from an older build
+# would shadow the fresh one and fail on renamed or new C functions.
+PKG_DIR="$SCRIPT_DIR/creating_intelligence"
+find "$PKG_DIR" -maxdepth 1 -type f -name 'libmemory*' \
+    \( -name '*.so' -o -name '*.dylib' -o -name '*.pyd' \) \
+    -print -delete | sed 's/^/Removed stale library: /'
+
 echo "Installing creating-intelligence package..."
 python -m pip install -q --upgrade pip
 python -m pip install -q -e "$SCRIPT_DIR[viz]"
@@ -46,10 +55,14 @@ BACKEND=$(env -u MEMORY_BACKEND python -W ignore -c \
 if [ "$BACKEND" != "c_ffi" ]; then
     echo "======================================================================"
     echo " "
-    echo "WARNING: The C memory backend could not be built."
+    echo "WARNING: The C memory backend could not be built or loaded."
     echo "creating-intelligence works, but uses the slower pure-Python backend."
     echo " "
-    echo "To get the fast C backend, install a C compiler and rerun this script:"
+    echo "Reason:"
+    MEMORY_BACKEND=c_ffi python -c "import creating_intelligence" 2>&1 \
+        | tail -n 1 | sed 's/^/  /' || true
+    echo " "
+    echo "If no library was found, install a C compiler and rerun this script:"
     echo "  - macOS:         xcode-select --install"
     echo "  - Ubuntu/Debian: sudo apt-get install build-essential python3-dev"
     echo "  - Fedora:        sudo dnf groupinstall \"Development Tools\" && sudo dnf install python3-devel"
