@@ -17,7 +17,9 @@ See also: https://creatingintelligence.org/#sparse-holographic-representations
 - Decoder plugin for the [`output`](output.md) component.
 - Encodes integers 0 to K-1 as non-overlapping SHRs.
 - The default number of categories is taken to be the ratio of hyperparameters N/P.
-- If an explicit number K of categories is specified, the SHR population is set to N/K.
+- Divides the dimension N into K disjoint blocks of N/K elements, one block per category.
+- Each encoding draws a random sample of P elements from the category’s block. Repeated encodings of the same category therefore overlap but are not identical.
+- With the default K = floor(N/P), each block holds about P elements, and the encoding is fixed. With a smaller K, the blocks are larger than P, and the encoding varies from call to call.
 - Mappings with identical parameters [N, P, K] are globally shared, enabling encode-decode roundtrips. 
 
 <br>
@@ -31,8 +33,7 @@ See also: https://creatingintelligence.org/#sparse-holographic-representations
 
 ## Encoding and decoding chain for categories
 
-The following circuit encodes integers 0 to 19 as non-overlapping SHRs with population 50,
-and subsequently decodes the internal representation, mirroring the input. 
+The following circuit encodes integers 0 to 19 as non-overlapping SHRs with population 10, each drawn from a reserved block of 50 elements, and subsequently decodes the internal representation, mirroring the input.
 
 
 ```json

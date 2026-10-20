@@ -24,7 +24,7 @@ See also: https://creatingintelligence.org/#permutation
 The [`delay`](delay.md) component applying the `permutation` update rule:
 
 
-```
+```json
 { "hyperparameters": {"default": [1000, 10]},
   "dataflow": [
 	{"component": "input", "send": [1]},

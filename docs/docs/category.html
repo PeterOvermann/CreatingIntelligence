@@ -170,8 +170,15 @@ class="sidebar-icon">π</span>permutation</a></li>
         <li>Encodes integers 0 to K-1 as non-overlapping SHRs.</li>
         <li>The default number of categories is taken to be the ratio of
         hyperparameters N/P.</li>
-        <li>If an explicit number K of categories is specified, the SHR
-        population is set to N/K.</li>
+        <li>Divides the dimension N into K disjoint blocks of N/K
+        elements, one block per category.</li>
+        <li>Each encoding draws a random sample of P elements from the
+        category’s block. Repeated encodings of the same category
+        therefore overlap but are not identical.</li>
+        <li>With the default K = floor(N/P), each block holds about P
+        elements, and the encoding is fixed. With a smaller K, the
+        blocks are larger than P, and the encoding varies from call to
+        call.</li>
         <li>Mappings with identical parameters [N, P, K] are globally
         shared, enabling encode-decode roundtrips.</li>
         </ul>
@@ -195,8 +202,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2 id="encoding-and-decoding-chain-for-categories">Encoding and
         decoding chain for categories</h2>
         <p>The following circuit encodes integers 0 to 19 as
-        non-overlapping SHRs with population 50, and subsequently
-        decodes the internal representation, mirroring the input.</p>
+        non-overlapping SHRs with population 10, each drawn from a
+        reserved block of 50 elements, and subsequently decodes the
+        internal representation, mirroring the input.</p>
         <div class="sourceCode" id="cb1"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>

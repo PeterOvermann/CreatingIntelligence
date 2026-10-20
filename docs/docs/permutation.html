@@ -175,13 +175,14 @@ class="sidebar-icon">π</span>permutation</a></li>
         component with temporal sequence permutation</h2>
         <p>The <a href="delay.html"><code>delay</code></a> component
         applying the <code>permutation</code> update rule:</p>
-        <pre><code>{ &quot;hyperparameters&quot;: {&quot;default&quot;: [1000, 10]},
-  &quot;dataflow&quot;: [
-    {&quot;component&quot;: &quot;input&quot;, &quot;send&quot;: [1]},
-    {&quot;component&quot;: &quot;delay&quot;, &quot;plugin&quot;: &quot;permutation&quot;, 
-        &quot;send&quot;: [11], &quot;receive&quot;: [1], &quot;capacity&quot;: 2, &quot;decay&quot;: 0.15},
-    {&quot;component&quot;: &quot;output&quot;, &quot;receive&quot;: [11]}
-  ]}</code></pre>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;delay&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;permutation&quot;</span><span class="fu">,</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;capacity&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span> <span class="dt">&quot;decay&quot;</span><span class="fu">:</span> <span class="fl">0.15</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/delay_permutation.png"><br></p>
         <h2
         id="temporal-associative-memory-with-state-permutation">Temporal

@@ -64,8 +64,8 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Temporal associative memory with replacement update
 
-The [`temporal`](temporal.md) component applies the `replacement` update rule by default.
-At every execution cycle, it replaces the internal state with the current input,
+The [`temporal`](temporal.md) component with `replacement` update rule
+replaces the internal state with the current input,
 bypassing the `capacity` setting. This mechanism directly associates
 each signal to the subsequent signal.
 
