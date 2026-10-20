@@ -1,0 +1,10 @@
+the traffic light is red . 
+the traffic light is green . 
+the traffic light is yellow . 
+the cat sat on the mat . 
+the dog sat on the rug . 
+new york city is big . 
+the cat by the door slept on the sofa . 
+the dog by the door slept on the bed . 
+the cat by the door near the old red chair slept on the pillow . 
+the dog by the door near the old red chair slept on the blanket . 

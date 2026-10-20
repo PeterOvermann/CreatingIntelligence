@@ -910,7 +910,6 @@ def transition(config):
                 sum(b[1] for b in query_blocks)]
     params_B = [sum(b[0] for b in send_blocks),
                 sum(b[1] for b in send_blocks)]
-                
     pop = params_A[1]
 
     # Limit size of the query pattern, relative to pop. Applies to both
@@ -945,25 +944,17 @@ def transition(config):
                     size=absratelimit,
                     replace=False).tolist())
 
-        if B:
-            # Instructed learning with teacher forcing: the teaching
-            # signal takes the place of the retrieved pattern.
-            M["store"](X, B)
-            Y = B
+        # Always learn (does nothing if B is empty)
+        M["store"](X, B)
+
+        # Always retrieve.
+        if decimation < 1.0:
+            Xdec = sorted(rng.choice(
+                X, size=math.floor(decimation * len(X)), replace=False).tolist())
         else:
-            # Proportional decimation of the query
-            if decimation < 1.0:
-                sample_size = math.floor(decimation * len(X))
-                Xdec = sorted(
-                    rng.choice(
-                        X,
-                        size=sample_size,
-                        replace=False).tolist())
-            else:
-                Xdec = X
-
-            Y = M["retrieve"](Xdec)
-
+            Xdec = X
+        Y = M["retrieve"](Xdec)
+        
         X_out = plugin["updaterule"](Y, X)
         X_out = sorted(list(set(X_out)))
 

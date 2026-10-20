@@ -7,6 +7,8 @@ CIRCUIT COMPONENTS
 
 Temporal-associative memory component.
 
+See also: https://creatingintelligence.org/#temporal-associative-memory
+
 
 ## Details and properties
 

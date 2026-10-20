@@ -1,0 +1,68 @@
+the cat by the door in new york city sat on the mat  . 
+the cat by the door in new york city slept on the pillow  . 
+the cat by the door under the big window sat on the mat  . 
+the cat by the door under the big window slept on the pillow  . 
+the cat in new york city by the door sat on the mat  . 
+the cat in new york city by the door slept on the pillow  . 
+the cat in new york city near the old red chair sat on the mat  . 
+the cat in new york city near the old red chair slept on the pillow  . 
+the cat in new york city sat on the mat  . 
+the cat in new york city under the big window sat on the mat  . 
+the cat in new york city under the big window slept on the pillow  . 
+the cat near the old red chair by the door sat on the mat  . 
+the cat near the old red chair by the door slept on the pillow  . 
+the cat near the old red chair in new york city slept on the pillow  . 
+the cat near the old red chair sat on the mat  . 
+the cat near the old red chair slept on the pillow  . 
+the cat near the old red chair under the big window sat on the mat  . 
+the cat near the old red chair under the big window slept on the pillow  . 
+the cat sat on the mat  . 
+the cat slept on the pillow  . 
+the cat under the big window by the door sat on the mat  . 
+the cat under the big window by the door slept on the pillow  . 
+the cat under the big window in new york city sat on the mat  . 
+the cat under the big window in new york city slept on the pillow  . 
+the cat under the big window near the old red chair sat on the mat  . 
+the cat under the big window sat on the mat  . 
+the dog by the door in new york city slept on the blanket  . 
+the dog by the door near the old red chair sat on the rug  . 
+the dog by the door sat on the rug  . 
+the dog by the door slept on the blanket  . 
+the dog by the door under the big window sat on the rug  . 
+the dog by the door under the big window slept on the blanket  . 
+the dog in new york city by the door slept on the blanket  . 
+the dog in new york city near the old red chair sat on the rug  . 
+the dog in new york city near the old red chair slept on the blanket  . 
+the dog in new york city sat on the rug  . 
+the dog in new york city slept on the blanket  . 
+the dog near the old red chair by the door sat on the rug  . 
+the dog near the old red chair by the door slept on the blanket  . 
+the dog near the old red chair sat on the rug  . 
+the dog near the old red chair slept on the blanket  . 
+the dog under the big window by the door slept on the blanket  . 
+the dog under the big window in new york city slept on the blanket  . 
+the dog under the big window near the old red chair slept on the blanket  . 
+the dog under the big window sat on the rug  . 
+the dog under the big window slept on the blanket  . 
+the cat by the door near the old red chair sat on the mat  . 
+the cat by the door near the old red chair slept on the pillow  . 
+the cat by the door sat on the mat  . 
+the cat by the door slept on the pillow  . 
+the cat in new york city slept on the pillow  . 
+the cat near the old red chair in new york city sat on the mat  . 
+the cat under the big window near the old red chair slept on the pillow  . 
+the cat under the big window slept on the pillow  . 
+the dog by the door in new york city sat on the rug  . 
+the dog by the door near the old red chair slept on the blanket  . 
+the dog in new york city by the door sat on the rug  . 
+the dog in new york city under the big window sat on the rug  . 
+the dog in new york city under the big window slept on the blanket  . 
+the dog near the old red chair in new york city sat on the rug  . 
+the dog near the old red chair in new york city slept on the blanket  . 
+the dog near the old red chair under the big window sat on the rug  . 
+the dog near the old red chair under the big window slept on the blanket  . 
+the dog sat on the rug  . 
+the dog slept on the blanket  . 
+the dog under the big window by the door sat on the rug  . 
+the dog under the big window in new york city sat on the rug  . 
+the dog under the big window near the old red chair sat on the rug  . 

@@ -15,6 +15,7 @@
   - [output](output.md)
   - [delay](delay.md)
   - [noise](noise.md)
+  - [empty](empty.md)
   - [circuit](circuit.md)
   - [auto](auto.md)
   - [transition](transition.md)

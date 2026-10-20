@@ -722,10 +722,6 @@ external feedback path) produces learned trajectories.
 
 receive: k teaching blocks (B), followed by k query blocks (A).
 send:    k output blocks, matching the teaching and query blocks.
-
-If B is non-empty, store A -> B and use B as the retrieved value
-(teacher forcing). Otherwise retrieve Y from A.
-Returns updaterule[Y, A], split into blocks.
 *)
 
 transition[config_Association] :=
@@ -764,18 +760,14 @@ transition[config_Association] :=
 		If[Length[X] > absratelimit,
 			X = Sort[RandomSample[X, absratelimit]]];
 
-		If[ B =!= {},
-			(* Instructed learning with teacher forcing: the teaching
-			signal takes the place of the retrieved pattern. *)
-			M["store"][X, B];
-			Y = B,
+		(* Always learn (does nothing if B is empty) *)
+		M["store"][X, B];
 
-			(* Note: Proportional decimation may result in an empty list. *)
-			Xdec = If[decimation < 1,
-				Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
-			Y = M["retrieve"][Xdec]
-			];
-
+		(* Always retrieve.  *)
+		Xdec = If[decimation < 1,
+			Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
+		Y = M["retrieve"][Xdec];
+		
 		X = Union[plugin["updaterule"][Y, X]];
 
 		Sequence @@ MultisetBlockSplit[X, dims]
