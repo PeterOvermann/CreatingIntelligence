@@ -878,8 +878,7 @@ def transition(config):
     receive: k teaching blocks (B), followed by k query blocks (A).
     send:    k output blocks, matching the teaching and query blocks.
 
-    If B is non-empty, store A -> B and use B as the retrieved value
-    (teacher forcing). Otherwise retrieve Y from A.
+    If B is non-empty, store A -> B. Then retrieve Y from A.
     Returns updaterule(Y, A), split into blocks.
     """
     plugin_factory = config.get("plugin", replacement)

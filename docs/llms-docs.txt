@@ -2529,12 +2529,12 @@ See also: https://creatingintelligence.org/#state-transition-memory
 - Receives the teaching signal B from the first half of its `receive` blocks, and the query A from the second half.
 - Always learns A → B (has no effect if the teaching signal B is empty), then queries the memory with pattern A.
 - Uses update rule plugins to control how the retrieved pattern interacts with the query.
-- Holds no internal state. 
+- Holds no internal state.
 - Retrieved patterns are valid queries: routed back through a feedback path, the component generates learned trajectories. Without a feedback path, it performs a single transition per query.
 - Controls sparsity through stochastic subsampling mechanisms.
 - Resolves multiset and inhibitory input prior to processing.
 - Supports multiple data blocks. Each output block requires a matching teaching block and a matching query block.
-- Takes the memory's query hyperparameters from the query blocks and its target hyperparameters from the output blocks. 
+- Takes the memory's query hyperparameters from the query blocks and its target hyperparameters from the output blocks.
 - An output block with population 0 excludes its block from storage and retrieval.
 
 <br>
@@ -2553,15 +2553,20 @@ See also: https://creatingintelligence.org/#state-transition-memory
 
 Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
 
-Note on matching: with the default threshold, a single symbolic token (SHR) exceeds the pattern matching threshold. A query can therefore match a stored key with which it shares only one of its tokens. Where a transition must only fire on the complete key, for example a state combined with an input symbol, set `matching` to 1.0. An undefined transition then returns an empty result.
-
+Note on matching: with the default threshold, a single symbolic token (SHR)
+exceeds the pattern matching threshold. A query can therefore match a stored
+key with which it shares only one of its tokens. Where a transition must only
+fire on its complete key, raise the threshold (see the finite automata example below).
 
 
 ## State transitions with replacement update
 
-As the default update rule for the [`transition`](transition.md) component,
-`replacement` returns the retrieved pattern B. In a teaching cycle, it returns
-the teaching signal.
+
+As the default update rule for the transition component,
+[`replacement`](replacement.md) returns the retrieved pattern B. In a teaching
+cycle, the retrieval follows the storage, so it returns the taught pattern, or
+a superposition if the query has other stored successors.
+
 
 In the following circuit, the first input provides the teaching signal and the second input the query. Storing the transitions A → B and B → C, then querying with A, returns B.
 
@@ -2582,12 +2587,16 @@ In the following circuit, the first input provides the teaching signal and the s
 
 ## State transitions with complement update
 
-As a plugin for the [`transition`](transition.md) component, the `complement`
+As a plugin for the `transition` component, the [`complement`](complement.md)
 update rule removes the query pattern from the retrieved pattern, returning only the elements that the transition adds to the query. This matters where the target pattern overlaps with the query, for instance in production rules operating on bundles.
 
 The following circuit routes the output back to the query input, merging it with external input. Once a query starts the process, the circuit follows the stored transitions A → B → C → D cycle by cycle, and terminates when a state has no stored successor.
 
-The same feedback path supports learning. Presenting A as the query together with B as the teaching signal, followed by C and D as teaching signals alone, stores the entire chain, because each teaching cycle returns the taught pattern, which becomes the next query. The first teaching signal must arrive in the same cycle as the query: a query presented alone retrieves nothing and leaves nothing on the feedback path.
+The same feedback path supports learning. Presenting A as the query together
+with B as the teaching signal, followed by C and D as teaching signals alone,
+stores the entire chain: each teaching cycle retrieves the newly taught
+pattern, which becomes the next query.
+
 
 Because the circuit runs on its own output during retrieval, it must not be latched.
 
@@ -2606,26 +2615,48 @@ Because the circuit runs on its own output during retrieval, it must not be latc
 <img width="240" alt="image" src="img/transition_complement.png"><br>
 
 
-## Finite automata with block-coded queries
+## Finite automata
 
-A deterministic finite automaton maps the current state S and an input symbol a to the next state S'. The query combines S and a, either as a bundle in a single block or as two disjoint blocks. In the block-coded form, the teaching signal is S' with an empty symbol block.
+A deterministic finite automaton maps the current state and an input symbol a
+to the next state. In the following circuit, the query is a bundle of the state
+and the symbol, and the teaching signal is the next state. The output is fed
+back and bundled with the next symbol, so the automaton advances by one
+transition per cycle.
 
-The following circuit uses the block-coded form. Its two output blocks are paired with a state block and a symbol block. The symbol's teaching block is supplied by an `empty` component, and the symbol's output slot 12 is declared with population 0, so that the memory stores and retrieves the state block only. The next state is fed back to the query's state block, where it is merged with the start state input. `threshold` 1.0 ensures that an undefined transition returns an empty result and halts the automaton.
+A transition must fire only on its complete key. The default threshold is
+exceeded by a single symbolic token, so a query could match a stored key
+through the state or the symbol alone. Here, the threshold is set to 1.5, i.e.
+between the population of a single token and that of a complete
+(state, symbol) key. The margin below 2.0 allows for a few elements shared by
+the state's and the symbol's codes. An undefined transition then returns the
+empty set and halts the automaton. Since neither a symbol alone nor a state
+alone reaches the threshold, the automaton stays halted until it is restarted.
 
-To run the automaton, present the start state together with the first symbol and, while teaching, the next state. From then on, present one symbol per cycle, with the next state as the teaching signal while teaching and without it afterwards. The circuit is latched, so cycles without input are skipped: on an unlatched cycle without a symbol, the fed-back state alone would retrieve the superposition of all its successors.
+To teach the automaton, run it with the next state as the teaching signal:
+present the start state together with the first symbol, then one symbol per
+cycle. Each training cycle returns the next state, which becomes the state of
+the next query. Rules can also be taught one at a time, by presenting the state,
+the symbol and the next state together. Then each rule must be followed by an
+empty cycle, so that its output does not become part of the next rule's key.
+
+To run the automaton, present the start state together with the first symbol,
+then one symbol per cycle. Present a symbol in every cycle: on a cycle without
+one, the fed-back state alone falls below the threshold, and the automaton
+halts. For a cyclic automaton whose strings start and end in the same state,
+presenting that state with each string's first symbol also restarts the
+automaton after a halt.
 
 
 ```json
-{ "options": {"latch": true},
-  "hyperparameters": {"default": [2000, 10], "12": [2000, 0]},
+{ "hyperparameters": {"default": [2000, 10]},
   "dataflow": [
-	{"component": "input", "send": [1], "label": "S`"},
-	{"component": "input", "send": [3], "label": "S"},
-	{"component": "input", "send": [4], "label": "a"},
-	{"component": "empty", "send": [2]},
-	{"component": "transition", "send": [11, 12],
-		"receive": [1, 2, [3, 11], 4], "threshold": 1.0},
-	{"component": "output", "receive": [11]}
+	{"component": "input", "plugin": "codec", "send": [1], "label": "next"},
+	{"component": "input", "plugin": "codec", "send": [2], "label": "state"},
+	{"component": "input", "plugin": "codec", "send": [3], "label": "a"},
+	{"component": "transition", "send": [11], "threshold": 1.5,
+		"receive": [1, [2, 11, 3]]},
+	{"component": "output", "plugin": "codec",
+		"receive": [11], "label": "next"}
   ]}
 ```
 
@@ -2640,8 +2671,7 @@ def transition(config):
     receive: k teaching blocks (B), followed by k query blocks (A).
     send:    k output blocks, matching the teaching and query blocks.
 
-    If B is non-empty, store A -> B and use B as the retrieved value
-    (teacher forcing). Otherwise retrieve Y from A.
+    If B is non-empty, store A -> B. Then retrieve Y from A.
     Returns updaterule(Y, A), split into blocks.
     """
     plugin_factory = config.get("plugin", replacement)

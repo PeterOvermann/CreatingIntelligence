@@ -1,9 +1,9 @@
 { "hyperparameters": {"default": [2000, 10]},
   "dataflow": [
-	{"component": "input", "plugin": "codec", "send": [1], "label": "S′"},
-	{"component": "input", "plugin": "codec", "send": [2], "label": "S"},
+	{"component": "input", "plugin": "codec", "send": [1], "label": "next"},
+	{"component": "input", "plugin": "codec", "send": [2], "label": "state"},
 	{"component": "input", "plugin": "codec", "send": [3], "label": "letter"},
 	{"component": "transition", "send": [11], "threshold": 1.5,
 		"receive": [1, [2, 11, 3]]},
-	{"component": "output", "plugin": "codec", "receive": [11], "label": "S"}
+	{"component": "output", "plugin": "codec", "receive": [11], "label": "next"}
   ]}
