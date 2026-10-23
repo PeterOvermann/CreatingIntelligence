@@ -1323,15 +1323,20 @@ def heteroencoder(config):
 
     M = Memory(m_config)
 
+    learning_threshold = M["T"]
+
     def f(*blocks):
         X = resolve_block_join_normal(list(blocks), dims)
 
-        # Empty input: no output, nothing to learn
-        if not X:
+        # An input below the pattern matching threshold T can never
+        # retrieve its token, and the token cannot
+        # compose with later writes, because each new token is random.
+        if len(X) < learning_threshold:
             return ([],)
 
         Y = M["retrieve"](X)
 
+        # Generate new SHR encoding if retrieval fails.
         if not Y:
             n, p = params_B
             Y = sorted(
@@ -1339,6 +1344,7 @@ def heteroencoder(config):
                     range(1, n + 1),
                     size=p, replace=False).tolist())
 
+        # Always learn, broadening X as an attractor.
         M["store"](X, Y)
         return (Y,)
 
@@ -1352,7 +1358,7 @@ def heteroencoder(config):
     }
     result.update(M)
     return result
-
+    
 
 def predictor(config):
     """

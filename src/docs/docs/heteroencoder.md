@@ -14,14 +14,16 @@ See also: https://creatingintelligence.org/#heteroencoder
 
 ## Details and properties
 
+## Details and properties
+
 - Encapsulates a hetero-associative topological memory instance.
 - Maps similar sets (SDRs or SHRs) to stable symbolic tokens (SHRs) on the fly.
 - Has no input for a teaching signal.
-- Generates and learns a unique output SHR when encountering unknown input.
+- Learns from every input it processes: an input that matches a stored pattern retrieves its token and is stored with it; an unknown input receives a new random SHR, which is stored as its output.
+- Has a learning threshold equal to the pattern matching threshold T: smaller input returns an empty result and is not learned, because its token could never be retrieved and, being random, could not combine with later writes. The `threshold` option therefore also sets the learning threshold.
 - Performs both clustering and pattern separation; the matching criterion (`threshold` and `residual`) sets the boundary.
 - May receive block-coded input.
-- Resolves multiset and inhibitory input prior to processing.
-
+- Resolves multiset and inhibitory input prior to processing; the learning threshold applies to the resolved input.
 
 <br>
 

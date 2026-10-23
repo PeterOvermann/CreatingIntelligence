@@ -1017,19 +1017,23 @@ Heteroencoder A -> B. A may be partitioned. Has no input for B.
 *)
 
 heteroencoder[config_Association] := 
-	Module[ {f, dims, M},
+	Module[ {f, dims, M, learningthreshold},
 	
 	dims = First /@ config["receive_blocks"];
 	
 	M = Memory[ Join[config, <|
 		"A_parameters" -> Plus @@ config["receive_blocks"],
 		"B_parameters" -> First[config["send_blocks"]] |>  ]];
+		
+	learningthreshold = M["T"];	
 	
 	f[blocks__List] := Module[{X, Y},
 		X = ResolveBlockJoinNormal[{blocks}, dims];
 		
-		(* No input, nothing to learn. *)
-		If[X === {}, Return[{}]];
+		(* An input below the pattern matching threshold T can never 
+		   retrieve its token, and the token cannot
+		   compose with later writes, because each new token is random. *)
+		If[ Length[X] < learningthreshold, Return[{}]];
 		
 		Y = M["retrieve"][X];
 		
