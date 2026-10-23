@@ -8,7 +8,7 @@ CIRCUIT COMPONENTS
 Hetero-associative memory component for unsupervised learning.
 
 
-See also: https://creatingintelligence.org/#heteroencoder
+See also: https://creatingintelligence.org/#heteroencoding
 
 
 

@@ -143,13 +143,20 @@ Copyright © 2026 Peter Overmann. All rights reserved.
 
 #### [Hetero-Associative Memory](#hetero-associative-memory) 
 
-##### [Properties](#properties) • [Supervised learning](#supervised-learning) • [Predictive learning](#predictive-learning) • [Heteroencoder](#heteroencoder) 
+##### [Properties](#properties) • [Supervised learning](#supervised-learning) • [Predictive learning](#predictive-learning) • [Heteroencoding](#heteroencoding)  • [State transition memory](#state-transition-memory) 
+
+
+#### [Temporal-Associative Memory](#temporal-associative-memory) 
+
+##### [Temporal memory properties](#temporal-memory-properties)
+
+
 
 #### [Circuits](#circuits)
 
 ##### [Dataflow dynamics](#dataflow-dynamics) • [Schematics and components](#schematics-and-components) 
 
-#### [Recurrence and Temporal Memory](#recurrence-and-temporal-memory) 
+#### [Recurrent Architectures](#recurrent-architectures) 
 
 ##### [Recurrence](#recurrence) • [Reverberatory Circuits](#reverberatory-circuits) •  [Reservoir architecture](#reservoir-architectures)
 
@@ -175,7 +182,7 @@ Copyright © 2026 Peter Overmann. All rights reserved.
 
 #### [A Perspective on Neuroscience](#a-perspective-on-neuroscience)
 
-##### [Cerebellum](#cerebellum) • [Neocortex](#neocortex) • [The locus of learning and memory](#the-locus-of-learning-and-memory) • [The binding problem and short-term associative memory](#the-binding-problem-and-shortterm-associative-memory) • [An explanation for childhood amnesia](#an-explanation-for-childhood-amnesia) • [Step-wise response to threshold modulation](#stepwise-response-to-threshold-modulation) • [A neural equivalent of stochastic subsampling](#a-neural-equivalent-of-stochastic-subsampling) • [The signature of SHRs](#the-signature-of-shrs)
+##### [Cerebellum](#cerebellum) • [Neocortex](#neocortex) • [The locus of learning and memory](#the-locus-of-learning-and-memory) • [The binding problem and short-term associative memory](#the-binding-problem-and-shortterm-associative-memory) • [An explanation for childhood amnesia](#an-explanation-for-childhood-amnesia) • [Stepwise response to threshold modulation](#stepwise-response-to-threshold-modulation) • [A neural equivalent of stochastic subsampling](#a-neural-equivalent-of-stochastic-subsampling) • [The signature of SHRs](#the-signature-of-shrs)
 
 
 #### [Appendix: Capacity Calculations](#appendix-capacity-calculations)
@@ -312,7 +319,7 @@ the topology itself. This implies that information is represented in discrete
 form: learning modifies the topology by switching individual connections on,
 and the memory decays when those links disconnect.
 
-Rosenblatt’s model relies on continuous synaptic weights. Topological memory, by contrast, operates natively on binary neuron models. But it
+Rosenblatt's model relies on continuous synaptic weights. Topological memory, by contrast, operates natively on binary neuron models. But it
 also aligns with alternative learning mechanisms, such as dendritic plasticity.
 
 Associative topologies require an expanded hidden layer with fixed input and
@@ -408,8 +415,8 @@ Nearly synchronous spiking is clearly a prerequisite for population codes to
 materialize. Synchrony can be achieved if neurons repeatedly fire at irregular
 time intervals until a critical number of spikes occur within the same small
 time window. The phenomenon known as *temporal multiplexing*, observed in the
-[neocortex](#neocortex), aligns well with this aspect of population coding. While
-many researchers hypothesize that the microtiming of multiplexing encodes
+[neocortex](#neocortex), aligns well with this aspect of population coding.
+While many researchers hypothesize that the microtiming of multiplexing encodes
 information, this framework provides a more direct explanation: the timing
 simply reflects the sequence of a neural layer executing a memory query and
 subsequently presenting the retrieved response.
@@ -615,11 +622,9 @@ overlapping representations.
 
 Because the empty set is trivially a subset of all SHRs, querying with an empty or completely unrecognized pattern yields no unique resolution: it is a superposition of all possible knowledge.
 
-
 > **Sparse holographic representation (SHR)**  
 > A set where all possible subsets represent the same semantic information.
 > Used as an encoding scheme for symbolic tokens. 
-
 
 In formal logic, if a set and all its subsets map to the exact same semantic
 value, the set is treated as a singleton in the information space. Although it
@@ -642,8 +647,6 @@ sets by forming their union. But in order to decompose that union and recover
 its original constituents, we must group elements by their meaning, and this is
 only possible for holographic sets. Decomposition would fail if the sets
 involved had overlapping substructures.
-
-
 
 <br>
 <a id="sparse-distributed-representations"></a>
@@ -754,7 +757,7 @@ holds specific sub-feature meaning. Both SDRs and SHRs are natively processed
 within the same computational pipeline.
 
 A symbol is grounded when its abstract SHR is bound to the physical SDR of that
-object. Computationally, this is the result of [heteroencoding](#heteroencoder).
+object. Computationally, this is the result of [heteroencoding](#heteroencoding).
 For example, the perception of the color red is encoded as a class of highly
 overlapping SDRs, each representing different impressions of red. Heteroencoding
 maps these to a stable SHR: the symbol "red" is no longer a floating syntactic
@@ -1192,12 +1195,12 @@ for writing and retrieving associations $A \to B$. [Auto-associative](#auto-asso
 behavior is realized at the usage level by constraining data storage to
 autoassociations $A \to A$.
 
-A hetero-associative memory $M$ generally represents a mapping $M: U
-\to V$ from a universal set $U$ to a universal set $V$, which differs from $U$
-in dimension and object type. We call $U$ the memory's input layer and $V$
-its output layer. The memory is constructed incrementally by storing elementary
-associations $A \to B$, where $A \subset U$ and $B \subset V$ are small subsets
-of their respective universes.
+A hetero-associative memory $M$ generally represents a mapping 
+$M: U \to V$ from a universal set $U$ to a universal set $V$, 
+which differs from $U$ in dimension and object type. We call $U$ the memory's
+input layer and $V$ its output layer. The memory is constructed incrementally by
+storing elementary associations $A \to B$, where $A \subset U$ and $B \subset V$
+are small subsets of their respective universes.
 
 An [auto-associative memory](#auto-associative-memory) maps a universal set $U$ onto itself. In
 this case, the memory's input and output layers are shared, and the memory
@@ -1248,9 +1251,9 @@ change certain behaviors listed above.
 
 Memory retrieval functions via subset pattern matching:
 
-When queried with a set $A \subset U$, the memory retrieves an association $X
-\to Y$ by identifying the best partial match $X \subseteq A$ and its associated
-set $Y \subset V$.
+When queried with a set $A \subset U$, the memory retrieves an association 
+$X \to Y$ by identifying the best partial match $X \subseteq A$ 
+and its associated set $Y \subset V$.
 
 > **Best match**  
 > For a query pattern $A$, the best match $X \to Y$ is defined as the unique
@@ -1261,7 +1264,7 @@ set $Y \subset V$.
 Here are the main properties of this mechanism:
 
 - The size of the matching patterns $X$ and $Y$ may vary, but must exceed the
-  thresholds defined by the memory’s [hyperparameters](#hyperparameters).
+  thresholds defined by the memory's [hyperparameters](#hyperparameters).
 
 - An implementation should give an empty result if there is no match meeting
   those requirements. This mechanism, based on overlap probabilities within the
@@ -1388,6 +1391,12 @@ or fails if the remaining elements drop below the hyperparameter threshold.
 Note on pattern attribution: While the core algorithm returns the retrieved
 pattern $Y$, the matching subset $X \subseteq A$ is manifested internally. It
 can be exposed via an API function to support an application's explainability.
+
+The core retrieval algorithm can be extended with a per-query matching
+threshold that grows with the size of the query pattern $A$: the threshold
+$T$ in steps 2 and 5 is replaced by an effective threshold derived from $T$
+and a residual $Q$, introduced [below](#hyperparameters).
+
 
 Implementation details:
 
@@ -1549,20 +1558,20 @@ with sparse holographic representations (SHRs) of uniform sparsity.
 | $P_A$             | input population | |
 | $N_B$             | output dimension | $N_B = N_A$ if auto-associative |
 | $P_B$             | output matching threshold | $P_B = P_A$ if auto-associative  |
-| $T$               | input matching threshold |computed automatically or set explicitly |
-
+| $T$               | input matching threshold | computed automatically or set explicitly |
+| $Q$               | residual: maximum number of non-matching input elements absorbed as noise | unlimited by default |
 
 Auto-associative memory is realized by a configuration with $N_B = N_A$ and
 $P_B = P_A$.
 
 A software or hardware implementation of topological associative memory should
-allow arbitrary-sized patterns to be stored into memory. In particular,
-it should not treat storing an association involving an empty set as an error.
-For a write operation to affect the
-memory state, $A$ must have at least two elements, and $B$ must be non-empty.
+allow arbitrary-sized patterns to be stored into memory. In particular, it
+should not treat storing an association involving an empty set as an error. For
+a write operation to affect the memory state, $A$ must have at least two
+elements, and $B$ must be non-empty.
 
-In memory retrieval, a successful match must include at least $T$ elements of
-$A$ and $P_B$ elements of $B$.
+In memory retrieval, a successful match must include at least $\max(T, |A| - Q)$
+elements of $A$ and $P_B$ elements of $B$.
 
 By default, the pattern matching threshold $T$ is automatically set to a value
 that minimizes false-positive matches. This is based on the memory's capacity
@@ -1571,11 +1580,19 @@ Computing $T$ involves the full set of hyperparameters.
 
 The automatically computed value of $T$ is optimized for a memory that stores
 SHRs. This default can be overridden, which is often necessary when operating
-on SDRs. The pattern matching threshold is a global parameter within the memory
-instance; it cannot be adjusted on a per-query basis. If an explicit value is
+on SDRs. Like all hyperparameters, $T$ is a global parameter within the memory
+instance. It cannot be adjusted on a per-query basis. If an explicit value is
 specified for $T$, the value of $P_A$ has no effect on the memory's operation:
 either $P_A$ or an explicit value of $T$ governs the pattern matching logic,
 but not both at the same time.
+
+The residual $Q$ bounds the number of query elements that retrieval may
+discard as noise. For any finite $Q$, the effective threshold
+$\max(T, |A| - Q)$ therefore grows with the size of the query, while $T$
+remains the lower bound for small queries. $Q = 0$ requires a full match.
+Values well below $P_A$, for instance $P_A/2$, absorb noise but still reject
+a query that contains an additional SHR, which contributes close to $P_A$
+non-matching elements. This enables matching of SHR bundles of variable size.
 
 Apart from these hyperparameters, the memory algorithm contains no other
 configuration options &mdash; it is neither necessary nor possible to fine-tune
@@ -1806,10 +1823,10 @@ Substituting the hypergeometric probability for $p(T)$ and the nominal capacity 
 
 $$\left( \ln(2) \frac{N_A (N_A - 1) N_B}{P_A (P_A - 1) P_B}\right)^2 \cdot \binom{P_A}{T} \binom{N_A - P_A}{P_A - T} \binom{N_A}{P_A}^{-1} < 1$$
 
-
-This requirement can be fulfilled only for inputs with populations $P_A
-\ge 7$. For smaller populations, we set $T = P_A$, which means all elements
-of the input pattern must match.
+This requirement can be fulfilled only for inputs with populations 
+$P_A \ge 7$. 
+For smaller populations, we set $T = P_A$, which means all elements of the input
+pattern must match.
 
 The following table shows the pattern matching threshold $T$ for various
 hyperparameter configurations $N = N_A = N_B$ and $P = P_A = P_B$:
@@ -1930,9 +1947,11 @@ unordered collections. To represent ordering, we need to use either [block
 coding](#block-coding) or [permutations](#permutation).
 
 Associativity: the grouping of sets during the bundling process does not affect
-the resulting representation. $(A \cup B) \cup C$ produces the same set as $A \cup (B \cup C)$. Similarly, because the operation is
-commutative, the order of sets in the bundle is also irrelevant. This allows us
-to build up bundles incrementally, in any order.
+the resulting representation. $(A \cup B) \cup C$ produces the same set as 
+$A \cup (B \cup C)$. 
+Similarly, because the operation is commutative, the order of sets in the bundle
+is also irrelevant. This allows us to build up bundles incrementally, in any
+order.
 
 The bundling operation preserves similarity: Both $A$ and $B$ are similar to $A
 \cup B$, as measured by their overlaps. In comparison, the
@@ -2056,7 +2075,7 @@ any other set. From a computational point of view, we just need to properly
 re-index the elements with a contiguous range of numbers. This process is
 structurally equivalent to concatenating the sets' characteristic vectors.
 
-Notably, auto-associative memory preserves the partitioned structure. Storing
+Auto-associative memory preserves the partitioned structure. Storing
 an association $(A,B) \to (A,B)$ in memory treats the inputs as
 one contiguous set, linking information across the partitions. Querying the
 memory with a partially filled structure such as $(A, \varnothing)$
@@ -2228,7 +2247,7 @@ mapping is known as cyclic shift, roll, or right-rotation.
 
 In biologically plausible models, information processing must be generally
 invariant against the natural permutation of signals as they travel along
-neural pathways. The exception to this rule: by design, recurrence
+neural pathways. An exception to this rule: by design, recurrence
 inside the auto-associative architecture does not permute information.
 
 Permutation is an invertible operation, and the cyclic shift approach is
@@ -2284,7 +2303,7 @@ Auto-associative memory can handle any type of set, regardless of its semantic
 interpretation: sparse holographic representations ([SHRs](#sparse-holographic-representations)), their
 [bundles](#bundling), partitioned sets resulting from disjoint bundles, memory
 pointers, and general sparse distributed representations ([SDRs](#sparse-distributed-representations)).
-Notably, the [binding](#binding) operation for symbolic
+The [binding](#binding) operation for symbolic
 representations is realized through storing SHR bundles in auto-associative
 memory.
 
@@ -2417,11 +2436,6 @@ realized through memory-internal recurrence. Output retrieved from memory is
 routed back, updating the state of the  memory's input layer. How the output
 interacts with the input is governed by the memory's update rule.
 
-In this framework, hetero-associative memory cannot simulate autoassociations
-because, as discussed earlier, an external recurrent pathway would inevitably
-permute the signal. Internal recurrence within the auto-associative topology is
-the only mechanism that leaves feedback unscrambled.
-
 The choice of the update rule defines the system's dynamics. Below are the most
 common configurations for managing the relationship between the memory's input
 layer (state) $X$ and the computed output $Y$.
@@ -2452,9 +2466,7 @@ non-matching elements. Used iteratively in conjunction with stochastic
 subsampling, this mechanism converges incrementally to a stable state.
 
 The *coincidence* update mechanism retains only the matching elements,
-without completing the pattern. This rule can also be applied in
-hetero-associative memory. All other update rules discussed here are unique to
-autoassociations.
+without completing the pattern. 
 
 The *residual* update rule removes the retrieved pattern from the memory's
 state, leaving only the novel elements.
@@ -2519,7 +2531,7 @@ A generic auto-associative feedback algorithm consists of the following
 steps: 
 
 
-**Configuration:** Auto-associative memory $M$, stochastic decimation factor $D$, learning threshold $L$, pattern matching threshold $T$.
+**Configuration:** Auto-associative memory $M$, stochastic decimation factor $D$, learning threshold $L$, pattern matching threshold $T$, update rule $u$.
 
 **Input:** Sets $A_t$ (external input) and $X_{t-1}$ (feedback from previous cycle $t-1$)
 
@@ -2532,7 +2544,7 @@ steps:
 
 3. **Learn:** If $Y = \varnothing$ and $\vert X\vert \ge L$, store $X\to X$ in $M$ and let $Y \gets X$
 
-4. **State Update:** $X_t \gets \texttt{updaterule}(Y, X)$
+4. **State Update:** $X_t \gets u(Y, X)$
 
 5. **Output**: Return $X_t$
 
@@ -2758,14 +2770,13 @@ The approximation $(P-1/2)/P$ is valid for very large dimensions $N$.
 A relatively small bipartite memory with two blocks of dimension $N = 1,000$ and population $P = 10$ can store and
 accurately retrieve nominally 769,393 bidirectional associations. 
 
-
-Note on the [pattern matching threshold](#pattern-matching-threshold) for partitioned
-autoassociations: calculating the threshold based on an unpartitioned
-representation gives a mathematically conservative upper bound. Since
-partitioning slightly reduces overall capacity, this assumption safely protects
-against false-positive matches without threshold adjustments. Therefore, the
-fact that the memory algorithm is "blind" to partitioning does not impair its
-functionality.
+Note on the [pattern matching threshold](#pattern-matching-threshold) for
+partitioned autoassociations: calculating the threshold based on an
+unpartitioned representation gives a mathematically conservative upper bound.
+Since partitioning slightly reduces overall capacity, this assumption safely
+protects against false-positive matches without threshold adjustments.
+Therefore, the fact that the memory algorithm is "blind" to partitioning does
+not impair its functionality.
 
 
 <br>
@@ -3258,7 +3269,7 @@ of red circles, so we can assume that the query returns the binding
 "redcircle". But in case of a novel perception, for instance an orange circle,
 the corresponding memory query fails: a new random SHR representing the binding
 "orange circle" must be deployed. This way, higher-level representations are
-generated on the fly. This is a form of [heteroencoding](#heteroencoder).
+generated on the fly. This is a form of [heteroencoding](#heteroencoding).
 
 Depending on the context, binding can be linked to long-term memory or to a
 short-term associative memory where information decays quickly.
@@ -3323,7 +3334,7 @@ and a hetero-associative readout mechanism is discussed further below.
 
 # <a id="hetero-associative-memory">Hetero-Associative Memory</a>
 
-##### [Properties](#properties) • [Supervised learning](#supervised-learning) • [Predictive learning](#predictive-learning)• [Heteroencoder](#heteroencoder) 
+##### [Properties](#properties) • [Supervised learning](#supervised-learning) • [Predictive learning](#predictive-learning) • [Heteroencoding](#heteroencoding)  • [State transition memory](#state-transition-memory) 
 
 <br>
 
@@ -3454,20 +3465,28 @@ analogue to predictive processing (or predictive coding) in the brain.
 
 Implemented as a self-contained system component, a hetero-associative
 predictor simply carries its input $A_t$ over to the following cycle.
+Within a cognitive architecture, a predictor component serves as the readout
+memory for a reservoir representing the system's current state.
 
 
 <br>
-<a id="heteroencoder"></a>
+<a id="heteroencoding"></a>
 
-### Heteroencoder
+### Heteroencoding
 
-In the topological memory framework, the transition from continuous perception data to discrete symbolic tokens uses a dedicated bridging mechanism: the heteroencoder. A heteroencoder is an unsupervised learning process that translates overlapping perceptual data (SDRs) into stable symbolic tokens (SHRs). Rather than extracting continuous hidden features from an input, a heteroencoder acts as a discrete classifier. It operates dynamically on the boundary between the known and the unknown. 
+In the topological memory framework, the transition from continuous perception data to discrete symbolic tokens uses a dedicated bridging mechanism: the heteroencoder. Heteroencoding is an unsupervised learning process that translates overlapping perceptual data (SDRs) into stable symbolic tokens (SHRs). Rather than extracting continuous hidden features from an input, a heteroencoder acts as a discrete classifier. It operates dynamically on the boundary between the known and the unknown. 
 
 When a heteroencoder receives an input $A$, it attempts to retrieve an output
 value $B$ from memory. The query fails if $A$ is a novel pattern. In this case,
-the encoder generates a new random SHR $B$ on the fly and stores the
-association $A \to B$ in memory. This autonomous learning mechanism
-guarantees that any input, as long as it is above a certain size, returns an SHR.
+the encoder generates a new random SHR $B$ on the fly and stores the association
+$A \to B$ in memory. This autonomous learning mechanism guarantees that every
+input with at least $T$ elements (the [pattern matching
+threshold](#pattern-matching-threshold)) returns a token. Smaller inputs return
+an empty result and are not learned: unlike storage with a fixed teaching
+signal, heteroencoding mints a random output for each such input, so the
+association [cannot combine with later writes](#properties), and its token could
+never be retrieved.
+
 
 > **Heteroencoding**  
 > An unsupervised learning process that maps sets (SDRs or SHRs) to 
@@ -3476,24 +3495,277 @@ guarantees that any input, as long as it is above a certain size, returns an SHR
 
 Heteroencoding is the bridge from perceptual information (SDRs) to symbols,
 represented as SHRs. Similar SDRs, for example, encodings of nearby color hues,
-are intrinsically mapped to the same SHR, subject to the memory's pattern
+are mapped to the same SHR, subject to a suitably chosen pattern
 matching threshold. This mechanism functions as an unsupervised classifier or
-clustering algorithm for sets. 
+clustering algorithm for sets.
+
+The same mechanism also performs the opposite operation, pattern separation:
+inputs that share most of their elements can be mapped to unrelated SHRs.
+Clustering and separation are not competing mechanisms. A heteroencoder makes a
+single binary decision, whether an input matches something it has already
+named. It returns either a stored SHR or a new random one. Plotted against
+input overlap, output overlap therefore forms a step. Inputs that meet the
+matching criterion converge onto one token, and their differences are erased
+(clustering). Inputs that fall short of it diverge into unrelated tokens, and
+their remaining similarity is erased (separation). Every heteroencoder does
+both. The matching criterion sets where the step occurs, and thus the
+granularity of the resulting categories, much like the vigilance parameter of
+adaptive resonance theory (Carpenter and Grossberg 1987).
+
+> **Pattern separation and clustering**  
+> Two outcomes of the same binary decision: inputs that match a stored
+> pattern converge onto its token, all others diverge into new, unrelated
+> tokens. The matching criterion sets the boundary between the two.
+
+The default [pattern matching threshold](#pattern-matching-threshold) $T$ is
+calibrated to suppress false-positive matches in a memory filled to its nominal
+capacity with random SHRs. Heteroencoding any other kind of input requires an
+explicitly chosen matching criterion. For overlapping SDRs, a custom threshold
+decides how much overlap counts as “the same”, and thus how coarse the resulting
+categories are, for example how far apart two color hues must be to receive
+different tokens.
+
+For bundles of SHRs, a fixed threshold is not sufficient. A single shared SHR
+already reaches $T$, so a bundle that shares one item with a stored bundle would
+retrieve that bundle's token. The criterion must grow with the size of the
+bundle, which is what the residual $Q$ (unlimited by default) provides when set
+explicitly: retrieval may discard at most $Q$ query elements as noise, so a
+match must include at least $\max(T, |A| - Q)$ elements of the query $A$. The
+threshold $T$ remains the lower bound for small inputs, such as a single SHR. A
+residual $Q = 0$ requires a full match, which is an idealization. A value well
+below the population $P_A$ of a single SHR, for instance $P_A/2$, absorbs noise,
+yet still separates bundles that differ by one item, because a new item
+contributes close to $P_A$ non-matching elements.
+
+The criterion is asymmetric with respect to set inclusion. An input contained in
+a known input is not new: it retrieves that input's token, as long as at least
+$T$ of its elements remain. An input that contains a new item is new: the item
+contributes close to $P_A$ non-matching elements, more than the residual
+absorbs, and the input receives its own token. Two bundles that each hold an
+item the other lacks are therefore separated, while a part of a known bundle is
+recognized. A part shared by several bundles retrieves the
+[superposition](#properties) of their tokens. This response is not a stored
+entry; it reflects every encoded bundle that contains the part and grows as
+further such bundles are encoded. No rule selects among these outcomes:
+recognition, separation and superposition all follow from one retrieval over the
+aggregate of stored associations, which is why a table of explicit entries
+cannot reproduce them. At the level of items, the inputs that receive tokens
+form an antichain, for the same reason that
+[hyperassociations](#hyperassociations) satisfy the Sperner property: a subset
+of known information is not new.
+
+
+A stepwise transfer function of this kind has been reported for the combined
+CA3/dentate gyrus region, in contrast to a graded response in CA1 (Lacy et al.
+2011).
 
 Traditional neurosymbolic architectures require complex pipelines to translate
 continuous dense embeddings into discrete tokens. The heteroencoder does this
-using only sparse representations. This natively grounds symbols to physical
+using only sparse representations. This natively grounds symbols in physical
 reality.
 
-Apart from mapping SDRs to SHRs, heteroencoding can be used to transcode
-symbols between spaces with different dimensions ($N$) or populations ($P$).
-This enables the transfer of SHRs between circuits that operate under distinct
-hyperparameter constraints, preserving their semantic meaning while converting
-their mathematical footprint.
+Apart from mapping SDRs to SHRs, heteroencoding can be used to transcode symbols
+between spaces with different dimensions ($N$) or populations ($P$). This
+enables the transfer of SHRs between circuits that operate under distinct
+hyperparameter constraints, preserving their meaning while changing their
+dimensions and populations.
 
 Applied to a partitioned set where SHRs are separated into non-overlapping
-blocks, heteroencoding can consolidate such arrays into new, more compact
-symbolic representations. 
+blocks, heteroencoding can consolidate the set's blocks into new, more compact
+symbolic representations.
+
+<br>
+<a id="state-transition-memory"></a>
+
+### State transition memory
+
+
+A state transition memory stores heteroassociations $A \to B$ in which $A$ and
+$B$ are drawn from the same representational space. It receives a query
+signal $A$ and a teaching signal $B$. If the teaching signal is present, the
+memory stores $A \to B$. It then retrieves the pattern associated with $A$:
+after storage, it returns the best match over all stored associations, which need not equal the newly taught pattern.
+
+> **State transition memory**  
+> A memory topology with a shared input and output space that stores
+> heteroassociations from an external teaching signal.
+
+Because input and output share one space, every output can serve as a valid
+query. Routed back through an external feedback path, the memory follows a
+best-match trajectory, one transition per execution cycle. Unlike the
+[temporal-associative memory](#temporal-associative-memory) discussed in the
+next chapter, a state transition memory holds no internal state. The trajectory
+exists only in the circulating signal, and without the feedback path the memory
+performs a single transition and stops. The run ends at a state where memory
+retrieval returns no unique best match, which indicates either an unknown state
+or a tie in the pattern matching algorithm. The same setup supports online
+learning, storing an entire sequence in a single pass.
+
+State transition memory obeys the storage properties of
+[heteroassociations](#properties). A state with several stored successors
+retrieves their superposition, and different states that lead to the same
+successor remain separate. The [update rule](#update-rules) determines how the
+retrieved pattern is combined with the query to form the output. With
+*replacement*, the output is the retrieved pattern $B$ itself. With
+*complement*, the output is $B \setminus A$: only the elements that the
+transition adds. This matters where the retrieved pattern overlaps with the
+query, as in production rules that rewrite part of a bundle.
+
+State transition memory is naturally suited to represent finite automata. A
+deterministic finite automaton (DFA) is defined by a transition function
+$\delta(q, a) = q'$ that maps the current state $q$ and an input symbol $a$ to
+the next state $q'$. State transition memory implements $\delta$ directly: the
+query combines $q$ and $a$, either as a bundle or as two disjoint blocks, and
+the teaching signal is $q'$. In the block-coded form, the teaching signal's
+symbol block remains empty. 
+
+A DFA requires the *replacement* update rule, which returns the next state
+itself. The output can then be fed back and merged with the next input symbol.
+Rules that combine the retrieved pattern with the query would alter the state:
+*complement* returns nothing for a transition that keeps the state, which halts
+the automaton. Under *replacement*, only an undefined transition returns the
+empty set and halts the automaton. This corresponds to a missing transition in a
+partial automaton, or to the dead state of its completion.
+
+# <a id="temporal-associative-memory">Temporal-Associative Memory</a>
+
+##### [Temporal memory properties](#temporal-memory-properties)
+
+The auto-associative memory as introduced earlier processes spatial associations
+where all elements of a stored pattern are present at the same time. This
+reflects a network topology with a single layer that functions as the memory's
+input and output, and where there is no input for a separate teaching signal.
+
+This chapter introduces a memory type that operates within the auto-associative
+topology, but stores heteroassociations: temporal-associative memory associates
+its previous state with the current input, and predicts the next input based on
+its current integrated state.
+
+The state is maintained inside the memory rather than routed through external
+pathways. A prediction is of the same type as the input that follows
+it, and it can take the place of that input to generate a temporal sequence.
+
+> **Temporal-associative memory**  
+> A recurrent memory topology with a shared input and output layer that 
+> associates its integrated state with the subsequent input.
+
+Presented with overlapping temporal sequences, the memory may learn a bundle of
+overlapping trajectories. This is an inherent behavior of topological memory
+that cannot be directly emulated via finite states and transition probabilities.
+
+How external signals are integrated with the state is governed by [update
+rules](#update-rules), introduced in the context of auto-associative memory and
+extended here by [permutation](#permutation). Stochastic subsampling controls
+the state's sparsity.
+
+The topological memory's ability to [separate known from
+unknown](#separating-known-from-unknown) applies to predictions as well. An
+empty prediction signals an unfamiliar context or a pattern matching tie. A
+non-empty prediction that fails to match the next input signals a surprise. This
+distinction between the absence of an expectation and a violated expectation
+underlies more advanced cognitive architectures.
+
+<br>
+<a id="temporal-memory-properties"></a>
+
+### Temporal memory properties
+
+
+We use the following notation: $A_t$ is the input at clock tick $t$, $S_t$ the
+memory's state after integrating $A_t$, and $Y_{t+1} = M(S_t)$ the prediction
+retrieved from the memory $M$. Input, state, and prediction share one
+representational space with identical dimensions, and inputs have population $P$.
+
+**Storage and retrieval.** At every clock tick, the memory performs three
+operations:
+
+1. **Store:** $S_{t-1} \to A_t$ in $M$
+2. **Integrate:** $S_t \gets u(A_t, S'_{t-1})$
+3. **Retrieve:** $Y_{t+1} \gets M(S_t)$
+
+Here $S'_{t-1}$ denotes the previous state after [stochastic
+subsampling](#stochastic-subsampling). The update rule $u$ determines what the
+state remembers of the past. Three basic forms cover the main applications:
+
+| **Update Rule** | **Set Operation** | **Temporal Context** |
+|:-----------------|:------------------|:---------------------|
+| replacement | $S_t \gets A_t$ | previous input only |
+| augmentation | $S_t \gets A_t \cup S'_{t-1}$ | unordered set of recent inputs |
+| [permutation](#permutation) | $S_t \gets A_t \cup \pi S'_{t-1}$ | ordered sequence of recent inputs |
+
+<br>
+
+The memory's state capacity $\hat{P}$ is the maximum population of the state
+carried over to the next cycle: [signal capping](#stochastic-subsampling)
+reduces a state $S$ to a state $S'$ of at most $\hat{P}$ elements.
+
+
+The memory stores an association at every cycle, even when its prediction
+was correct. A correct prediction does not imply that the state matched a
+previously stored state exactly: partial pattern matching may have resolved a
+variant of a known state. Storage is idempotent: because each write operation
+updates memory sets by union, storing $S \to A$ twice leaves the memory in the
+same state as storing it once. Continuous learning therefore adds information
+only for associations not stored before, such as new subsampled variants of a
+familiar state. These variants broaden the associative base of the prediction.
+
+
+With *permutation* and *augmentation*, the state reaches a steady population of at most $P + \hat{P}$. From then on, each subsampling step retains a fraction $\hat{P}/(P + \hat{P})$ of the state, so an input received $k$ cycles ago contributes an expected
+
+$$P \left(\frac{\hat{P}}{P + \hat{P}}\right)^{k}$$
+
+elements to $S_t$. Past inputs fade geometrically rather than dropping out at a fixed horizon. With permutation, the memory therefore resembles a Markov model whose order is soft rather than fixed. The replacement update rule corresponds to $\hat{P} = 0$ and yields a first-order model.
+
+The state capacity determines the effective order of the model: it governs how
+far into the past the state reaches on average. Within this reach, the order
+used for an individual prediction varies, because different subsampled variants
+of a context retain different elements of the past. Continuous learning
+accumulates the associations of these variants over repeated exposure. A larger
+state capacity therefore raises the attainable order. Repetition
+determines how quickly the memory approaches it.
+
+
+Temporal associations obey the storage properties of
+[heteroassociations](#properties). Two properties are particularly relevant for
+sequences:
+
+- *Branching:* storing $S \to A_1$ and $S \to A_2$ is equivalent to storing 
+  $S \to A_1 \cup A_2$. A state with several known continuations predicts their
+  superposition.
+- *Convergence:* storing $S_1 \to A$ and $S_2 \to A$ is not equivalent to
+  storing $S_1 \cup S_2 \to A$. Different histories can lead to the same
+  continuation without being merged.
+
+Unlike autoassociations, temporal associations are not
+[irreducible](#irreducibility). A whole can be learned from parts that arrive
+at different times. Under *augmentation*, each part is associated with the
+accumulated set of preceding parts. Observed in different orders, these
+associations combine so that a partial observation predicts the 
+remaining parts.
+
+In a simulation with a string of 2,000 random characters `A` to `Z`, prediction
+accuracy reaches about 98% after the first epoch and 100% after the second.
+The accuracy is measured online during the pass.
+This result illustrates a distinctive learning regime. Each presentation stores
+the associations of its states completely and in a single step. There is no
+learning rate and no gradual strengthening of connections. Because each
+subsampled state carries only part of the context, a repeated presentation
+stores new samples of the same context rather than repeating what is already
+known. Storage only adds connections, so learning cannot overwrite earlier
+associations. Forgetting requires an explicit decay mechanism.
+
+> **Sampled one-shot learning**  
+> Each exposure stores the associations of its subsampled states completely
+> and in one step. Repetition extends the coverage of the context instead of
+> strengthening existing associations.
+
+This regime differs from gradient-based learning, which needs many passes
+through the data, depends on a learning rate, and can overwrite earlier 
+learning (catastrophic forgetting).
+It also differs from lookup tables of $n$-gram statistics, which learn in one
+pass but enumerate their contexts explicitly and cannot generalize to similar
+ones.
+
 
 
 # <a id="circuits">Circuits</a>
@@ -3709,7 +3981,7 @@ pathways to the receiving components where it is processed (the *tock* phase).
 Therefore, a circuit component delays the signal flow by one cycle.
 
 Whereas circuit components generally maintain a state between evaluation
-cycles, pathways are strictly stateless conduits. They do not remember
+cycles, pathways are stateless conduits. They do not remember
 what signal flowed through them in the previous cycle. (Even the temporal
 gating mechanism is based on an external clock, not the data payload.)
 
@@ -3859,7 +4131,7 @@ In this framework, the simplest recurrent network consists of
 a delay component with an external feedback line:
 
 <p align="center">
-  <img width="230" alt="image" src="assets/recurrencesimple.png"><br>
+  <img width="230" alt="image" src="assets/recurrence.png"><br>
   <em>A basic recurrent architecture.</em>
 </p>
 
@@ -3962,12 +4234,12 @@ similar inputs.
 
 <p align="center">
   <img width="220" alt="image" src="assets/heteroencoder.png"/><br>
-  <em>A *heteroencoder* circuit components works as a classifier, categorizing input patterns and generating a unique token for each detected cluster. </em>
+  <em>A *heteroencoder* circuit component works as a classifier, categorizing input patterns and generating a unique token for each detected cluster. </em>
 </p>
 
 
 
-# <a id="recurrence-and-temporal-memory">Recurrence and Temporal Memory</a>
+# <a id="recurrent-architectures">Recurrent Architectures</a>
 
 ##### [Recurrence](#recurrence) • [Reverberatory Circuits](#reverberatory-circuits) •   [Reservoir architecture](#reservoir-architectures)
 
@@ -4109,12 +4381,13 @@ to hold information over a longer time window.
 
 Instead of filling the reservoir with raw incoming tokens, this circuit
 transcribes each incoming token pair into a bigram. The bigram encoding
-mechanism shown here uses a [heteroencoder](#heteroencoder) memory component that
-generates a new sparse holographic representation (SHR) for every unique token
-pair. Bigram encoding squares the representational space, vastly increasing the
-circuit's learning capacity. For example, a data stream consisting of digits 0
-to 9 (a 10-token lexicon) expands to 100 different bigram tokens, activating a
-much larger section of the topological memory's latent space.
+mechanism shown here uses a [heteroencoder](#heteroencoding) memory component
+that generates a new sparse holographic representation (SHR) for every unique
+token pair. Bigram encoding squares the representational space, vastly
+increasing the circuit's learning capacity. For example, a data stream
+consisting of digits 0 to 9 (a 10-token lexicon) expands to 100 different bigram
+tokens, activating a much larger section of the topological memory's latent
+space.
 
 In this architecture, the readout node associates predictions not only with the
 reservoir's state, but also directly with the current input. This shortcut
@@ -4359,7 +4632,7 @@ or unsupervised clustering with a separate hetero-associative memory instance.
 
 We can measure the semantic similarity between words directly through a
 comparison of their dense activation patterns. This requires a similarity
-metric that compensates for the probability of random overlaps among dense
+metric that compensates for chance overlaps among dense
 representations &mdash; a straight overlap or Jaccard distance calculation does
 not account for this. The adjusted Rand index (ARI), defined in the formula
 below, is a suitable measure for the similarity of dense distributed
@@ -4391,7 +4664,7 @@ of the ARI computation is a process located within the memory's expanded hidden 
 
 ### Frames
 
-Marvin Minsky’s frame theory, introduced in his 1974 MIT AI Memo, models
+Marvin Minsky's frame theory, introduced in his 1974 MIT AI Memo, models
 knowledge as a collection of "frames": modular data structures representing
 stereotyped situations. Frames function as interconnected grid-shaped subgraphs
 of the mind's knowledge hypergraph. This nicely aligns with auto-associative
@@ -4581,7 +4854,7 @@ Netherlands Amsterdam Dutch Euro
 ```
 
 The following query results in a 2-to-2 tie between "France" and "UK". In such
-an unstable situation, the outcome is influenced by possible random overlaps
+an unstable situation, the outcome is influenced by chance overlaps
 between the underlying SHRs, causing the two competing inputs to have slightly
 different populations. Also randomized subsampling of the input may nudge the
 system into a nearby stable state.
@@ -4913,7 +5186,8 @@ memory or transmission glitches, considering the associative memory's
 resilience against systematic and statistical errors. This should significantly
 reduce production costs.
 
-A von Neumann computer relies on a central processor. An associative connection machine has none: computation is fully distributed across decentralized memory units.
+A von Neumann computer relies on a central processor. An associative connection 
+machine has none: computation is fully distributed across decentralized memory units.
 
 Some nodes can receive external inputs, which are already preprocessed and
 encoded as small sets. Different input nodes specialize in various data types,
@@ -4925,7 +5199,8 @@ adapting to changing external inputs, continuing processing even in their
 absence.
 
 Conventional computers have two bottlenecks that lead to high-pressure data
-flow: small word sizes (up to 64 bits) and narrow memory interfaces. An associative connection machine uses hyperdimensional
+flow: small word sizes (up to 64 bits) and narrow memory interfaces. An associative 
+connection machine uses hyperdimensional
 words (such as 8, 16 or 32 Kbits). Neighboring nodes exchange only sparse data.
 
 Eliminating these two bottlenecks
@@ -5129,7 +5404,7 @@ When a stochastic memory decay mechanism is enabled, we can protect commonly
 used memory traces from fading by writing them back to memory after each
 successful retrieval. With a memory operating at its nominal capacity,
 this write operation will trigger the stochastic deletion of other, competing
-memories. This approach aligns with a phenomenon known as retrieval-inspired
+memories. This approach aligns with a phenomenon known as retrieval-induced
 forgetting (RIF) in cognitive psychology: successfully recalling a 
 memory suppresses and weakens competing, noisy associations.
 
@@ -5258,7 +5533,7 @@ Raw retrieval corresponds to the classical recall procedure of binary associativ
 
 # <a id="a-perspective-on-neuroscience">A Perspective on Neuroscience</a>
 
-##### [Cerebellum](#cerebellum) • [Neocortex](#neocortex) • [The locus of learning and memory](#the-locus-of-learning-and-memory) • [The binding problem and short-term associative memory](#the-binding-problem-and-shortterm-associative-memory) • [An explanation for childhood amnesia](#an-explanation-for-childhood-amnesia) • [Step-wise response to threshold modulation](#stepwise-response-to-threshold-modulation) • [A neural equivalent of stochastic subsampling](#a-neural-equivalent-of-stochastic-subsampling) • [The signature of SHRs](#the-signature-of-shrs)
+##### [Cerebellum](#cerebellum) • [Neocortex](#neocortex) • [The locus of learning and memory](#the-locus-of-learning-and-memory) • [The binding problem and short-term associative memory](#the-binding-problem-and-shortterm-associative-memory) • [An explanation for childhood amnesia](#an-explanation-for-childhood-amnesia) • [Stepwise response to threshold modulation](#stepwise-response-to-threshold-modulation) • [A neural equivalent of stochastic subsampling](#a-neural-equivalent-of-stochastic-subsampling) • [The signature of SHRs](#the-signature-of-shrs)
 
 
 <a id="cerebellum"></a>
@@ -5299,7 +5574,7 @@ hetero-associative topologies and supervised learning.
 Interestingly, climbing fibers fire continuously at an average
 rate of about 1 Hz, mimicking irregular, Poisson-like noise. 
 Hypothetically, this random generator might be the source of new
-SHRs which get deployed within the [hetero-encoding](#heteroencoder) mechanism. 
+SHRs which get deployed within the [heteroencoding](#heteroencoding) mechanism. 
 Because climbing fiber activation triggers a prolonged depolarization,
 such complex spikes can be temporally integrated to form new
 sparse representations, ready to be used as a new teaching signal.
@@ -5317,10 +5592,10 @@ functioning via subset pattern matching.
 
 ### Neocortex
 
-Reverse-engineering the neocortex’s architecture from the viewpoint of our
+Reverse-engineering the neocortex's architecture from the viewpoint of our
 topological memory shows that it is auto-associative: input and output
 functions are localized within the same neural layer. And the architecture
-lacks a secondary input, analogous to the cerebellum’s climbing fibers,
+lacks a secondary input, analogous to the cerebellum's climbing fibers,
 required for learning heteroassociations.
 
 We see this dual-use design of the input/output layer in a phenomenon known as
@@ -5359,12 +5634,13 @@ complex data structures composed of symbols and pointers, combined to represent
 knowledge as hypergraphs.
 
 Mountcastle did not believe his columnar theory extended to other parts of the
-brain, such as the cerebellum. In fact, he viewed the neocortex’s particular
+brain, such as the cerebellum. In fact, he viewed the neocortex's particular
 structure as the exclusive key to higher brain function. But from the 
 perspective of topological memory, the neocortex and the cerebellum share
 the same abstract network topology from which associative memory emerges.
 This suggests that both structures, despite their evident differences,
 perform the same basic computation.
+
 
 
 <br>
@@ -5386,7 +5662,7 @@ learning occurs through the modification of synaptic strength. Hebb (1949)
 described synaptic plasticity from a biological perspective. Contrary to common
 belief, he did not imply that connection strength is a carrier of continuous
 information. Within the context of our topological associative memory, synaptic
-weight is strictly binary. This is consistent with Warren McCulloch's and
+weight is binary. This is consistent with Warren McCulloch's and
 Walter Pitts' original artificial neuron model (1943). If synaptic strength is
 indeed a valid concept, its function would be to encode the connection's
 permanence, not just a fractional piece of a memory.
@@ -5490,27 +5766,62 @@ hippocampus.
 
 ### An explanation for childhood amnesia
 
+Childhood amnesia &mdash; the inability to recall memories from before age
+three or four &mdash; lacks a consensus biological explanation. Topological
+memory suggests a mechanism that requires no loss of stored information.
 
-Childhood amnesia &mdash; the inability to recall memories prior to age three
-or four &mdash; lacks a consensus biological explanation. This phenomenon turns
-out to be consistent with our topological model of long-term memory.
+Memory retrieval depends on the population of the stored patterns. The
+[kWTA](#k-winners-take-all) step selects the $k$ most strongly activated output
+elements and accepts them only if the weakest reaches the threshold derived
+from $T$. Here, $k$ corresponds to the memory's population hyperparameter $P$
+(in an auto-associative memory, $P_A = P_B = P$). A stored pattern with fewer
+than $P$ elements cannot supply enough winners. Retrieval returns the empty
+set, and the pattern is classified as unknown, even if every connection that
+encodes it is still present.
 
-A newborn possesses roughly one-quarter of the brain cells of an adult. Most
-neurons develop during the first few years of life. Translated to
-hyperdimensional terms, the universal set dimensionality quadruples during
-early childhood. Assuming the brain maintains a constant sparsity ratio
-throughout this growth, early memories are encoded by a much smaller neural
-population. As the overall dimensionality expands, these early encodings fall
-permanently below the adult pattern matching threshold, making them
-inaccessible via associative memory retrieval.
+In the exact algorithm, this boundary is sharp. If the population grows by as
+little as one element, patterns stored at the earlier population become
+inaccessible, even when queried with the complete pattern. The brain does not
+run an exact version of the algorithm: a pattern that falls slightly short of the current population
+may still be retrieved occasionally, or only in part. We should therefore
+expect a rapid decline in accessibility rather than a hard cutoff. Even so, a
+small, lasting increase in population would make most older memories
+inaccessible.
 
+This suggests that childhood amnesia reflects a change in how episodes are
+encoded, rather than a loss of what was stored. In this framework, the
+hippocampus does not hold the episode itself. The episodic record is a
+[hyperassociation](#hyperassociations) stored elsewhere, and the hippocampus
+processes a pointer to it. As long as the population of these pointers keeps
+growing, memories formed under earlier conditions drop out of reach: the
+records remain intact, but they become unreachable once their pointers can no
+longer be retrieved. Once the population stabilizes, new memories remain
+accessible.
+
+This view parallels the hippocampal memory indexing theory (Teyler and DiScenna
+1986), which holds that the hippocampus stores an index to patterns of cortical
+activity rather than the memories themselves. The topological memory model adds
+a reason why early indices become unreachable.
+
+> **Hypothesis**  
+> The neuron population that encode the pointer to an episodic record
+> increases during early childhood and stops increasing when childhood 
+> amnesia ends.
+
+The natural place to test this theory is the hippocampus, where episodic
+memories are first encoded. Its entry stage &mdash; the dentate gyrus (DG)
+&mdash; is the one part of the hippocampus that keeps adding neurons after
+birth. The following observations would support the theory:
+
+- In animals, the number of DG neurons active during a single episode grows over the period of infantile forgetting and levels off when memories start to persist.
+- Species whose DG is largely complete at birth show little or no infantile forgetting.
 
 
 
 <br>
 <a id="stepwise-response-to-threshold-modulation"></a>
 
-### Step-wise response to threshold modulation
+### Stepwise response to threshold modulation
 
 In the topological memory framework, the pattern matching threshold $T$
 functions as a discrete guardrail, separating known symbols from random noise.
@@ -5530,7 +5841,7 @@ This effect can manifest in various ways across different brain areas,
 potentially causing sensory hallucinations as well as an impairment of symbolic
 thinking. But this would be hard to observe at a system-wide scale (via
 psychological experiments) where the aggregate behaviors of many individual
-circuits average out. At a micro-circuit level, however, a step-wise activity
+circuits average out. At a micro-circuit level, however, a stepwise activity
 increase should be measurable via electrophysiological experiments. Observing
 this effect would validate our hypothesis that discrete set matching is a core
 operation of the brain.
@@ -5814,6 +6125,26 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={2015}
 }
 
+@article{carpenter1987,
+  title={A Massively Parallel Architecture for a Self-Organizing Neural Pattern Recognition Machine},
+  author={Carpenter, Gail A. and Grossberg, Stephen},
+  journal={Computer Vision, Graphics, and Image Processing},
+  volume={37},
+  number={1},
+  pages={54--115},
+  year={1987}
+}
+
+@article{cleeremans1989,
+  title={Finite State Automata and Simple Recurrent Networks},
+  author={Cleeremans, Axel and Servan-Schreiber, David and McClelland, James L.},
+  journal={Neural Computation},
+  volume={1},
+  number={3},
+  pages={372--381},
+  year={1989}
+}
+
 @inproceedings{gayler2003,
   title={Vector Symbolic Architectures Answer Jackendoff's Challenges for Cognitive Neuroscience},
   author={Gayler, Ross W.},
@@ -5899,6 +6230,19 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1988}
 }
 
+
+@article{lacy2011,
+  title={Distinct Pattern Separation Related Transfer Functions in Human CA3/Dentate and CA1 Revealed Using High-Resolution fMRI and Variable Mnemonic Similarity},
+  author={Lacy, Joyce W. and Yassa, Michael A. and Stark, Shauna M. and Muftuler, L. Tugan and Stark, Craig E. L.},
+  journal={Learning \& Memory},
+  volume={18},
+  number={1},
+  pages={15--18},
+  year={2011}
+}
+
+
+
 @inproceedings{lazzaro1988,
   title={Winner-take-all networks of O (n) complexity},
   author={Lazzaro, John and Ryckebusch, Sylvie and Mahowald, Misha Anne and Mead, Carver A.},
@@ -5906,6 +6250,7 @@ deep learning paradigm and the computationalist framework introduced in this wor
   volume={1},
   year={1988}
 }
+
 
 @misc{lecun1998,
   title={The MNIST Database of Handwritten Digits},
@@ -6008,6 +6353,16 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1995}
 }
 
+@article{reber1967,
+  title={Implicit Learning of Artificial Grammars},
+  author={Reber, Arthur S.},
+  journal={Journal of Verbal Learning and Verbal Behavior},
+  volume={6},
+  number={6},
+  pages={855--863},
+  year={1967}
+}
+
 @article{rosenblatt1958,
   title={The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain},
   author={Rosenblatt, Frank},
@@ -6028,6 +6383,17 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1990}
 }
 
+@article{teyler1986,
+  title={The Hippocampal Memory Indexing Theory},
+  author={Teyler, Timothy J. and DiScenna, Pascal},
+  journal={Behavioral Neuroscience},
+  volume={100},
+  number={2},
+  pages={147--154},
+  year={1986}
+}
+
+
 @article{willshaw1969,
   title={Non-Holographic Associative Memory},
   author={Willshaw, D. J. and Buneman, O. P. and Longuet-Higgins, H. C.},
@@ -6036,6 +6402,7 @@ deep learning paradigm and the computationalist framework introduced in this wor
   pages={960--962},
   year={1969}
 }
+
 
 
 ```
