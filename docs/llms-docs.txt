@@ -3317,8 +3317,6 @@ See also: https://creatingintelligence.org/#heteroencoder
 
 ## Details and properties
 
-## Details and properties
-
 - Encapsulates a hetero-associative topological memory instance.
 - Maps similar sets (SDRs or SHRs) to stable symbolic tokens (SHRs) on the fly.
 - Has no input for a teaching signal.
@@ -3327,6 +3325,7 @@ See also: https://creatingintelligence.org/#heteroencoder
 - Performs both clustering and pattern separation; the matching criterion (`threshold` and `residual`) sets the boundary.
 - May receive block-coded input.
 - Resolves multiset and inhibitory input prior to processing; the learning threshold applies to the resolved input.
+
 
 <br>
 
@@ -3363,8 +3362,9 @@ A simple hetero-encoding circuit:
 
 ## Pattern separation and the residual
 
-The heteroencoder always returns a token: an input either retrieves a
-stored SHR or receives a new random one. Inputs that meet the matching
+The heteroencoder returns a token for every input of at least T elements:
+the input either retrieves a stored SHR or receives a new random one. Smaller
+input returns an empty result (see the learning threshold above). Inputs that meet the matching
 criterion converge onto the same token (clustering); all others receive
 unrelated tokens (pattern separation). The `threshold` and `residual` options
 decide where this boundary lies.
@@ -3385,7 +3385,8 @@ population of non-matching elements. A value of 0 requires a full match.
 { "hyperparameters": {"default": [2000, 20]},
   "dataflow": [
 	{"component": "input", "plugin": "codec", "send": [1]},
-	{"component": "heteroencoder", "send": [11], "receive": [1], "residual": 0.5},
+	{"component": "heteroencoder", "send": [11], 
+		"receive": [1], "residual": 0.5},
 	{"component": "output", "receive": [11]}
   ]}
 ```
@@ -3410,20 +3411,22 @@ True True True
 The two overlapping bundles receive distinct tokens, and a repeated bundle
 returns its token. Without `residual`, `b` would retrieve the token of `a`.
 
-The decision is asymmetric:
+The decision is asymmetric with respect to set inclusion:
 
-- Removing elements from a known input keeps its token: `d` is a subset of
-  the first bundle. This also holds for randomly subsampled elements.
+- Removing elements from a known input keeps its token, as long as at least
+  T elements remain: `d` is a subset of the first bundle. This also holds for randomly subsampled elements.
 - Adding noise keeps the token as long as the number of added elements does
   not exceed the residual. Adding an item that was not stored together with
   the rest produces a new token.
 - A subset contained in several stored inputs retrieves the superposition of
-  their tokens (2P elements), which is then stored as that subset's output.
-  The output is not a valid SHR; design inputs so that this does not occur,
-  or treat it as an ambiguous result.
+  their tokens (2P elements for two inputs). This response is not a stored
+  entry: it reflects every encoded input that contains the subset, and
+  learning it leaves the memory unchanged. The output is a bundle of tokens
+  rather than a single SHR; design inputs so that this does not occur, or
+  treat it as an ambiguous result.
 
 An input therefore receives a new token unless its items are contained in a
-single previously encoded input.
+previously encoded input.
 
 
 

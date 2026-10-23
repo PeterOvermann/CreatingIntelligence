@@ -160,7 +160,6 @@ class="sidebar-icon">π</span>permutation</a></li>
         href="https://creatingintelligence.org/#heteroencoder"
         class="uri">https://creatingintelligence.org/#heteroencoder</a></p>
         <h2 id="details-and-properties">Details and properties</h2>
-        <h2 id="details-and-properties-1">Details and properties</h2>
         <ul>
         <li>Encapsulates a hetero-associative topological memory
         instance.</li>
@@ -241,13 +240,14 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p><img width="240" alt="image" src="img/heteroencoder_circuit.png"><br></p>
         <h2 id="pattern-separation-and-the-residual">Pattern separation
         and the residual</h2>
-        <p>The heteroencoder always returns a token: an input either
-        retrieves a stored SHR or receives a new random one. Inputs that
-        meet the matching criterion converge onto the same token
-        (clustering); all others receive unrelated tokens (pattern
-        separation). The <code>threshold</code> and
-        <code>residual</code> options decide where this boundary
-        lies.</p>
+        <p>The heteroencoder returns a token for every input of at least
+        T elements: the input either retrieves a stored SHR or receives
+        a new random one. Smaller input returns an empty result (see the
+        learning threshold above). Inputs that meet the matching
+        criterion converge onto the same token (clustering); all others
+        receive unrelated tokens (pattern separation). The
+        <code>threshold</code> and <code>residual</code> options decide
+        where this boundary lies.</p>
         <p>The two options work together. The default threshold remains
         the lower bound for every query and governs small inputs, such
         as a single SHR or a fragment of one. To heteroencode bundles of
@@ -263,9 +263,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2000</span><span class="ot">,</span> <span class="dv">20</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;heteroencoder&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;residual&quot;</span><span class="fu">:</span> <span class="fl">0.5</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;heteroencoder&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;residual&quot;</span><span class="fu">:</span> <span class="fl">0.5</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><strong>Code</strong></p>
         <div class="sourceCode" id="cb3"><pre
         class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> Circuit(config)[<span class="st">&quot;function&quot;</span>]</span>
@@ -282,22 +283,25 @@ class="sidebar-icon">π</span>permutation</a></li>
         repeated bundle returns its token. Without
         <code>residual</code>, <code>b</code> would retrieve the token
         of <code>a</code>.</p>
-        <p>The decision is asymmetric:</p>
+        <p>The decision is asymmetric with respect to set inclusion:</p>
         <ul>
-        <li>Removing elements from a known input keeps its token:
-        <code>d</code> is a subset of the first bundle. This also holds
-        for randomly subsampled elements.</li>
+        <li>Removing elements from a known input keeps its token, as
+        long as at least T elements remain: <code>d</code> is a subset
+        of the first bundle. This also holds for randomly subsampled
+        elements.</li>
         <li>Adding noise keeps the token as long as the number of added
         elements does not exceed the residual. Adding an item that was
         not stored together with the rest produces a new token.</li>
         <li>A subset contained in several stored inputs retrieves the
-        superposition of their tokens (2P elements), which is then
-        stored as that subset’s output. The output is not a valid SHR;
-        design inputs so that this does not occur, or treat it as an
-        ambiguous result.</li>
+        superposition of their tokens (2P elements for two inputs). This
+        response is not a stored entry: it reflects every encoded input
+        that contains the subset, and learning it leaves the memory
+        unchanged. The output is a bundle of tokens rather than a single
+        SHR; design inputs so that this does not occur, or treat it as
+        an ambiguous result.</li>
         </ul>
         <p>An input therefore receives a new token unless its items are
-        contained in a single previously encoded input.</p>
+        contained in a previously encoded input.</p>
         <h2 id="source-code">Source code</h2>
         <div class="sourceCode" id="cb5"><pre
         class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> heteroencoder(config):</span>
