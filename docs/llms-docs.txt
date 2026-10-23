@@ -1,4 +1,4 @@
-# Generated from main on 2026-10-20
+# Generated from main on 2026-10-23
 
 # Source: README.md
 
@@ -224,8 +224,8 @@ pprint(mem)
  'T': 7,
  'backend': 'c_ffi',
  'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
- 'matching': 0.0,
  'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
+ 'residual': 1000,
  'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
  'store': <function Memory.<locals>.store at 0x109a65d20>}
 ```
@@ -253,7 +253,7 @@ Properties of the output dictionary:
 | `A_parameters`      |   input layer hyperparameters [N,P]  |
 | `B_parameters` |  output layer parameters  |
 | `T` |  retrieval pattern matching threshold   |
-| `matching` | fraction of the query population that must match |
+| `residual` |  absolute number of non-matching query elements that may be absorbed as noise (N if unlimited)  |
 | `store` |  write to memory  |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
@@ -1219,18 +1219,32 @@ relative `threshold` decides how much overlap counts as "the same". For
 example, it sets how far apart two color hues must be to receive different
 tokens.
 
-### Exact matching with `matching` 1.0
+### Full and partial matching with `residual`
 
-The `matching` option sets the fraction of the query population that must match.
-With `matching` 1.0, every element of the query must be part of the match:
-the noise-removing iterations of the retrieval algorithm are skipped, and a
-query either matches as a whole or returns an empty result. This is typically
-used for heteroencoding combinations of symbolic tokens, such as bigrams or
-chunks, where each distinct combination must map to its own token. Under the
-default threshold, a stored pair would also match a query that shares only one
-of its two tokens, because one SHR alone exceeds `T`. Use the default threshold
-where noise tolerance or similarity is the point, for example when clustering
-SDRs.
+The `residual` option limits how many query elements retrieval may discard as
+noise, in multiples of the input population P. Only elements present in the
+query count: a query that lacks elements of a stored pattern still matches,
+while a query with extra elements fails once these exceed the residual.
+
+- `residual` 0 requires a full match: every element of the query must be part
+  of the match, and a query either matches as a whole or returns an empty
+  result.
+- A value such as 0.5 absorbs up to P/2 noise elements, while a query that
+  contains an additional token (about P non-matching elements) still fails.
+  Values well below 1 keep this margin.
+- Without the option, the number of discarded elements is unlimited, and only
+  the threshold `T` applies.
+
+The residual is typically used for heteroencoding combinations of symbolic
+tokens, such as bigrams, chunks or bundles, where each distinct combination
+must map to its own token. Under the default threshold, a stored pair would
+also match a query that shares only one of its two tokens, because one SHR
+alone exceeds `T`. Use the default where noise tolerance or similarity is the
+point, for example when clustering SDRs.
+
+The memory dictionary exposes the residual as an absolute number of elements,
+alongside the absolute threshold `T`. An unlimited residual is reported as the
+input dimension N.
 
 ### Always learning
 
@@ -2262,6 +2276,7 @@ underlying set of unique elements.
 | `receive`     |  *required*    |  same as `send`, with optional pathway tags |
 | `plugin`	    | `replacement` | auto-associative update rule |  
 | `threshold`     | *automatic*    |  relative auto-associative pattern matching threshold |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match |
 | `rate_limit`    | unlimited | subsample input if it exceeds the specified relative rate limit |    
 | `decimate`      | 1    | proportional stochastic decimation |
 | `learn`      | 1   |  learning threshold or interval, given as scaling factors relative to the default population |
@@ -2546,6 +2561,7 @@ See also: https://creatingintelligence.org/#state-transition-memory
 | `receive`     |  *required*    |  teaching slots followed by query slots, each matching `send`, with optional pathway tags |
 | `plugin`	    | `replacement` | update rule |
 | `threshold`     | *automatic*    |  relative pattern matching threshold |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match |
 | `rate_limit`    | unlimited | subsample the query if it exceeds the specified relative rate limit (applies to storage and retrieval) |
 | `decimate`      | 1    | proportional stochastic decimation, applied to the query during retrieval |
 
@@ -2557,6 +2573,9 @@ Note on matching: with the default threshold, a single symbolic token (SHR)
 exceeds the pattern matching threshold. A query can therefore match a stored
 key with which it shares only one of its tokens. Where a transition must only
 fire on its complete key, raise the threshold (see the finite automata example below).
+Setting `residual` to 0 covers the converse case: it rejects queries that
+contain tokens outside the stored key. A query consisting of a single token of
+a two-token key still matches, because it is contained in the key.
 
 
 ## State transitions with replacement update
@@ -3076,6 +3095,7 @@ See also: https://creatingintelligence.org/#supervised-learning
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  two or more input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match  |
 | `decimate`      | 1    | proportional stochastic decimation applied to training data |
 
 <br>
@@ -3184,6 +3204,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  two or more input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match ([details](design_principles.md#full-and-partial-matching-with-residual)) |
 
 <br>
 
@@ -3300,6 +3321,7 @@ See also: https://creatingintelligence.org/#heteroencoder
 - Maps similar sets (SDRs or SHRs) to stable symbolic tokens (SHRs) on the fly.
 - Has no input for a teaching signal.
 - Generates and learns a unique output SHR when encountering unknown input.
+- Performs both clustering and pattern separation; the matching criterion (`threshold` and `residual`) sets the boundary.
 - May receive block-coded input.
 - Resolves multiset and inhibitory input prior to processing.
 
@@ -3312,6 +3334,7 @@ See also: https://creatingintelligence.org/#heteroencoder
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  one or several input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match  |
 
 <br>
 
@@ -3334,6 +3357,71 @@ A simple hetero-encoding circuit:
 ```
 
 <img width="240" alt="image" src="img/heteroencoder_circuit.png"><br>
+
+
+## Pattern separation and the residual
+
+The heteroencoder always returns a token: an input either retrieves a
+stored SHR or receives a new random one. Inputs that meet the matching
+criterion converge onto the same token (clustering); all others receive
+unrelated tokens (pattern separation). The `threshold` and `residual` options
+decide where this boundary lies.
+
+The two options work together. The default threshold remains the lower
+bound for every query and governs small inputs, such as a single SHR or a
+fragment of one. To heteroencode bundles of multiple SHRs, add the
+`residual` option. It limits how many query elements retrieval may discard
+as noise, in multiples of the input population, so the number of elements that
+must match grows with the size of the bundle.
+
+A residual well below 1, such as 0.5, absorbs noise but still separates bundles
+that differ by one item, because a new item contributes close to a full
+population of non-matching elements. A value of 0 requires a full match.
+
+
+```json
+{ "hyperparameters": {"default": [2000, 20]},
+  "dataflow": [
+	{"component": "input", "plugin": "codec", "send": [1]},
+	{"component": "heteroencoder", "send": [11], "receive": [1], "residual": 0.5},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+**Code**
+```python
+f = Circuit(config)["function"]
+
+a = f(["A", "B", "C", "D", "E", "G"])[0]
+b = f(["A", "B", "C", "F", "G"])[0]
+c = f(["A", "B", "C", "D", "E", "G"])[0]
+d = f(["A", "B", "C", "D"])[0]
+
+print(a != b, a == c, a == d)
+```
+
+**Output**
+```text
+True True True
+```
+
+The two overlapping bundles receive distinct tokens, and a repeated bundle
+returns its token. Without `residual`, `b` would retrieve the token of `a`.
+
+The decision is asymmetric:
+
+- Removing elements from a known input keeps its token: `d` is a subset of
+  the first bundle. This also holds for randomly subsampled elements.
+- Adding noise keeps the token as long as the number of added elements does
+  not exceed the residual. Adding an item that was not stored together with
+  the rest produces a new token.
+- A subset contained in several stored inputs retrieves the superposition of
+  their tokens (2P elements), which is then stored as that subset's output.
+  The output is not a valid SHR; design inputs so that this does not occur,
+  or treat it as an ambiguous result.
+
+An input therefore receives a new token unless its items are contained in a
+single previously encoded input.
 
 
 
@@ -4557,6 +4645,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
 import math
+import numbers
 import numpy as np
 from itertools import combinations
 
@@ -4587,9 +4676,13 @@ def Memory(config: dict) -> dict:
     
     T = max(2, T)
 
-    # Optional relative threshold: fraction of the query population that must
-    # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
-    matching = config.get("matching") or 0.0
+    # Optional residual: the number of non-matching query elements that may
+    # be absorbed as noise, in multiples of PA. NA means unlimited (the default).
+    r = config.get("residual")
+    if isinstance(r, numbers.Real) and not isinstance(r, bool) and r >= 0:
+        residual = math.floor(r * PA + 1e-9)
+    else:
+        residual = NA
 
     # Initialize enclosed memory dictionary and zero array
     mem = {}
@@ -4618,12 +4711,13 @@ def Memory(config: dict) -> dict:
 
         X = A
         
-        # Per-query threshold, at least the fixed threshold T
-        Tq = max(T, math.ceil(matching * len(X) - 1e-9))
+        # Per-query threshold: at least T, and at most residual query
+        # elements may be discarded as noise
+        Tquery = max(T, len(A) - residual)
 
         while True:
             P = len(X)
-            if P < Tq:
+            if P < Tquery:
                 return []
 
             Ri = np.zeros((P, NB + 1), dtype=np.int32)
@@ -4642,7 +4736,7 @@ def Memory(config: dict) -> dict:
             t_val = sorted_R[-PB] if PB <= len(sorted_R) else sorted_R[0]
             t = max(1, t_val)
 
-            if t < (Tq * (Tq - 1)) / 2:
+            if t < (Tquery * (Tquery - 1)) / 2:
                 return []
             
             Y = [i for i in range(1, NB + 1) if R[i] >= t]
@@ -4654,13 +4748,13 @@ def Memory(config: dict) -> dict:
             while h > 0 and ws[-h] < len(Y) * (h - 1):
                 h -= 1
 
-            if h < Tq:
+            if h < Tquery:
                 return []
 
             cutoff = ws[-h]
             new_X = [X[i] for i in range(P) if w[i] >= cutoff]
 
-            if h == Tq and h < len(new_X):
+            if h == Tquery and h < len(new_X):
                 return []
 
             if len(new_X) == P:
@@ -4678,7 +4772,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "matching": matching,
+        "residual": residual,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,
@@ -4739,8 +4833,8 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, matching = 0, capacity, zero,
-		store, retrieve, clear, memorycount},
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, 
+				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -4763,12 +4857,13 @@ Memory[config_Association] :=
 			
 		If[T < 2, T = 2];
 
-		(* Optional relative threshold: Fraction of the query population 
-			that must match (1 = all input bits). Absent or 0 keeps 
-			the fixed threshold T. *)
-		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
-			matching = config["matching"]];
-
+		(* Optional residual: the number of non-matching query elements 
+			that may be absorbed as noise, in multiples of PA. 
+			NA means unlimited (the default). *)
+		residual = If[KeyExistsQ[config, "residual"] && NumberQ[config["residual"]] 
+				&& config["residual"] >= 0, 
+				Floor[config["residual"] * PA + 10^-9], NA];		
+		
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
 		(* Store hetero-association A -> B in memory. *)
@@ -4786,17 +4881,14 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff, Tq},
+			Module[ {X, P, Y, Tquery, R, Ri, sub2, v, t, w, ws, h, cutoff},
 			(* Step 1: Initialize. *)
 			X = A; 
-			
-			(* Per-query threshold, at least the fixed threshold T. 
-				The offset guards against floating-point round-up. *)
-			Tq = Max[T, Ceiling[matching * Length[X] - 10^-9]];
+			Tquery = Max[T, Length[A] - residual];
 			
 			While[ True,
 				(* Step 2: Threshold check.  *)
-				If[ (P = Length[X]) < Tq, Return[{}]]; 
+				If[ (P = Length[X]) < Tquery, Return[{}]]; 
 			
 				(* Step 3: Expansion coding. *)
 				sub2 = Subsets[Range[P], {2}];
@@ -4807,14 +4899,13 @@ Memory[config_Association] :=
 						Ri[[#1]] += v; Ri[[#2]] += v) & @@@ sub2;
 				R = (Plus @@ Ri) / 2; 
 			
-				(* Step 5: Select (kWTA with threshold T(T-1)/2) *)
+				(* Step 5: Select (kWTA with threshold Tquery(Tquery-1)/2) *)
 				(* The first element of a negative Ordering is the index 
-					of the k-th largest value. 
-					Use this for the threshold check. *)
+					of the k-th largest value. Use this for the threshold check. *)
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
 				
 				(* Step 6: Threshold check. *)
-				If[ t < Tq (Tq - 1) / 2, Return[{}]]; 
+				If[ t < Tquery (Tquery - 1) / 2, Return[{}]]; 
 				Y = Sort[Pick[Range[NB], UnitStep[R - t], 1]];
 			
 				(* Step 7: Per-element weights. *)
@@ -4825,17 +4916,17 @@ Memory[config_Association] :=
 				h = P;
 				While[ (cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[ h < Tq, Return[{}]]; 		
+				If[ h < Tquery, Return[{}]]; 		
 				
 				(* Step 9: Refine. *)
 				X = Pick[X, # >= cutoff & /@ w];
 				
 				(* Handle edge case. *)
-				If[h === Tq &&  h < Length[X], X = {}; Return[{}]];
-				
+				If[h === Tquery &&  h < Length[X], X = {}; Return[{}]];
+	
 				(* Finished if X has converged. *)
-				If[Length[X] == P, Return[Y]]; 
-
+				If[Length[X] == P, Return[Y]];
+				
 				(* Step 10: Iterate.  *)
 				]
 			];
@@ -4847,7 +4938,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"matching" -> matching,
+			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,
@@ -4961,11 +5052,14 @@ typedef struct
 	int Bpopulation;		// (same as A if auto-associative)
 	
 	int T;					//	Pattern matching threshold (absolute population)
+
+	int residual;			//  Absolute number of non-matching query elements
+							//  that may be absorbed as noise
 	
 	Set *X;					//	Matching elements from last memory retrieval.
 
-	double matching;		//	Relative matching threshold: 					//  fraction of the query population that must match
-							//	(0 = fixed threshold T only, 1 = all elements)
+
+
 	} Memory;
 
 
@@ -4976,9 +5070,9 @@ Memory *Memory_new (int na, int pa, int nb, int pb);
 void Memory_set_threshold (Memory*, int);
 int  Memory_get_threshold (Memory*);
 
-//	Relative pattern matching threshold (fraction of the query population)
-void   Memory_set_matching (Memory*, double);
-double Memory_get_matching (Memory*);
+//	Residual (absolute)
+void   Memory_set_residual (Memory*, int);
+int Memory_get_residual (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);

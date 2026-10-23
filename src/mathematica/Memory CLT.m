@@ -20,7 +20,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 Memory[config_Association] :=
 
 	Module[ {process, NA, PA, NB, PB, tostr, opt = Nothing, T = Nothing, 
-		fopt = Nothing, F = Nothing, store, retrieve, clear, memorycount},
+		ropt = Nothing, residual = Nothing, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -31,18 +31,21 @@ Memory[config_Association] :=
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
 			opt = "-T"; T = Round[config["threshold"] * PA]];	
 
-		(* Optional relative threshold (fraction of the query population).
-			CForm yields a C-readable real, e.g. "0.9", "1." or "1.e-6". *)
-		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
-			fopt = "-M"; F = ToString[CForm[N[config["matching"]]]]];
-			
+		(* Optional residual: the number of non-matching query elements 
+			that may be absorbed as noise, in multiples of PA. *)
+		If[KeyExistsQ[config, "residual"] && NumberQ[config["residual"]] 
+				&& config["residual"] >= 0, ropt = "-R";
+				residual = Floor[config["residual"] * PA + 10^-9]];						
+												
 		process = StartProcess[{FileNameJoin[ 
 			{$UserBaseDirectory, "SystemFiles", "LibraryResources", 
-			  $SystemID, "TAM_CLT"}], opt, T, fopt, F, NA, PA, NB, PB}];
-		
-		(* Retrieve the absolute threshold from the CLT. *)
+			  $SystemID, "TAM_CLT"}], opt, T, ropt, residual, NA, PA, NB, PB}];
+				
+		(* Retrieve the absolute threshold and residual from the CLT. *)
 		WriteLine[process, "threshold"]; 
-		T = ToExpression[ReadLine[process]];	
+		T = ToExpression[ReadLine[process]];
+		WriteLine[process, "residual"]; 
+		residual = ToExpression[ReadLine[process]];
 											
 		tostr[ x: {___Integer}] := StringRiffle[ToString /@ x];
 
@@ -69,7 +72,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"matching" -> Lookup[config, "matching", 0.0],
+			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

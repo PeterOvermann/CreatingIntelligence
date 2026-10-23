@@ -77,11 +77,14 @@ typedef struct
 	int Bpopulation;		// (same as A if auto-associative)
 	
 	int T;					//	Pattern matching threshold (absolute population)
+
+	int residual;			//  Absolute number of non-matching query elements
+							//  that may be absorbed as noise
 	
 	Set *X;					//	Matching elements from last memory retrieval.
 
-	double matching;		//	Relative matching threshold: 					//  fraction of the query population that must match
-							//	(0 = fixed threshold T only, 1 = all elements)
+
+
 	} Memory;
 
 
@@ -92,9 +95,9 @@ Memory *Memory_new (int na, int pa, int nb, int pb);
 void Memory_set_threshold (Memory*, int);
 int  Memory_get_threshold (Memory*);
 
-//	Relative pattern matching threshold (fraction of the query population)
-void   Memory_set_matching (Memory*, double);
-double Memory_get_matching (Memory*);
+//	Residual (absolute)
+void   Memory_set_residual (Memory*, int);
+int Memory_get_residual (Memory*);
 
 //	Destructor
 void Memory_free (Memory*);

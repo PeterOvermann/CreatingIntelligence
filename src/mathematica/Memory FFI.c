@@ -18,12 +18,11 @@ DLLEXPORT void TAMsetthreshold (void *m, int t)
 DLLEXPORT int TAMgetthreshold(void *m)
 	{ return Memory_get_threshold( (Memory*) m); }
 
-DLLEXPORT void TAMsetmatching (void *m, double f)
-	{ Memory_set_matching((Memory*) m, f); }
+DLLEXPORT void TAMsetresidual (void *m, int r)
+	{ Memory_set_residual((Memory*) m, r); }
 
-DLLEXPORT double TAMgetmatching(void *m)
-	{ return Memory_get_matching( (Memory*) m); }
-
+DLLEXPORT int TAMgetresidual(void *m)
+	{ return Memory_get_residual( (Memory*) m); }
 
 DLLEXPORT int TAMmemory(void *m)
 	{ return Memory_count ( (Memory*) m); }

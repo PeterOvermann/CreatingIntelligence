@@ -491,21 +491,37 @@ class="sidebar-icon">π</span>permutation</a></li>
         how much overlap counts as “the same”. For example, it sets how
         far apart two color hues must be to receive different
         tokens.</p>
-        <h3 id="exact-matching-with-matching-1.0">Exact matching with
-        <code>matching</code> 1.0</h3>
-        <p>The <code>matching</code> option sets the fraction of the
-        query population that must match. With <code>matching</code>
-        1.0, every element of the query must be part of the match: the
-        noise-removing iterations of the retrieval algorithm are
-        skipped, and a query either matches as a whole or returns an
-        empty result. This is typically used for heteroencoding
-        combinations of symbolic tokens, such as bigrams or chunks,
-        where each distinct combination must map to its own token. Under
-        the default threshold, a stored pair would also match a query
-        that shares only one of its two tokens, because one SHR alone
-        exceeds <code>T</code>. Use the default threshold where noise
-        tolerance or similarity is the point, for example when
+        <h3 id="full-and-partial-matching-with-residual">Full and
+        partial matching with <code>residual</code></h3>
+        <p>The <code>residual</code> option limits how many query
+        elements retrieval may discard as noise, in multiples of the
+        input population P. Only elements present in the query count: a
+        query that lacks elements of a stored pattern still matches,
+        while a query with extra elements fails once these exceed the
+        residual.</p>
+        <ul>
+        <li><code>residual</code> 0 requires a full match: every element
+        of the query must be part of the match, and a query either
+        matches as a whole or returns an empty result.</li>
+        <li>A value such as 0.5 absorbs up to P/2 noise elements, while
+        a query that contains an additional token (about P non-matching
+        elements) still fails. Values well below 1 keep this
+        margin.</li>
+        <li>Without the option, the number of discarded elements is
+        unlimited, and only the threshold <code>T</code> applies.</li>
+        </ul>
+        <p>The residual is typically used for heteroencoding
+        combinations of symbolic tokens, such as bigrams, chunks or
+        bundles, where each distinct combination must map to its own
+        token. Under the default threshold, a stored pair would also
+        match a query that shares only one of its two tokens, because
+        one SHR alone exceeds <code>T</code>. Use the default where
+        noise tolerance or similarity is the point, for example when
         clustering SDRs.</p>
+        <p>The memory dictionary exposes the residual as an absolute
+        number of elements, alongside the absolute threshold
+        <code>T</code>. An unlimited residual is reported as the input
+        dimension N.</p>
         <h3 id="always-learning">Always learning</h3>
         <p>For heteroassociations (including temporal associations),
         storing every observed association, even when the prediction was

@@ -26,8 +26,8 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, matching = 0, capacity, zero,
-		store, retrieve, clear, memorycount},
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, 
+				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -50,12 +50,13 @@ Memory[config_Association] :=
 			
 		If[T < 2, T = 2];
 
-		(* Optional relative threshold: Fraction of the query population 
-			that must match (1 = all input bits). Absent or 0 keeps 
-			the fixed threshold T. *)
-		If[KeyExistsQ[config, "matching"] && NumberQ[config["matching"]],
-			matching = config["matching"]];
-
+		(* Optional residual: the number of non-matching query elements 
+			that may be absorbed as noise, in multiples of PA. 
+			NA means unlimited (the default). *)
+		residual = If[KeyExistsQ[config, "residual"] && NumberQ[config["residual"]] 
+				&& config["residual"] >= 0, 
+				Floor[config["residual"] * PA + 10^-9], NA];		
+		
 		zero = Developer`ToPackedArray[ConstantArray[0, NB]];
 
 		(* Store hetero-association A -> B in memory. *)
@@ -73,17 +74,14 @@ Memory[config_Association] :=
 
 		(* Memory retrieval. *)
 		retrieve[A_List] := 
-			Module[ {X, P, Y, R, Ri, sub2, v, t, w, ws, h, cutoff, Tq},
+			Module[ {X, P, Y, Tquery, R, Ri, sub2, v, t, w, ws, h, cutoff},
 			(* Step 1: Initialize. *)
 			X = A; 
-			
-			(* Per-query threshold, at least the fixed threshold T. 
-				The offset guards against floating-point round-up. *)
-			Tq = Max[T, Ceiling[matching * Length[X] - 10^-9]];
+			Tquery = Max[T, Length[A] - residual];
 			
 			While[ True,
 				(* Step 2: Threshold check.  *)
-				If[ (P = Length[X]) < Tq, Return[{}]]; 
+				If[ (P = Length[X]) < Tquery, Return[{}]]; 
 			
 				(* Step 3: Expansion coding. *)
 				sub2 = Subsets[Range[P], {2}];
@@ -94,14 +92,13 @@ Memory[config_Association] :=
 						Ri[[#1]] += v; Ri[[#2]] += v) & @@@ sub2;
 				R = (Plus @@ Ri) / 2; 
 			
-				(* Step 5: Select (kWTA with threshold T(T-1)/2) *)
+				(* Step 5: Select (kWTA with threshold Tquery(Tquery-1)/2) *)
 				(* The first element of a negative Ordering is the index 
-					of the k-th largest value. 
-					Use this for the threshold check. *)
+					of the k-th largest value. Use this for the threshold check. *)
 				t = Max[1, R[[First @ Ordering[R, -PB]]]];
 				
 				(* Step 6: Threshold check. *)
-				If[ t < Tq (Tq - 1) / 2, Return[{}]]; 
+				If[ t < Tquery (Tquery - 1) / 2, Return[{}]]; 
 				Y = Sort[Pick[Range[NB], UnitStep[R - t], 1]];
 			
 				(* Step 7: Per-element weights. *)
@@ -112,17 +109,17 @@ Memory[config_Association] :=
 				h = P;
 				While[ (cutoff = ws[[-h]]) < Length[Y] * (h - 1), --h];
 
-				If[ h < Tq, Return[{}]]; 		
+				If[ h < Tquery, Return[{}]]; 		
 				
 				(* Step 9: Refine. *)
 				X = Pick[X, # >= cutoff & /@ w];
 				
 				(* Handle edge case. *)
-				If[h === Tq &&  h < Length[X], X = {}; Return[{}]];
-				
+				If[h === Tquery &&  h < Length[X], X = {}; Return[{}]];
+	
 				(* Finished if X has converged. *)
-				If[Length[X] == P, Return[Y]]; 
-
+				If[Length[X] == P, Return[Y]];
+				
 				(* Step 10: Iterate.  *)
 				]
 			];
@@ -134,7 +131,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"matching" -> matching,
+			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

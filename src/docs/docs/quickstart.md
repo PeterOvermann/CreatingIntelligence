@@ -118,8 +118,8 @@ pprint(mem)
  'T': 7,
  'backend': 'c_ffi',
  'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
- 'matching': 0.0,
  'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
+ 'residual': 1000,
  'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
  'store': <function Memory.<locals>.store at 0x109a65d20>}
 ```
@@ -147,7 +147,7 @@ Properties of the output dictionary:
 | `A_parameters`      |   input layer hyperparameters [N,P]  |
 | `B_parameters` |  output layer parameters  |
 | `T` |  retrieval pattern matching threshold   |
-| `matching` | fraction of the query population that must match |
+| `residual` |  absolute number of non-matching query elements that may be absorbed as noise (N if unlimited)  |
 | `store` |  write to memory  |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |

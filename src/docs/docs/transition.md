@@ -34,6 +34,7 @@ See also: https://creatingintelligence.org/#state-transition-memory
 | `receive`     |  *required*    |  teaching slots followed by query slots, each matching `send`, with optional pathway tags |
 | `plugin`	    | `replacement` | update rule |
 | `threshold`     | *automatic*    |  relative pattern matching threshold |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match |
 | `rate_limit`    | unlimited | subsample the query if it exceeds the specified relative rate limit (applies to storage and retrieval) |
 | `decimate`      | 1    | proportional stochastic decimation, applied to the query during retrieval |
 
@@ -45,6 +46,9 @@ Note on matching: with the default threshold, a single symbolic token (SHR)
 exceeds the pattern matching threshold. A query can therefore match a stored
 key with which it shares only one of its tokens. Where a transition must only
 fire on its complete key, raise the threshold (see the finite automata example below).
+Setting `residual` to 0 covers the converse case: it rejects queries that
+contain tokens outside the stored key. A query consisting of a single token of
+a two-token key still matches, because it is contained in the key.
 
 
 ## State transitions with replacement update

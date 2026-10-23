@@ -13,6 +13,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
 import ctypes
+import math
+import numbers
 import os
 import sys
 import importlib.machinery
@@ -74,11 +76,11 @@ lib.Memory_set_threshold.restype = None
 lib.Memory_get_threshold.argtypes = [ctypes.c_void_p]
 lib.Memory_get_threshold.restype = ctypes.c_int
 
-lib.Memory_set_matching.argtypes = [ctypes.c_void_p, ctypes.c_double]
-lib.Memory_set_matching.restype = None
+lib.Memory_set_residual.argtypes = [ctypes.c_void_p, ctypes.c_int]
+lib.Memory_set_residual.restype = None
 
-lib.Memory_get_matching.argtypes = [ctypes.c_void_p]
-lib.Memory_get_matching.restype = ctypes.c_double
+lib.Memory_get_residual.argtypes = [ctypes.c_void_p]
+lib.Memory_get_residual.restype = ctypes.c_int
 
 lib.Memory_count.argtypes = [ctypes.c_void_p]
 lib.Memory_count.restype = ctypes.c_int64
@@ -104,15 +106,18 @@ def Memory(config: dict) -> dict:
         scaled_threshold = round(config.get("threshold") * PA)
         lib.Memory_set_threshold(M, scaled_threshold) 
         
-    # Push optional relative threshold (fraction of the query population).
-    if config.get("matching") is not None:
-        lib.Memory_set_matching(M, float(config.get("matching")))
+    # Push optional residual: the number of non-matching query elements that
+    # may be absorbed as noise, in multiples of PA. If absent, the C default
+    # NA applies (unlimited).
+    r = config.get("residual")
+    if isinstance(r, numbers.Real) and not isinstance(r, bool) and r >= 0:
+        lib.Memory_set_residual(M, math.floor(r * PA + 1e-9))
 
     # Retrieve final absolute threshold from C backend.
     T = lib.Memory_get_threshold(M) 
 
-    # Retrieve fraction parameter from C backend
-    matching = lib.Memory_get_matching(M) 
+    # Retrieve final absolute residual from C backend.
+    residual = lib.Memory_get_residual(M)
 
     def _make_cset(data_list, dimension):
         """Creates a CSet and holds the underlying array reference to prevent garbage collection."""
@@ -161,7 +166,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "matching": matching,
+        "residual": residual,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

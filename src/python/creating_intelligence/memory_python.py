@@ -13,6 +13,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 """
 
 import math
+import numbers
 import numpy as np
 from itertools import combinations
 
@@ -43,9 +44,13 @@ def Memory(config: dict) -> dict:
     
     T = max(2, T)
 
-    # Optional relative threshold: fraction of the query population that must
-    # match (1.0 = all input bits). Absent or 0 keeps the fixed threshold T.
-    matching = config.get("matching") or 0.0
+    # Optional residual: the number of non-matching query elements that may
+    # be absorbed as noise, in multiples of PA. NA means unlimited (the default).
+    r = config.get("residual")
+    if isinstance(r, numbers.Real) and not isinstance(r, bool) and r >= 0:
+        residual = math.floor(r * PA + 1e-9)
+    else:
+        residual = NA
 
     # Initialize enclosed memory dictionary and zero array
     mem = {}
@@ -74,12 +79,13 @@ def Memory(config: dict) -> dict:
 
         X = A
         
-        # Per-query threshold, at least the fixed threshold T
-        Tq = max(T, math.ceil(matching * len(X) - 1e-9))
+        # Per-query threshold: at least T, and at most residual query
+        # elements may be discarded as noise
+        Tquery = max(T, len(A) - residual)
 
         while True:
             P = len(X)
-            if P < Tq:
+            if P < Tquery:
                 return []
 
             Ri = np.zeros((P, NB + 1), dtype=np.int32)
@@ -98,7 +104,7 @@ def Memory(config: dict) -> dict:
             t_val = sorted_R[-PB] if PB <= len(sorted_R) else sorted_R[0]
             t = max(1, t_val)
 
-            if t < (Tq * (Tq - 1)) / 2:
+            if t < (Tquery * (Tquery - 1)) / 2:
                 return []
             
             Y = [i for i in range(1, NB + 1) if R[i] >= t]
@@ -110,13 +116,13 @@ def Memory(config: dict) -> dict:
             while h > 0 and ws[-h] < len(Y) * (h - 1):
                 h -= 1
 
-            if h < Tq:
+            if h < Tquery:
                 return []
 
             cutoff = ws[-h]
             new_X = [X[i] for i in range(P) if w[i] >= cutoff]
 
-            if h == Tq and h < len(new_X):
+            if h == Tquery and h < len(new_X):
                 return []
 
             if len(new_X) == P:
@@ -134,7 +140,7 @@ def Memory(config: dict) -> dict:
         "A_parameters": (NA, PA),
         "B_parameters": (NB, PB),
         "T": T,
-        "matching": matching,
+        "residual": residual,
         "store": store,
         "retrieve": retrieve,
         "clear": clear,

@@ -277,8 +277,8 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;T&#39;</span>: <span class="dv">7</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;backend&#39;</span>: <span class="st">&#39;c_ffi&#39;</span>,</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;clear&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.clear at <span class="bn">0x10d7fcd50</span><span class="op">&gt;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;matching&#39;</span>: <span class="fl">0.0</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;memorycount&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.memorycount at <span class="bn">0x109b95380</span><span class="op">&gt;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;memorycount&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.memorycount at <span class="bn">0x109b95380</span><span class="op">&gt;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;residual&#39;</span>: <span class="dv">1000</span>,</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;retrieve&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.retrieve at <span class="bn">0x109a65c70</span><span class="op">&gt;</span>,</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;store&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.store at <span class="bn">0x109a65d20</span><span class="op">&gt;</span>}</span></code></pre></div>
         <p>Store an autoassociation in memory, then retrieve it from a
@@ -292,6 +292,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>]</span></code></pre></div>
         <p>Properties of the output dictionary:</p>
         <table>
+        <colgroup>
+        <col style="width: 20%" />
+        <col style="width: 79%" />
+        </colgroup>
         <thead>
         <tr>
         <th style="text-align: left;">Property</th>
@@ -314,9 +318,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         threshold</td>
         </tr>
         <tr>
-        <td style="text-align: left;"><code>matching</code></td>
-        <td style="text-align: left;">fraction of the query population
-        that must match</td>
+        <td style="text-align: left;"><code>residual</code></td>
+        <td style="text-align: left;">absolute number of non-matching
+        query elements that may be absorbed as noise (N if
+        unlimited)</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>store</code></td>

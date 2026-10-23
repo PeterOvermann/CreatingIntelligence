@@ -168,6 +168,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         <li>Has no input for a teaching signal.</li>
         <li>Generates and learns a unique output SHR when encountering
         unknown input.</li>
+        <li>Performs both clustering and pattern separation; the
+        matching criterion (<code>threshold</code> and
+        <code>residual</code>) sets the boundary.</li>
         <li>May receive block-coded input.</li>
         <li>Resolves multiset and inhibitory input prior to
         processing.</li>
@@ -205,6 +208,13 @@ class="sidebar-icon">π</span>permutation</a></li>
         <td style="text-align: left;">relative pattern matching
         threshold</td>
         </tr>
+        <tr>
+        <td style="text-align: left;"><code>residual</code></td>
+        <td style="text-align: center;"><em>unlimited</em></td>
+        <td style="text-align: left;">non-matching query elements that
+        may be absorbed as noise, relative to the input population; 0
+        requires a full match</td>
+        </tr>
         </tbody>
         </table>
         <p><br></p>
@@ -220,56 +230,115 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/heteroencoder_circuit.png"><br></p>
-        <h2 id="source-code">Source code</h2>
+        <h2 id="pattern-separation-and-the-residual">Pattern separation
+        and the residual</h2>
+        <p>The heteroencoder always returns a token: an input either
+        retrieves a stored SHR or receives a new random one. Inputs that
+        meet the matching criterion converge onto the same token
+        (clustering); all others receive unrelated tokens (pattern
+        separation). The <code>threshold</code> and
+        <code>residual</code> options decide where this boundary
+        lies.</p>
+        <p>The two options work together. The default threshold remains
+        the lower bound for every query and governs small inputs, such
+        as a single SHR or a fragment of one. To heteroencode bundles of
+        multiple SHRs, add the <code>residual</code> option. It limits
+        how many query elements retrieval may discard as noise, in
+        multiples of the input population, so the number of elements
+        that must match grows with the size of the bundle.</p>
+        <p>A residual well below 1, such as 0.5, absorbs noise but still
+        separates bundles that differ by one item, because a new item
+        contributes close to a full population of non-matching elements.
+        A value of 0 requires a full match.</p>
         <div class="sourceCode" id="cb2"><pre
-        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> heteroencoder(config):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Heteroencoder A -&gt; B. A may be partitioned. Has no input for B.</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    receive_blocks <span class="op">=</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, [])</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    dims <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks]</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    params_A <span class="op">=</span> [<span class="bu">sum</span>(b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks), <span class="bu">sum</span>(b[<span class="dv">1</span>]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> b <span class="kw">in</span> receive_blocks)]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    params_B <span class="op">=</span> config.get(<span class="st">&quot;send_blocks&quot;</span>, [[<span class="dv">0</span>, <span class="dv">0</span>]])[<span class="dv">0</span>]</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: params_A,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: params_B</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(<span class="op">*</span>blocks):</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> resolve_block_join_normal(<span class="bu">list</span>(blocks), dims)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Empty input: no output, nothing to learn</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> X:</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> ([],)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> M[<span class="st">&quot;retrieve&quot;</span>](X)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> Y:</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            n, p <span class="op">=</span> params_B</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>            Y <span class="op">=</span> <span class="bu">sorted</span>(</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">range</span>(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>),</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>p, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        M[<span class="st">&quot;store&quot;</span>](X, Y)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (Y,)</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> {</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;arginp&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>,</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fill&quot;</span>: <span class="dv">11</span>,</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;size&quot;</span>: <span class="dv">18</span>,</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;◀▶&quot;</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
+        class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2000</span><span class="ot">,</span> <span class="dv">20</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;codec&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;heteroencoder&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;residual&quot;</span><span class="fu">:</span> <span class="fl">0.5</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+        <p><strong>Code</strong></p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> Circuit(config)[<span class="st">&quot;function&quot;</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> f([<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="st">&quot;G&quot;</span>])[<span class="dv">0</span>]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> f([<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>])[<span class="dv">0</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> f([<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="st">&quot;G&quot;</span>])[<span class="dv">0</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> f([<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>])[<span class="dv">0</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a <span class="op">!=</span> b, a <span class="op">==</span> c, a <span class="op">==</span> d)</span></code></pre></div>
+        <p><strong>Output</strong></p>
+        <pre class="text"><code>True True True</code></pre>
+        <p>The two overlapping bundles receive distinct tokens, and a
+        repeated bundle returns its token. Without
+        <code>residual</code>, <code>b</code> would retrieve the token
+        of <code>a</code>.</p>
+        <p>The decision is asymmetric:</p>
+        <ul>
+        <li>Removing elements from a known input keeps its token:
+        <code>d</code> is a subset of the first bundle. This also holds
+        for randomly subsampled elements.</li>
+        <li>Adding noise keeps the token as long as the number of added
+        elements does not exceed the residual. Adding an item that was
+        not stored together with the rest produces a new token.</li>
+        <li>A subset contained in several stored inputs retrieves the
+        superposition of their tokens (2P elements), which is then
+        stored as that subset’s output. The output is not a valid SHR;
+        design inputs so that this does not occur, or treat it as an
+        ambiguous result.</li>
+        </ul>
+        <p>An input therefore receives a new token unless its items are
+        contained in a single previously encoded input.</p>
+        <h2 id="source-code">Source code</h2>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> heteroencoder(config):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Heteroencoder A -&gt; B. A may be partitioned. Has no input for B.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    receive_blocks <span class="op">=</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, [])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    dims <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    params_A <span class="op">=</span> [<span class="bu">sum</span>(b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks), <span class="bu">sum</span>(b[<span class="dv">1</span>]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> b <span class="kw">in</span> receive_blocks)]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    params_B <span class="op">=</span> config.get(<span class="st">&quot;send_blocks&quot;</span>, [[<span class="dv">0</span>, <span class="dv">0</span>]])[<span class="dv">0</span>]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: params_A,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: params_B</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(<span class="op">*</span>blocks):</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> resolve_block_join_normal(<span class="bu">list</span>(blocks), dims)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Empty input: no output, nothing to learn</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> X:</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> ([],)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> M[<span class="st">&quot;retrieve&quot;</span>](X)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> Y:</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>            n, p <span class="op">=</span> params_B</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>            Y <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">range</span>(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>),</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>p, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        M[<span class="st">&quot;store&quot;</span>](X, Y)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (Y,)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> {</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;arginp&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fill&quot;</span>: <span class="dv">11</span>,</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;size&quot;</span>: <span class="dv">18</span>,</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;◀▶&quot;</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
       </article>
     </section>
   </main>

@@ -31,6 +31,7 @@ See also: https://creatingintelligence.org/#predictive-learning
 | `send`        |  *required*    |  integer, representing a single output slot |
 | `receive`     |  *required*    |  two or more input slots with pathway tags |
 | `threshold`     | *automatic*    |  relative pattern matching threshold  |
+| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match ([details](design_principles.md#full-and-partial-matching-with-residual)) |
 
 <br>
 

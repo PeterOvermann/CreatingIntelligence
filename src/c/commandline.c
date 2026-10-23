@@ -37,7 +37,7 @@ static void print_help(void)
 
 	printf("Command line options: \n");
 	printf("   -T <threshold>\n");
-	printf("   -M <matching>\n\n");
+	printf("   -R <residual>\n\n");
 
 	printf("Store A -> B:\n");
 	printf("1 2 3 4 5 6 7 8 9 10 -> 11 12 13 14 15 16 17 18 19 20\n\n");
@@ -48,8 +48,8 @@ static void print_help(void)
 	printf("Matching treshold\n");
 	printf("   threshold\n\n");
 
-	printf("Relative matching threshold\n");
-	printf("   matching\n\n");
+	printf("Matching residual\n");
+	printf("   residual\n\n");
 
 	printf("Memory count (bits)\n");
 	printf("   memorycount\n\n");
@@ -96,16 +96,17 @@ int main(int argc, char *argv[])
 	
 	// Options, in any order:
 	// -T <threshold>	User-defined absolute activation threshold
-	// -M <matching>	Relative threshold (fraction of the query population)
+	// -R <residual>	Absolute number of elements that may be absorbed as noise
 	int pmin = 0;
-	double matching = 0.0;
+	
+	int residual = -1; // initialization with invalid value
 	while (a + 2 < argc && argv[a + 1][0] == '-')
 		{
 		int ok = 0;
 		if (strcmp(argv[a + 1], "-T") == 0)
 			ok = sscanf( argv[a + 2], "%d", &pmin) == 1;
-		else if (strcmp(argv[a + 1], "-F") == 0)
-			ok = sscanf( argv[a + 2], "%lf", &matching) == 1;
+		else if (strcmp(argv[a + 1], "-R") == 0)
+			ok = sscanf( argv[a + 2], "%d", &residual) == 1;
 		if (! ok)
 			{ print_help(); exit(1); }
 		a += 2;
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
    			*y	= Set_new(ny);
     	
 	if (pmin > 0) Memory_set_threshold (H, pmin);
-	if (matching > 0.0) Memory_set_matching (H, matching);
+	if (residual != -1) Memory_set_residual (H, residual);
 	
 	while (	fgets(inputline, sizeof(inputline), stdin) != NULL)
 		{
@@ -138,8 +139,8 @@ int main(int argc, char *argv[])
 		else if ( strcmp(inputline, "threshold\n") == 0)
 			{ printf("%d\n", Memory_get_threshold(H)); fflush(stdout);}
 
-		else if ( strcmp(inputline, "matching\n") == 0)
-			{ printf("%g\n", Memory_get_matching(H)); fflush(stdout);}
+		else if ( strcmp(inputline, "residual\n") == 0)
+			{ printf("%d\n", Memory_get_residual(H)); fflush(stdout);}
 
 		else if ( strcmp(inputline, "quit\n") == 0)
 			return 0;

@@ -327,18 +327,32 @@ relative `threshold` decides how much overlap counts as "the same". For
 example, it sets how far apart two color hues must be to receive different
 tokens.
 
-### Exact matching with `matching` 1.0
+### Full and partial matching with `residual`
 
-The `matching` option sets the fraction of the query population that must match.
-With `matching` 1.0, every element of the query must be part of the match:
-the noise-removing iterations of the retrieval algorithm are skipped, and a
-query either matches as a whole or returns an empty result. This is typically
-used for heteroencoding combinations of symbolic tokens, such as bigrams or
-chunks, where each distinct combination must map to its own token. Under the
-default threshold, a stored pair would also match a query that shares only one
-of its two tokens, because one SHR alone exceeds `T`. Use the default threshold
-where noise tolerance or similarity is the point, for example when clustering
-SDRs.
+The `residual` option limits how many query elements retrieval may discard as
+noise, in multiples of the input population P. Only elements present in the
+query count: a query that lacks elements of a stored pattern still matches,
+while a query with extra elements fails once these exceed the residual.
+
+- `residual` 0 requires a full match: every element of the query must be part
+  of the match, and a query either matches as a whole or returns an empty
+  result.
+- A value such as 0.5 absorbs up to P/2 noise elements, while a query that
+  contains an additional token (about P non-matching elements) still fails.
+  Values well below 1 keep this margin.
+- Without the option, the number of discarded elements is unlimited, and only
+  the threshold `T` applies.
+
+The residual is typically used for heteroencoding combinations of symbolic
+tokens, such as bigrams, chunks or bundles, where each distinct combination
+must map to its own token. Under the default threshold, a stored pair would
+also match a query that shares only one of its two tokens, because one SHR
+alone exceeds `T`. Use the default where noise tolerance or similarity is the
+point, for example when clustering SDRs.
+
+The memory dictionary exposes the residual as an absolute number of elements,
+alongside the absolute threshold `T`. An unlimited residual is reported as the
+input dimension N.
 
 ### Always learning
 

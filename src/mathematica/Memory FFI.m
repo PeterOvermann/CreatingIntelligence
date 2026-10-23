@@ -25,8 +25,8 @@ Uses the Standard C backend implementation of topological associative memory.
 Memory[config_Association] :=
 
 	Module[ 
-		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setmatching,
-		getmatching, memory, read, write, store, retrieve, 
+		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setresidual,
+		getresidual, memory, read, write, store, retrieve, 
 		free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
@@ -38,11 +38,11 @@ Memory[config_Association] :=
 		getthreshold = ForeignFunctionLoad["TAM", "TAMgetthreshold", 
 			{"OpaqueRawPointer"} -> "CInt"];
 
-		setmatching = ForeignFunctionLoad["TAM", "TAMsetmatching", 
-			{"OpaqueRawPointer", "CDouble"} -> "Void"];
+		setresidual = ForeignFunctionLoad["TAM", "TAMsetresidual", 
+			{"OpaqueRawPointer", "CInt"} -> "Void"];
 
-		getmatching = ForeignFunctionLoad["TAM", "TAMgetmatching", 
-			{"OpaqueRawPointer"} -> "CDouble"];
+		getresidual = ForeignFunctionLoad["TAM", "TAMgetresidual", 
+			{"OpaqueRawPointer"} -> "CInt"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
 			{"OpaqueRawPointer"} -> "CInt"];
@@ -70,10 +70,11 @@ Memory[config_Association] :=
 		If[KeyExistsQ[config, "threshold"] && NumberQ[config["threshold"]],
 			setthreshold[M, Round[config["threshold"] * PA]]];
 
-		(* Push optional relative threshold (fraction of the query population). 
-			N[] converts exact numbers such as 9/10 or 1 to machine reals. *)
-		If[KeyExistsQ[config, "fraction"] && NumberQ[config["fraction"]],
-			setmatching[M, N[config["matching"]]]];
+		(* Push optional residual: the number of non-matching query elements 
+			that may be absorbed as noise, in multiples of PA. *)
+		If[KeyExistsQ[config, "residual"] && NumberQ[config["residual"]] 
+				&& config["residual"] >= 0, 
+				setresidual[M, Floor[config["residual"] * PA + 10^-9]]];		
 
 		(* Get final threshold. *)
 		T = getthreshold[M];
@@ -103,7 +104,7 @@ Memory[config_Association] :=
 			"A_parameters" -> {NA, PA},
 			"B_parameters" -> {NB, PB},
 			"T" -> T, (* Absolute pattern matching threshold. *)
-			"matching" -> getmatching[M],
+			"residual" -> getresidual[M],
 			"store" -> store,
 			"retrieve" -> retrieve,
 			"clear" :> clear,

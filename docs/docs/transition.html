@@ -227,6 +227,13 @@ class="sidebar-icon">π</span>permutation</a></li>
         threshold</td>
         </tr>
         <tr>
+        <td style="text-align: left;"><code>residual</code></td>
+        <td style="text-align: center;"><em>unlimited</em></td>
+        <td style="text-align: left;">non-matching query elements that
+        may be absorbed as noise, relative to the input population; 0
+        requires a full match</td>
+        </tr>
+        <tr>
         <td style="text-align: left;"><code>rate_limit</code></td>
         <td style="text-align: center;">unlimited</td>
         <td style="text-align: left;">subsample the query if it exceeds
@@ -249,7 +256,11 @@ class="sidebar-icon">π</span>permutation</a></li>
         query can therefore match a stored key with which it shares only
         one of its tokens. Where a transition must only fire on its
         complete key, raise the threshold (see the finite automata
-        example below).</p>
+        example below). Setting <code>residual</code> to 0 covers the
+        converse case: it rejects queries that contain tokens outside
+        the stored key. A query consisting of a single token of a
+        two-token key still matches, because it is contained in the
+        key.</p>
         <h2 id="state-transitions-with-replacement-update">State
         transitions with replacement update</h2>
         <p>As the default update rule for the transition component, <a
