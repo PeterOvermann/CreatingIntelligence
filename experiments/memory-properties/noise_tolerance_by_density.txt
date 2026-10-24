@@ -1,0 +1,63 @@
+Generated with noise_tolerance_by_density.py
+System: Linux-6.18.44-fc-v153-x86_64-with-glibc2.39, x86_64, Python 3.12.3
+Backend: creating_intelligence.memory_c_ffi
+Date: 2026-10-24
+
+Auto-associative memory at 1000/10, matching threshold T = 7, exact additive noise, 500 queries per row
+
+Density 0.200 (306220 stored patterns)
+
+|       noise |         SNR |     correct |       empty |       false |
+|-------------|-------------|-------------|-------------|-------------|
+|          10 |        9.34 |         500 |           0 |           0 |
+|          20 |        5.70 |         500 |           0 |           0 |
+|          30 |        4.15 |         500 |           0 |           0 |
+|          40 |        3.27 |         485 |          15 |           0 |
+|          50 |        2.71 |         412 |          88 |           0 |
+|          60 |        2.31 |         316 |         184 |           0 |
+
+Noise at 90% correct: 44.8
+Noise at 50% correct: outside tested range
+
+Density 0.300 (491112 stored patterns)
+
+|       noise |         SNR |     correct |       empty |       false |
+|-------------|-------------|-------------|-------------|-------------|
+|          10 |        8.15 |         500 |           0 |           0 |
+|          20 |        4.97 |         499 |           1 |           0 |
+|          30 |        3.62 |         495 |           5 |           0 |
+|          40 |        2.86 |         426 |          74 |           0 |
+|          50 |        2.36 |         290 |         210 |           0 |
+|          60 |        2.02 |         214 |         286 |           0 |
+
+Noise at 90% correct: 36.5
+Noise at 50% correct: 55.3
+
+Density 0.400 (704597 stored patterns)
+
+|       noise |         SNR |     correct |       empty |       false |
+|-------------|-------------|-------------|-------------|-------------|
+|          10 |        7.63 |         500 |           0 |           0 |
+|          20 |        4.65 |         500 |           0 |           0 |
+|          30 |        3.39 |         449 |          51 |           0 |
+|          40 |        2.67 |         327 |         173 |           0 |
+|          50 |        2.21 |         182 |         318 |           0 |
+|          60 |        1.89 |          90 |         410 |           0 |
+
+Noise at 90% correct: 29.8
+Noise at 50% correct: 45.3
+
+Density 0.450 (825029 stored patterns)
+
+|       noise |         SNR |     correct |       empty |       false |
+|-------------|-------------|-------------|-------------|-------------|
+|          10 |        7.51 |         500 |           0 |           0 |
+|          20 |        4.58 |         493 |           7 |           0 |
+|          30 |        3.34 |         425 |          75 |           0 |
+|          40 |        2.63 |         262 |         238 |           0 |
+|          50 |        2.18 |         155 |         345 |           0 |
+|          60 |        1.86 |          78 |         421 |           1 |
+
+Noise at 90% correct: 26.3
+Noise at 50% correct: 41.1
+
