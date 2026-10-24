@@ -59,7 +59,7 @@ I demonstrate that associative memory emerges naturally from network topologies
 featuring a combinatorially expanded hidden layer. Learning is driven by
 topological plasticity rather than scalar weight adjustments. This architecture
 unifies auto-associative and hetero-associative learning under a single core
-algorithm: information retrieval via subset pattern matching and exact
+algorithm: information retrieval via subset pattern matching and
 nearest-neighbor search. Operating with constant-time complexity, these
 mechanisms bridge perceptual data (sparse distributed representations) and
 symbols (sparse holographic representations) without continuous bottlenecks.
@@ -234,20 +234,16 @@ spiking neurons, makes heavy use of recurrence and predictive coding, and
 learns from single experiences without relying on backpropagation, for 
 which a biological equivalent remains debated.
 
-A future synthetic intelligence may diverge from biology. But it is worthwhile
-to learn from nature's blueprints. Evolution has optimized biological
+Synthetic intelligence need not copy biology, but nature's blueprints are worth learning from. Evolution has optimized biological
 intelligence for exactly the traits current AI lacks: energy efficiency and
 continuous learning. Pursuing biological plausibility is an engineering
-strategy to overcome the scaling walls of deep learning. If we were to build a
-true biologically plausible AGI, it would be an adaptive, self-organizing
-system defined by different computational rules. Here is how we would
-define its fundamental mechanics:
+strategy to overcome the scaling walls of deep learning. A biologically plausible AGI is an adaptive, self-organizing system defined by different computational rules. Its fundamental mechanics:
 
-- Its neurons would send binary signals rather than dense matrices of floating-point numbers to each other, spending energy only on pathways that are currently active. Such models are known as spiking neural networks (SNNs).
-- It would use local learning rules, enabling autonomous learning on the fly.
-- It would be driven by predictive processing: external input only travels up the network hierarchy if it contradicts the prediction.
-- It would constantly update its world model, adapting to novel situations.
-- It would allocate its compute resources dynamically &mdash; the analogy of neuroplasticity.
+- Its neurons send binary signals rather than dense matrices of floating-point numbers to each other, spending energy only on pathways that are currently active. Such models are known as spiking neural networks (SNNs).
+- It uses local learning rules, enabling autonomous learning on the fly.
+- It is driven by predictive processing: external input only travels up the network hierarchy if it contradicts the prediction.
+- It constantly updates its world model, adapting to novel situations.
+- It allocates its compute resources dynamically &mdash; the analogy of neuroplasticity.
 
 
 Following this path, the challenge is to reverse-engineer the mind's native
@@ -328,9 +324,11 @@ manuscript (2022) and mirrored in the cerebellum and the neocortex, is
 condensed here into a minimal *clean-room* architecture. The result is a
 unifying core algorithm for topological associative memory.
 
-Computationally, the algorithm realizes the exact nearest-neighbor search
-within set theory, paralleling the role of vector databases in
-continuous-valued embedding spaces. Data retrieval time is independent of the
+Computationally, the algorithm realizes
+[exact nearest-neighbor search](#exact-nearestneighbor-search) within set
+theory, paralleling the role of vector databases in continuous-valued
+embedding spaces. 
+Data retrieval time is independent of the
 number of items stored in memory. Due to its scalability and performance, this
 architecture should prove useful in technical applications beyond AGI.
 
@@ -389,7 +387,7 @@ Although their internal mechanisms are fundamentally analog, neurons simulate
 digital codes by communicating via discrete electrical pulses. These
 all-or-nothing events translate to binary codes 1 (spike) or 0 (no spike).
 
-The apparently digital output of neurons is usually classified into two broad
+The digital output of neurons is usually classified into two broad
 schemes: population coding and temporal/frequency-based coding. Additionally,
 neural digital signals may transmit control codes that do not carry cognitive
 information.
@@ -405,9 +403,7 @@ The *temporal coding hypothesis* posits that precise, millisecond-level timing
 and patterning of individual neuronal spikes carry essential, high-fidelity
 information. Temporal firing patterns naturally occur during sensory processing
 and motor control. In these systems, temporal patterns act as a translator,
-converting static population codes into dynamic, real-time physical events. But
-pure temporal coding is unlikely to play a fundamental role in memory or
-symbolic thought.
+converting static population codes into dynamic, real-time physical events. But this framework holds that pure temporal coding plays no fundamental role in memory or symbolic thought.
 
 Instead, in the context of population coding, temporal effects serve a
 supporting role: they synchronize, aggregate, and sustain neural signals.
@@ -480,21 +476,16 @@ values uniformly distributed over all dimensions. Mathematical operations
 involving dense vectors can be defined coherently to preserve both the density
 and the uniform distribution of representations.
 
-Dense models may be mathematically elegant. But because they involve every
+Dense models are mathematically elegant. But because they involve every
 dimension in every calculation, they do not capture the sparse activity
 patterns and computational efficiency of the biological brain. 
 
 Yet, working effectively with sparse hypervectors comes with its own conceptual
 challenges, compared to dense models. Viewed in isolation, sparse binary
-hypervectors are a data structure with limited use. It might have been the
-strict adherence to the vector metaphor that hindered progress with sparse
-models.
+hypervectors are a data structure with limited use. Adherence to the vector
+metaphor has held back progress with sparse models.
 
-A much more effective reference frame for hyperdimensional computing is set
-theory: Binary hypervectors, interpreted as *characteristic vectors*,
-correspond directly to sets. In the context of sparse distributed
-representations, we are particularly interested in small subsets of a universal
-set corresponding to the hyperdimensional space.
+A much more effective reference frame for hyperdimensional computing is set theory: Binary hypervectors, interpreted as *characteristic vectors*, correspond directly to sets. Mathematically, nothing is lost or gained by this translation. What changes is which operations become natural. In the context of sparse distributed representations, we are particularly interested in small subsets of a universal set corresponding to the hyperdimensional space.
 
 With this shift in perspective, set theory, and by extension subset
 combinatorics and hypergraph theory, turns out to be a solid foundation for
@@ -639,7 +630,7 @@ SHRs may represent semantic primitives (like "red" or "apple"), chunks of
 information ("red apple"), non-lexical and higher-level concepts, or pointers
 to data structures.
 
-Although the information represented by an SHR may have some kind of
+Although the information represented by an SHR can have
 substructure, the SHR has by definition no internal structure: every element
 carries the same meaning. This is the key to compositionality, or more
 precisely its inverse: *decompositionality*. We can easily compose multiple
@@ -787,7 +778,7 @@ memory locations. Human memory has an enormous storage capacity, and it learns
 quickly.
 
 The data objects stored in this content-addressable memory are population
-codes: relatively small, discrete subsets of a very large group of neurons.
+codes: small, discrete subsets of a very large group of neurons.
 
 A biologically plausible mechanism for this kind of memory has remained elusive
 for decades. Without a direct mechanism to store and retrieve these population
@@ -820,14 +811,10 @@ artificial neuron proposed by Warren McCulloch and Walter Pitts (1943).
 
 We model learning simply through the opening and closing of signal paths,
 abstracting away the biological specifics of neural plasticity. Topological
-plasticity becomes the generalized mechanism of associative learning. The
-underlying biological realization may be synaptic long-term potentiation (LTP),
-dendritic plasticity, or other phenomena. Additionally, topological plasticity
-may involve a combination of such neural mechanisms. This abstraction is
-supported by experimental observations: the rapid formation and elimination of
-dendritic spines combined with the activation of "silent" synapses indicate
-that the brain uses switch-like mechanisms to alter its effective network
-topology.
+plasticity becomes the generalized mechanism of associative learning. Biologically, this can be realized by synaptic LTP, dendritic plasticity, or a combination of mechanisms. The framework does not depend on which. This abstraction is supported by experimental observations: the rapid formation and
+elimination of dendritic spines combined with the activation of "silent"
+synapses indicate that the brain uses switch-like mechanisms to alter its
+effective network topology.
 
 > **Topological plasticity**  
 > The generalized mechanism of associative learning in this framework. 
@@ -1256,9 +1243,10 @@ $X \to Y$ by identifying the best partial match $X \subseteq A$
 and its associated set $Y \subset V$.
 
 > **Best match**  
-> For a query pattern $A$, the best match $X \to Y$ is defined as the unique
-> largest subset $X \subseteq A$ where every element pair within $X$
-> contributes to every element of $Y$. 
+> For a query pattern $A$, the best match $X \to Y$ is defined by the output $Y$
+> that receives full support from the largest possible subsets of $A$: every 
+> element pair within such a subset contributes to every element of $Y$. $X$ 
+> comprises the elements of $A$ that support $Y$.
 
 
 Here are the main properties of this mechanism:
@@ -1271,10 +1259,11 @@ Here are the main properties of this mechanism:
   memory's storage capacity, serves as a test of whether or not an item is
   known.
 
-- If multiple subsets of $A$ of the exact same size meet the matching
-  criteria, a tie occurs and the retrieval algorithm defaults to an
-  empty result. Such ties can be resolved by systematic stochastic subsampling
-  of the query patterns.
+- If subsets of the same size support different outputs, a tie occurs and the
+  algorithm returns an empty result. At the threshold itself, any second
+  qualifying subset of size $T$ causes an empty result, even one supporting the
+  same output. Such ties can be resolved by systematic stochastic subsampling of
+  the query patterns.
 
 - Memory retrieval operates on all memory traces linked to element pairs
   within $A$. Any prior write operation involving those element pairs may
@@ -1350,14 +1339,20 @@ involved dimensions &mdash; this is the basis for the memory's high capacity.
 
 
 For an input set $A$, memory retrieval isolates the association $X \to Y$
-that best matches previously stored information: 
-$X$ is the largest subset of $A$ where every element pair contributes to $Y$.
+that best matches previously stored information. $Y$ is the output that
+receives full support from the largest possible subset of $A$: every element
+pair within that subset contributes to every element of $Y$. $X \subseteq A$
+comprises the elements that support $Y$. Usually $X$ is a single subset. If
+several subsets of $A$ support the same output, $X$ is their union.
 
-The algorithm operates iteratively. It calculates the most likely output $Y$,
-identifies the elements of $X$ that do not contribute to $Y$, and drops them.
-A new estimate for $Y$ is recalculated in each cycle.
-The process converges when all elements of $X$  map consistently to $Y$,
-or fails if the remaining elements drop below the hyperparameter threshold.
+The algorithm operates iteratively. It estimates the most likely output $Y$,
+measures how strongly each element of $X$ supports it, and removes the
+elements that are too weakly supported to belong to the best match. A new
+estimate of $Y$ is then calculated from the remaining elements. The process
+converges when no further element can be removed. It fails, returning an
+empty set, if fewer than $T$ elements can still form a supporting subset, or
+if no unique best match can be determined.
+
 
 **Input:** Query set $A$, hyperparameters $T$ and $P_B$
 
@@ -1378,23 +1373,31 @@ or fails if the remaining elements drop below the hyperparameter threshold.
 
 5. **Select**: $Y \gets R_{\top P_B}$ ([kWTA](#k-winners-take-all) with cutoff $T(T-1)/2$)
 
-6. **Threshold check:** If $|Y| < P_B$ return $\varnothing$
+6. **Threshold check:** If $Y = \varnothing$ return $\varnothing$
 
-7. **Per-element weights:** $w_i \gets |R_i \cap Y|$
+7. **Per-element support:** $w_i \gets |R_i \cap Y|$ (multiset intersection,
+   at most $(|X| - 1)|Y|$)
 
-8. **Convergence test:** If $w_i \ge (|X| - 1) |Y|$ return $Y$
+8. **Feasibility test:** Bound the size of the largest subset of $X$ that
+   fully supports $Y$. If the bound is below $T$, return $\varnothing$. If it
+   equals $T$ but more than $T$ elements qualify, the match is ambiguous:
+   return $\varnothing$
 
-9. **Refine:** $X \gets X \setminus X_\text{min}$ (drop weakest contributors)
+9. **Refine:** Remove the elements of $X$ that are too weakly supported to
+   belong to a subset of that size
 
-10. **Iterate:** Go to step 2
+10. **Convergence test:** If no element was removed, return $Y$
+
+11. **Iterate:** Go to step 2
+
 
 Note on pattern attribution: While the core algorithm returns the retrieved
-pattern $Y$, the matching subset $X \subseteq A$ is manifested internally. It
-can be exposed via an API function to support an application's explainability.
+pattern $Y$, the matching subset $X \subseteq A$ is manifested internally. 
+It can be exposed via an API function to support an application's explainability.
 
 The core retrieval algorithm can be extended with a per-query matching
 threshold that grows with the size of the query pattern $A$: the threshold
-$T$ in steps 2 and 5 is replaced by an effective threshold derived from $T$
+$T$ in steps 2, 5 and 8 is replaced by an effective threshold derived from $T$
 and a residual $Q$, introduced [below](#hyperparameters).
 
 
@@ -1414,9 +1417,41 @@ shown here (and coded in the reference library) uses a heuristic based on
 subset combinatorics and operates with high mathematical accuracy. Any
 biological realization of memory retrieval will naturally be less accurate.
 
+
+In the reference implementation, steps 8 and 9 use a bound closely related to
+the h-index, which Hirsch (2005) introduced to quantify scientific output: the
+largest number $h$ such that $h$ of a researcher's papers have been cited at
+least $h$ times each. In memory retrieval, the input elements take the place of
+papers. Normalized by the size of the output, the per-element weight 
+$d_i = w_i / |Y|$ counts the partners within $X$ with which element $i$ 
+jointly supports
+each element of $Y$. The feasibility test determines the largest $h$ such that
+the $h$ strongest elements each have at least $h - 1$ such partners, 
+$h = \max\{h : d_{(h)} \ge h - 1\}$, where $d_{(h)}$ denotes the $h$-th largest
+weight. The shift from $h$ to $h - 1$ reflects that an element cannot pair with
+itself. This gives $h$ a precise combinatorial meaning: in a subset of size $c$
+whose element pairs all contribute to $Y$, each member has $c - 1$ such
+partners. Therefore $h$ is an upper bound on the size of any subset of $X$ that
+fully supports the current estimate $Y$. The refinement step drops all elements
+weaker than the $h$-th strongest, and $Y$ is recomputed. Retrieval converges
+when the cutoff removes no element. In the typical case $h = |X|$, every element
+then reaches the maximum weight $(|X| - 1)|Y|$, and every element pair in $X$
+contributes to every element of $Y$. With tied weights, the cutoff can also
+retain several subsets that support the same output; $X$ is then their union. If
+$h$ falls below the matching threshold $T$, no admissible match exists and
+retrieval returns an empty set. If $h = T$ but more than $T$ elements reach the
+cutoff weight, the match is ambiguous and is rejected as a tie.
+
+As a procedure that successively removes weakly connected
+elements, the refinement finds the best match reliably as long as the first
+estimate of $Y$ is largely correct. It does not guarantee the best match
+for arbitrary inputs. Under strong additive noise, an early iteration may
+remove elements of the true match; retrieval then returns an empty set rather
+than a false result.
+
 No iteration is needed if there is an immediate perfect match with previously
 stored information. If the input $A$ includes non-contributing elements, one or
-two iterations are normally sufficient.
+two iterations are normally sufficient for moderately noisy inputs.
 
 
 
@@ -1472,7 +1507,7 @@ predictions.
 The biological equivalent of kWTA is lateral inhibition, where active neurons
 suppress their neighbors via inhibitory interneurons.
 
-In the context of associative memory, kWTA has a long history as a recall strategy. Graham and Willshaw (1995) showed that selecting the output units with the highest dendritic sums improves recall from a binary associative net presented with partial or noisy cues, and Gripon et al. (2016) compare this “winners-take-all” threshold with other retrieval dynamics for sparse associative memories. Topological memory uses the same selection step, applied to responses summed over pairs of input elements rather than over individual inputs. What follows the selection &mdash; steps 6 to 10 of the [memory retrieval algorithm](#retrieving-associations) &mdash; is specific to this framework: the iterative refinement of the input, which retains only the input elements that consistently support the selected output, and returns an empty result if no unique match emerges.
+In the context of associative memory, kWTA has a long history as a recall strategy. Graham and Willshaw (1995) showed that selecting the output units with the highest dendritic sums improves recall from a binary associative net presented with partial or noisy cues, and Gripon et al. (2016) compare this “winners-take-all” threshold with other retrieval dynamics for sparse associative memories. Topological memory uses the same selection step, applied to responses summed over pairs of input elements rather than over individual inputs. What follows the selection &mdash; steps 6 to 11 of the [memory retrieval algorithm](#retrieving-associations) &mdash; is specific to this framework: the iterative refinement of the input, which retains only the input elements that consistently support the selected output, and returns an empty result if no unique match emerges.
 
 
 
@@ -1511,8 +1546,8 @@ $k$.
 
 In the associative-memory literature, this structure is known as a third-order Willshaw model.
 
-
-The core function of memory retrieval from an input $A$ is equivalent to
+In tensor notation, a single pass of 
+[raw memory retrieval](#raw-memory-retrieval) computes
 $B_k = ( \sum_{i<j} T_{ijk} A_i A_j )_{\top P_B}$.
 
 The geometrical interpretation of this structure is a triangular prism: a
@@ -1779,14 +1814,44 @@ inputs with 15 additional random elements:
 
 The average overlap decreases as the memory density increases. Examining the
 output of individual queries, we observe that most outcomes are either perfect
-or empty. Zero results occur when there is a tie between equally valid
-matches. In practical applications, queries will be repeated a few times with
-subsampled versions of the input, until a unique best match is found: the
-decrease of overlap as shown in the figure above correlates with an increasing
-number of randomized queries, necessary for a partial match to win.
+or empty. Empty results have two causes. Equally valid matches may tie; in
+practical applications, such queries are repeated with subsampled versions of
+the input until a unique best match is found. Alternatively, strong
+interference may cause refinement to discard elements of the true match, as
+discussed below.
 
 
+Additive noise limits retrieval through interference. Consider a query
+$A = X \cup Z$, where $X$ is the matching subset with $|X| = P$ and $Z$
+contains the noise elements. Each element of the matching output receives
+support from every element pair within $X$, $\binom{P}{2}$ contributions in
+total. All other element pairs of the query, those involving at least one
+element of $Z$, activate memory content unrelated to the match. There are
+$|Z|(2P + |Z| - 1)/2$ such pairs, and in a memory of density $\rho$, each
+contributes to a given output element with a probability of roughly $\rho$.
+This gives a simple approximation of the signal-to-noise ratio (SNR) of the 
+first output estimate:
 
+$$\mathrm{SNR} \approx \binom{P}{2} \Big/ \sqrt{\frac{|Z|(2P + |Z| - 1)}{2}\,\rho(1-\rho)}$$
+
+Once $|Z|$ exceeds $P$, the SNR falls roughly in proportion to $1/|Z|$. When
+it becomes too low, some elements of the matching output lose against the
+strongest interference-driven output elements in the first estimate.
+Refinement then evaluates the query against a partly wrong output and may
+discard elements of the true match. Later iterations cannot recover them, and
+retrieval returns an empty set rather than a false result. The estimate treats
+memory bits as independent and therefore describes how noise tolerance
+scales, not exact failure rates.
+
+The estimate also indicates how noise tolerance scales with the population.
+When the noise set is much larger than the matching subset, $|Z| \gg P$, the
+number of interfering element pairs grows as $|Z|^2/2$, and the SNR becomes
+approximately $P(P-1) / \big(\sqrt{2}\,|Z| \sqrt{\rho(1-\rho)}\big)$. For a
+given required SNR, the tolerable number of noise elements therefore grows
+with $P^2$: doubling the population quadruples the amount of noise from which
+a match can still be retrieved. Simulations confirm this effect when the
+sparsity $P/N$ is held constant, which keeps the nominal capacity practically
+unchanged. 
 
 <br>
 <a id="pattern-matching-threshold"></a>
@@ -1794,7 +1859,7 @@ number of randomized queries, necessary for a partial match to win.
 ### Pattern matching threshold
 
 The memory retrieval algorithm attempts to find the best possible match of an
-input set $A$ with previously stored associations. To avoid false positives
+input set $A$ against the memory's aggregate state. To avoid false positives
 (hallucinations), a minimum number $T$ of elements must coincide. This pattern
 matching threshold is governed by the overlap probability between a pair of
 random sets and by the memory's nominal capacity $C$.
@@ -2363,20 +2428,20 @@ being populated. Borrowing from the terminology of Gestalt psychology: in auto-a
 
 Auto-associative topologies effectively store collections of sets. This
 functionality can be simply modeled with a database where the retrieval process
-computes the overlap between the query set and all stored records. This is
+computes the overlap between the query set and every stored record. This is
 functionally identical to auto-associative memory retrieval, but of course
 impractical for large datasets.
 
 In contrast to autoassociations, heteroassociations can be
 [decomposed](#properties) into separate storage operations. Overlapping
-associations merge in memory to form a new association which absorbs its
+associations compose in memory to form a new association which absorbs its
 original constituents. This unique functionality cannot be replicated with a
 simple database model.
 
 Autoassociations have another important property, closely related to their
 irreducibility: memories cannot be retrieved in pieces. Querying the memory
 with a subset of a known item resolves to the full set.
-In other words, the memory cannot separate an item from its subsets.
+In other words, the memory does not separate an item from its subsets.
 
 This is an immediate consequence of the underlying storage model. For a proper
 subset $A_1 \subset A$, storing both $A_1 \to A_1$ and its enclosing set $A \to
@@ -2403,26 +2468,43 @@ decompose token bundles.
 Auto-associative memory functions as a database for sets. Although the system
 does not keep records of individual write operations, memory retrieval can
 isolate any distinct pattern stored in memory. This is a direct consequence of
-the [irreducibility property](#irreducibility) of the storage process, as discussed
-above.
+the [irreducibility property](#irreducibility) of the storage process, as
+discussed above.
 
-When queried with an input pattern, memory retrieval finds its nearest neighbor
-among the patterns stored in memory. This mechanism is driven solely by the
-coincidence (intersection) of elements, ignoring non-overlapping elements:
-pattern matching maximizes the overlap metric. The process does not minimize
-the Hamming distance.
+When queried with an input pattern, memory retrieval finds its nearest
+neighbor among the patterns stored in memory. This mechanism is driven solely
+by the coincidence (intersection) of elements, ignoring non-overlapping
+elements: pattern matching maximizes the overlap metric. The process does not
+minimize the Hamming distance.
 
-This retrieval mechanism is independent of the overlap characteristics
-and the size distribution of the sets stored in memory: auto-associative
-memory can represent highly overlapping SDRs as well as SHRs or SHR bundles.
+This retrieval mechanism is independent of the overlap characteristics and the
+size distribution of the sets stored in memory: auto-associative memory can
+represent highly overlapping SDRs as well as SHRs or SHR bundles.
 
-Nearest-neighbor search systematically identifies the exact
-best match rather than an approximation. This is a direct consequence
-of the memory's discrete data representation.
+When retrieval succeeds, nearest-neighbor search returns the exact best match
+rather than an approximation. The result is always a pattern that was stored
+as a whole: autoassociations never combine in memory to form a new
+autoassociation, and a query matching part of a stored pattern retrieves the
+complete pattern. This distinguishes auto-associative retrieval from
+[hetero-associative](#properties) retrieval, where overlapping associations
+merge in memory and the result can be an association that was never stored in
+this precise form.
+
+Whether retrieval succeeds depends on two factors. The memory density
+determines how reliably information can be retrieved at all, as discussed
+under [memory capacity](#memory-capacity). Additive noise in the query is
+the second factor, which applies at any density where memory content interferes.
+Non-matching query elements activate unrelated memory content. As their number
+grows, this interference can mislead the first estimate of the output, and
+refinement may then discard elements of the true match (see [Retrieving
+associations](#retrieving-associations)). Retrieval then returns an empty
+result rather than a wrong one. 
 
 > **Exact nearest-neighbor search**  
-> Topological auto-associative memory retrieves information by identifying the > absolute best match, defining proximity by the overlap metric.
-
+> Topological auto-associative memory retrieves the stored pattern with the
+> largest overlap with the query, as long as this overlap dominates the
+> interference from non-matching query elements and other memory content.
+> Otherwise, it returns an empty result rather than an approximation.
 
 
 
@@ -2736,7 +2818,8 @@ update rules), or graph traversal (generative update rules).
 
 Partitioning auto-associative memory generally affects its capacity.
 The capacity of a bidirectional memory, storing pairs of
-tokens $(A,B)$ with dimension $N$ and population $P$, is given by
+tokens $(A,B)$ where each block has dimension $N$ and population $P$, 
+is given by
 
 $$\texttt{capacity}(N, P) \approx \ln(2)\frac{N^2(N-1)}{P^2(P-1)}$$
 
@@ -3144,7 +3227,7 @@ manipulate high-dimensional distributed representations (the others being
 [bundling](#bundling) and [permutation](#permutation)). Binding is the glue that
 associates distinct pieces of information, such as a key and its value, or a
 role and its filler. This concept was introduced in 1990 by Paul Smolensky in
-the context of tensor product representations &mdash; arguably the common
+the context of tensor product representations &mdash; the common
 ancestor of hyperdimensional computing, vector-symbolic architectures, and the
 topological memory model discussed here.
 
@@ -3264,10 +3347,10 @@ and maintains sparsity. In the context of perception, this mechanism is known
 as *chunking*: the grouping of inputs into cohesive perceptual units.
 
 To chunk two perceptions "red" and "circle", a memory query tests if this
-combination is already known. By now we have probably encountered many examples
-of red circles, so we can assume that the query returns the binding
-"redcircle". But in case of a novel perception, for instance an orange circle,
-the corresponding memory query fails: a new random SHR representing the binding
+combination is already known. We have encountered many red circles before, 
+so the query returns the binding "redcircle". 
+But in case of a novel perception, for instance an orange circle, the
+corresponding memory query fails: a new random SHR representing the binding
 "orange circle" must be deployed. This way, higher-level representations are
 generated on the fly. This is a form of [heteroencoding](#heteroencoding).
 
@@ -3286,7 +3369,7 @@ auto-associative memory through a grid-shaped binding structure.
 
 ### Sequences and pointer chains
 
-Biological networks do not appear to dynamically allocate and persist
+Biological networks do not dynamically allocate and persist
 variable-length arrays. To be consistent with this constraint, we model
 sequences as temporal rather than spatial processes.
 
@@ -3776,9 +3859,12 @@ ones.
 
 <br>
 
-Intelligent systems, whether natural or synthetic, emerge not from monolithic scaling, but from the integration of discrete functional components.
-Even complex cognitive functions like episodic or working memory may arise from the interaction of just a few associative memory instances. We model such architectures by assembling specialized units, each performing a specific
-associative function. 
+Intelligent systems, whether natural or synthetic, emerge not from monolithic
+scaling, but from the integration of discrete functional components. In this
+framework, even complex cognitive functions like episodic or working memory
+arise from the interaction of just a few associative memory instances. We model
+such architectures by assembling specialized units, each performing a specific
+associative function.
 
 A topological memory unit may consist of thousands of neurons, forming millions
 of connections within their vast hidden layer. But rather than individually
@@ -3836,7 +3922,7 @@ temporal processing.
 
 Following this approach, known as "synthetic neuroanatomy", we integrate
 functional modules into system-level architectures &mdash; creating intelligence
-that may simulate human cognition, or solve non-human, technical challenges.
+designed to simulate human cognition or to solve technical challenges.
 
 
 
@@ -4688,16 +4774,15 @@ fillers for their respective slots are in the third row:
 </p>
 
 
-Each column represents a slot, binding a top-level node (for instance
-"capital") with a filler value ("Paris") in the context of the specific frame
-instance ("France"). The first column plays a special role: It binds the class
-("country") to the instance ("France"). In this bare-bones model, a frame
-always has three rows, while the number of columns varies. In more elaborate
-versions, additional information such as procedural instructions or type
-constraints, often called "facets", can be attached via an extra row. And it
-might be useful to incorporate a unique pointer to serve as the frame's
-universal identifier and locator. In the grid shown above, such a pointer would
-be placed in the empty cell at the left.
+Each column represents a slot, binding a top-level node (for instance "capital")
+with a filler value ("Paris") in the context of the specific frame instance
+("France"). The first column plays a special role: It binds the class
+("country") to the instance ("France"). In this bare-bones model, a frame always
+has three rows, while the number of columns varies. In more elaborate versions,
+additional information such as procedural instructions or type constraints,
+often called "facets", can be attached via an extra row. A unique pointer can
+also serve as the frame's universal identifier and locator. In the grid shown
+above, such a pointer would be placed in the empty cell at the left.
 
 A column where the middle cell is empty binds a slot to a generic default
 value. This default will be used by any instance that has no filler (the bottom
@@ -5165,21 +5250,20 @@ bandwidth.
 
 ### An associative connection machine
 
-A powerful intelligent machine may consist of hundreds or thousands of circuit
-components with self-contained associative memory instances. These nodes are
+An associative connection machine consists of hundreds or thousands of circuit components with self-contained associative memory instances. These nodes are
 sparsely interconnected, fetching their inputs (serialized small sets) from the
 output registers of directly connected nodes. Nodes are individually programmed
 to carry out specific memory functions, as explored earlier in the discussion
-of neural circuit components. The connection topology is programmable and could
+of neural circuit components. The connection topology is programmable and can
 even evolve at runtime in order to achieve a degree of plasticity.
 
 Such a system can be built from memory units proposed in the previous section,
 combined with a configurable chip-to-chip interconnect. A low-bandwidth
 interconnect is adequate for peer-to-peer networking between memory units, as
-only sparse data is exchanged. It might even be feasible to build a system from
-geographically distributed units connected via wide-area networks, creating a
-form of hive intelligence. On the other end of the design spectrum, an entire
-self-contained system could be integrated onto a single silicon wafer.
+only sparse data is exchanged. The same design extends to geographically
+distributed units connected via wide-area networks, creating a form of hive
+intelligence. On the other end of the design spectrum, an entire self-contained
+system could be integrated onto a single silicon wafer.
 
 The machine can be designed to tolerate small manufacturing faults and sporadic
 memory or transmission glitches, considering the associative memory's
@@ -5231,7 +5315,7 @@ The baseline topological memory algorithm uses a binary storage model. This appr
 
 Each storage bit represents the topological connectedness between an input pair and an output element. A 0 means no link exists, and a 1 means at least one link exists. This model does not count parallel connections, as redundant routes do not alter the transmitted binary signal.
 
-An alternative storage model might use non-binary memory values,
+An alternative storage model uses non-binary memory values,
 tracking the number of topological connections, or serving as an abstract
 model of connection strength. 
 
@@ -5486,31 +5570,30 @@ Here are the algorithmic steps:
 
 On conventional CPUs, this variant runs slower than the reference algorithm because the system must calculate steps 4 and 5 sequentially for every input element. However, with-memory computing architectures perform bitwise aggregation and kWTA in parallel, eliminating this bottleneck. On specialized hardware, cascaded kWTA is likely the optimal retrieval method.
 
-
 <br>
 <a id="raw-memory-retrieval"></a>
 
 ### Raw memory retrieval
 
-The core memory retrieval algorithm relies on threshold checks and
-noise-cancelling iterations to separate known from unknown query patterns. This
+The core retrieval algorithm identifies the elements of the query pattern that
+support the retrieved output, and rejects queries without a unique match. This
 functionality is essential for processing symbolic tokens (for example item
-stores and hyperassociations) where known items can be reliably extracted from
-noisy signals.
+stores and hyperassociations), where known items must be reliably extracted
+from noisy signals.
 
 When working with sparse distributed representations (SDRs) that encode
-physical data, there is often no clear boundary between signals and noise.
-In such scenarios, a single-pass retrieval algorithm without threshold checks
-can be the most efficient choice. This process simply calculates the
-k-winners-take-all response to the hidden layer activations, always returning a
-non-empty set if there are at least $k = P_B$ output elements.
+physical data, there is often no clear boundary between signal and noise. In
+such scenarios, a single-pass retrieval without threshold checks or refinement
+can be the most efficient choice. Raw retrieval computes the hidden layer
+response to the full query pattern and applies k-winners-take-all to it.
 
 Here is an outline of the steps:
 
 
 **Input:** Query set $A$, hyperparameter $P_B$
 
-**Output:** K-winners-take-all result $Y$, or an empty set $\varnothing$
+**Output:** K-winners-take-all result $Y$, or an empty set $\varnothing$ if no output
+element receives a vote
 
 
 1. **Expansion coding:** Map 2-subsets $\binom{A}{2}$  to memory sets $M_{ij}$
@@ -5519,15 +5602,55 @@ Here is an outline of the steps:
    
 3. **Select**: $Y \gets R_{\top P_B}$ ([kWTA](#k-winners-take-all) with cutoff 1)
 
-This method is equivalent to the [core retrieval algorithm](#retrieving-associations) with
-the pattern matching threshold set to $T = 2$. Like the core algorithm, it
-performs subset pattern matching, but without determining the contributing
-elements of the query pattern. Whereas the core algorithm isolates a unique
-best match and rejects unknown inputs, this retrieval method always returns a
-raw statistical result, even for completely random inputs.
+These are steps 3 to 5 of the [core retrieval algorithm](#retrieving-associations),
+executed once on the full query $X = A$ with the kWTA cutoff lowered to 1. Raw
+retrieval omits the threshold checks, the per-element weights, and the
+iterative refinement of the input.
 
+The size of the result is not fixed. Hard kWTA returns all elements tied at
+the $P_B$-th rank, so $Y$ may contain more than $P_B$ elements. If fewer than
+$P_B$ output elements receive a vote, $Y$ contains only those.
 
-Raw retrieval corresponds to the classical recall procedure of binary associative memories. Willshaw, Buneman and Longuet-Higgins (1969) activated the output units whose summed input reaches the number of active elements in a complete cue pattern. For partial or noisy cues, Graham and Willshaw (1995) instead select the output units with the highest summed input, which is the kWTA step used here. Since memory sets are addressed by pairs of input elements, the aggregated response $R$ is the local field of a third-order Willshaw memory as analysed by Löwe and Vermet (2026), with kWTA selection in place of their fixed threshold.
+Raw retrieval is overlap-weighted recall. If a stored association $X \to Y$
+satisfies $X \subseteq A$, every element of $Y$ receives at least
+$|X|(|X|-1)/2$ votes, one from each element pair within $X$. The stored pattern
+with the largest overlap therefore tends to win the kWTA selection. Because
+votes are counted over pairs rather than over individual elements, this
+advantage grows quadratically with the size of the overlap.
+
+Raw retrieval does not perform subset pattern matching. Summing the
+votes discards the information about which input pairs cast them. The result
+therefore neither identifies a matching subset $X \subseteq A$ nor verifies
+that a single consistent subset supports every element of $Y$. 
+
+Once the memory holds data, raw retrieval returns a non-empty result even
+for completely random query patterns. It cannot separate known from unknown
+information. Because random queries produce low, evenly spread vote counts,
+ties at the $P_B$-th rank are common, and the result may be several times
+larger than $P_B$.
+
+When the query is a bundle of stored patterns with equal overlap, raw retrieval
+does not return a stored pattern. In an exact tie, hard kWTA returns the
+elements of all of them; otherwise, interference from other memory traces
+decides a mixture, which may again exceed $P_B$ elements. For an exact tie, the
+core algorithm returns an empty set, and randomized subsampling then extracts
+one of the constituent patterns.
+
+Steps 6 to 11 of the core retrieval algorithm retain only the input elements
+that consistently support the selected output, and return an empty set when no
+unique match exists. This turns the statistical estimate of raw retrieval into
+subset pattern matching, which returns either a consistent match or an empty
+result.
+
+Raw retrieval corresponds to the classical recall procedure of binary
+associative memories. Willshaw, Buneman and Longuet-Higgins (1969) activated
+the output units whose summed input reaches the number of active elements in a
+complete cue pattern. For partial or noisy cues, Graham and Willshaw (1995)
+instead select the output units with the highest summed input, which is the
+kWTA step used here. Since memory sets are addressed by pairs of input
+elements, the aggregated response $R$ is the local field of a third-order
+Willshaw memory as analysed by Löwe and Vermet (2026), with kWTA selection in
+place of their fixed threshold.
 
 
 
@@ -5573,8 +5696,8 @@ hetero-associative topologies and supervised learning.
 
 Interestingly, climbing fibers fire continuously at an average
 rate of about 1 Hz, mimicking irregular, Poisson-like noise. 
-Hypothetically, this random generator might be the source of new
-SHRs which get deployed within the [heteroencoding](#heteroencoding) mechanism. 
+This random generator is a likely source of new
+SHRs which get minted within the [heteroencoding](#heteroencoding) mechanism. 
 Because climbing fiber activation triggers a prolonged depolarization,
 such complex spikes can be temporally integrated to form new
 sparse representations, ready to be used as a new teaching signal.
@@ -5602,9 +5725,8 @@ We see this dual-use design of the input/output layer in a phenomenon known as
 *temporal multiplexing*: a quick, synchronized burst (the low-latency phase)
 acts as the input query, while the subsequent repetitions (high-latency phase)
 represent the retrieved memory. These repetitions likely serve to filter out
-noise, much like the iterative steps in the algorithm described earlier. The
-precise timing of those bursts does not encode information, but may be relevant
-for synchronization.
+noise, much like the iterative steps in the algorithm described earlier. 
+In this framework, the precise timing of those bursts does not encode information, but may be relevant for synchronization.
 
 Unlike the cerebellum, where a massive amount of specialized neurons form the
 memory's hidden layer, the neocortex employs a recurrent architecture with an
@@ -6110,7 +6232,7 @@ deep learning paradigm and the computationalist framework introduced in this wor
 | learning dynamics | offline / batch | online / atomic |
 | symbol grounding | entangled continuous spaces | heteroencoding SDRs to SHRs |
 | information decay | catastrophic forgetting / pruning | stochastic decay | 
-| retrieval reliability | statistical approximation | exact pattern matching |
+| retrieval reliability | statistical approximation | exact match or empty result |
 | hardware architecture	| von Neumann / memory wall	| neuromorphic / in-memory |	
 
 <!--  ---------------------------------------------------------------------- -->
@@ -6199,6 +6321,16 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1949},
   publisher={John Wiley and Sons},
   address={New York}
+}
+
+@article{hirsch2005,
+  title={An Index to Quantify an Individual's Scientific Research Output},
+  author={Hirsch, J. E.},
+  journal={Proceedings of the National Academy of Sciences},
+  volume={102},
+  number={46},
+  pages={16569--16572},
+  year={2005}
 }
 
 
