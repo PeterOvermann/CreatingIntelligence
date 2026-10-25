@@ -17,23 +17,25 @@ This repository includes a software framework (the system layer) for modeling an
 simulating neural circuits based on the topological memory kernel.
 
 The methods introduced here lend themselves to binary in-memory and neuromorphic
-computating, opening a new route toward synthetic intelligence that does not rely
+computation, opening a new route toward synthetic intelligence that does not rely
 on GPU acceleration.
 
 ### General Information
 
 * Website: https://creatingintelligence.org
 * Documentation: https://creatingintelligence.org/docs
-* Documentation for LLMs and AI agents: https://creatingintelligence.org/llms-docs.txt
+* Documentation for AI agents: https://creatingintelligence.org/llms.txt
 * Manuscript (PDF): https://creatingintelligence.org/CreatingIntelligence.pdf
 * Release information: https://pypi.org/project/creating-intelligence/
 * Preprint: https://arxiv.org/abs/2606.31819
-* Discussions: https://github.com/PeterOvermann/CreatingIntelligence/discussions
-* Issue Tracker: https://github.com/PeterOvermann/CreatingIntelligence/issues
+
+
+Questions and ideas are welcome in [Discussions](https://github.com/PeterOvermann/CreatingIntelligence/discussions).
+Please report bugs at the [Issue Tracker](https://github.com/PeterOvermann/CreatingIntelligence/issues).
 
 ### Python Installation
 
-```python
+```bash
 pip install creating-intelligence
 ```
 
@@ -116,5 +118,5 @@ This repository contains two distinct categories of content, which are licensed 
 
 * **The Manuscript & Assets:** All Rights Reserved. These materials may not be reproduced, distributed, modified, translated, or commercialized without explicit, prior written permission from the author. 
 
-See the full [LICENSE](LICENSE) file for details.
+See the full [License](License) file for details.
 
