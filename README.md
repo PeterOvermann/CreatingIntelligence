@@ -26,7 +26,7 @@ on GPU acceleration.
 * Documentation: https://creatingintelligence.org/docs
 * Context for LLMs and AI agents: https://creatingintelligence.org/llms.txt
 * Release information: https://pypi.org/project/creating-intelligence/
-* Manuscript (PDF): https://raw.githubusercontent.com/PeterOvermann/Writings/main/CreatingIntelligence.pdf
+* Manuscript: https://raw.githubusercontent.com/PeterOvermann/Writings/main/CreatingIntelligence.pdf
 * Preprint: https://arxiv.org/abs/2606.31819
 
 
