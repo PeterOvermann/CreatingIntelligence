@@ -28,12 +28,15 @@
 
 typedef struct
 	{
-	int *a;								//	Set indices, size-n array,
+	int *a;								//	Ordered set indices, size-n array,
 										//	zero-based numbering
 	int	n;								//	Dimension
 	int	p; 								//	Population
 	} Set;
-	
+
+
+// Note: the topological associative memory implementation expects
+// set indices to be ordered. 	
 
 Set	*Set_new (int);						//	Construct empty set
 Set	*Set_new_copy (Set* A);				//	Copy constructor
@@ -76,7 +79,7 @@ typedef struct
 	int Bdimension;			//	B hyperparameters 
 	int Bpopulation;		// (same as A if auto-associative)
 	
-	int T;					//	Pattern matching threshold (absolute population)
+	int T;					//	Pattern matching threshold (absolute)
 
 	int residual;			//  Absolute number of non-matching query elements
 							//  that may be absorbed as noise
