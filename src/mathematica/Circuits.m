@@ -713,74 +713,6 @@ auto[config_Association] :=
 
 
 (*
-State transition memory component.
-
-Stores heteroassociations A -> B within a shared input/output space,
-taught by an explicit instructive signal (the teaching blocks).
-Retrieved patterns are valid queries, so iterated retrieval (via an
-external feedback path) produces learned trajectories.
-
-receive: k teaching blocks (B), followed by k query blocks (A).
-send:    k output blocks, matching the teaching and query blocks.
-*)
-
-transition[config_Association] :=
-	Module[ {f, plugin, k, dims, paramsA, paramsB, pop, M,
-		absratelimit, decimation},
-
-	(* Update rule *)
-	plugin = Lookup[config, "plugin", replacement][config];
-
-	k = Length[config["send_blocks"]];
-	dims = First /@ config["send_blocks"];
-
-	(* Memory hyperparameters: A from the query blocks, B from the
-	send blocks. The "paired" check guarantees matching dimensions. *)
-    paramsB = Plus @@ config["send_blocks"];
-    paramsA = Plus @@ Drop[config["receive_blocks"], k];
-	pop = Last[paramsA];
-
-	(* Limit size of query pattern. Applies to both storage and retrieval.
-	Default: unlimited. *)
-	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];
-
-	(* Proportional stochastic subsampling, applied to the query only. *)
-	decimation = Lookup[config, "decimate", 1];
-
-	M = Memory[Join[config,
-		<| "A_parameters" -> paramsA, "B_parameters" -> paramsB |> ]];
-
-	f[blocks__List] := Module[ {B, X, Y, Xdec},
-
-		(* Join partitions and apply inhibition. *)
-		B = ResolveBlockJoinNormal[Take[{blocks}, k], dims];
-		X = ResolveBlockJoinNormal[Drop[{blocks}, k], dims];
-
-		(* Limit the rate of incoming positives. *)
-		If[Length[X] > absratelimit,
-			X = Sort[RandomSample[X, absratelimit]]];
-
-		(* Always learn (does nothing if B is empty) *)
-		M["store"][X, B];
-
-		(* Always retrieve.  *)
-		Xdec = If[decimation < 1,
-			Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
-		Y = M["retrieve"][Xdec];
-		
-		X = Union[plugin["updaterule"][Y, X]];
-
-		Sequence @@ MultisetBlockSplit[X, dims]
-		];
-
-	Join[ plugin, <| "function" -> f,
-		"checks" -> {"paired"},
-		"label" -> plugin["label"] <> "\[FilledCircle]",
-		"shape" -> "square", "fill" -> 14 |>, M]
-	]
-
-
-(*
 Temporal-associative memory component. 
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
@@ -978,37 +910,74 @@ chunker[config_Association] :=
 
 
 
-(* 
-Vanilla hetero-associative node for supervised learning A -> B.
-B is the first input argument.
-A is given by the rest of the input arguments. Can be block-coded.
-Always learns if B =!= {}.
+(*
+Generic hetero-associative component.
+
+Stores heteroassociations A -> B
+A can be block-coded.
+
+receive: B, A1, A2, ...
+send:    B
+
+If B and A1 are in the same dimensional space, this component
+represents a state transition memory:
+
+receive: S', S, C1,...
+send:    S'
+
 *)
 
-associator[config_Association] := 
-	Module[ {f, Adims, M},
+associator[config_Association] :=
+	Module[ {f, Adims, Apop, paramsA, paramsB, M,
+		absratelimit, decimation, label = ""},
 
-	Adims = First /@ Rest[config["receive_blocks"]]; (* Dimensions of input blocks A *)
-	
-	(* Memory instance: *)
-	M = Memory[Join[config, <|
-		"A_parameters" -> Plus@@Rest[config["receive_blocks"]], 
-		"B_parameters" -> First[config["receive_blocks"]] |> ]];
-	
-	f[B_List, blocks__List] := Module[{X, Y},
-		
+    paramsA = Plus @@ Rest[config["receive_blocks"]];
+    paramsB = First[config["receive_blocks"]];
+    
+	Adims = First /@ Rest[config["receive_blocks"]]; 
+	Apop = Last[paramsA];
+
+	(* Limit size of query pattern. Applies to both storage and retrieval.
+      	Default: unlimited. *)
+	absratelimit = Round[Apop * Lookup[config, "rate_limit", Total[Adims]/Apop]];
+
+	(* Proportional stochastic subsampling, applied to the query only. *)
+	decimation = Lookup[config, "decimate", 1];
+
+	M = Memory[Join[config,
+		<| "A_parameters" -> paramsA, "B_parameters" -> paramsB |> ]];
+
+	(* Special label for state transition memory *)
+	If[ Length[Adims] > 0 && 
+		config["receive_blocks"][[1]] === config["receive_blocks"][[2]],
+		label = "\[FilledSquare]" <> StringJoin[Table[ "\[EmptySquare]", Length[Adims]-1]]];
+
+	f[B_List, blocks__List] := Module[ {X, Xdec, Y},
+
 		(* Apply and drop inhibitory elements. *)
 		X = ResolveBlockJoinNormal[{blocks}, Adims];
 		Y = ResolveNormal[B];
+
+		(* Limit the rate of incoming positives. *)
+		If[Length[X] > absratelimit,
+			X = Sort[RandomSample[X, absratelimit]]];
+
+		(* Always learn (does nothing if B is empty) *)
+		M["store"][X, Y];
+
+		(* Proportional stochastic decimiation of query pattern. *)
+		Xdec = If[decimation < 1,
+			Sort[RandomSample[X, Floor[decimation * Length[X]]]], X];
+		If[ Length[Xdec] < Apop, Xdec = X];
 		
-		If[Y === {}, Return[ M["retrieve"][X]]]; (* Test. *)
 		
-		M["store"][X, Y]; 
-		{}	
-		];   
-		
-	Join[ <| "function" -> f, "checks" -> { "dimfirst", "oneout"},
-		"shape" -> "square", "fill" -> 11, "size" -> 18, "label"-> "\[FilledRightTriangle]\[FilledCircle]" |>, M]
+		M["retrieve"][Xdec]
+		];
+
+	Join[ <| "function" -> f,
+		"checks" -> {"dimfirst", "multinp", "oneout"}, 
+		"label" -> label, "size"-> 10,
+		"shape" -> "square", "fill" -> 11 |>, M]
 	]
 
 
@@ -1825,7 +1794,7 @@ Circuit::encoder   = "`1` cannot be used as a decoder.";
 Circuit::decoder   = "`1` cannot be used as an encoder.";
 Circuit::regress   = "Regression: output should match `1`.";
 Circuit::multiplex = "Malformed multiplex specification `1`.";
-Circuit::paired = "`1`: Expecting one teaching block and one query block per output block.";
+
 
 
 (* 
@@ -1841,12 +1810,11 @@ Circuit`check["totaldim"] = Total[#1[[All,1]]] === Total[#2[[All,1]]] &;
 Circuit`check["dimfirst"] = #1[[1]] === #2[[1]] &;
 Circuit`check["input"]    = #1 === {} &;
 Circuit`check["oneinp"]   = Length[#1] === 1 &;
+Circuit`check["multinp"]  = Length[#1] > 1 &;
 Circuit`check["arginp"]   = Positive[Length[#1]] &;
 Circuit`check["output"]   = #2 === {} &;
 Circuit`check["oneout"]   = Length[#2] === 1 &;
 Circuit`check["argout"]   = Positive[Length[#2]] &;
-Circuit`check["paired"] = (Positive[Length[#2]] &&
-	#1[[All,1]] === Join[#2[[All,1]], #2[[All,1]]]) &;
 
 
 

@@ -20,7 +20,6 @@ See also: https://creatingintelligence.org/#circuits
 | [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
 | [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
 | [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
-| [`transition`](transition.md) | State transition memory that learns heteroassociations within a shared space from a teaching signal, applying update rules to the retrieved or taught pattern.|
 | [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
 | [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
 | [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |

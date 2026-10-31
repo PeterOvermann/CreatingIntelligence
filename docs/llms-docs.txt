@@ -1,4 +1,4 @@
-# Generated from main on 2026-10-23
+# Generated from main on 2026-10-31
 
 # Source: README.md
 
@@ -457,7 +457,6 @@ See also: https://creatingintelligence.org/#circuits
 | [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
 | [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
 | [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
-| [`transition`](transition.md) | State transition memory that learns heteroassociations within a shared space from a teaching signal, applying update rules to the retrieved or taught pattern.|
 | [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
 | [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
 | [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |
@@ -1978,53 +1977,6 @@ def noise(config):
 
 
 
-# Source: empty.md
-
-
-CIRCUIT COMPONENTS
-
-# empty
-
-<img width="130" alt="image" src="img/empty.png"><br>
-
-
-A circuit component that sends the empty set on every cycle.
-
-## Details and properties
-
-- The `empty` component has no input and returns one empty output block. 
-- Used as dummy input for a receive slot that is deliberately left without a
-signal. Every receive slot must connect to an output slot (but unconnected send
-slots are allowed).
-- Typical use: a component in a chain whose neighbor is missing at the boundary, so that all instances keep the same block signature.
-
-<br>
-
-| Property        | Default | Description |
-|:------------|:-----:|:----------------------------------------|
-| `send`        | *required*     |  a single output slot  |
-
-
-Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
-
-
-## Example
-
-A two-block `delay` whose second block receives no signal:
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "empty", "send": [2]},
-	{"component": "delay", "send": [3, 4], "receive": [1, 2]},
-	{"component": "output", "receive": [3]}
-  ]}
-```
-
-
-
-
 # Source: circuit.md
 
 
@@ -2523,269 +2475,6 @@ def auto(config):
 
 
 
-# Source: transition.md
-
-
-CIRCUIT COMPONENTS
-
-# transition
-
-<img width="240" alt="image" src="img/transition.png"><br>
-
-State transition memory component, learning heteroassociations within a shared representational space.
-
-
-See also: https://creatingintelligence.org/#state-transition-memory
-
-
-## Details and properties
-
-- Stores heteroassociations A → B, where A and B share the same representational space.
-- Receives the teaching signal B from the first half of its `receive` blocks, and the query A from the second half.
-- Always learns A → B (has no effect if the teaching signal B is empty), then queries the memory with pattern A.
-- Uses update rule plugins to control how the retrieved pattern interacts with the query.
-- Holds no internal state.
-- Retrieved patterns are valid queries: routed back through a feedback path, the component generates learned trajectories. Without a feedback path, it performs a single transition per query.
-- Controls sparsity through stochastic subsampling mechanisms.
-- Resolves multiset and inhibitory input prior to processing.
-- Supports multiple data blocks. Each output block requires a matching teaching block and a matching query block.
-- Takes the memory's query hyperparameters from the query blocks and its target hyperparameters from the output blocks.
-- An output block with population 0 excludes its block from storage and retrieval.
-
-<br>
-
-
-| Property        | Default | Description |
-|:------------|:-----:|:----------------------------------------|
-| `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
-| `receive`     |  *required*    |  teaching slots followed by query slots, each matching `send`, with optional pathway tags |
-| `plugin`	    | `replacement` | update rule |
-| `threshold`     | *automatic*    |  relative pattern matching threshold |
-| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match |
-| `rate_limit`    | unlimited | subsample the query if it exceeds the specified relative rate limit (applies to storage and retrieval) |
-| `decimate`      | 1    | proportional stochastic decimation, applied to the query during retrieval |
-
-<br>
-
-Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
-
-Note on matching: with the default threshold, a single symbolic token (SHR)
-exceeds the pattern matching threshold. A query can therefore match a stored
-key with which it shares only one of its tokens. Where a transition must only
-fire on its complete key, raise the threshold (see the finite automata example below).
-Setting `residual` to 0 covers the converse case: it rejects queries that
-contain tokens outside the stored key. A query consisting of a single token of
-a two-token key still matches, because it is contained in the key.
-
-
-## State transitions with replacement update
-
-
-As the default update rule for the transition component,
-[`replacement`](replacement.md) returns the retrieved pattern B. In a teaching
-cycle, the retrieval follows the storage, so it returns the taught pattern, or
-a superposition if the query has other stored successors.
-
-
-In the following circuit, the first input provides the teaching signal and the second input the query. Storing the transitions A → B and B → C, then querying with A, returns B.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1], "label": "teach"},
-	{"component": "input", "send": [2], "label": "query"},
-	{"component": "transition", "plugin": "replacement",
-		"send": [11], "receive": [1, 2]},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/transition_replacement.png"><br>
-
-
-## State transitions with complement update
-
-As a plugin for the `transition` component, the [`complement`](complement.md)
-update rule removes the query pattern from the retrieved pattern, returning only the elements that the transition adds to the query. This matters where the target pattern overlaps with the query, for instance in production rules operating on bundles.
-
-The following circuit routes the output back to the query input, merging it with external input. Once a query starts the process, the circuit follows the stored transitions A → B → C → D cycle by cycle, and terminates when a state has no stored successor.
-
-The same feedback path supports learning. Presenting A as the query together
-with B as the teaching signal, followed by C and D as teaching signals alone,
-stores the entire chain: each teaching cycle retrieves the newly taught
-pattern, which becomes the next query.
-
-
-Because the circuit runs on its own output during retrieval, it must not be latched.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1], "label": "teach"},
-	{"component": "input", "send": [2], "label": "query"},
-	{"component": "transition", "plugin": "complement",
-		"send": [11], "receive": [1, [2, 11]]},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/transition_complement.png"><br>
-
-
-## Finite automata
-
-A deterministic finite automaton maps the current state and an input symbol a
-to the next state. In the following circuit, the query is a bundle of the state
-and the symbol, and the teaching signal is the next state. The output is fed
-back and bundled with the next symbol, so the automaton advances by one
-transition per cycle.
-
-A transition must fire only on its complete key. The default threshold is
-exceeded by a single symbolic token, so a query could match a stored key
-through the state or the symbol alone. Here, the threshold is set to 1.5, i.e.
-between the population of a single token and that of a complete
-(state, symbol) key. The margin below 2.0 allows for a few elements shared by
-the state's and the symbol's codes. An undefined transition then returns the
-empty set and halts the automaton. Since neither a symbol alone nor a state
-alone reaches the threshold, the automaton stays halted until it is restarted.
-
-To teach the automaton, run it with the next state as the teaching signal:
-present the start state together with the first symbol, then one symbol per
-cycle. Each training cycle returns the next state, which becomes the state of
-the next query. Rules can also be taught one at a time, by presenting the state,
-the symbol and the next state together. Then each rule must be followed by an
-empty cycle, so that its output does not become part of the next rule's key.
-
-To run the automaton, present the start state together with the first symbol,
-then one symbol per cycle. Present a symbol in every cycle: on a cycle without
-one, the fed-back state alone falls below the threshold, and the automaton
-halts. For a cyclic automaton whose strings start and end in the same state,
-presenting that state with each string's first symbol also restarts the
-automaton after a halt.
-
-
-```json
-{ "hyperparameters": {"default": [2000, 10]},
-  "dataflow": [
-	{"component": "input", "plugin": "codec", "send": [1], "label": "next"},
-	{"component": "input", "plugin": "codec", "send": [2], "label": "state"},
-	{"component": "input", "plugin": "codec", "send": [3], "label": "a"},
-	{"component": "transition", "send": [11], "threshold": 1.5,
-		"receive": [1, [2, 11, 3]]},
-	{"component": "output", "plugin": "codec",
-		"receive": [11], "label": "next"}
-  ]}
-```
-
-<img width="240" alt="image" src="img/transition_dfa.png"><br>
-
-
-## Source code
-
-```python
-def transition(config):
-    """
-    receive: k teaching blocks (B), followed by k query blocks (A).
-    send:    k output blocks, matching the teaching and query blocks.
-
-    If B is non-empty, store A -> B. Then retrieve Y from A.
-    Returns updaterule(Y, A), split into blocks.
-    """
-    plugin_factory = config.get("plugin", replacement)
-
-    if isinstance(plugin_factory, str):
-        # Resolve string name to function dynamically
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            replacement)
-
-    plugin = plugin_factory(config)
-
-    send_blocks = config.get("send_blocks", [])
-    receive_blocks = config.get("receive_blocks", [])
-    k = len(send_blocks)
-    dims = [b[0] for b in send_blocks]
-
-    # Memory hyperparameters: A from the query blocks, B from the
-    # output blocks. The "paired" check guarantees matching dimensions.
-    # Taking the populations of B from the output blocks lets an output
-    # block with population 0 exclude its block from storage and
-    # retrieval, e.g. the symbol block of a bipartite (state, symbol)
-    # query. The teaching blocks keep their own populations upstream.
-    query_blocks = receive_blocks[k:]
-    params_A = [sum(b[0] for b in query_blocks),
-                sum(b[1] for b in query_blocks)]
-    params_B = [sum(b[0] for b in send_blocks),
-                sum(b[1] for b in send_blocks)]
-    pop = params_A[1]
-
-    # Limit size of the query pattern, relative to pop. Applies to both
-    # storage and retrieval. Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
-    else:
-        absratelimit = sum(dims)
-
-    # Proportional stochastic subsampling, applied to the query only.
-    decimation = config.get("decimate", 1.0)
-
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params_A,
-        "B_parameters": params_B
-    })
-
-    # Memory backend
-    M = Memory(m_config)
-
-    def f(*blocks):
-        # Join partitions and apply inhibition
-        B = resolve_block_join_normal(list(blocks[:k]), dims)
-        X = resolve_block_join_normal(list(blocks[k:]), dims)
-
-        # Limit the rate of incoming positives
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Always learn (does nothing if B is empty)
-        M["store"](X, B)
-
-        # Always retrieve.
-        if decimation < 1.0:
-            Xdec = sorted(rng.choice(
-                X, size=math.floor(decimation * len(X)), replace=False).tolist())
-        else:
-            Xdec = X
-        Y = M["retrieve"](Xdec)
-        
-        X_out = plugin["updaterule"](Y, X)
-        X_out = sorted(list(set(X_out)))
-
-        return tuple(multiset_block_split(X_out, dims))
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "label": plugin.get("label", "") + "●",
-        "checks": ["paired"],
-        "shape": "square", "fill": 14
-    })
-    result.update(M)
-
-    return result
-```
-
-
-
-
 # Source: temporal.md
 
 
@@ -3127,10 +2816,19 @@ A basic supervised learning setup using hetero-associative memory:
 ```python
 def associator(config):
     """
-    Vanilla hetero-associative node for supervised learning A -> B.
-    B is the first input argument. 
-    A is given by the rest of the input arguments.
-    Can be block-coded. Always learns if B != [].
+    Generic hetero-associative component.
+
+    Stores heteroassociations A -> B.
+    A can be block-coded.
+
+    receive: B, A1, A2, ...
+    send:    B
+
+    If B and A1 are in the same dimensional space, this component
+    represents a state transition memory:
+
+    receive: S', S, C1,...
+    send:    S'
     """
     receive_blocks = config.get("receive_blocks", [])
     Adims = [b[0] for b in receive_blocks[1:]]
@@ -3138,6 +2836,16 @@ def associator(config):
     params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
                     for b in receive_blocks[1:])]
     params_B = receive_blocks[0]
+
+    Apop = params_A[1]
+
+    # Limit size of query pattern. Applies to both storage and retrieval.
+    # Default: unlimited.
+    absratelimit = round(
+        Apop * config.get("rate_limit", sum(Adims) / Apop))
+
+    # Proportional stochastic subsampling, applied to the query only.
+    decimation = config.get("decimate", 1.0)
 
     m_config = dict(config)
     m_config.update({
@@ -3147,20 +2855,47 @@ def associator(config):
 
     M = Memory(m_config)
 
+    # Special label for state transition memory
+    label = ""
+    if len(Adims) > 0 and \
+            list(receive_blocks[0]) == list(receive_blocks[1]):
+        label = "■" + "□" * (len(Adims) - 1)
+
     def f(B, *blocks):
+        # Apply and drop inhibitory elements.
         X = resolve_block_join_normal(list(blocks), Adims)
         Y = resolve_normal(B)
 
-        if not Y:
-            return (M["retrieve"](X),)
+        # Limit the rate of incoming positives.
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
 
+        # Always learn (does nothing if B is empty)
         M["store"](X, Y)
-        return ([],)
+
+        # Proportional stochastic decimation of query pattern.
+        Xdec = X
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(X))
+            Xdec = sorted(
+                rng.choice(
+                    X,
+                    size=sample_size,
+                    replace=False).tolist())
+        if len(Xdec) < Apop:
+            Xdec = X
+
+        return (M["retrieve"](Xdec),)
 
     result = {
         "function": f,
-        "checks": ["dimfirst", "oneout"],
-        "shape": "square", "fill": 11, "size": 18, "label": "▶●"
+        "checks": ["dimfirst", "multinp", "oneout"],
+        "label": label, "size": 10,
+        "shape": "square", "fill": 11
     }
     result.update(M)
     return result
@@ -3511,7 +3246,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
 - Default update rule for [`auto`](auto.md) and [`delay`](delay.md).
 - Bypasses the component's `capacity` setting.
 - Transparently handles multisets and inhibitory signals.
@@ -3753,7 +3488,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
 - Transparently handles multisets and inhibitory signals.
 - Corresponds to the set complement after deduplication.
 
@@ -3839,7 +3574,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), [`temporal`](temporal.md), and [`transition`](transition.md) components.
+- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
 - Computes the multiset aggregation of its inputs.
 - Corresponds to the set union after deduplication.
 
@@ -5014,12 +4749,15 @@ The Python and Mathematica packages use this implementation as a C extension.
 
 typedef struct
 	{
-	int *a;								//	Set indices, size-n array,
+	int *a;								//	Ordered set indices, size-n array,
 										//	zero-based numbering
 	int	n;								//	Dimension
 	int	p; 								//	Population
 	} Set;
-	
+
+
+// Note: the topological associative memory implementation expects
+// set indices to be ordered. 	
 
 Set	*Set_new (int);						//	Construct empty set
 Set	*Set_new_copy (Set* A);				//	Copy constructor
@@ -5062,7 +4800,7 @@ typedef struct
 	int Bdimension;			//	B hyperparameters 
 	int Bpopulation;		// (same as A if auto-associative)
 	
-	int T;					//	Pattern matching threshold (absolute population)
+	int T;					//	Pattern matching threshold (absolute)
 
 	int residual;			//  Absolute number of non-matching query elements
 							//  that may be absorbed as noise

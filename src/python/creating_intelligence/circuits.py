@@ -863,112 +863,6 @@ def auto(config):
     return result
 
 
-"""
-State transition memory component.
-
-Stores heteroassociations A -> B within a shared input/output space,
-taught by an explicit instructive signal (the teaching blocks).
-Retrieved patterns are valid queries, so iterated retrieval (via an
-external feedback path) produces learned trajectories.
-"""
-
-
-def transition(config):
-    """
-    receive: k teaching blocks (B), followed by k query blocks (A).
-    send:    k output blocks, matching the teaching and query blocks.
-
-    If B is non-empty, store A -> B. Then retrieve Y from A.
-    Returns updaterule(Y, A), split into blocks.
-    """
-    plugin_factory = config.get("plugin", replacement)
-
-    if isinstance(plugin_factory, str):
-        # Resolve string name to function dynamically
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            replacement)
-
-    plugin = plugin_factory(config)
-
-    send_blocks = config.get("send_blocks", [])
-    receive_blocks = config.get("receive_blocks", [])
-    k = len(send_blocks)
-    dims = [b[0] for b in send_blocks]
-
-    # Memory hyperparameters: A from the query blocks, B from the
-    # output blocks. The "paired" check guarantees matching dimensions.
-    # Taking the populations of B from the output blocks lets an output
-    # block with population 0 exclude its block from storage and
-    # retrieval, e.g. the symbol block of a bipartite (state, symbol)
-    # query. The teaching blocks keep their own populations upstream.
-    query_blocks = receive_blocks[k:]
-    params_A = [sum(b[0] for b in query_blocks),
-                sum(b[1] for b in query_blocks)]
-    params_B = [sum(b[0] for b in send_blocks),
-                sum(b[1] for b in send_blocks)]
-    pop = params_A[1]
-
-    # Limit size of the query pattern, relative to pop. Applies to both
-    # storage and retrieval. Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
-    else:
-        absratelimit = sum(dims)
-
-    # Proportional stochastic subsampling, applied to the query only.
-    decimation = config.get("decimate", 1.0)
-
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params_A,
-        "B_parameters": params_B
-    })
-
-    # Memory backend
-    M = Memory(m_config)
-
-    def f(*blocks):
-        # Join partitions and apply inhibition
-        B = resolve_block_join_normal(list(blocks[:k]), dims)
-        X = resolve_block_join_normal(list(blocks[k:]), dims)
-
-        # Limit the rate of incoming positives
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Always learn (does nothing if B is empty)
-        M["store"](X, B)
-
-        # Always retrieve.
-        if decimation < 1.0:
-            Xdec = sorted(rng.choice(
-                X, size=math.floor(decimation * len(X)), replace=False).tolist())
-        else:
-            Xdec = X
-        Y = M["retrieve"](Xdec)
-        
-        X_out = plugin["updaterule"](Y, X)
-        X_out = sorted(list(set(X_out)))
-
-        return tuple(multiset_block_split(X_out, dims))
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "label": plugin.get("label", "") + "●",
-        "checks": ["paired"],
-        "shape": "square", "fill": 14
-    })
-    result.update(M)
-
-    return result
 
 
 """
@@ -1265,10 +1159,19 @@ def chunker(config):
 
 def associator(config):
     """
-    Vanilla hetero-associative node for supervised learning A -> B.
-    B is the first input argument. 
-    A is given by the rest of the input arguments.
-    Can be block-coded. Always learns if B != [].
+    Generic hetero-associative component.
+
+    Stores heteroassociations A -> B.
+    A can be block-coded.
+
+    receive: B, A1, A2, ...
+    send:    B
+
+    If B and A1 are in the same dimensional space, this component
+    represents a state transition memory:
+
+    receive: S', S, C1,...
+    send:    S'
     """
     receive_blocks = config.get("receive_blocks", [])
     Adims = [b[0] for b in receive_blocks[1:]]
@@ -1276,6 +1179,16 @@ def associator(config):
     params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
                     for b in receive_blocks[1:])]
     params_B = receive_blocks[0]
+
+    Apop = params_A[1]
+
+    # Limit size of query pattern. Applies to both storage and retrieval.
+    # Default: unlimited.
+    absratelimit = round(
+        Apop * config.get("rate_limit", sum(Adims) / Apop))
+
+    # Proportional stochastic subsampling, applied to the query only.
+    decimation = config.get("decimate", 1.0)
 
     m_config = dict(config)
     m_config.update({
@@ -1285,20 +1198,47 @@ def associator(config):
 
     M = Memory(m_config)
 
+    # Special label for state transition memory
+    label = ""
+    if len(Adims) > 0 and \
+            list(receive_blocks[0]) == list(receive_blocks[1]):
+        label = "■" + "□" * (len(Adims) - 1)
+
     def f(B, *blocks):
+        # Apply and drop inhibitory elements.
         X = resolve_block_join_normal(list(blocks), Adims)
         Y = resolve_normal(B)
 
-        if not Y:
-            return (M["retrieve"](X),)
+        # Limit the rate of incoming positives.
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
 
+        # Always learn (does nothing if B is empty)
         M["store"](X, Y)
-        return ([],)
+
+        # Proportional stochastic decimation of query pattern.
+        Xdec = X
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(X))
+            Xdec = sorted(
+                rng.choice(
+                    X,
+                    size=sample_size,
+                    replace=False).tolist())
+        if len(Xdec) < Apop:
+            Xdec = X
+
+        return (M["retrieve"](Xdec),)
 
     result = {
         "function": f,
-        "checks": ["dimfirst", "oneout"],
-        "shape": "square", "fill": 11, "size": 18, "label": "▶●"
+        "checks": ["dimfirst", "multinp", "oneout"],
+        "label": label, "size": 10,
+        "shape": "square", "fill": 11
     }
     result.update(M)
     return result
@@ -1575,13 +1515,14 @@ circuit_messages = {
     "identdim": "{0}: Input and output dimensions must be identical.",
     "totaldim": "{0}: Total input and output dimensions must match.",
     "dimfirst": "{0}: Output must match first input slot.",
-    "paired": "{0}: Expecting one teaching block and one query block per output block.",
     "input": "No input slots allowed in {0}.",
     "oneinp": "Expecting one input slot in {0}.",
+    "multinp": "{0}: Expecting multiple input slots.",
     "arginp": "{0}: Missing input.",
     "output": "No output slots allowed in {0}.",
     "oneout": "{0}: Expecting one output slot.",
     "argout": "{0}: Missing output.",
+    "regress": "Regression: output should match {0}.",
     "unsent": "No sender for receive slot(s) {0}; use the 'empty' component for an empty input."
 }
 
@@ -1594,12 +1535,12 @@ circuit_checks = {
         s: sum(b[0] for b in r) == sum(b[0] for b in s),
     "dimfirst": lambda r,
         s: len(r) > 0 and len(s) > 0 and r[0] == s[0],
-    "paired": lambda r,
-        s: len(s) > 0 and [b[0] for b in r] == 2 * [b[0] for b in s],
     "input": lambda r,
         s: len(r) == 0,
     "oneinp": lambda r,
         s: len(r) == 1,
+    "multinp": lambda r,
+        s: len(r) > 1,
     "arginp": lambda r,
         s: len(r) > 0,
     "output": lambda r,

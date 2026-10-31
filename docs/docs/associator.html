@@ -106,10 +106,8 @@
 <li><a href="output.html">output</a></li>
 <li><a href="delay.html">delay</a></li>
 <li><a href="noise.html">noise</a></li>
-<li><a href="empty.html">empty</a></li>
 <li><a href="circuit.html">circuit</a></li>
 <li><a href="auto.html">auto</a></li>
-<li><a href="transition.html">transition</a></li>
 <li><a href="temporal.html">temporal</a></li>
 <li><a href="associator.html">associator</a></li>
 <li><a href="predictor.html">predictor</a></li>
@@ -238,43 +236,89 @@ class="sidebar-icon">π</span>permutation</a></li>
         <div class="sourceCode" id="cb2"><pre
         class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> associator(config):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Vanilla hetero-associative node for supervised learning A -&gt; B.</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    B is the first input argument. </span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    A is given by the rest of the input arguments.</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Can be block-coded. Always learns if B != [].</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    receive_blocks <span class="op">=</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, [])</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    Adims <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:]]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Generic hetero-associative component.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Stores heteroassociations A -&gt; B.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    A can be block-coded.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    receive: B, A1, A2, ...</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">    send:    B</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    params_A <span class="op">=</span> [<span class="bu">sum</span>(b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:]), <span class="bu">sum</span>(b[<span class="dv">1</span>]</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:])]</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    params_B <span class="op">=</span> receive_blocks[<span class="dv">0</span>]</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: params_A,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: params_B</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(B, <span class="op">*</span>blocks):</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> resolve_block_join_normal(<span class="bu">list</span>(blocks), Adims)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> resolve_normal(B)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> Y:</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> (M[<span class="st">&quot;retrieve&quot;</span>](X),)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        M[<span class="st">&quot;store&quot;</span>](X, Y)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ([],)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> {</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;dimfirst&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>, <span class="st">&quot;fill&quot;</span>: <span class="dv">11</span>, <span class="st">&quot;size&quot;</span>: <span class="dv">18</span>, <span class="st">&quot;label&quot;</span>: <span class="st">&quot;▶●&quot;</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">    If B and A1 are in the same dimensional space, this component</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">    represents a state transition memory:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">    receive: S&#39;, S, C1,...</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">    send:    S&#39;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    receive_blocks <span class="op">=</span> config.get(<span class="st">&quot;receive_blocks&quot;</span>, [])</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    Adims <span class="op">=</span> [b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:]]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    params_A <span class="op">=</span> [<span class="bu">sum</span>(b[<span class="dv">0</span>] <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:]), <span class="bu">sum</span>(b[<span class="dv">1</span>]</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> b <span class="kw">in</span> receive_blocks[<span class="dv">1</span>:])]</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    params_B <span class="op">=</span> receive_blocks[<span class="dv">0</span>]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    Apop <span class="op">=</span> params_A[<span class="dv">1</span>]</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Limit size of query pattern. Applies to both storage and retrieval.</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Default: unlimited.</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    absratelimit <span class="op">=</span> <span class="bu">round</span>(</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        Apop <span class="op">*</span> config.get(<span class="st">&quot;rate_limit&quot;</span>, <span class="bu">sum</span>(Adims) <span class="op">/</span> Apop))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Proportional stochastic subsampling, applied to the query only.</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    decimation <span class="op">=</span> config.get(<span class="st">&quot;decimate&quot;</span>, <span class="fl">1.0</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: params_A,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: params_B</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Special label for state transition memory</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    label <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(Adims) <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="op">\</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>            <span class="bu">list</span>(receive_blocks[<span class="dv">0</span>]) <span class="op">==</span> <span class="bu">list</span>(receive_blocks[<span class="dv">1</span>]):</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        label <span class="op">=</span> <span class="st">&quot;■&quot;</span> <span class="op">+</span> <span class="st">&quot;□&quot;</span> <span class="op">*</span> (<span class="bu">len</span>(Adims) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(B, <span class="op">*</span>blocks):</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Apply and drop inhibitory elements.</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> resolve_block_join_normal(<span class="bu">list</span>(blocks), Adims)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> resolve_normal(B)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Limit the rate of incoming positives.</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(X) <span class="op">&gt;</span> absratelimit:</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>            X <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>                    X,</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>absratelimit,</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Always learn (does nothing if B is empty)</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        M[<span class="st">&quot;store&quot;</span>](X, Y)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Proportional stochastic decimation of query pattern.</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        Xdec <span class="op">=</span> X</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decimation <span class="op">&lt;</span> <span class="fl">1.0</span>:</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>            sample_size <span class="op">=</span> math.floor(decimation <span class="op">*</span> <span class="bu">len</span>(X))</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>            Xdec <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>                rng.choice(</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>                    X,</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>                    size<span class="op">=</span>sample_size,</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>                    replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xdec) <span class="op">&lt;</span> Apop:</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            Xdec <span class="op">=</span> X</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (M[<span class="st">&quot;retrieve&quot;</span>](Xdec),)</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> {</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;dimfirst&quot;</span>, <span class="st">&quot;multinp&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: label, <span class="st">&quot;size&quot;</span>: <span class="dv">10</span>,</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>, <span class="st">&quot;fill&quot;</span>: <span class="dv">11</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
       </article>
     </section>
   </main>
