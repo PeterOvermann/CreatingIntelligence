@@ -16,7 +16,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 # Reber grammar: a finite automaton in transition memory.
 #
 # The circuit in ReberGrammar.json implements the finite-state grammar of
-# Reber (1967) with a "transition" memory component. The query is a bundle
+# Reber (1967) with an "associator" memory component. The query is a bundle
 # of the current state and the current letter, and the memory returns the
 # next state. The state is fed back and bundled with the next letter.
 #
