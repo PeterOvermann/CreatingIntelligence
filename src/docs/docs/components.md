@@ -16,14 +16,16 @@ See also: https://creatingintelligence.org/#circuits
 
 | Component | Functionality |
 |:---------------------|:----------------------------------------------------------------------|
-| [`input`](input.md) & [`output`](output.md) | Gateway components that connect to the circuit's function interface, reducing multisets to sets by default while optionally loading encoder or decoder plugins.  |
-| [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
-| [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
-| [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
-| [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
-| [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
-| [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |
-| [`heteroencoder`](heteroencoder.md) | Hetero-associative memory for unsupervised learning that maps similar sets to stable SHRs on the fly, generating and learning new unique tokens for unknown inputs.  |
+| [`input`](input.md)   | Gateway to the circuit's function interface. Supports encoder plugins.  |
+| [`output`](output.md) | Gateway to the circuit's function interface. Supports decoder plugins.  |
+| [`circuit`](circuit.md) | Embeds a circuits within a component. |
+| [`delay`](delay.md) | Delays incoming signals by one cycle. Integrates them temporally based on update rules. |
+| [`noise`](noise.md) | Generates pseudo-random sparse sets.  |
+| [`auto`](auto.md) | Auto-associative memory component. |
+| [`associator`](associator.md) | Hetero-associative memory for supervised learning or state transition memory.  |
+| [`predictor`](predictor.md) | Hetero-associative memory for predictive learning. |
+| [`heteroencoder`](heteroencoder.md) | Hetero-associative memory for unsupervised learning and pattern separation. |
+| [`temporal`](temporal.md) | Temporal-associative memory that maps temporal states to incoming inputs. |
 
 
 
@@ -36,7 +38,7 @@ See also: https://creatingintelligence.org/#circuits
 - The functionality of components can be extended via a standardized plugin mechanism.
 - This framework supports the seamless integration of user-defined, custom components and plugins.
 - Certain components may receive and send multiple signal partitions (block coding).
-- Components are visualized as circles (data flow components) or squares (memory components)  in circuit schematics.
+- Components are visualized as circles (data flow components) or squares (memory components) in circuit schematics.
 
 
 <br>

@@ -1,4 +1,4 @@
-# Generated from main on 2026-10-31
+# Generated from main on 2026-11-01
 
 # Source: README.md
 
@@ -453,14 +453,16 @@ See also: https://creatingintelligence.org/#circuits
 
 | Component | Functionality |
 |:---------------------|:----------------------------------------------------------------------|
-| [`input`](input.md) & [`output`](output.md) | Gateway components that connect to the circuit's function interface, reducing multisets to sets by default while optionally loading encoder or decoder plugins.  |
-| [`delay`](delay.md) & [`noise`](noise.md) | [`delay`](delay.md) defers incoming signals by one cycle and integrates them temporally based on update rules; [`noise`](noise.md) generates pseudo-random sparse sets without requiring input blocks.  |
-| [`circuit`](circuit.md) | Embeds nested circuits locally via the `file` plugin or globally via the `shared` registry plugin.  |
-| [`auto`](auto.md) | Auto-associative memory that incrementally learns at each cycle, applying update rules to manage how the retrieved pattern interacts with query pattern. |
-| [`temporal`](temporal.md) | Temporal associative memory that maps temporal states to incoming inputs, automatically learning higher-order sequences on the fly when predictions fail.  |
-| [`associator`](associator.md) | Hetero-associative memory for supervised learning that resolves multiset and inhibitory input, trains when the label input block is non-empty, and infers when the label block is empty.  |
-| [`predictor`](predictor.md) | Hetero-associative memory for predictive learning that associates data from the previous cycle with the current label. |
-| [`heteroencoder`](heteroencoder.md) | Hetero-associative memory for unsupervised learning that maps similar sets to stable SHRs on the fly, generating and learning new unique tokens for unknown inputs.  |
+| [`input`](input.md)   | Gateway to the circuit's function interface. Supports encoder plugins.  |
+| [`output`](output.md) | Gateway to the circuit's function interface. Supports decoder plugins.  |
+| [`circuit`](circuit.md) | Embeds a circuits within a component. |
+| [`delay`](delay.md) | Delays incoming signals by one cycle. Integrates them temporally based on update rules. |
+| [`noise`](noise.md) | Generates pseudo-random sparse sets.  |
+| [`auto`](auto.md) | Auto-associative memory component. |
+| [`associator`](associator.md) | Hetero-associative memory for supervised learning or state transition memory.  |
+| [`predictor`](predictor.md) | Hetero-associative memory for predictive learning. |
+| [`heteroencoder`](heteroencoder.md) | Hetero-associative memory for unsupervised learning and pattern separation. |
+| [`temporal`](temporal.md) | Temporal-associative memory that maps temporal states to incoming inputs. |
 
 
 
@@ -473,7 +475,7 @@ See also: https://creatingintelligence.org/#circuits
 - The functionality of components can be extended via a standardized plugin mechanism.
 - This framework supports the seamless integration of user-defined, custom components and plugins.
 - Certain components may receive and send multiple signal partitions (block coding).
-- Components are visualized as circles (data flow components) or squares (memory components)  in circuit schematics.
+- Components are visualized as circles (data flow components) or squares (memory components) in circuit schematics.
 
 
 <br>
@@ -1612,6 +1614,223 @@ def output(config):
 
 
 
+# Source: circuit.md
+
+
+CIRCUIT COMPONENTS
+
+
+# circuit
+
+<img width="240" alt="image" src="img/circuit_component.png"><br>
+
+A component that embeds an entire circuit.
+
+See also: https://creatingintelligence.org/#circuits
+
+
+## Details and properties
+
+- Circuits can be nested to any depth, provided the nesting is acyclic.
+- Uses the `shared` plugin for embedding a shared circuit.
+- Uses the `file` plugin to create a local embedded circuit.
+- Exchanges sets or multisets with the embedded circuit.
+- The embedded circuit may use [`input`](input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
+
+<br>
+
+ 
+| Property    | Default | Description |
+|:------------|:---------:|:---------------------------------------|
+| `send`      |  *required* |  output slots, as a list of integers |
+| `receive`   |  *required* | input slots with optional pathway tags |
+| `plugin`	  |  `shared` |   extension module |  
+| `name`	  |  *required* |   registry identifier / filename |  
+
+
+## Shared embedded circuits 
+
+An instantiated circuit can be shared to and embedded by other circuits
+by registering it via a `name` option:
+
+```json
+{ "options": {"name": "PERM"},
+  "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "output", "receive": [{"slot": 1, "tags": ["permute"]}]}
+  ]}
+```
+
+<img width="130" alt="image" src="img/circuit_permute.png"><br>
+
+
+The following circuit embeds the above instance by referring to its
+registry name. The same shared instance can be embedded by multiple `circuit`
+components.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "circuit", "plugin": "shared", "send": [11], 
+		"receive": [1], "name": "PERM"},
+	{"component": "output", "receive": [11]}
+  ]}
+
+```
+
+
+<img width="240" alt="image" src="img/circuit_shared.png"><br>
+
+The hyperparameters of shared embedded circuits must
+match the parameters of its inbound and outbound slots.
+
+
+## Local embedded circuits
+
+Using the `file` plugin, the `circuit` component imports a JSON circuit 
+description and embeds a local instance:
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "circuit", "plugin": "file", "send": [11], 
+		"receive": [1], "name": "permutation.json"},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/circuit_file.png"><br>
+
+If the embedded circuit specifies a registry name, it can be shared 
+across multiple `circuit` components.
+
+The hyperparameters of local embedded circuits are automatically rescaled to
+match the parameters of its inbound and outbound slots.
+
+
+## Source code
+
+```python
+def circuit(config):
+    """
+    Embedded circuit component.
+    Multiple circuit components can reference the same embedded instance.
+    """
+    plugin_factory = config.get("plugin", shared)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(sys.modules[__name__], plugin_factory, shared)
+
+    plugin = plugin_factory(config)
+    if not plugin:
+        return {}
+
+    params = [plugin.get("receive_blocks", []), plugin.get("send_blocks", [])]
+
+    if [config.get("receive_blocks", []), config.get(
+            "send_blocks", [])] != params:
+        raise ValueError(
+            f"Hyperparameters of embedded circuit do not match: {params}")
+
+    def f(*blocks):
+        return plugin["function"](*blocks)
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout"],
+        "size": 9
+    })
+
+    return result
+```
+
+### Plugins
+
+```python
+def shared(config):
+    """Plug-in for embedding a precompiled circuit."""
+    name = config.get("name")
+    if not name:
+        raise ValueError(
+            f"Missing 'name' property in shared circuit: {config}")
+
+    sub = circuit_registry.get(name)
+    if not sub:
+        raise ValueError(f"Unknown circuit '{name}'.")
+
+    result = dict(sub)
+    result["label"] = name
+    result.pop("clear", None)
+
+    return result
+```
+
+```python
+def file(config):
+    file_path = config.get("name")
+    if not file_path:
+        raise CircuitError(f"Missing 'name' property in {config}")
+
+    if not file_path.endswith(".json"):
+        file_path += ".json"
+
+    # Search current working directory first, then sys.path
+    search_paths = [""] + sys.path
+
+    full_path = None
+    for base in search_paths:
+        target = os.path.join(base, file_path) if base else file_path
+        if os.path.exists(target):
+            full_path = target
+            break
+
+    if not full_path:
+        raise CircuitError(
+            f"File '{file_path}' not found in current directory or sys.path.")
+
+    with open(full_path, "r") as f:
+        circ_expr = json.load(f)
+
+    # Rescale hyperparameters of embedded circuit
+    scale = config.get("scale")
+    default_hp = circ_expr.get("hyperparameters", {}).get("default")
+
+    if (isinstance(scale, (list, tuple)) and len(scale) == 2 and
+            isinstance(default_hp, (list, tuple)) and len(default_hp) == 2):
+
+        # Calculate separate scaling factors
+        rescale_factor_n = scale[0] / default_hp[0]
+        rescale_factor_p = scale[1] / default_hp[1]
+
+        # Apply scaling to all hyperparameters in the embedded circuit
+        for k, v in circ_expr["hyperparameters"].items():
+            if isinstance(v, (list, tuple)) and len(v) == 2:
+                circ_expr["hyperparameters"][k] = [
+                    round(v[0] * rescale_factor_n),
+                    round(v[1] * rescale_factor_p)
+                ]
+
+    # Compile the imported circuit
+    sub = Circuit(circ_expr)
+
+    # Extract up to 5 characters from the filename for the label
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
+    sub["label"] = base_name[:5]
+
+    return sub
+```
+
+
+
+
+
 # Source: delay.md
 
 
@@ -1977,223 +2196,6 @@ def noise(config):
 
 
 
-# Source: circuit.md
-
-
-CIRCUIT COMPONENTS
-
-
-# circuit
-
-<img width="240" alt="image" src="img/circuit_component.png"><br>
-
-A component that embeds an entire circuit.
-
-See also: https://creatingintelligence.org/#circuits
-
-
-## Details and properties
-
-- Circuits can be nested to any depth, provided the nesting is acyclic.
-- Uses the `shared` plugin for embedding a shared circuit.
-- Uses the `file` plugin to create a local embedded circuit.
-- Exchanges sets or multisets with the embedded circuit.
-- The embedded circuit may use [`input`](input.md) or [`output`](output.md) plugins to preprocess or postprocess the exchanged data.
-
-<br>
-
- 
-| Property    | Default | Description |
-|:------------|:---------:|:---------------------------------------|
-| `send`      |  *required* |  output slots, as a list of integers |
-| `receive`   |  *required* | input slots with optional pathway tags |
-| `plugin`	  |  `shared` |   extension module |  
-| `name`	  |  *required* |   registry identifier / filename |  
-
-
-## Shared embedded circuits 
-
-An instantiated circuit can be shared to and embedded by other circuits
-by registering it via a `name` option:
-
-```json
-{ "options": {"name": "PERM"},
-  "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "output", "receive": [{"slot": 1, "tags": ["permute"]}]}
-  ]}
-```
-
-<img width="130" alt="image" src="img/circuit_permute.png"><br>
-
-
-The following circuit embeds the above instance by referring to its
-registry name. The same shared instance can be embedded by multiple `circuit`
-components.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "circuit", "plugin": "shared", "send": [11], 
-		"receive": [1], "name": "PERM"},
-	{"component": "output", "receive": [11]}
-  ]}
-
-```
-
-
-<img width="240" alt="image" src="img/circuit_shared.png"><br>
-
-The hyperparameters of shared embedded circuits must
-match the parameters of its inbound and outbound slots.
-
-
-## Local embedded circuits
-
-Using the `file` plugin, the `circuit` component imports a JSON circuit 
-description and embeds a local instance:
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "circuit", "plugin": "file", "send": [11], 
-		"receive": [1], "name": "permutation.json"},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/circuit_file.png"><br>
-
-If the embedded circuit specifies a registry name, it can be shared 
-across multiple `circuit` components.
-
-The hyperparameters of local embedded circuits are automatically rescaled to
-match the parameters of its inbound and outbound slots.
-
-
-## Source code
-
-```python
-def circuit(config):
-    """
-    Embedded circuit component.
-    Multiple circuit components can reference the same embedded instance.
-    """
-    plugin_factory = config.get("plugin", shared)
-
-    if isinstance(plugin_factory, str):
-        import sys
-        plugin_factory = getattr(sys.modules[__name__], plugin_factory, shared)
-
-    plugin = plugin_factory(config)
-    if not plugin:
-        return {}
-
-    params = [plugin.get("receive_blocks", []), plugin.get("send_blocks", [])]
-
-    if [config.get("receive_blocks", []), config.get(
-            "send_blocks", [])] != params:
-        raise ValueError(
-            f"Hyperparameters of embedded circuit do not match: {params}")
-
-    def f(*blocks):
-        return plugin["function"](*blocks)
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "checks": ["arginp", "argout"],
-        "size": 9
-    })
-
-    return result
-```
-
-### Plugins
-
-```python
-def shared(config):
-    """Plug-in for embedding a precompiled circuit."""
-    name = config.get("name")
-    if not name:
-        raise ValueError(
-            f"Missing 'name' property in shared circuit: {config}")
-
-    sub = circuit_registry.get(name)
-    if not sub:
-        raise ValueError(f"Unknown circuit '{name}'.")
-
-    result = dict(sub)
-    result["label"] = name
-    result.pop("clear", None)
-
-    return result
-```
-
-```python
-def file(config):
-    file_path = config.get("name")
-    if not file_path:
-        raise CircuitError(f"Missing 'name' property in {config}")
-
-    if not file_path.endswith(".json"):
-        file_path += ".json"
-
-    # Search current working directory first, then sys.path
-    search_paths = [""] + sys.path
-
-    full_path = None
-    for base in search_paths:
-        target = os.path.join(base, file_path) if base else file_path
-        if os.path.exists(target):
-            full_path = target
-            break
-
-    if not full_path:
-        raise CircuitError(
-            f"File '{file_path}' not found in current directory or sys.path.")
-
-    with open(full_path, "r") as f:
-        circ_expr = json.load(f)
-
-    # Rescale hyperparameters of embedded circuit
-    scale = config.get("scale")
-    default_hp = circ_expr.get("hyperparameters", {}).get("default")
-
-    if (isinstance(scale, (list, tuple)) and len(scale) == 2 and
-            isinstance(default_hp, (list, tuple)) and len(default_hp) == 2):
-
-        # Calculate separate scaling factors
-        rescale_factor_n = scale[0] / default_hp[0]
-        rescale_factor_p = scale[1] / default_hp[1]
-
-        # Apply scaling to all hyperparameters in the embedded circuit
-        for k, v in circ_expr["hyperparameters"].items():
-            if isinstance(v, (list, tuple)) and len(v) == 2:
-                circ_expr["hyperparameters"][k] = [
-                    round(v[0] * rescale_factor_n),
-                    round(v[1] * rescale_factor_p)
-                ]
-
-    # Compile the imported circuit
-    sub = Circuit(circ_expr)
-
-    # Extract up to 5 characters from the filename for the label
-    base_name = os.path.splitext(os.path.basename(file_path))[0]
-    sub["label"] = base_name[:5]
-
-    return sub
-```
-
-
-
-
-
 # Source: auto.md
 
 
@@ -2471,282 +2473,6 @@ def auto(config):
 
     return result
 ```
-
-
-
-
-# Source: temporal.md
-
-
-CIRCUIT COMPONENTS
-
-# temporal
-
-<img width="240" alt="image" src="img/temporal.png"><br>
-
-Temporal-associative memory component.
-
-See also: https://creatingintelligence.org/#temporal-associative-memory
-
-
-## Details and properties
-
-- Learns the association of the previous state with the current input.
-- Predicts the next input based on the current state.
-- Always learns, even when the prediction is correct. This may broaden the base temporal associations.
-- A closed feedback loop enables generative behavior.
-- Uses update rule plugins to control the mechanics of temporal integration.
-- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
-- With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
-- With `latch` (default), the component is event-driven, so empty cycles are skipped entirely.
-- Supports the same set of update rules as the [`delay`](delay.md) component.
-- Controls sparsity through stochastic subsampling mechanisms.  
-- Represents the integrated state as a multiset.
-- Supports multiple input or output blocks.
-
-
-<br>
-
- 
-| Property        | Default | Description |
-|:------------|:-----:|:----------------------------------------|
-| `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
-| `receive`     |  *required*    |  one or more input slots with pathway tags |
-| `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
-| `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
-| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
-| `decay`         | 0    | pre-integration decay (leak rate) |
-| `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
-| `decimate`      | 1    | proportional stochastic decimation |
-
-<br>
-
-Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
-
-
-## Temporal associative memory with state permutation
-
-The `temporal` component applies the [`permutation`](permutation.md) update rule by default.
-This mechanism accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", 
-		"send": [11], "receive": [1], "capacity": 2},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_permutation.png"><br>
-
-
-
-
-## Temporal associative memory with replacement update
-
-With the [`replacement`](replacement.md) update rule, the current input
-replaces the internal state,
-bypassing the `capacity` setting. This mechanism directly associates
-each signal to the subsequent signal.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "replacement", 
-		"send": [11], "receive": [1]},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_replacement.png"><br>
-
-
-
-## Temporal associative memory with difference update
-
-The [`difference`](difference.md) 
-update rule replaces the internal state with 
-the symmetric multiset difference of the state and the incoming signal.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "difference", 
-		"send": [11], "receive": [1]},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_difference.png"><br>
-
-## Temporal associative memory with complement plugin
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "complement", 
-		"send": [11], "receive": [1], "capacity": 2},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_complement.png"><br>
-
-
-## Temporal associative memory with state augmentation
-
-The  [`augmentation`](augmentation.md) update rule plugin
-aggregates an orderless temporal state.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", "plugin": "augmentation", 
-		"send": [11], "receive": [1], "capacity": 5},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_augmentation.png"><br>
-
-
-
-
-
-## Source code
-
-```python
-def temporal(config):
-    """
-    Temporal-associative memory component.
-    Learns higher-order sequences on the fly and predicts the next token.
-    A hybrid between auto-associative and hetero-associative architectures.
-    Uses the same temporal integration plugins and parameterization as
-    "delay". Default plugin: permutation. With latch (default), empty input
-    gives empty output and leaves the component unchanged (event-driven).
-    """
-    plugin_factory = config.get("plugin", permutation)
-
-    if isinstance(plugin_factory, str):
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            permutation)
-
-    plugin = plugin_factory(config)
-
-    receive_blocks = config.get("receive_blocks", [])
-    dims = [b[0] for b in receive_blocks]
-
-    params = [sum(b[0] for b in receive_blocks), sum(b[1]
-                                                     for b in receive_blocks)]
-    pop = params[1] if len(params) > 1 else 0
-
-
-    # Limit size of query pattern, relative to pop.
-    # Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
-    else:
-        absratelimit = sum(dims)
-
-    decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 1.0)
-    abscapacity = round(capacity_factor * pop)
-    decimation = config.get("decimate", 1.0)
-    # Latch: empty input leaves the component unchanged
-    latch = config.get("latch", True)
-
-    # Memory with identical input and output parameters
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params,
-        "B_parameters": params
-    })
-
-    M = Memory(m_config)
-    Xstate = []
-    prediction = []
-
-    def f(*blocks):
-        nonlocal Xstate, prediction
-        X = multiset_block_join(list(blocks), dims)
-
-        # Latch: empty input gives empty output, no learning, no state update
-        if not X and latch:
-            return tuple(multiset_block_split([], dims))
-
-        # Rate limiting equally applies to positive and negative elements
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Pre-integration stochastic decay
-        if decay > 0.0:
-            keep_size = math.floor((1.0 - decay) * len(Xstate))
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=keep_size,
-                    replace=False).tolist())
-
-        # Always learn.
-        M["store"](resolve_normal(Xstate), resolve_normal(X))
-
-        # Multiset subsampling applied to previous state
-        if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=abscapacity,
-                    replace=False).tolist())
-
-        # Temporal integration via update rules
-        Xstate = plugin["updaterule"](X, Xstate)
-
-        # Proportional multiset subsampling applied to the integrated state
-        Xdec = Xstate
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(Xdec))
-            Xdec = sorted(
-                rng.choice(
-                    Xdec,
-                    size=sample_size,
-                    replace=False).tolist())
-
-        # Predict next token
-        prediction = M["retrieve"](resolve_normal(Xdec))
-
-        return tuple(multiset_block_split(prediction, dims))
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "checks": ["arginp", "argout", "ident"],
-        "shape": "square", "fill": 14
-    })
-    result.update(M)
-
-    return result
-```
-
-
-
-
 
 
 
@@ -3251,6 +2977,282 @@ def heteroencoder(config):
     result.update(M)
     return result
 ```
+
+
+
+
+
+
+# Source: temporal.md
+
+
+CIRCUIT COMPONENTS
+
+# temporal
+
+<img width="240" alt="image" src="img/temporal.png"><br>
+
+Temporal-associative memory component.
+
+See also: https://creatingintelligence.org/#temporal-associative-memory
+
+
+## Details and properties
+
+- Learns the association of the previous state with the current input.
+- Predicts the next input based on the current state.
+- Always learns, even when the prediction is correct. This may broaden the base temporal associations.
+- A closed feedback loop enables generative behavior.
+- Uses update rule plugins to control the mechanics of temporal integration.
+- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
+- With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
+- With `latch` (default), the component is event-driven, so empty cycles are skipped entirely.
+- Supports the same set of update rules as the [`delay`](delay.md) component.
+- Controls sparsity through stochastic subsampling mechanisms.  
+- Represents the integrated state as a multiset.
+- Supports multiple input or output blocks.
+
+
+<br>
+
+ 
+| Property        | Default | Description |
+|:------------|:-----:|:----------------------------------------|
+| `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
+| `receive`     |  *required*    |  one or more input slots with pathway tags |
+| `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
+| `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
+| `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
+| `decay`         | 0    | pre-integration decay (leak rate) |
+| `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
+| `decimate`      | 1    | proportional stochastic decimation |
+
+<br>
+
+Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
+
+
+## Temporal associative memory with state permutation
+
+The `temporal` component applies the [`permutation`](permutation.md) update rule by default.
+This mechanism accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", 
+		"send": [11], "receive": [1], "capacity": 2},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_permutation.png"><br>
+
+
+
+
+## Temporal associative memory with replacement update
+
+With the [`replacement`](replacement.md) update rule, the current input
+replaces the internal state,
+bypassing the `capacity` setting. This mechanism directly associates
+each signal to the subsequent signal.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", "plugin": "replacement", 
+		"send": [11], "receive": [1]},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_replacement.png"><br>
+
+
+
+## Temporal associative memory with difference update
+
+The [`difference`](difference.md) 
+update rule replaces the internal state with 
+the symmetric multiset difference of the state and the incoming signal.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", "plugin": "difference", 
+		"send": [11], "receive": [1]},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_difference.png"><br>
+
+## Temporal associative memory with complement plugin
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", "plugin": "complement", 
+		"send": [11], "receive": [1], "capacity": 2},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_complement.png"><br>
+
+
+## Temporal associative memory with state augmentation
+
+The  [`augmentation`](augmentation.md) update rule plugin
+aggregates an orderless temporal state.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", "plugin": "augmentation", 
+		"send": [11], "receive": [1], "capacity": 5},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_augmentation.png"><br>
+
+
+
+
+
+## Source code
+
+```python
+def temporal(config):
+    """
+    Temporal-associative memory component.
+    Learns higher-order sequences on the fly and predicts the next token.
+    A hybrid between auto-associative and hetero-associative architectures.
+    Uses the same temporal integration plugins and parameterization as
+    "delay". Default plugin: permutation. With latch (default), empty input
+    gives empty output and leaves the component unchanged (event-driven).
+    """
+    plugin_factory = config.get("plugin", permutation)
+
+    if isinstance(plugin_factory, str):
+        import sys
+        plugin_factory = getattr(
+            sys.modules[__name__],
+            plugin_factory,
+            permutation)
+
+    plugin = plugin_factory(config)
+
+    receive_blocks = config.get("receive_blocks", [])
+    dims = [b[0] for b in receive_blocks]
+
+    params = [sum(b[0] for b in receive_blocks), sum(b[1]
+                                                     for b in receive_blocks)]
+    pop = params[1] if len(params) > 1 else 0
+
+
+    # Limit size of query pattern, relative to pop.
+    # Default: total input dimension (no limit).
+    if "rate_limit" in config:
+        absratelimit = round(pop * config["rate_limit"])
+    else:
+        absratelimit = sum(dims)
+
+    decay = config.get("decay", 0.0)
+    capacity_factor = config.get("capacity", 1.0)
+    abscapacity = round(capacity_factor * pop)
+    decimation = config.get("decimate", 1.0)
+    # Latch: empty input leaves the component unchanged
+    latch = config.get("latch", True)
+
+    # Memory with identical input and output parameters
+    m_config = dict(config)
+    m_config.update({
+        "A_parameters": params,
+        "B_parameters": params
+    })
+
+    M = Memory(m_config)
+    Xstate = []
+    prediction = []
+
+    def f(*blocks):
+        nonlocal Xstate, prediction
+        X = multiset_block_join(list(blocks), dims)
+
+        # Latch: empty input gives empty output, no learning, no state update
+        if not X and latch:
+            return tuple(multiset_block_split([], dims))
+
+        # Rate limiting equally applies to positive and negative elements
+        if len(X) > absratelimit:
+            X = sorted(
+                rng.choice(
+                    X,
+                    size=absratelimit,
+                    replace=False).tolist())
+
+        # Pre-integration stochastic decay
+        if decay > 0.0:
+            keep_size = math.floor((1.0 - decay) * len(Xstate))
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=keep_size,
+                    replace=False).tolist())
+
+        # Always learn.
+        M["store"](resolve_normal(Xstate), resolve_normal(X))
+
+        # Multiset subsampling applied to previous state
+        if len(Xstate) > abscapacity:
+            Xstate = sorted(
+                rng.choice(
+                    Xstate,
+                    size=abscapacity,
+                    replace=False).tolist())
+
+        # Temporal integration via update rules
+        Xstate = plugin["updaterule"](X, Xstate)
+
+        # Proportional multiset subsampling applied to the integrated state
+        Xdec = Xstate
+        if decimation < 1.0:
+            sample_size = math.floor(decimation * len(Xdec))
+            Xdec = sorted(
+                rng.choice(
+                    Xdec,
+                    size=sample_size,
+                    replace=False).tolist())
+
+        # Predict next token
+        prediction = M["retrieve"](resolve_normal(Xdec))
+
+        return tuple(multiset_block_split(prediction, dims))
+
+    result = dict(plugin)
+    result.update({
+        "function": f,
+        "checks": ["arginp", "argout", "ident"],
+        "shape": "square", "fill": 14
+    })
+    result.update(M)
+
+    return result
+```
+
+
 
 
 

@@ -104,14 +104,14 @@
 <ul>
 <li><a href="input.html">input</a></li>
 <li><a href="output.html">output</a></li>
+<li><a href="circuit.html">circuit</a></li>
 <li><a href="delay.html">delay</a></li>
 <li><a href="noise.html">noise</a></li>
-<li><a href="circuit.html">circuit</a></li>
 <li><a href="auto.html">auto</a></li>
-<li><a href="temporal.html">temporal</a></li>
 <li><a href="associator.html">associator</a></li>
 <li><a href="predictor.html">predictor</a></li>
 <li><a href="heteroencoder.html">heteroencoder</a></li>
+<li><a href="temporal.html">temporal</a></li>
 </ul></li>
 <li><strong>UPDATE RULE PLUGINS</strong>
 <ul>
@@ -174,67 +174,63 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tbody>
         <tr>
         <td style="text-align: left;"><a
-        href="input.html"><code>input</code></a> &amp; <a
-        href="output.html"><code>output</code></a></td>
-        <td style="text-align: left;">Gateway components that connect to
-        the circuit’s function interface, reducing multisets to sets by
-        default while optionally loading encoder or decoder
-        plugins.</td>
+        href="input.html"><code>input</code></a></td>
+        <td style="text-align: left;">Gateway to the circuit’s function
+        interface. Supports encoder plugins.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
-        href="delay.html"><code>delay</code></a> &amp; <a
-        href="noise.html"><code>noise</code></a></td>
-        <td style="text-align: left;"><a
-        href="delay.html"><code>delay</code></a> defers incoming signals
-        by one cycle and integrates them temporally based on update
-        rules; <a href="noise.html"><code>noise</code></a> generates
-        pseudo-random sparse sets without requiring input blocks.</td>
+        href="output.html"><code>output</code></a></td>
+        <td style="text-align: left;">Gateway to the circuit’s function
+        interface. Supports decoder plugins.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
         href="circuit.html"><code>circuit</code></a></td>
-        <td style="text-align: left;">Embeds nested circuits locally via
-        the <code>file</code> plugin or globally via the
-        <code>shared</code> registry plugin.</td>
+        <td style="text-align: left;">Embeds a circuits within a
+        component.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="delay.html"><code>delay</code></a></td>
+        <td style="text-align: left;">Delays incoming signals by one
+        cycle. Integrates them temporally based on update rules.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="noise.html"><code>noise</code></a></td>
+        <td style="text-align: left;">Generates pseudo-random sparse
+        sets.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
         href="auto.html"><code>auto</code></a></td>
-        <td style="text-align: left;">Auto-associative memory that
-        incrementally learns at each cycle, applying update rules to
-        manage how the retrieved pattern interacts with query
-        pattern.</td>
-        </tr>
-        <tr>
-        <td style="text-align: left;"><a
-        href="temporal.html"><code>temporal</code></a></td>
-        <td style="text-align: left;">Temporal associative memory that
-        maps temporal states to incoming inputs, automatically learning
-        higher-order sequences on the fly when predictions fail.</td>
+        <td style="text-align: left;">Auto-associative memory
+        component.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
         href="associator.html"><code>associator</code></a></td>
         <td style="text-align: left;">Hetero-associative memory for
-        supervised learning that resolves multiset and inhibitory input,
-        trains when the label input block is non-empty, and infers when
-        the label block is empty.</td>
+        supervised learning or state transition memory.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
         href="predictor.html"><code>predictor</code></a></td>
         <td style="text-align: left;">Hetero-associative memory for
-        predictive learning that associates data from the previous cycle
-        with the current label.</td>
+        predictive learning.</td>
         </tr>
         <tr>
         <td style="text-align: left;"><a
         href="heteroencoder.html"><code>heteroencoder</code></a></td>
         <td style="text-align: left;">Hetero-associative memory for
-        unsupervised learning that maps similar sets to stable SHRs on
-        the fly, generating and learning new unique tokens for unknown
-        inputs.</td>
+        unsupervised learning and pattern separation.</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><a
+        href="temporal.html"><code>temporal</code></a></td>
+        <td style="text-align: left;">Temporal-associative memory that
+        maps temporal states to incoming inputs.</td>
         </tr>
         </tbody>
         </table>

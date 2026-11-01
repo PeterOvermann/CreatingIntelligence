@@ -13,14 +13,14 @@
 - **CIRCUIT COMPONENTS**
   - [input](input.md)
   - [output](output.md)
+  - [circuit](circuit.md)
   - [delay](delay.md)
   - [noise](noise.md)
-  - [circuit](circuit.md)
   - [auto](auto.md)
-  - [temporal](temporal.md)
   - [associator](associator.md)
   - [predictor](predictor.md)
   - [heteroencoder](heteroencoder.md)
+  - [temporal](temporal.md)
 
   
 - **UPDATE RULE PLUGINS**
