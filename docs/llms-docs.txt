@@ -455,7 +455,7 @@ See also: https://creatingintelligence.org/#circuits
 |:---------------------|:----------------------------------------------------------------------|
 | [`input`](input.md)   | Gateway to the circuit's function interface. Supports encoder plugins.  |
 | [`output`](output.md) | Gateway to the circuit's function interface. Supports decoder plugins.  |
-| [`circuit`](circuit.md) | Embeds a circuits within a component. |
+| [`circuit`](circuit.md) | Embeds a circuit within a component. |
 | [`delay`](delay.md) | Delays incoming signals by one cycle. Integrates them temporally based on update rules. |
 | [`noise`](noise.md) | Generates pseudo-random sparse sets.  |
 | [`auto`](auto.md) | Auto-associative memory component. |
