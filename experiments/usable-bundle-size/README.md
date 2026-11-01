@@ -18,8 +18,9 @@ item can be extracted from it.
 2. A bundle is the union of $k$ randomly chosen stored items.
 3. The bundle is queried repeatedly. Each query is decimated by the factor $D$:
    a random subset of $\operatorname{round}(D \cdot |S|)$ elements of the
-   bundle $S$. Bundles of no more than $P$ elements are not decimated, since
-   they cannot contain a tie between intact items.
+   bundle $S$, drawn anew for every query. The bundle itself stays intact.
+   Bundles of no more than $P$ elements are not decimated, since they cannot
+   contain a tie between intact items.
 4. The latency is the number of queries until memory retrieval returns one of
    the bundled items. A result that is not a bundled item counts as a false
    extraction.
@@ -141,14 +142,16 @@ The pattern matching threshold $T$ is given in parentheses.
 - **The usable bundle size is small and nearly independent of the
   dimension.** At a given memory density and threshold, it changes by one to
   three items between $N = 1000$ and $N = 4000$.
-- **It is governed by the retained margin $DP - T$,** the expected number of
-  elements a decimated query retains of an intact item beyond the threshold.
-  Where $T$ steps from 7 to 8, a larger population can do worse: in run 1,
-  $P = 13$ with $T = 8$ falls below $P = 12$ with $T = 7$, while $P = 13$ with
-  $T = 7$ (at $N \ge 3000$) matches or exceeds it.
+- **It increases with the margin $P - T$** between population and pattern
+  matching threshold. In run 2, the usable bundle size grows with the margin
+  in every row. A larger population does not help unless the margin grows:
+  where $T$ steps from 7 to 8, $P = 13$ with $T = 8$ falls slightly below
+  $P = 12$ with $T = 7$ in run 1, while $P = 13$ with $T = 7$ (at
+  $N \ge 3000$) matches or exceeds it.
 - **Memory load reduces the usable bundle size moderately.** From run 1 to
   run 2, $P = 10$ drops from 7 to 8 items to 4 to 5, and $P = 16$ from 9 to 12
-  items to 8 to 10. A larger margin makes extraction more robust against load.
+  items to 8 to 10. A larger margin $P - T$ makes extraction more robust
+  against load.
 - **False extractions are rare:** 18 in run 1 and 297 in run 2. Populations
   with a large margin are least affected: in run 2, $P = 14$ and $P = 16$ at
   $N \ge 2000$ had at most 4. False extractions occur when a decimated query

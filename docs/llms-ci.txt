@@ -511,7 +511,7 @@ elements &mdash; the *representational capacity* &mdash; is given by
 $\binom{N}{P}$.
 
 
-Consider a concrete set with dimension $N = 2,000$ and population $P = 10$:
+Consider a concrete set with dimension $N = 2{,}000$ and population $P = 10$:
 
 ```
 {158 368 379 387 568 583 618 1012 1025 1966}
@@ -540,7 +540,7 @@ combinatorics, particularly regarding the probability of set overlap. Two
 random sets usually share no or very few elements. Significant or even complete
 overlap is statistically improbable. This probability distribution is shown here
 as a table, for random sets with cardinality $P = 10$ within an overall
-dimension $N = 1,000$:
+dimension $N = 1{,}000$:
 
 
 ```
@@ -557,7 +557,6 @@ dimension $N = 1,000$:
       9           0.00000000000000000003758
      10           0.000000000000000000000003796
 ```
-
 
 Generally, the probability that two random sets with equal dimensions $N$ and 
 respective populations $P_1$ and $P_2$ share $t$ elements is given
@@ -949,7 +948,7 @@ information is stored in a single pass and can be immediately retrieved.
 
 
 At the session start, we instantiate a memory for heteroassociations $A \to B$
-with hyperparameters $N_A = 1,000$, $N_B = 500$ (dimensions), $P_A = 10$, and
+with hyperparameters $N_A = 1{,}000$, $N_B = 500$ (dimensions), $P_A = 10$, and
 $P_B = 5$ (populations). Note that this memory is asymmetric with respect to
 its input and output parameters.
 
@@ -1067,7 +1066,7 @@ subsampling. This process is the basis for [iterative
 decomposition](#iterative-decomposition) of bundled data.
 
 Next we instantiate a second, independent memory where inputs and outputs have
-the same dimension $N = 1,000$ and uniform population $P = 10$:
+the same dimension $N = 1{,}000$ and uniform population $P = 10$:
 
 ```
 > memory 1000 10 -> 1000 10
@@ -1671,13 +1670,13 @@ Topological memory belongs to the family of binary associative memories introduc
 
 
 The following plot shows the relationship between memory density and the number
-of stored SHRs. A configuration with $N = 1,000$ and $P = 10$ has a
+of stored SHRs. A configuration with $N = 1{,}000$ and $P = 10$ has a
 nominal capacity of around 769,393 heteroassociations at density $\rho^* = 0.5$.
 
 
 <p align="center">
   <img width="405" alt="image" src="assets/memorydensity.png"><br>
-  <em>SHR storage capacity as a function of memory density $\rho$ for hyperparameters $N = 1,000$ and $P = 10$.</em>
+  <em>SHR storage capacity as a function of memory density $\rho$ for hyperparameters $N = 1{,}000$ and $P = 10$.</em>
 </p>
 
 Two complementary metrics quantify retrieval accuracy: the average overlap
@@ -1724,8 +1723,21 @@ $$C_\text{auto} \approx \ln(2) \frac{ N(N-1)(N-2)} {P(P-1)(P-2)}$$
 We conclude that the capacity for storing autoassociations is about $P/(P-2)$
 times larger than that for heteroassociations with the same hyperparameters.
 
-Auto-associative memory with $N = 1,000$ and $P = 10$ can store and
+Auto-associative memory with $N = 1{,}000$ and $P = 10$ can store and
 accurately recall about 959,818 random patterns.
+
+
+Although the clamped elements carry no information about stored items, they are
+indispensable for auto-associative memory retrieval. The retrieval algorithm
+requires every element pair of a matching subset to support every element of
+the output, including the pair’s own two elements. In an implementation that
+zeroes these self-connections, retrieval would still recognize complete stored
+patterns and reject unknown information. But pattern completion from partial
+inputs would fail, even in a sparsely filled memory. The cleanup of noisy
+inputs would fail once the memory is loaded. Unlike Hopfield networks, which
+set diagonal elements to zero to prevent units from reinforcing themselves,
+auto-associative topological memory requires self-connections.
+
 
 For a fixed population size, memory capacity scales rapidly with the
 dimensionality $N$. A configuration with 5,000 dimensions can store
@@ -1784,7 +1796,7 @@ Topological associative memory is fault-tolerant: information can be accurately
 retrieved from mere subsets of originally stored patterns. In an
 auto-associative context, this mechanism drives pattern completion.
 
-For a memory configuration with $N = 1,000$ and $P = 10$, the default pattern
+For a memory configuration with $N = 1{,}000$ and $P = 10$, the default pattern
 matching threshold is $T = 7$. Retrieval succeeds even if three random elements
 are missing, but input reduction increases susceptibility to interference. This
 shifts the memory cliff to a lower memory density:
@@ -1918,7 +1930,7 @@ For auto-associative memory, the threshold condition is given by
 $$\left( \ln(2) \frac{N (N - 1) (N - 2)}{P (P - 1) (P - 2)}\right)^2 \cdot \binom{P}{T} \binom{N - P}{P - T} \binom{N}{P}^{-1} < 1$$
  
  
-A closely related condition appears in the original analysis of the binary associative net by Willshaw, Buneman and Longuet-Higgins (1969). There, an output unit fires if all $P$ elements of a complete cue pattern connect to it. A unit that does not belong to the stored pattern reaches this threshold by chance with probability $\rho^P$, where $\rho$ is the memory density. Requiring the expected number of such spurious units, $N \rho^P$, to stay at one gives the largest number of patterns that can be stored without errors, and the optimal population $P = -\ln N / \ln \rho$. At the nominal density $\rho^* = 1/2$, this becomes $P = \ln N / \ln 2$, about 10 for $N = 1,000$. The threshold condition derived above follows the same logic, bounding the expected number of false matches below one, but applies it to partial matches of at least $T$ elements in a memory filled to its nominal capacity.
+A closely related condition appears in the original analysis of the binary associative net by Willshaw, Buneman and Longuet-Higgins (1969). There, an output unit fires if all $P$ elements of a complete cue pattern connect to it. A unit that does not belong to the stored pattern reaches this threshold by chance with probability $\rho^P$, where $\rho$ is the memory density. Requiring the expected number of such spurious units, $N \rho^P$, to stay at one gives the largest number of patterns that can be stored without errors, and the optimal population $P = -\ln N / \ln \rho$. At the nominal density $\rho^* = 1/2$, this becomes $P = \ln N / \ln 2$, about 10 for $N = 1{,}000$. The threshold condition derived above follows the same logic, bounding the expected number of false matches below one, but applies it to partial matches of at least $T$ elements in a memory filled to its nominal capacity.
 
 
 <br> 
@@ -1946,7 +1958,7 @@ responses to random query patterns.
 
 <p align="center">
   <img width="405" alt="image" src="assets/falsepositive.png"><br>
-  <em>Probability of false-positive responses to random queries, as a function of memory density $\rho$. This simulation uses heteroassociations with $N=1,000$ and $P=10$.</em>
+  <em>Probability of false-positive responses to random queries, as a function of memory density $\rho$. This simulation uses heteroassociations with $N=1{,}000$ and $P=10$.</em>
 </p>
 
 
@@ -2053,7 +2065,7 @@ with all possible elements:
 
 <p align="center">
   <img width="405" alt="image" src="assets/bundlepopulation.png"><br>
-  <em>Expected size of a superposition as a function of the number of bundled SHRs, assuming $N = 1,000$ and $P = 10$.</em>
+  <em>Expected size of a superposition as a function of the number of bundled SHRs, assuming $N = 1{,}000$ and $P = 10$.</em>
 </p>
 
 
@@ -2256,7 +2268,8 @@ probability of maintaining the tie (both $A_1$ and $A_2$ losing one element).
 Removing three elements always breaks the tie. The combinatorics
 becomes unwieldy when more than two items are involved, and if items overlap.
 
-Simulations show that subsampling by a decimation factor $D \approx 0.8$ works
+Simulations show that subsampling by a decimation factor between
+$D = 0.7$ and $D = 0.8$ works
 well across a wide range of usage scenarios and configurations. As a
 prerequisite for this mechanism, memory hyperparameters must be chosen so that
 the SHR population $P$ exceeds the pattern matching threshold $T$ (for instance
@@ -2850,7 +2863,7 @@ $$\frac{C_{\text{bam}}}{C_{\text{auto}}}  = \frac{N(P-1/2)}{P(N-1/2)} \approx \f
 
 The approximation $(P-1/2)/P$ is valid for very large dimensions $N$.
 
-A relatively small bipartite memory with two blocks of dimension $N = 1,000$ and population $P = 10$ can store and
+A relatively small bipartite memory with two blocks of dimension $N = 1{,}000$ and population $P = 10$ can store and
 accurately retrieve nominally 769,393 bidirectional associations. 
 
 Note on the [pattern matching threshold](#pattern-matching-threshold) for
@@ -3120,7 +3133,9 @@ Hyper-associative memory uses a vertex bundle to retrieve another bundle
 linked to all or some of the inputs. For ambiguous queries, stochastic
 subsampling selects one of several valid outcomes.
 
-Walking a hypergraph vertex by vertex normally requires extracting a single item from a retrieved bundle using a separate item store, then feeding it into the next query.
+Walking a hypergraph vertex by vertex normally requires extracting a single 
+item from a retrieved bundle using a separate item store, then feeding it 
+into the next query.
 
 Extracting a specific vertex at every step is unnecessary: we can
 instead use the entire output from the previous step to compute the next step.
@@ -3129,9 +3144,8 @@ This mirrors how we can jump from a specific memory to a broad category
 instantly. The random walk fluidly transitions between entire groups of nodes
 based on their participation in overlapping hyperedges.
 
-Simulations of [random walks](#random-walks-on-graphs) on larger graphs are discussed
-further below to illustrate these dynamics.
-
+Simulations of [random walks](#random-walks-on-graphs) on larger graphs are
+discussed further below to illustrate these dynamics.
 
 
 <br>
@@ -3145,76 +3159,117 @@ bundle, which is the inverse of the bundling operation.
 
 We represent a bundle as a flat union of sets, so its elements cannot be
 directly traced back to the distinct items from which the bundle was formed.
-Furthermore, due to spurious interference some elements may originate from
-multiple items, causing a small amount of data compression.
+Furthermore, some elements may originate from multiple items due to chance
+overlap, which causes a small information loss.
 
 The prerequisite for unbundling SHRs is an item memory that stores all items
-involved in the bundle. The item memory must contain only individual SHRs, but
-no bundles of SHRs.
+involved in the bundle. The item memory must contain only individual SHRs, not
+bundles.
 
-Querying the item memory with a bundle of non-overlapping SHRs with equal
+Querying the item memory with a bundle of non-overlapping SHRs with uniform
 populations results in a pattern matching tie: memory retrieval returns an
-empty result. We apply [stochastic subsampling](#stochastic-subsampling) to raise the
-probability of a unique match emerging during memory retrieval. For small
-bundles, one or two trials are normally sufficient to retrieve one SHR.
+empty result. We apply [stochastic subsampling](#stochastic-subsampling) to
+raise the probability of a unique match emerging during memory retrieval. For
+small bundles, one or two trials are normally sufficient to break the symmetry 
+and isolate one SHR.
 
-Once a bundled SHR is matched with the item store, we delete it from the bundle
-using the [complement update](#update-rules) rule and iterate the process. This
-iterative decomposition process extracts the components of a bundle one after
-another.
+Once a bundled SHR is matched with the item memory, we can delete it from the
+(undecimated) bundle using the [complement update](#update-rules) rule and
+iterate the process. This iterative decomposition process extracts the
+components of a bundle one after another.
 
 > **Iterative decomposition (unbundling)**  
-> Step-by-step extraction of individual tokens from a bundle, using 
+> Step-by-step extraction of individual items from a bundle, using 
 > stochastic subsampling to break representational symmetries and 
 > isolate unique matches.
 
 
-This generates a *random temporal sequence*, assuming uniform populations of
-the items within the bundle. Each item has an approximately equal chance of
-being recalled first (spurious overlaps may introduce a small bias).
+Iterative decomposition generates a *random temporal sequence*, assuming
+uniform populations of the items within the bundle. Each item has an
+approximately equal chance of being recalled first (spurious overlaps may
+introduce a small bias).
 
 If the bundle to be decomposed consists of items with different populations,
-larger items are more likely to emerge as the best unique match. This allows us
-to manipulate the retrieval order, creating a priority-based decoupling
-mechanism by modulating the size of the items during bundling.
+larger items are more likely to emerge as the unique best match. This allows us
+to manipulate the retrieval order, creating a priority-based decomposition
+mechanism by modulating item populations during bundling.
 
 For instance, a *last-in-first-out* queue can be realized by scaling down
 older items every time a new item is added. This implements temporal sequencing
-through magnitude decay.
+through population decay.
 
-Another interesting possibility: if we subsample (or transcode) items with
-different populations that encode a ranking, iterative decomposition 
-functions as a *natural sorter*: the most relevant items pop out of the bundle
-in the first few iterations of the recovery process. 
+Another interesting possibility: if we subsample (or transcode) items to
+populations that reflect their rank, iterative decomposition functions as a
+*natural sorter*. The most relevant items pop out of the bundle in the first
+few iterations of the recovery process.
 
 Similarly, an attention mechanism might encode information that requires
 *priority processing* (for instance "food" or "danger") with a
 higher-than-average set population.
 
-We can experimentally measure the average number of iterations needed to
-extract one item from a bundle:
+We can experimentally measure the median number of trials (the 
+extraction latency) needed to extract one item from a bundle:
 
 
 <p align="center">
   <img width="425" alt="image" src="assets/unbundling.png"><br>
-  <em>Average number of iterations needed to extract one token from a bundle, as a function of the number of bundled tokens. This is simulated with hyperparameters $N=2,000$ and $P=10$. The results are consistent with Miller's magical number seven, plus or minus two.</em>
+  <em>Median extraction latency as a function of the number of bundled 
+  items. Simulated with $N = 2{,}000$ and $P = 10$ in a memory loaded with 5 million items (density 0.36). 
+  The decimation factor is $D = 0.7$.</em>
 </p>
 
 
-Extracting one item from a small bundle usually succeeds on the first try, and
-rarely a second try is needed. This works reliably for bundles composed of
-fewer than 10 items. For larger bundles, the number of attempts needed
-grows rapidly. The process becomes impractical for bundles larger than about 12
-items. We observe this consistent behavior within a wider range of
-hyperparameter configurations.
+Extraction latency shows a pronounced knee. It stays at one or two for bundles
+up to six items. For larger bundles, the latency grows rapidly and the
+process becomes impractical. 
 
-The number of items practically extractable from a bundle coincides with George
- *Miller's magical number seven, plus or minus two* (1956). Miller
-discovered that the average human working memory has a capacity of roughly $7
-\pm 2$ items. This correlation suggests that human working memory makes use
-of stochastic bundle decomposition.
+We define the *usable bundle size* as the largest bundle size for which the
+median number of trials needed to extract the first item does not exceed two.
+This depends on the hyperparameters $N$ and $P$, the memory density, and the
+decimation method. For this analysis, we keep the proportional decimation
+factor fixed &mdash; this is an algorithmic choice and not necessarily the
+optimal strategy.
 
-The bundle decomposition mechanism bears a striking similarity to a quantum-mechanical measurement process. A quantum system exists in a superposition of multiple basic states until a measurement forces it to reduce to a single state (wavefunction collapse). Similarly, we can interpret a bundle of SHRs as a superposition of multiple symbols. Repeatedly measuring subsampled versions of this bundle against an item store eventually reduces it to one of its basic constituents. Spurious overlaps between items act like quantum interference, skewing the probability of which symbol emerges. This aspect of the topological memory model aligns with the concept of quantum cognition: it mimics the quantum-mechanical formalism of superposition, interference, and collapse &mdash; but without requiring a physical quantum substrate.
+The following table lists the usable bundle size for different dimensions and
+populations, with $D = 0.7$ and the item memory filled to its nominal 
+capacity at density $\rho^* = 0.5$.
+The pattern matching threshold is $T = 7$
+for $P = 10$ and $P = 12$, and $T = 8$ for $P = 14$ and $P = 16$.
+
+| $N$ | $P = 10$ | $P = 12$ | $P = 14$ | $P = 16$ |
+|:------:|:----:|:----:|:----:|:----:|
+| 1,000 | 5 | 6 | 7 | 8 |
+| 2,000 | 5 | 7 | 8 | 9 |
+| 4,000 | 4 | 7 | 8 | 10 |
+
+The usable bundle size is small and barely depends on the dimension: between 
+$N = 1{,}000$ and $N = 4{,}000$, it varies by at most two items. 
+A larger margin $P - T$ between population and threshold 
+makes decomposition more robust against
+interference: from $P = 10$ to $P = 16$, the usable bundle size nearly doubles.
+The drawback is that larger populations reduce the memory capacity to about
+a fifth over the same range. They also
+increase the activity (and therefore the energy) required to represent each item
+&mdash; both in a computer system and in a biological brain.
+
+Decomposing an entire bundle is harder than extracting its first item. Removing
+an extracted item also deletes any elements it shares with the remaining items.
+These eroded items win queries less often, and an item is lost once fewer than
+$T$ elements of its population survive. Compounding this effect, the elements
+of a bundle may decay over the course of the iterations.
+
+Within this framework, the usable bundle size is an inherent limitation of
+memory retrieval for a given time budget. A computer system may extend this
+limit by allocating more compute time. A brain, in which signals decay, cannot
+extend it at will.
+
+If human short-term memory decomposes bundles under a tight latency constraint,
+its usable bundle size is four to ten items in a memory filled to capacity.
+This offers a computational explanation for Miller’s *magical number seven,
+plus or minus two* (1956), the limit he observed on how many items people can
+hold in short-term memory. In this framework, the capacity limit is not a fixed
+number of slots, but the point at which iterative decomposition becomes too
+slow.
 
 
 <br>
@@ -4694,7 +4749,7 @@ memory after encoding each word as a sparse holographic representation (SHR). Th
 </p>
 
 
-Storing 1.9 million associations requires a memory of dimension $N = 3,000$
+Storing 1.9 million associations requires a memory of dimension $N = 3{,}000$
 if tokens are encoded with a population $P = 10$. 
 
 The memory inherently merges associations that share the same key into
@@ -5121,7 +5176,7 @@ of the amount of information already stored.
 
 The standard C implementation, benchmarked on a 2023 laptop computer, achieves
 a single-threaded write speed of about 600,000 random associations per second,
-using hyperparameters $N = 1,000$ and $P = 10$. Given this high throughput, the
+using hyperparameters $N = 1{,}000$ and $P = 10$. Given this high throughput, the
 code is well-suited for applications requiring real-time model updates.
 
 If the input is noise-free, data retrieval also follows $\mathcal{O}(P^2)$
@@ -5321,18 +5376,25 @@ model of connection strength.
 
 While much less space-efficient than a binary model, this approach has
 an immediate advantage: it enables the exact reversal of a write operation
-without degrading overlapping, unrelated information. This precise rollback feature is useful for technical applications, even if it diverges from biological memory decay models.
+without degrading overlapping, unrelated information. This precise rollback feature, while departing from biological memory decay models, is useful for technical applications such as knowledge editing or finetuning.
 
-The baseline topological memory algorithm stores information in memory sets, each linked to a node within the expanded hidden layer. In a model based
-on integer counters, those memory sets are replaced with memory multisets.
-The multiplicity of an element within a memory multiset indicates the
-number of output patterns to which a specific hidden layer node contributes.
-Storing new information increments those counters, and decrementing the
-same counters reverses the storage operation.
+The baseline topological memory algorithm stores information in memory sets,
+each linked to a node within the expanded hidden layer. In a model based on
+(unclipped) integer counters, those memory sets are replaced with memory
+multisets. The multiplicity of an element within a memory multiset indicates
+the number of output patterns to which a specific hidden layer node
+contributes. Storing data increments those counters, and
+decrementing them deletes it. 
+
+Graded values do not increase storage capacity in any substantial way:
+an unclipped Hebbian rule stores at most $1/(2\ln 2) \approx 0.72$ bits per
+connection, compared with $\ln 2 \approx 0.69$ bits for the binary Willshaw
+model (Nadal and Toulouse 1990), at the cost of storing graded
+values instead of bits (Knoblauch, Palm and Sommer 2010).
 
 Here is the modified write algorithm for a memory model with integer counters.
 Step 2 uses multiset aggregation where the original algorithm uses the union
-operation:
+operation. Storing the same association twice increases its weights. By comparison, binary topological memory deduplicates write operations.
 
 **Input:** Sets $A$ and $B$
 
@@ -5342,7 +5404,8 @@ operation:
 
 The corresponding deletion process uses multiset subtraction,
 stopping at zero because an element cannot appear a negative number of times.
-
+This enables the precise reversal of write operations without degrading
+unrelated information.
 
 **Input:** Sets $A$ and $B$
 
@@ -5350,15 +5413,13 @@ stopping at zero because an element cannot appear a negative number of times.
 
 2. **Memory deletion:** $M_{ij} \gets M_{ij} \setminus B$ (truncated multiset subtraction)
 
-
-
 Memory retrieval aggregates the overall response multiset by combining
 the memory multisets, accurately adding up each element's multiplicities.
 Here are the steps for a single-pass memory query.
 
 **Input:** Query set $A$
 
-**Output:** Unique best match $Y$, or an empty set $\varnothing$
+**Output:** Best match $Y$, or an empty set $\varnothing$
 
 
 1. **Threshold check:** If $|A| < T$ return $\varnothing$
@@ -5373,24 +5434,28 @@ Here are the steps for a single-pass memory query.
 
 6. **Output:** return $Y$
 
-This algorithm can store and retrieve heteroassociations much like
-the core algorithm of topological memory. Using integer counters instead
-of bits does not increase the memory's storage capacity. 
 
-Unlike topological memory, this model does not deduplicate information:
-storing the same association twice increases its weight during memory
-retrieval.
+This algorithm implements [raw memory retrieval](#raw-memory-retrieval) 
+on multisets, yielding a frequency-weighted recall without isolating the
+query subset that produces the best match. Subset pattern matching &mdash; the defining feature of topological memory &mdash; requires a binary memory
+model. This implies discarding the graded weights by clipping memory counters
+at 1 (as in the original model) for the purpose of computing the largest
+matching subset of the query. 
 
-However, neither this counter-based algorithm nor variants with continuous
-weights are suitable for autoassociations. When storing autoassociations,
-the values corresponding to the self-correlations quickly inflate because
-they increase at every step. When self-correlation dominates cross-correlation, the memory collapses into a useless identity operation: a memory query
-with any input pattern, whether known or unknown, returns exactly the
-input. A similar phenomenon has been observed in classical auto-associative
-memories based on continuous weights.
+Auto-associative memory with frequency-based weights requires a further
+adjustment. When storing autoassociations, the values corresponding to the
+self-correlations quickly inflate because they increase at every step. When
+self-correlation dominates cross-correlation, the memory collapses into a
+useless identity operation: a memory query with any input pattern, whether
+known or unknown, returns exactly the query. The remedy for this behavior is to
+count the self-supporting (clamped) memory positions like the others, but to
+clip their values at 1 when they are read. In classical auto-associative
+memories with continuous weights, diagonal elements are typically set to zero
+to enable autoassociations. In topological memory, by contrast, the clamped memory positions must be non-zero because they support the query elements in pattern matching.
 
-This demonstrates that the binary model of topological memory connections
-is not just a space optimization. Instead, binary memory storage is a functional necessity for auto-associative functionality to emerge.
+In summary, a non-binary variant of topological memory would enable frequency-weighted output selection and exact targeted memory deletion,
+at the cost of a higher memory footprint and computational overhead.
+Subset pattern matching itself remains binary.
 
 
 <br> 
@@ -5484,13 +5549,7 @@ This entropy-increasing mechanism works well as a computational model of
 short-term memory, as it requires a much lower deletion rate than the
 entropy-decreasing mechanism.
 
-When a stochastic memory decay mechanism is enabled, we can protect commonly
-used memory traces from fading by writing them back to memory after each
-successful retrieval. With a memory operating at its nominal capacity,
-this write operation will trigger the stochastic deletion of other, competing
-memories. This approach aligns with a phenomenon known as retrieval-induced
-forgetting (RIF) in cognitive psychology: successfully recalling a 
-memory suppresses and weakens competing, noisy associations.
+When a stochastic memory decay mechanism is enabled, we can protect commonly used memory traces from fading by writing them back to memory after each successful retrieval. The write operation restores the bits of the retrieved item that decay has cleared. It does not weaken other memories. Memories that are not retrieved continue to decay at the background rate set by ongoing write operations, regardless of whether they overlap with the refreshed item. Frequently recalled memories therefore persist, while unused ones fade, so retention depends on use. 
 
 
 <br>
@@ -5777,17 +5836,22 @@ a point in the output layer. A 0 value means there is no route, and a value of
 1 indicates that there is at least one open route. The number of routes between
 two points is not counted.
 
-In this topological model, the connections from the input to the hidden layer are fixed, and learning takes place anywhere between the latent and the output layer. This abstraction from  specific biological mechanisms accommodates both traditional synaptic plasticity and the increasingly supported hypothesis of dendritic learning.
+In this topological model, the connections from the input to the hidden layer
+are fixed, and learning takes place anywhere between the latent and the output
+layer. This abstraction from specific biological mechanisms accommodates both
+traditional synaptic plasticity and the increasingly supported hypothesis of
+dendritic learning.
 
-Standard neuroscience views synapses as the primary locus of learning and memory. This is based on Donald Hebb's suggestion that
-learning occurs through the modification of synaptic strength. Hebb (1949)
-described synaptic plasticity from a biological perspective. Contrary to common
-belief, he did not imply that connection strength is a carrier of continuous
-information. Within the context of our topological associative memory, synaptic
-weight is binary. This is consistent with Warren McCulloch's and
-Walter Pitts' original artificial neuron model (1943). If synaptic strength is
-indeed a valid concept, its function would be to encode the connection's
-permanence, not just a fractional piece of a memory.
+Standard neuroscience views synapses as the primary locus of learning and
+memory. This is based on Donald Hebb's suggestion that learning occurs through
+the modification of synaptic strength. Hebb (1949) described synaptic
+plasticity from a biological perspective. Contrary to common belief, he did not
+imply that connection strength is a carrier of continuous information. Within
+the context of our topological associative memory, synaptic weight is binary.
+This is consistent with Warren McCulloch's and Walter Pitts' original
+artificial neuron model (1943). If synaptic strength is indeed a valid concept,
+its function would be to encode the connection's permanence, not just a
+fractional piece of a memory.
 
 Synaptic long-term potentiation is traditionally viewed as the primary
 mechanism of memory. But recent evidence points to dendritic plasticity as
@@ -5801,20 +5865,16 @@ The following sketch illustrates this scheme: the hidden layer
 (shown as parallel lines on top) connects via fixed synapses to three dendrites
 of a postsynaptic neuron, with each dendrite behaving like an electric switch.
 
-
-
 <p align="center">
   <img width="325" alt="image" src="assets/dendrites.png"/><br>
   <em>Dendritic on/off switches as the mechanism of topological plasticity.</em>
 </p>
 
-
-
 A presynaptic neuron may have multiple connections to the same postsynaptic
 neuron via different dendrites. Because the voltage across every branch of a
 parallel circuit is equal, the same signal is transmitted regardless of the
-number of possible connections. For this reason, the topological
-associative memory uses a [binary storage model](#non-binary-memory-storage) as opposed to
+number of possible connections. For this reason, the topological associative
+memory uses a [binary storage model](#non-binary-memory-storage) as opposed to
 integer weights.
 
 The dendritic learning hypothesis aligns well with our architecture: fixed
@@ -5829,8 +5889,8 @@ A simple binary switching mechanism within each dendrite would suffice for
 topological associative memory to emerge &mdash; there is no need for dendritic
 plasticity to provide counters or continuous weights.
 
-The model that dendrites function as dual-state switches is a clear,
-testable hypothesis for experimental neuroscience.
+The model that dendrites function as dual-state switches is a clear, testable
+hypothesis for experimental neuroscience.
 
 
 
@@ -5904,11 +5964,11 @@ encodes it is still present.
 In the exact algorithm, this boundary is sharp. If the population grows by as
 little as one element, patterns stored at the earlier population become
 inaccessible, even when queried with the complete pattern. The brain does not
-run an exact version of the algorithm: a pattern that falls slightly short of the current population
-may still be retrieved occasionally, or only in part. We should therefore
-expect a rapid decline in accessibility rather than a hard cutoff. Even so, a
-small, lasting increase in population would make most older memories
-inaccessible.
+run an exact version of the algorithm: a pattern that falls slightly short of
+the current population may still be retrieved occasionally, or only in part. We
+should therefore expect a rapid decline in accessibility rather than a hard
+cutoff. Even so, a small, lasting increase in population would make most older
+memories inaccessible.
 
 This suggests that childhood amnesia reflects a change in how episodes are
 encoded, rather than a loss of what was stored. In this framework, the
@@ -5970,7 +6030,6 @@ operation of the brain.
 
 
 
-
 <br>
 <a id="a-neural-equivalent-of-stochastic-subsampling"></a>
 
@@ -5985,14 +6044,14 @@ decimation of active elements. This process breaks the representational
 symmetry between bundled items, which allows a best subset match to emerge.
 
 This decimation factor $D$ must lie within a narrow, optimal zone. If
-decimation is too weak ($D \lesssim 1$), ties between competing possible
-matches remain. If it is too aggressive ($D \ll 0.8$), constituent SHRs are
+decimation is too weak ($D$ close to $1$), ties between competing possible
+matches remain. If it is too aggressive ($D \ll 0.7$), constituent SHRs are
 likely to be pushed below the memory's pattern matching threshold.
 Values outside the optimal zone result in cognitive failures, for instance
 the inability to recall known concepts.
 
-Computational experiments show that subsampling by a decimation factor $D
-\approx 0.8$ is most suitable to minimize these failure modes.
+Computational experiments show that subsampling by a decimation factor $D$
+between $0.7$ and $0.8$ is most suitable to minimize these failure modes.
 
 This model predicts the existence of a neural equivalent of stochastic
 proportional decimation: a neuromodulatory mechanism that effectively
@@ -6000,8 +6059,7 @@ fine-tunes activity levels to optimize memory retrieval. This would affect
 higher-level cognitive functions (driven by sparse holographic representations)
 rather than perception (sparse distributed representations). The effect would
 manifest as a peak in cognitive performance, measured within a narrow interval
-around the modulatory strength corresponding to $D \approx 0.8$. This response
-curve is shown qualitatively in the following figure.
+around the modulatory strength corresponding to $D$ between $0.7$ and $0.8$. This response curve is shown qualitatively in the following figure.
 
 <p align="center">
   <img width="405" alt="image" src="assets/neuromodulation.png"/><br>
@@ -6095,7 +6153,8 @@ This increase is owed to the inherent redundancy of self-correlation. In
 topological memory, a memory set $M_{ij}$ links the input pair $(i, j)$ to the
 output elements. But in an autoassociation, the output pattern is identical to
 the input pattern. Therefore, the output always includes $i$ and $j$ &mdash;
-these elements are *clamped*, which means their  topological connections do not carry information. The memory only needs to record the connections from $(i, j)$ to the other $P - 2$ elements in the active set.
+these elements are *clamped*, which means their  topological connections do not carry information. 
+Only the connections from $(i, j)$ to the other $P - 2$ elements in the active set carry information. The connections to $i$ and $j$ themselves are still stored, because memory retrieval depends on them
 
 Adjusting our parameters for the informational space: The effective number of
 output dimensions is $N - 2$, resulting in an addressable volume of:
@@ -6267,6 +6326,7 @@ deep learning paradigm and the computationalist framework introduced in this wor
   year={1989}
 }
 
+
 @inproceedings{gayler2003,
   title={Vector Symbolic Architectures Answer Jackendoff's Challenges for Cognitive Neuroscience},
   author={Gayler, Ross W.},
@@ -6351,6 +6411,18 @@ deep learning paradigm and the computationalist framework introduced in this wor
   pages={139--159},
   year={2009}
 }
+
+
+@article{knoblauch2010,
+  title={Memory Capacities for Synaptic and Structural Plasticity},
+  author={Knoblauch, Andreas and Palm, Günther and Sommer, Friedrich T.},
+  journal={Neural Computation},
+  volume={22},
+  number={2},
+  pages={289--341},
+  year={2010}
+}
+
 
 @article{kosko1988,
   title={Bidirectional Associative Memories},
@@ -6455,6 +6527,19 @@ deep learning paradigm and the computationalist framework introduced in this wor
   pages={408--434},
   year={1957}
 }
+
+
+@article{nadal1990,
+  title={Information Storage in Sparsely Coded Memory Nets},
+  author={Nadal, Jean-Pierre and Toulouse, Gerard},
+  journal={Network: Computation in Neural Systems},
+  volume={1},
+  number={1},
+  pages={61--74},
+  year={1990}
+}
+
+
 
 @article{napper1988,
   title={Number of Parallel Fiber Synapses on an Individual Purkinje Cell in the Cerebellum of the Rat},
