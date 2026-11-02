@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[     47520,       1074]
-NotebookOptionsPosition[     41395,        939]
-NotebookOutlinePosition[     45339,       1037]
-CellTagsIndexPosition[     45296,       1034]
+NotebookDataLength[     53259,       1183]
+NotebookOptionsPosition[     47021,       1047]
+NotebookOutlinePosition[     51100,       1148]
+CellTagsIndexPosition[     51057,       1145]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -32,43 +32,42 @@ Cell[TextData[{
 
 Cell[BoxData[
  RowBox[{
-  RowBox[{
-   RowBox[{"Module", "[", 
-    RowBox[{
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"LEFTMARGIN", "=", "62"}], ",", 
-       RowBox[{"FONT", "=", "\"\<Inter Variable\>\""}], ",", 
-       RowBox[{"TITLECOLOR", "=", 
-        RowBox[{"RGBColor", "[", "\"\<#BF616A\>\"", "]"}]}], ",", 
-       RowBox[{"TEXTCOLOR", "=", 
-        RowBox[{"RGBColor", "[", "\"\<#2E3440\>\"", "]"}]}]}], "}"}], ",", 
-     RowBox[{"(*", 
-      RowBox[{"Change", " ", "LEFTMARGIN", " ", "to", " ", "whatever", " ", 
-       RowBox[{"pixel", "/", "point"}], " ", "value", " ", "centers", " ", 
-       "the", " ", "600", "px", " ", "content"}], "*)"}], 
-     RowBox[{"SetOptions", "[", 
-      RowBox[{
-       RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
-       RowBox[{"DockedCells", "->", 
-        RowBox[{"{", 
-         RowBox[{"Cell", "[", 
-          RowBox[{
-           RowBox[{"BoxData", "[", 
-            RowBox[{"ToBoxes", "[", 
-             RowBox[{"Row", "[", 
-              RowBox[{"{", 
-               RowBox[{"Button", "[", 
-                RowBox[{"\"\<Export PDF\>\"", ",", 
-                 RowBox[{"Module", "[", 
-                  RowBox[{
-                   RowBox[{"{", 
-                    RowBox[{
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"LEFTMARGIN", "=", "62"}], ",", 
+      RowBox[{"FONT", "=", "\"\<Inter Variable\>\""}], ",", 
+      RowBox[{"TITLECOLOR", "=", 
+       RowBox[{"RGBColor", "[", "\"\<#BF616A\>\"", "]"}]}], ",", 
+      RowBox[{"TEXTCOLOR", "=", 
+       RowBox[{"RGBColor", "[", "\"\<#2E3440\>\"", "]"}]}]}], "}"}], ",", 
+    RowBox[{"(*", 
+     RowBox[{"Change", " ", "LEFTMARGIN", " ", "to", " ", "whatever", " ", 
+      RowBox[{"pixel", "/", "point"}], " ", "value", " ", "centers", " ", 
+      "the", " ", "600", "px", " ", "content"}], "*)"}], 
+    RowBox[{"SetOptions", "[", 
+     RowBox[{
+      RowBox[{"EvaluationNotebook", "[", "]"}], ",", 
+      RowBox[{"DockedCells", "->", 
+       RowBox[{"{", 
+        RowBox[{"Cell", "[", 
+         RowBox[{
+          RowBox[{"BoxData", "[", 
+           RowBox[{"ToBoxes", "[", 
+            RowBox[{"Row", "[", 
+             RowBox[{"{", 
+              RowBox[{"Button", "[", 
+               RowBox[{"\"\<Export PDF\>\"", ",", 
+                RowBox[{"Module", "[", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{
                     RowBox[{"nb", "=", 
                     RowBox[{"EvaluationNotebook", "[", "]"}]}], ",", 
                     "cleanPath"}], "}"}], ",", 
-                   RowBox[{
-                    RowBox[{"cleanPath", "=", 
+                  RowBox[{
+                   RowBox[{"cleanPath", "=", 
                     RowBox[{"FileNameJoin", "[", 
                     RowBox[{"{", 
                     RowBox[{
@@ -76,299 +75,295 @@ Cell[BoxData[
                     RowBox[{"FileBaseName", "[", 
                     RowBox[{"NotebookFileName", "[", "nb", "]"}], "]"}]}], 
                     "}"}], "]"}]}], ";", "\[IndentingNewLine]", 
-                    RowBox[{"Export", "[", 
+                   RowBox[{"Export", "[", 
                     RowBox[{
                     RowBox[{"cleanPath", "<>", "\"\<.pdf\>\""}], ",", "nb"}], 
-                    "]"}]}]}], "]"}], ",", "\[IndentingNewLine]", "\t", 
-                 RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], "}"}], 
-              "]"}], "]"}], "]"}], ",", "\"\<DockedCell\>\"", ",", 
-           RowBox[{"Background", "->", 
-            RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", 
-           RowBox[{"CellMargins", "->", 
-            RowBox[{"{", 
-             RowBox[{
-              RowBox[{"{", 
-               RowBox[{"0", ",", "0"}], "}"}], ",", 
-              RowBox[{"{", 
-               RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], "}"}]}], ",", 
-       RowBox[{"(*", 
-        RowBox[{"Headers", " ", "and", " ", "Footers"}], "*)"}], 
-       "\[IndentingNewLine]", "\[IndentingNewLine]", 
-       RowBox[{"PageHeaders", "->", 
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}], ",", 
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}]}], 
-         "}"}]}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
-       RowBox[{"PageFooters", "->", 
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", 
-            RowBox[{"Cell", "[", 
-             RowBox[{"TextData", "[", 
-              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-            ",", "\"\<\>\""}], "}"}], ",", 
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", 
-            RowBox[{"Cell", "[", 
-             RowBox[{"TextData", "[", 
-              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-            ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
-       "\[IndentingNewLine]", 
-       RowBox[{"PageFooters", "->", 
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", 
-            RowBox[{"Cell", "[", 
-             RowBox[{"TextData", "[", 
-              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-            ",", "\"\<\>\""}], "}"}], ",", 
-          RowBox[{"{", 
-           RowBox[{"\"\<\>\"", ",", 
-            RowBox[{"Cell", "[", 
-             RowBox[{"TextData", "[", 
-              RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
-            ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
-       "\[IndentingNewLine]", "\[IndentingNewLine]", 
-       RowBox[{"PrintingOptions", "->", 
-        RowBox[{"{", 
-         RowBox[{
-          RowBox[{"\"\<PaperSize\>\"", "->", 
-           RowBox[{"{", 
-            RowBox[{"510", ",", "680"}], "}"}]}], ",", 
-          RowBox[{"(*", 
-           RowBox[{
-            RowBox[{"{", 
-             RowBox[{"width", ",", "height"}], "}"}], " ", "for", " ", 
-            "Portrait"}], "*)"}], 
-          RowBox[{"\"\<PrintingMargins\>\"", "->", 
+                    "]"}]}]}], "]"}], ",", 
+                RowBox[{"Method", "->", "\"\<Queued\>\""}]}], "]"}], "}"}], 
+             "]"}], "]"}], "]"}], ",", "\"\<DockedCell\>\"", ",", 
+          RowBox[{"Background", "->", 
+           RowBox[{"RGBColor", "[", "\"\<#EBCB8B\>\"", "]"}]}], ",", 
+          RowBox[{"CellMargins", "->", 
            RowBox[{"{", 
             RowBox[{
              RowBox[{"{", 
               RowBox[{"0", ",", "0"}], "}"}], ",", 
              RowBox[{"{", 
-              RowBox[{"30", ",", "30"}], "}"}]}], "}"}]}]}], " ", 
+              RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], "}"}]}], ",", 
+      RowBox[{"(*", 
+       RowBox[{"Headers", " ", "and", " ", "Footers"}], "*)"}], 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"PageHeaders", "->", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}], ",", 
+         
+         RowBox[{"{", 
+          RowBox[{"\"\<\>\"", ",", "\"\<\>\"", ",", "\"\<\>\""}], "}"}]}], 
+        "}"}]}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"PageFooters", "->", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"\"\<\>\"", ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{"TextData", "[", 
+             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+           ",", "\"\<\>\""}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"\"\<\>\"", ",", 
+           RowBox[{"Cell", "[", 
+            RowBox[{"TextData", "[", 
+             RowBox[{"CounterBox", "[", "\"\<Page\>\"", "]"}], "]"}], "]"}], 
+           ",", "\"\<\>\""}], "}"}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"PrintingOptions", "->", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"\"\<PaperSize\>\"", "->", 
+          RowBox[{"{", 
+           RowBox[{"510", ",", "680"}], "}"}]}], ",", 
          RowBox[{"(*", 
           RowBox[{
-           RowBox[{"left", "/", "right"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"width", ",", "height"}], "}"}], " ", "for", " ", 
+           "Portrait"}], "*)"}], 
+         RowBox[{"\"\<PrintingMargins\>\"", "->", 
+          RowBox[{"{", 
            RowBox[{
-            RowBox[{"bottom", "/", "top"}], " ", "margins"}]}], "*)"}], 
-         "}"}]}], ",", 
-       RowBox[{"(*", 
-        RowBox[{"Stylesheet", " ", "overrides"}], "*)"}], 
-       "\[IndentingNewLine]", "\[IndentingNewLine]", 
-       RowBox[{"StyleDefinitions", "->", 
-        RowBox[{"Notebook", "[", 
-         RowBox[{"{", 
+            RowBox[{"{", 
+             RowBox[{"0", ",", "0"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"30", ",", "30"}], "}"}]}], "}"}]}]}], " ", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"left", "/", "right"}], ",", 
           RowBox[{
-           RowBox[{"Cell", "[", 
+           RowBox[{"bottom", "/", "top"}], " ", "margins"}]}], "*)"}], 
+        "}"}]}], ",", 
+      RowBox[{"(*", 
+       RowBox[{"Stylesheet", " ", "overrides"}], "*)"}], 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"StyleDefinitions", "->", 
+       RowBox[{"Notebook", "[", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"Cell", "[", 
+           RowBox[{"StyleData", "[", 
+            RowBox[{"StyleDefinitions", "->", "\"\<Default.nb\>\""}], "]"}], 
+           "]"}], ",", 
+          RowBox[{"(*", 
+           RowBox[{"No", " ", 
+            RowBox[{"header", "/", "footer"}], " ", "lines"}], "*)"}], 
+          "\[IndentingNewLine]", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
             RowBox[{"StyleData", "[", 
-             RowBox[{"StyleDefinitions", "->", "\"\<Default.nb\>\""}], "]"}], 
-            "]"}], ",", 
-           RowBox[{"(*", 
-            RowBox[{"No", " ", 
-             RowBox[{"header", "/", "footer"}], " ", "lines"}], "*)"}], 
-           "\[IndentingNewLine]", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Header\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Footer\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Title\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             
-             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"10", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           "\[IndentingNewLine]", "\[IndentingNewLine]", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Subtitle\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-             RowBox[{"FontSize", "->", "20"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"20", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           "\[IndentingNewLine]", "\[IndentingNewLine]", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Section\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellFrame", "->", "False"}], ",", 
-             RowBox[{"PageBreakAbove", "->", "True"}], ",", 
-             RowBox[{"GroupPageBreakWithin", "->", "True"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"20", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Subsection\>\"", ",", "\"\<Printout\>\""}], "]"}], 
-             ",", 
-             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Subsubsection\>\"", ",", "\"\<Printout\>\""}], 
-              "]"}], ",", 
-             RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Text\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"Hyphenation", "->", "True"}], ",", 
-             "\[IndentingNewLine]", 
-             RowBox[{"LineSpacing", " ", "->", " ", 
-              RowBox[{"{", 
-               RowBox[{"1.4", ",", "0"}], "}"}]}], ",", 
-             RowBox[{"FontColor", "->", "TEXTCOLOR"}], ",", 
-             RowBox[{"FontFamily", "->", "FONT"}], ",", 
-             RowBox[{"CellFrame", "->", "False"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "60"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"7", ",", "7"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Code\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"CellFrameMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"20", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"8", ",", "8"}], "}"}]}], "}"}]}], ",", 
-             RowBox[{"PageWidth", "->", "670"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "30"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"7", ",", "15"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           "\[IndentingNewLine]", "    ", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", "\"\<Program\>\"", "]"}], ",", " ", 
-             "\n", "\t\t\t", 
-             RowBox[{"CellOpen", " ", "->", " ", "True"}], ",", " ", "\n", 
-             "\t\t\t", 
-             RowBox[{"FontFamily", " ", "->", " ", "\"\<JetBrains Mono\>\""}],
-              ",", "\n", "\t\t\t", 
-             RowBox[{"FontSize", "->", " ", "10"}], ",", 
-             RowBox[{"FontColor", " ", "->", " ", "Black"}], ",", "\n", 
-             "\t\t\t", 
-             RowBox[{"ShowCellBracket", " ", "->", " ", "False"}], ",", " ", 
-             "\n", "\t\t\t", 
-             RowBox[{"CellMargins", " ", "->", " ", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", " ", "0"}], "}"}], ",", " ", 
-                RowBox[{"{", 
-                 RowBox[{
-                  RowBox[{"-", "2"}], ",", " ", 
-                  RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", "\n", "\t\t\t", 
-             RowBox[{"CellElementSpacings", " ", "->", " ", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"\"\<CellMinHeight\>\"", " ", "->", " ", "0"}], ",", 
-                " ", 
-                RowBox[{"\"\<ClosedCellHeight\>\"", " ", "->", " ", "0"}]}], 
-               "}"}]}], ",", "\n", "\t\t\t", 
-             RowBox[{"CellFrame", " ", "->", " ", "0"}], ",", 
-             RowBox[{"CellFrameMargins", " ", "->", " ", "0"}], ",", 
-             RowBox[{"Background", " ", "->", " ", "None"}]}], "\n", "\t\t\t",
-             "]"}], ",", "\n", "\[IndentingNewLine]", 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Output\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             RowBox[{"PageWidth", "->", "660"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{
-                  RowBox[{"LEFTMARGIN", "+", "20"}], ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
-           RowBox[{"(*", 
-            RowBox[{
-            "Hide", " ", "Input", " ", "cells", " ", "in", " ", "Printout"}], 
-            "*)"}], 
-           RowBox[{"Cell", "[", 
-            RowBox[{
-             RowBox[{"StyleData", "[", 
-              RowBox[{"\"\<Input\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
-             
-             RowBox[{"CellOpen", "->", "False"}], ",", 
-             RowBox[{"ShowCellBracket", "->", "False"}], ",", 
-             RowBox[{"CellMargins", "->", 
-              RowBox[{"{", 
-               RowBox[{
-                RowBox[{"{", 
-                 RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
-                RowBox[{"{", 
-                 RowBox[{
-                  RowBox[{"-", "2"}], ",", 
-                  RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", 
-             RowBox[{"CellElementSpacings", "->", 
-              RowBox[{"{", 
-               RowBox[{"\"\<ClosedCellHeight\>\"", "->", "0"}], "}"}]}]}], 
-            "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}], 
-  "\[IndentingNewLine]", "\[IndentingNewLine]"}]], "Input",
+             RowBox[{"\"\<Header\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            
+            RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Footer\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            
+            RowBox[{"CellFrame", "->", "0"}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Title\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"FontSize", "->", "26"}], ",", " ", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"20", ",", "20"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Subtitle\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+            RowBox[{"FontSize", "->", "20"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"20", ",", "0"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Section\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"CellFrame", "->", "False"}], ",", 
+            RowBox[{"PageBreakAbove", "->", "True"}], ",", 
+            RowBox[{"GroupPageBreakWithin", "->", "True"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"20", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Subsection\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Subsubsection\>\"", ",", "\"\<Printout\>\""}], 
+             "]"}], ",", 
+            RowBox[{"FontColor", "->", "TITLECOLOR"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Text\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"Hyphenation", "->", "True"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"LineSpacing", " ", "->", " ", 
+             RowBox[{"{", 
+              RowBox[{"1.4", ",", "0"}], "}"}]}], ",", 
+            RowBox[{"FontColor", "->", "TEXTCOLOR"}], ",", 
+            RowBox[{"FontFamily", "->", "FONT"}], ",", 
+            RowBox[{"CellFrame", "->", "False"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "60"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"7", ",", "7"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Code\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"CellFrameMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"20", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"8", ",", "8"}], "}"}]}], "}"}]}], ",", 
+            RowBox[{"PageWidth", "->", "670"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "30"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"7", ",", "15"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "    ", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", "\"\<Program\>\"", "]"}], ",", " ", 
+            "\n", "\t\t\t", 
+            RowBox[{"CellOpen", " ", "->", " ", "True"}], ",", " ", "\n", 
+            "\t\t\t", 
+            RowBox[{"FontFamily", " ", "->", " ", "\"\<JetBrains Mono\>\""}], 
+            ",", "\n", "\t\t\t", 
+            RowBox[{"FontSize", "->", " ", "10"}], ",", 
+            RowBox[{"FontColor", " ", "->", " ", "Black"}], ",", "\n", 
+            "\t\t\t", 
+            RowBox[{"ShowCellBracket", " ", "->", " ", "False"}], ",", " ", 
+            "\n", "\t\t\t", 
+            RowBox[{"CellMargins", " ", "->", " ", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", " ", "10"}], "}"}], ",", " ", 
+               RowBox[{"{", 
+                RowBox[{"24", ",", " ", "24"}], "}"}]}], "}"}]}], ",", "\n", 
+            "\t\t\t", 
+            RowBox[{"CellElementSpacings", " ", "->", " ", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"\"\<CellMinHeight\>\"", " ", "->", " ", "0"}], ",", 
+               " ", 
+               RowBox[{"\"\<ClosedCellHeight\>\"", " ", "->", " ", "0"}]}], 
+              "}"}]}], ",", "\n", "\t\t\t", 
+            RowBox[{"CellFrame", " ", "->", " ", "0"}], ",", 
+            RowBox[{"CellFrameMargins", " ", "->", " ", "0"}], ",", 
+            RowBox[{"Background", " ", "->", " ", "None"}]}], "\n", "\t\t\t", 
+           "]"}], ",", "\n", "\[IndentingNewLine]", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Program\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "10"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"24", ",", "24"}], "}"}]}], "}"}]}], ",", 
+            RowBox[{"PageWidth", "->", "WindowWidth"}]}], "]"}], ",", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Output\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            
+            RowBox[{"PageWidth", "->", "660"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"LEFTMARGIN", "+", "20"}], ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"10", ",", "10"}], "}"}]}], "}"}]}]}], "]"}], ",", 
+          RowBox[{"(*", 
+           RowBox[{
+           "Hide", " ", "Input", " ", "cells", " ", "in", " ", "Printout"}], 
+           "*)"}], 
+          RowBox[{"Cell", "[", 
+           RowBox[{
+            RowBox[{"StyleData", "[", 
+             RowBox[{"\"\<Input\>\"", ",", "\"\<Printout\>\""}], "]"}], ",", 
+            RowBox[{"CellOpen", "->", "False"}], ",", 
+            RowBox[{"ShowCellBracket", "->", "False"}], ",", 
+            RowBox[{"CellMargins", "->", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{"LEFTMARGIN", ",", "0"}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"-", "2"}], ",", 
+                 RowBox[{"-", "2"}]}], "}"}]}], "}"}]}], ",", 
+            RowBox[{"CellElementSpacings", "->", 
+             RowBox[{"{", 
+              RowBox[{"\"\<ClosedCellHeight\>\"", "->", "0"}], "}"}]}]}], 
+           "]"}]}], "}"}], "]"}]}]}], "]"}]}], "]"}], ";"}]], "Input",
  CellOpen->False,
- CellLabel->"In[30]:=",ExpressionUUID->"4ca5a095-e8cd-46b8-83ff-7b873ba4c2eb"],
+ CellLabel->"In[73]:=",ExpressionUUID->"17ad88f9-96f0-4606-9c90-489d71493c74"],
 
 Cell[CellGroupData[{
 
@@ -391,53 +386,99 @@ Cell["Requirements", "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da5
 
 Cell[BoxData[
  RowBox[{"<<", " ", "\"\<Circuits.m\>\""}]], "Code",
- CellLabel->"In[17]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+ CellLabel->"In[74]:=",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["Circuit", "Subsection",ExpressionUUID->"9cba5ac4-e80e-4ed7-aa9c-9108246db287"],
+Cell["Circuit", "Subsection",ExpressionUUID->"d3f10feb-dec5-4d0f-9734-d184c9d1fd1c"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
-  RowBox[{"dataflow", " ", "=", " ", 
-   RowBox[{"Import", "[", 
+  RowBox[{
+   RowBox[{"dfd", " ", "=", " ", 
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"input", "[", "codec", "]"}], "[", "11", "]"}], "[", "]"}], ",",
+       "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"temporal", "[", 
+         RowBox[{"\"\<capacity\>\"", "->", "2"}], "]"}], "[", "21", "]"}], "[",
+        "11", "]"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"output", "[", "codec", "]"}], "[", "]"}], "[", "21", "]"}], ",",
+       "\[IndentingNewLine]", 
+      RowBox[{"_", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"2000", ",", "10"}], "}"}]}]}], "}"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"jsonstr", " ", "=", " ", 
+    RowBox[{"ToJSON", "[", 
+     RowBox[{"FromDFD", "[", "dfd", "]"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Export", "[", " ", 
     RowBox[{
      RowBox[{
-      RowBox[{"NotebookDirectory", "[", "]"}], " ", "<>", 
-      " ", "\"\<circuit.json\>\""}], ",", " ", "\"\<Circuit\>\""}], "]"}]}], 
-  ";"}]], "Code",
- CellLabel->"In[18]:=",ExpressionUUID->"49a99ded-a396-49c9-a9fb-118e9a539fa9"],
+      RowBox[{"FileNameJoin", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"NotebookDirectory", "[", "]"}], ",", 
+         RowBox[{"FileBaseName", "[", 
+          RowBox[{"NotebookFileName", "[", 
+           RowBox[{"EvaluationNotebook", "[", "]"}], "]"}], "]"}]}], "}"}], 
+       "]"}], " ", "<>", " ", "\"\<.json\>\""}], ",", " ", "jsonstr", ",", 
+     " ", "\"\<String\>\""}], "]"}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"CellPrint", "[", 
+  RowBox[{"Cell", "[", 
+   RowBox[{
+    RowBox[{"\"\<jsonstr = \\n\\n\>\"", " ", "<>", " ", "jsonstr"}], ",", 
+    " ", "\"\<Program\>\""}], "]"}], "]"}]}], "Input",
+ CellLabel->"In[75]:=",ExpressionUUID->"4e4dcbdc-8e8d-4228-8d4d-19277da4baa1"],
 
-Cell[CellGroupData[{
+Cell["\<\
+jsonstr = 
 
-Cell[BoxData[
- RowBox[{"ExportString", "[", 
-  RowBox[{"dataflow", ",", " ", "\"\<Circuit\>\""}], "]"}]], "Code",
- CellLabel->"In[19]:=",ExpressionUUID->"083a778b-c31e-4f4b-9b63-bb0311767a13"],
+{
+  \"$schema\": \"https://creatingintelligence.org/schemas/circuit-v1.json\",
 
-Cell[BoxData["\<\"{\\n  \\\"$schema\\\": \
-\\\"https://creatingintelligence.org/schemas/circuit-v1.json\\\",\\n\\n  \
-\\\"hyperparameters\\\": {\\\"default\\\": [3000, 10]},\\n\\n  \\\"dataflow\\\
-\": [\\n\\t{\\\"component\\\": \\\"input\\\", \\\"plugin\\\": \\\"codec\\\", \
-\\\"send\\\": [11]},\\n\\n\\t{\\\"component\\\": \\\"temporal\\\", \\\"plugin\
-\\\": \\\"permutation\\\", \\\"send\\\": [21], \\\"receive\\\": [11], \
-\\\"capacity\\\": 8, \\\"decimate\\\": 0.8},\\n\\n\\t{\\\"component\\\": \
-\\\"output\\\", \\\"plugin\\\": \\\"codec\\\", \\\"receive\\\": [21]}\\n  \
-]\\n}\"\>"], "Output",
- CellLabel->"Out[19]=",ExpressionUUID->"d5be3caf-f5d6-4ee5-bfd1-49d94f4559a6"]
-}, Open  ]],
+  \"hyperparameters\": {\"default\": [2000, 10]},
+
+  \"dataflow\": [
+\t{\"component\": \"input\", \"plugin\": \"codec\", \"send\": [11]},
+
+\t{\"component\": \"temporal\", \"send\": [21], \"receive\": [11], \"capacity\
+\": 2},
+
+\t{\"component\": \"output\", \"plugin\": \"codec\", \"receive\": [21]}
+  ]
+}\
+\>", "Program",
+ GeneratedCell->True,
+ CellAutoOverwrite->
+  True,ExpressionUUID->"7c0798f2-53d3-4e60-a337-7a922044cc9b"],
+
+Cell[BoxData[""], "Input",
+ CellLabel->"In[79]:=",ExpressionUUID->"61c35ae1-af55-4155-a264-14ff9858104b"],
 
 Cell[CellGroupData[{
 
 Cell[BoxData[{
  RowBox[{
-  RowBox[{"circ", " ", "=", " ", 
-   RowBox[{"Circuit", "[", "dataflow", "]"}]}], ";"}], "\n", 
+  RowBox[{
+   RowBox[{"circ", " ", "=", " ", 
+    RowBox[{"Circuit", "[", "jsonstr", "]"}]}], ";"}], " "}], "\n", 
  RowBox[{
   RowBox[{"circ", "[", "\"\<schematics\>\"", "]"}], "[", 
-  RowBox[{"ImageSize", "->", " ", "220"}], "]"}]}], "Code",
- CellLabel->"In[20]:=",ExpressionUUID->"f91b3724-66b5-4d1c-8234-ec8fdf6baa08"],
+  RowBox[{"ImageSize", "->", "240"}], "]"}]}], "Code",
+ CellLabel->"In[80]:=",ExpressionUUID->"78e5e1d7-356e-4936-ab6f-027cdd1f02d4"],
 
 Cell[BoxData[
  GraphicsBox[
@@ -458,7 +499,7 @@ Cell[BoxData[
            Opacity[1], 
            AbsoluteThickness[0.5]]}, 
        GraphLayout -> {"LayeredDigraphEmbedding", "Orientation" -> Left}, 
-       ImageSize -> 220, PlotTheme -> "Classic", 
+       ImageSize -> 240, PlotTheme -> "Classic", 
        VertexCoordinates -> {{1, 0}, {2, 0}, {3, 0}}, 
        VertexLabels -> {2 -> Placed[
            Style["\[Pi]", 
@@ -662,8 +703,8 @@ Cell[BoxData[
   DefaultBaseStyle->"NetworkGraphics",
   FormatType->TraditionalForm,
   FrameTicks->None,
-  ImageSize->220]], "Output",
- CellLabel->"Out[21]=",ExpressionUUID->"186d0f3b-3616-4c1d-8f30-16d8e5afe0cf"]
+  ImageSize->240]], "Output",
+ CellLabel->"Out[81]=",ExpressionUUID->"f9d86329-59f7-4348-8da9-75f199c5a074"]
 }, Open  ]]
 }, Open  ]],
 
@@ -671,14 +712,24 @@ Cell[CellGroupData[{
 
 Cell["Data", "Subsection",ExpressionUUID->"c2f2d59a-ac2c-4b1d-948d-fb81fb0f3b06"],
 
-Cell[BoxData[
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"datadir", " ", "=", " ", 
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], " ", "<>", 
+    " ", "\"\<../../data/\>\""}]}], ";"}], "\n", 
  RowBox[{
   RowBox[{"data", " ", "=", " ", 
    RowBox[{"Import", "[", " ", 
-    RowBox[{
-     RowBox[{"NotebookDirectory", "[", "]"}], " ", "<>", 
-     " ", "\"\<data.csv\>\""}], "]"}]}], ";"}]], "Code",
- CellLabel->"In[22]:=",ExpressionUUID->"a328bbdc-4db3-4609-a54e-7b033ee1b835"]
+    RowBox[{"datadir", " ", "<>", " ", "\"\</sequences/pi-100.csv\>\""}], 
+    "]"}]}], ";"}], "\n", 
+ RowBox[{" ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "this", " ", "file", " ", "has", " ", "4", " ", "repetitions", " ", "of", " ",
+     "the", " ", "first", " ", "100", " ", "digits", " ", "of", " ", "Pi"}], 
+   " ", "*)"}]}]}], "Code",
+ CellLabel->"In[82]:=",ExpressionUUID->"a328bbdc-4db3-4609-a54e-7b033ee1b835"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -692,7 +743,7 @@ Cell[BoxData[
     RowBox[{
      RowBox[{"circ", "[", "\"\<function\>\"", "]"}], " ", "@@@", " ", 
      "data"}]}]}], ";"}]], "Code",
- CellLabel->"In[23]:=",ExpressionUUID->"40dc4443-9693-465f-8814-7b8c4a113827"]
+ CellLabel->"In[84]:=",ExpressionUUID->"40dc4443-9693-465f-8814-7b8c4a113827"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -833,112 +884,169 @@ Cell[BoxData[
          RowBox[{"paddedRows", ",", " ", "separatorRow", ",", " ", "2"}], 
          "]"}]}], ",", " ", "\n", "    ", "\"\<\\n\>\""}], "\n", "  ", 
       "]"}]}]}], "\n", "]"}]}]], "Code",
- CellLabel->"In[25]:=",ExpressionUUID->"8b12a60b-a5db-4227-bfab-fc755f1c856f"],
+ CellLabel->"In[85]:=",ExpressionUUID->"8b12a60b-a5db-4227-bfab-fc755f1c856f"],
 
 Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{"ArrayToMarkdownTable", "[", 
   RowBox[{"data", ",", " ", "out", ",", " ", "True"}], "]"}]], "Code",
- CellLabel->"In[27]:=",ExpressionUUID->"aed2048e-b27d-4394-b2b7-2dd4f47be5cd"],
+ CellLabel->"In[86]:=",ExpressionUUID->"aed2048e-b27d-4394-b2b7-2dd4f47be5cd"],
 
-Cell[BoxData["\<\"| in  | out  |\\n| --- | ---- |\\n| 3   | Null |\\n| 1   | \
-Null |\\n| 4   | Null |\\n| 1   | Null |\\n| 5   | 4    |\\n| 9   | 1    \
-|\\n| 2   | 5    |\\n| 6   | 9    |\\n| 5   | 2    |\\n| 3   | 6    |\\n| 5   \
-| Null |\\n| 8   | 3    |\\n| 9   | 5    |\\n| 7   | 5    |\\n| 9   | 9    \
-|\\n| 3   | 2    |\\n| 2   | 9    |\\n| 3   | 8    |\\n| 8   | 2    |\\n| 4   \
-| 3    |\\n| 6   | 8    |\\n| 2   | 5    |\\n| 6   | 6    |\\n| 4   | 2    \
-|\\n| 3   | 6    |\\n| 3   | 5    |\\n| 8   | 8    |\\n| 3   | 9    |\\n| 2   \
-| 8    |\\n| 7   | 3    |\\n| 9   | 3    |\\n| 5   | 3    |\\n| 0   | 9    \
-|\\n| 2   | 5    |\\n| 8   | 6    |\\n| 8   | 4    |\\n| 4   | 3    |\\n| 1   \
-| 6    |\\n| 9   | 2    |\\n| 7   | 9    |\\n| 1   | 2    |\\n| 6   | 3    \
-|\\n| 9   | 5    |\\n| 3   | 3    |\\n| 9   | 5    |\\n| 9   | 8    |\\n| 3   \
-| 9    |\\n| 7   | 2    |\\n| 5   | 9    |\\n| 1   | 3    |\\n| 0   | 5    \
-|\\n| 5   | 9    |\\n| 8   | Null |\\n| 2   | 9    |\\n| 0   | 6    |\\n| 9   \
-| 5    |\\n| 7   | 3    |\\n| 4   | 9    |\\n| 9   | 3    |\\n| 4   | 9    \
-|\\n| 4   | 3    |\\n| 5   | 9    |\\n| 9   | 9    |\\n| 2   | 2    |\\n| 3   \
-| 6    |\\n| 0   | 5    |\\n| 7   | 3    |\\n| 8   | 9    |\\n| 1   | 9    \
-|\\n| 6   | 4    |\\n| 4   | 4    |\\n| 0   | 3    |\\n| 6   | 9    |\\n| 2   \
-| 8    |\\n| 8   | 3    |\\n| 6   | 4    |\\n| 2   | 4    |\\n| 0   | 8    \
-|\\n| 8   | 9    |\\n| 9   | 4    |\\n| 9   | 3    |\\n| 8   | 9    |\\n| 6   \
-| 9    |\\n| 2   | 2    |\\n| 8   | 3    |\\n| 0   | 8    |\\n| 3   | 2    \
-|\\n| 4   | 8    |\\n| 8   | 8    |\\n| 2   | 9    |\\n| 5   | 9    |\\n| 3   \
-| 9    |\\n| 4   | 3    |\\n| 2   | 8    |\\n| 1   | 8    |\\n| 1   | 6    \
-|\\n| 7   | 9    |\\n| 0   | 9    |\\n| 6   | 9    |\\n| 7   | 2    |\\n| 3   \
-| 8    |\\n| 1   | 5    |\\n| 4   | 4    |\\n| 1   | 1    |\\n| 5   | 5    \
-|\\n| 9   | 9    |\\n| 2   | 2    |\\n| 6   | 6    |\\n| 5   | 5    |\\n| 3   \
-| 3    |\\n| 5   | 5    |\\n| 8   | 8    |\\n| 9   | 9    |\\n| 7   | 7    \
-|\\n| 9   | 9    |\\n| 3   | 3    |\\n| 2   | 2    |\\n| 3   | 3    |\\n| 8   \
-| 8    |\\n| 4   | 4    |\\n| 6   | 6    |\\n| 2   | 2    |\\n| 6   | 6    \
-|\\n| 4   | 4    |\\n| 3   | 3    |\\n| 3   | 3    |\\n| 8   | 8    |\\n| 3   \
-| 3    |\\n| 2   | 2    |\\n| 7   | 7    |\\n| 9   | 9    |\\n| 5   | 5    \
-|\\n| 0   | 0    |\\n| 2   | 2    |\\n| 8   | 8    |\\n| 8   | 8    |\\n| 4   \
-| 4    |\\n| 1   | 1    |\\n| 9   | 9    |\\n| 7   | 7    |\\n| 1   | 1    \
-|\\n| 6   | 6    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 9   | 9    |\\n| 9   \
-| 9    |\\n| 3   | 3    |\\n| 7   | 7    |\\n| 5   | 5    |\\n| 1   | 1    \
-|\\n| 0   | 0    |\\n| 5   | 5    |\\n| 8   | 8    |\\n| 2   | 2    |\\n| 0   \
-| 0    |\\n| 9   | 9    |\\n| 7   | 7    |\\n| 4   | 4    |\\n| 9   | 9    \
-|\\n| 4   | 4    |\\n| 4   | 4    |\\n| 5   | 5    |\\n| 9   | 9    |\\n| 2   \
-| 2    |\\n| 3   | 3    |\\n| 0   | 0    |\\n| 7   | 7    |\\n| 8   | 8    \
-|\\n| 1   | 1    |\\n| 6   | 6    |\\n| 4   | 4    |\\n| 0   | 0    |\\n| 6   \
-| 6    |\\n| 2   | 2    |\\n| 8   | 8    |\\n| 6   | 6    |\\n| 2   | 2    \
-|\\n| 0   | 0    |\\n| 8   | 8    |\\n| 9   | 9    |\\n| 9   | 9    |\\n| 8   \
-| 8    |\\n| 6   | 6    |\\n| 2   | 2    |\\n| 8   | 8    |\\n| 0   | 0    \
-|\\n| 3   | 3    |\\n| 4   | 4    |\\n| 8   | 8    |\\n| 2   | 2    |\\n| 5   \
-| 5    |\\n| 3   | 3    |\\n| 4   | 4    |\\n| 2   | 2    |\\n| 1   | 1    \
-|\\n| 1   | 1    |\\n| 7   | 7    |\\n| 0   | 0    |\\n| 6   | 6    |\\n| 7   \
-| 7    |\\n| 3   | 3    |\\n| 1   | 1    |\\n| 4   | 4    |\\n| 1   | 1    \
-|\\n| 5   | 5    |\\n| 9   | 9    |\\n| 2   | 2    |\\n| 6   | 6    |\\n| 5   \
-| 5    |\\n| 3   | 3    |\\n| 5   | 5    |\\n| 8   | 8    |\\n| 9   | 9    \
-|\\n| 7   | 7    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 2   | 2    |\\n| 3   \
-| 3    |\\n| 8   | 8    |\\n| 4   | 4    |\\n| 6   | 6    |\\n| 2   | 2    \
-|\\n| 6   | 6    |\\n| 4   | 4    |\\n| 3   | 3    |\\n| 3   | 3    |\\n| 8   \
-| 8    |\\n| 3   | 3    |\\n| 2   | 2    |\\n| 7   | 7    |\\n| 9   | 9    \
-|\\n| 5   | 5    |\\n| 0   | 0    |\\n| 2   | 2    |\\n| 8   | 8    |\\n| 8   \
-| 8    |\\n| 4   | 4    |\\n| 1   | 1    |\\n| 9   | 9    |\\n| 7   | 7    \
-|\\n| 1   | 1    |\\n| 6   | 6    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 9   \
-| 9    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 7   | 7    |\\n| 5   | 5    \
-|\\n| 1   | 1    |\\n| 0   | 0    |\\n| 5   | 5    |\\n| 8   | 8    |\\n| 2   \
-| 2    |\\n| 0   | 0    |\\n| 9   | 9    |\\n| 7   | 7    |\\n| 4   | 4    \
-|\\n| 9   | 9    |\\n| 4   | 4    |\\n| 4   | 4    |\\n| 5   | 5    |\\n| 9   \
-| 9    |\\n| 2   | 2    |\\n| 3   | 3    |\\n| 0   | 0    |\\n| 7   | 7    \
-|\\n| 8   | 8    |\\n| 1   | 1    |\\n| 6   | 6    |\\n| 4   | 4    |\\n| 0   \
-| 0    |\\n| 6   | 6    |\\n| 2   | 2    |\\n| 8   | 8    |\\n| 6   | 6    \
-|\\n| 2   | 2    |\\n| 0   | 0    |\\n| 8   | 8    |\\n| 9   | 9    |\\n| 9   \
-| 9    |\\n| 8   | 8    |\\n| 6   | 6    |\\n| 2   | 2    |\\n| 8   | 8    \
-|\\n| 0   | 0    |\\n| 3   | 3    |\\n| 4   | 4    |\\n| 8   | 8    |\\n| 2   \
-| 2    |\\n| 5   | 5    |\\n| 3   | 3    |\\n| 4   | 4    |\\n| 2   | 2    \
-|\\n| 1   | 1    |\\n| 1   | 1    |\\n| 7   | 7    |\\n| 0   | 0    |\\n| 6   \
-| 6    |\\n| 7   | 7    |\\n| 3   | 3    |\\n| 1   | 1    |\\n| 4   | 4    \
-|\\n| 1   | 1    |\\n| 5   | 5    |\\n| 9   | 9    |\\n| 2   | 2    |\\n| 6   \
-| 6    |\\n| 5   | 5    |\\n| 3   | 3    |\\n| 5   | 5    |\\n| 8   | 8    \
-|\\n| 9   | 9    |\\n| 7   | 7    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 2   \
-| 2    |\\n| 3   | 3    |\\n| 8   | 8    |\\n| 4   | 4    |\\n| 6   | 6    \
-|\\n| 2   | 2    |\\n| 6   | 6    |\\n| 4   | 4    |\\n| 3   | 3    |\\n| 3   \
-| 3    |\\n| 8   | 8    |\\n| 3   | 3    |\\n| 2   | 2    |\\n| 7   | 7    \
-|\\n| 9   | 9    |\\n| 5   | 5    |\\n| 0   | 0    |\\n| 2   | 2    |\\n| 8   \
-| 8    |\\n| 8   | 8    |\\n| 4   | 4    |\\n| 1   | 1    |\\n| 9   | 9    \
-|\\n| 7   | 7    |\\n| 1   | 1    |\\n| 6   | 6    |\\n| 9   | 9    |\\n| 3   \
-| 3    |\\n| 9   | 9    |\\n| 9   | 9    |\\n| 3   | 3    |\\n| 7   | 7    \
-|\\n| 5   | 5    |\\n| 1   | 1    |\\n| 0   | 0    |\\n| 5   | 5    |\\n| 8   \
-| 8    |\\n| 2   | 2    |\\n| 0   | 0    |\\n| 9   | 9    |\\n| 7   | 7    \
-|\\n| 4   | 4    |\\n| 9   | 9    |\\n| 4   | 4    |\\n| 4   | 4    |\\n| 5   \
-| 5    |\\n| 9   | 9    |\\n| 2   | 2    |\\n| 3   | 3    |\\n| 0   | 0    \
-|\\n| 7   | 7    |\\n| 8   | 8    |\\n| 1   | 1    |\\n| 6   | 6    |\\n| 4   \
-| 4    |\\n| 0   | 0    |\\n| 6   | 6    |\\n| 2   | 2    |\\n| 8   | 8    \
-|\\n| 6   | 6    |\\n| 2   | 2    |\\n| 0   | 0    |\\n| 8   | 8    |\\n| 9   \
-| 9    |\\n| 9   | 9    |\\n| 8   | 8    |\\n| 6   | 6    |\\n| 2   | 2    \
-|\\n| 8   | 8    |\\n| 0   | 0    |\\n| 3   | 3    |\\n| 4   | 4    |\\n| 8   \
-| 8    |\\n| 2   | 2    |\\n| 5   | 5    |\\n| 3   | 3    |\\n| 4   | 4    \
-|\\n| 2   | 2    |\\n| 1   | 1    |\\n| 1   | 1    |\\n| 7   | 7    |\\n| 0   \
-| 0    |\\n| 6   | 6    |\\n| 7   | 7    |\"\>"], "Output",
- CellLabel->"Out[27]=",ExpressionUUID->"ee170c4f-0177-4624-83b4-6ae93d6eb0e0"]
+Cell[BoxData["\<\"| in  | out             |\\n| --- | --------------- |\\n| 3 \
+  | Null            |\\n| 1   | Null            |\\n| 4   | Null            |\
+\\n| 1   | Null            |\\n| 5   | 4               |\\n| 9   | Null       \
+     |\\n| 2   | Null            |\\n| 6   | Null            |\\n| 5   | Null \
+           |\\n| 3   | 9               |\\n| 5   | 1               |\\n| 8   \
+| {3, 9}          |\\n| 9   | Null            |\\n| 7   | 2               \
+|\\n| 9   | Null            |\\n| 3   | 7               |\\n| 2   | 5         \
+      |\\n| 3   | 6               |\\n| 8   | {1, 2, 5}       |\\n| 4   | 9   \
+            |\\n| 6   | 1               |\\n| 2   | 5               |\\n| 6   \
+| {3, 6}          |\\n| 4   | 5               |\\n| 3   | {1, 6}          \
+|\\n| 3   | 5               |\\n| 8   | 8               |\\n| 3   | 4         \
+      |\\n| 2   | 8               |\\n| 7   | 3               |\\n| 9   | 9   \
+            |\\n| 5   | 3               |\\n| 0   | 9               |\\n| 2   \
+| 2               |\\n| 8   | 6               |\\n| 8   | 9               \
+|\\n| 4   | 4               |\\n| 1   | 6               |\\n| 9   | 5         \
+      |\\n| 7   | {2, 3, 5, 7}    |\\n| 1   | 9               |\\n| 6   | {4, \
+5, 9}       |\\n| 9   | 4               |\\n| 3   | 2               |\\n| 9   \
+| 2               |\\n| 9   | 3               |\\n| 3   | {2, 3, 5, 7, 9} \
+|\\n| 7   | 2               |\\n| 5   | {1, 9}          |\\n| 1   | 3         \
+      |\\n| 0   | 5               |\\n| 5   | 2               |\\n| 8   | 8   \
+            |\\n| 2   | 9               |\\n| 0   | 8               |\\n| 9   \
+| {2, 5}          |\\n| 7   | 7               |\\n| 4   | 9               \
+|\\n| 9   | {1, 3, 6}       |\\n| 4   | 5               |\\n| 4   | {1, 3, 6, \
+9}    |\\n| 5   | 9               |\\n| 9   | {0, 1, 3, 8, 9} |\\n| 2   | 2   \
+            |\\n| 3   | 6               |\\n| 0   | 8               |\\n| 7   \
+| 5               |\\n| 8   | 9               |\\n| 1   | 2               \
+|\\n| 6   | 0               |\\n| 4   | 9               |\\n| 0   | 3         \
+      |\\n| 6   | 9               |\\n| 2   | 2               |\\n| 8   | 6   \
+            |\\n| 6   | 8               |\\n| 2   | 2               |\\n| 0   \
+| 8               |\\n| 8   | 9               |\\n| 9   | 2               \
+|\\n| 9   | 7               |\\n| 8   | 3               |\\n| 6   | {4, 9}    \
+      |\\n| 2   | 2               |\\n| 8   | 6               |\\n| 0   | 6   \
+            |\\n| 3   | 2               |\\n| 4   | 3               |\\n| 8   \
+| 0               |\\n| 2   | 9               |\\n| 5   | 0               \
+|\\n| 3   | {0, 1, 3, 8, 9} |\\n| 4   | 5               |\\n| 2   | 8         \
+      |\\n| 1   | 8               |\\n| 1   | 5               |\\n| 7   | 4   \
+            |\\n| 0   | 1               |\\n| 6   | 6               |\\n| 7   \
+| 2               |\\n| 3   | 8               |\\n| 1   | 9               \
+|\\n| 4   | 4               |\\n| 1   | 1               |\\n| 5   | 5         \
+      |\\n| 9   | 9               |\\n| 2   | 2               |\\n| 6   | 6   \
+            |\\n| 5   | 5               |\\n| 3   | 3               |\\n| 5   \
+| 5               |\\n| 8   | 8               |\\n| 9   | 2               \
+|\\n| 7   | 7               |\\n| 9   | 9               |\\n| 3   | 3         \
+      |\\n| 2   | 2               |\\n| 3   | 3               |\\n| 8   | 8   \
+            |\\n| 4   | 4               |\\n| 6   | 1               |\\n| 2   \
+| 2               |\\n| 6   | 6               |\\n| 4   | 4               \
+|\\n| 3   | 3               |\\n| 3   | 5               |\\n| 8   | 8         \
+      |\\n| 3   | 3               |\\n| 2   | 2               |\\n| 7   | 3   \
+            |\\n| 9   | 8               |\\n| 5   | 3               |\\n| 0   \
+| 0               |\\n| 2   | 2               |\\n| 8   | 8               \
+|\\n| 8   | 8               |\\n| 4   | 4               |\\n| 1   | 6         \
+      |\\n| 9   | 9               |\\n| 7   | 7               |\\n| 1   | 1   \
+            |\\n| 6   | 6               |\\n| 9   | 9               |\\n| 3   \
+| 3               |\\n| 9   | 9               |\\n| 9   | 9               \
+|\\n| 3   | 3               |\\n| 7   | 7               |\\n| 5   | 5         \
+      |\\n| 1   | 1               |\\n| 0   | 0               |\\n| 5   | 5   \
+            |\\n| 8   | 8               |\\n| 2   | 2               |\\n| 0   \
+| 0               |\\n| 9   | 8               |\\n| 7   | 7               \
+|\\n| 4   | 4               |\\n| 9   | 9               |\\n| 4   | 4         \
+      |\\n| 4   | 4               |\\n| 5   | 5               |\\n| 9   | 9   \
+            |\\n| 2   | 2               |\\n| 3   | 3               |\\n| 0   \
+| 0               |\\n| 7   | 7               |\\n| 8   | 8               \
+|\\n| 1   | 1               |\\n| 6   | 6               |\\n| 4   | 4         \
+      |\\n| 0   | 3               |\\n| 6   | 6               |\\n| 2   | 2   \
+            |\\n| 8   | 8               |\\n| 6   | 6               |\\n| 2   \
+| 2               |\\n| 0   | 8               |\\n| 8   | 8               \
+|\\n| 9   | 9               |\\n| 9   | 9               |\\n| 8   | 8         \
+      |\\n| 6   | 6               |\\n| 2   | 2               |\\n| 8   | 8   \
+            |\\n| 0   | 6               |\\n| 3   | 3               |\\n| 4   \
+| 4               |\\n| 8   | 8               |\\n| 2   | 9               \
+|\\n| 5   | 5               |\\n| 3   | 3               |\\n| 4   | 4         \
+      |\\n| 2   | 8               |\\n| 1   | 1               |\\n| 1   | 1   \
+            |\\n| 7   | 7               |\\n| 0   | 0               |\\n| 6   \
+| 6               |\\n| 7   | 7               |\\n| 3   | 3               \
+|\\n| 1   | 9               |\\n| 4   | 4               |\\n| 1   | 1         \
+      |\\n| 5   | 5               |\\n| 9   | 9               |\\n| 2   | 2   \
+            |\\n| 6   | 6               |\\n| 5   | 5               |\\n| 3   \
+| 3               |\\n| 5   | 5               |\\n| 8   | 8               \
+|\\n| 9   | 9               |\\n| 7   | 7               |\\n| 9   | 4         \
+      |\\n| 3   | 3               |\\n| 2   | 2               |\\n| 3   | 3   \
+            |\\n| 8   | 8               |\\n| 4   | 4               |\\n| 6   \
+| 1               |\\n| 2   | 2               |\\n| 6   | 6               \
+|\\n| 4   | 4               |\\n| 3   | 3               |\\n| 3   | 3         \
+      |\\n| 8   | 8               |\\n| 3   | 3               |\\n| 2   | 2   \
+            |\\n| 7   | 7               |\\n| 9   | 9               |\\n| 5   \
+| 5               |\\n| 0   | 0               |\\n| 2   | 2               \
+|\\n| 8   | 8               |\\n| 8   | 8               |\\n| 4   | 4         \
+      |\\n| 1   | 1               |\\n| 9   | 9               |\\n| 7   | 7   \
+            |\\n| 1   | 1               |\\n| 6   | 6               |\\n| 9   \
+| 9               |\\n| 3   | 3               |\\n| 9   | 9               \
+|\\n| 9   | 9               |\\n| 3   | 3               |\\n| 7   | 7         \
+      |\\n| 5   | 5               |\\n| 1   | 1               |\\n| 0   | 0   \
+            |\\n| 5   | 5               |\\n| 8   | 8               |\\n| 2   \
+| 2               |\\n| 0   | 0               |\\n| 9   | 9               \
+|\\n| 7   | 7               |\\n| 4   | 4               |\\n| 9   | 9         \
+      |\\n| 4   | 4               |\\n| 4   | 4               |\\n| 5   | 5   \
+            |\\n| 9   | 9               |\\n| 2   | 2               |\\n| 3   \
+| 3               |\\n| 0   | 0               |\\n| 7   | 7               \
+|\\n| 8   | 8               |\\n| 1   | 1               |\\n| 6   | 6         \
+      |\\n| 4   | 4               |\\n| 0   | 0               |\\n| 6   | 6   \
+            |\\n| 2   | 2               |\\n| 8   | 8               |\\n| 6   \
+| 6               |\\n| 2   | 2               |\\n| 0   | 0               \
+|\\n| 8   | 8               |\\n| 9   | 9               |\\n| 9   | 9         \
+      |\\n| 8   | 8               |\\n| 6   | 6               |\\n| 2   | 2   \
+            |\\n| 8   | 0               |\\n| 0   | 8               |\\n| 3   \
+| 3               |\\n| 4   | 4               |\\n| 8   | 8               \
+|\\n| 2   | 2               |\\n| 5   | 5               |\\n| 3   | 3         \
+      |\\n| 4   | 4               |\\n| 2   | 2               |\\n| 1   | 1   \
+            |\\n| 1   | 1               |\\n| 7   | 7               |\\n| 0   \
+| 0               |\\n| 6   | 6               |\\n| 7   | 7               \
+|\\n| 3   | 3               |\\n| 1   | 1               |\\n| 4   | 4         \
+      |\\n| 1   | 1               |\\n| 5   | 5               |\\n| 9   | 9   \
+            |\\n| 2   | 2               |\\n| 6   | 6               |\\n| 5   \
+| 5               |\\n| 3   | 3               |\\n| 5   | 5               \
+|\\n| 8   | 8               |\\n| 9   | 9               |\\n| 7   | 7         \
+      |\\n| 9   | 9               |\\n| 3   | 3               |\\n| 2   | 2   \
+            |\\n| 3   | 3               |\\n| 8   | 8               |\\n| 4   \
+| 4               |\\n| 6   | 6               |\\n| 2   | 2               \
+|\\n| 6   | 6               |\\n| 4   | 4               |\\n| 3   | 3         \
+      |\\n| 3   | 3               |\\n| 8   | 8               |\\n| 3   | 3   \
+            |\\n| 2   | 2               |\\n| 7   | 7               |\\n| 9   \
+| 9               |\\n| 5   | 5               |\\n| 0   | 0               \
+|\\n| 2   | 2               |\\n| 8   | 8               |\\n| 8   | 8         \
+      |\\n| 4   | 4               |\\n| 1   | 1               |\\n| 9   | 9   \
+            |\\n| 7   | 7               |\\n| 1   | 1               |\\n| 6   \
+| 6               |\\n| 9   | 9               |\\n| 3   | 3               \
+|\\n| 9   | 9               |\\n| 9   | 9               |\\n| 3   | 3         \
+      |\\n| 7   | 7               |\\n| 5   | 5               |\\n| 1   | 1   \
+            |\\n| 0   | 0               |\\n| 5   | 5               |\\n| 8   \
+| 8               |\\n| 2   | 2               |\\n| 0   | 0               \
+|\\n| 9   | 9               |\\n| 7   | 7               |\\n| 4   | 4         \
+      |\\n| 9   | 9               |\\n| 4   | 4               |\\n| 4   | 4   \
+            |\\n| 5   | 5               |\\n| 9   | 9               |\\n| 2   \
+| 2               |\\n| 3   | 6               |\\n| 0   | 0               \
+|\\n| 7   | 7               |\\n| 8   | 8               |\\n| 1   | 1         \
+      |\\n| 6   | 6               |\\n| 4   | 4               |\\n| 0   | 0   \
+            |\\n| 6   | 6               |\\n| 2   | 2               |\\n| 8   \
+| 8               |\\n| 6   | 0               |\\n| 2   | 2               \
+|\\n| 0   | 0               |\\n| 8   | 8               |\\n| 9   | 9         \
+      |\\n| 9   | 9               |\\n| 8   | 8               |\\n| 6   | 6   \
+            |\\n| 2   | 2               |\\n| 8   | 8               |\\n| 0   \
+| 0               |\\n| 3   | 3               |\\n| 4   | 4               \
+|\\n| 8   | 8               |\\n| 2   | 2               |\\n| 5   | 5         \
+      |\\n| 3   | 3               |\\n| 4   | 4               |\\n| 2   | 2   \
+            |\\n| 1   | 1               |\\n| 1   | 1               |\\n| 7   \
+| 7               |\\n| 0   | 0               |\\n| 6   | 6               \
+|\\n| 7   | 7               |\"\>"], "Output",
+ CellLabel->"Out[86]=",ExpressionUUID->"4b029e77-3d7a-4a90-81e9-fde6bed3943c"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
 WindowSize->{808, 911},
-WindowMargins->{{Automatic, 362}, {Automatic, 3}},
+WindowMargins->{{Automatic, 53}, {56, Automatic}},
 DockedCells->{
   Cell[
    BoxData[
@@ -977,8 +1085,8 @@ StyleDefinitions->Notebook[{
    Cell[
     StyleData["Footer", "Printout"], CellFrame -> 0], 
    Cell[
-    StyleData["Title", "Printout"], CellMargins -> {{62, 0}, {10, 0}}, 
-    FontFamily -> "Inter Variable", FontColor -> 
+    StyleData["Title", "Printout"], CellMargins -> {{62, 0}, {20, 20}}, 
+    FontFamily -> "Inter Variable", FontSize -> 26, FontColor -> 
     RGBColor[0.7490196078431373, 0.3803921568627451, 0.41568627450980394`]], 
    Cell[
     StyleData["Subtitle", "Printout"], CellMargins -> {{62, 0}, {20, 0}}, 
@@ -1009,10 +1117,13 @@ StyleDefinitions->Notebook[{
     CellFrameMargins -> {{20, 0}, {8, 8}}], 
    Cell[
     StyleData["Program"], CellFrame -> 0, ShowCellBracket -> False, 
-    CellMargins -> {{62, 0}, {-2, -2}}, 
+    CellMargins -> {{62, 10}, {24, 24}}, 
     CellElementSpacings -> {"CellMinHeight" -> 0, "ClosedCellHeight" -> 0}, 
     CellOpen -> True, CellFrameMargins -> 0, FontFamily -> "JetBrains Mono", 
     FontSize -> 10, FontColor -> GrayLevel[0], Background -> None], 
+   Cell[
+    StyleData["Program", "Printout"], PageWidth -> WindowWidth, 
+    CellMargins -> {{62, 10}, {24, 24}}], 
    Cell[
     StyleData["Output", "Printout"], PageWidth -> 660, 
     CellMargins -> {{82, 0}, {10, 10}}], 
@@ -1037,42 +1148,40 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[554, 20, 392, 10, 34, "Text",ExpressionUUID->"68cf67fa-7141-40b7-a6f9-e072dbef9b14"],
-Cell[949, 32, 14822, 338, 23, "Input",ExpressionUUID->"4ca5a095-e8cd-46b8-83ff-7b873ba4c2eb",
+Cell[949, 32, 14356, 333, 23, "Input",ExpressionUUID->"17ad88f9-96f0-4606-9c90-489d71493c74",
  CellOpen->False],
 Cell[CellGroupData[{
-Cell[15796, 374, 80, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
-Cell[15879, 376, 95, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
-Cell[15977, 378, 333, 7, 178, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
+Cell[15330, 369, 80, 0, 120, "Title",ExpressionUUID->"d073459d-127b-439c-b315-94de6963b699"],
+Cell[15413, 371, 95, 0, 65, "Subtitle",ExpressionUUID->"74e7b6e8-0439-46d3-8fb5-ca078b2a5326"],
+Cell[15511, 373, 333, 7, 178, "Text",ExpressionUUID->"86cc569a-be37-4aff-8a57-73ac76739a7f"],
 Cell[CellGroupData[{
-Cell[16335, 389, 89, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
-Cell[16427, 391, 145, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
+Cell[15869, 384, 89, 0, 66, "Subsection",ExpressionUUID->"55a437b1-38f8-4e60-9875-98da51557600"],
+Cell[15961, 386, 145, 2, 63, "Code",ExpressionUUID->"9de35f9b-c211-4c25-9a7c-7cf15174be8c"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[16609, 398, 84, 0, 66, "Subsection",ExpressionUUID->"9cba5ac4-e80e-4ed7-aa9c-9108246db287"],
-Cell[16696, 400, 349, 9, 63, "Code",ExpressionUUID->"49a99ded-a396-49c9-a9fb-118e9a539fa9"],
+Cell[16143, 393, 84, 0, 66, "Subsection",ExpressionUUID->"d3f10feb-dec5-4d0f-9734-d184c9d1fd1c"],
+Cell[16230, 395, 1784, 48, 368, "Input",ExpressionUUID->"4e4dcbdc-8e8d-4228-8d4d-19277da4baa1"],
+Cell[18017, 445, 529, 20, 325, "Program",ExpressionUUID->"7c0798f2-53d3-4e60-a337-7a922044cc9b"],
+Cell[18549, 467, 105, 1, 36, "Input",ExpressionUUID->"61c35ae1-af55-4155-a264-14ff9858104b"],
 Cell[CellGroupData[{
-Cell[17070, 413, 192, 3, 63, "Code",ExpressionUUID->"083a778b-c31e-4f4b-9b63-bb0311767a13"],
-Cell[17265, 418, 679, 9, 399, "Output",ExpressionUUID->"d5be3caf-f5d6-4ee5-bfd1-49d94f4559a6"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[17981, 432, 327, 7, 87, "Code",ExpressionUUID->"f91b3724-66b5-4d1c-8234-ec8fdf6baa08"],
-Cell[18311, 441, 9038, 224, 76, "Output",ExpressionUUID->"186d0f3b-3616-4c1d-8f30-16d8e5afe0cf"]
+Cell[18679, 472, 341, 8, 87, "Code",ExpressionUUID->"78e5e1d7-356e-4936-ab6f-027cdd1f02d4"],
+Cell[19023, 482, 9038, 224, 81, "Output",ExpressionUUID->"f9d86329-59f7-4348-8da9-75f199c5a074"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[27398, 671, 81, 0, 66, "Subsection",ExpressionUUID->"c2f2d59a-ac2c-4b1d-948d-fb81fb0f3b06"],
-Cell[27482, 673, 296, 7, 63, "Code",ExpressionUUID->"a328bbdc-4db3-4609-a54e-7b033ee1b835"]
+Cell[28110, 712, 81, 0, 66, "Subsection",ExpressionUUID->"c2f2d59a-ac2c-4b1d-948d-fb81fb0f3b06"],
+Cell[28194, 714, 674, 17, 110, "Code",ExpressionUUID->"a328bbdc-4db3-4609-a54e-7b033ee1b835"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[27815, 685, 80, 0, 66, "Subsection",ExpressionUUID->"692156cf-4697-40bc-95f2-9b24015524b7"],
-Cell[27898, 687, 290, 7, 63, "Code",ExpressionUUID->"40dc4443-9693-465f-8814-7b8c4a113827"]
+Cell[28905, 736, 80, 0, 66, "Subsection",ExpressionUUID->"692156cf-4697-40bc-95f2-9b24015524b7"],
+Cell[28988, 738, 290, 7, 63, "Code",ExpressionUUID->"40dc4443-9693-465f-8814-7b8c4a113827"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[28225, 699, 112, 0, 66, "Subsection",ExpressionUUID->"d0c5b93d-fc4b-4a73-8e9b-d01036b774c4"],
-Cell[28340, 701, 5662, 134, 959, "Code",ExpressionUUID->"8b12a60b-a5db-4227-bfab-fc755f1c856f"],
+Cell[29315, 750, 112, 0, 66, "Subsection",ExpressionUUID->"d0c5b93d-fc4b-4a73-8e9b-d01036b774c4"],
+Cell[29430, 752, 5662, 134, 959, "Code",ExpressionUUID->"8b12a60b-a5db-4227-bfab-fc755f1c856f"],
 Cell[CellGroupData[{
-Cell[34027, 839, 202, 3, 63, "Code",ExpressionUUID->"aed2048e-b27d-4394-b2b7-2dd4f47be5cd"],
-Cell[34232, 844, 7123, 90, 10280, "Output",ExpressionUUID->"ee170c4f-0177-4624-83b4-6ae93d6eb0e0"]
+Cell[35117, 890, 202, 3, 63, "Code",ExpressionUUID->"aed2048e-b27d-4394-b2b7-2dd4f47be5cd"],
+Cell[35322, 895, 11659, 147, 10280, "Output",ExpressionUUID->"4b029e77-3d7a-4a90-81e9-fde6bed3943c"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
