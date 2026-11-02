@@ -1,0 +1,14 @@
+Generated with item-reconstruction.py
+System: Linux-6.18.44-fc-v185-x86_64-with-glibc2.39, x86_64, Python 3.12.3, numpy 2.4.4
+Backend: creating_intelligence.memory_python
+Date: 2026-11-02
+
+Consistency check (N=60, P=5, 300 items): bit table 11542 bits, Memory 11542 bits -> ok
+
+N=1000, P=10, nominal capacity C=959,818, stored items: 959,818 (1 C)
+Density of off-diagonal bits: 0.5000   (11 s)
+Expected chance 10-cliques in a random memory of density 1/2: 2.0e-13
+
+Element 1: stored items 9650 (expected CP/N = 9598), reconstructed 9650, correct 9650, false 0, missed 0   (8733 seeds, 155 s)
+
+Random baseline (density 1/2), element 1: 0 10-cliques through 2000 random set triples   (49 s)
