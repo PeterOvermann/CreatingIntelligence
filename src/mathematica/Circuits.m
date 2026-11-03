@@ -717,7 +717,8 @@ auto[config_Association] :=
 
 (*
 Temporal-associative memory component. 
-Learns higher-order sequences on the fly and predicts the next token.
+Learns first-order sequences by default (replacement plugin),
+and higher-order sequences with the permutation plugin and capacit > 0.
 A hybrid between auto-associative and hetero-associative architectures.
 Uses the same temporal integration plugins and parameterization as "delay".
 Default plugin: replacement. 
@@ -756,7 +757,7 @@ temporal[config_Association] :=
 	(* Label indicating the number of context blocks. *)
 	label = plugin["label"] <> StringJoin[Table[ "\[EmptySquare]", Length[contextdims]]];
 	
-	(* Memory with identical input and output parameters. *)
+	(* Instantiate the memory. *)
 	M = Memory[Join[config, 
 		<| "A_parameters" -> paramsA, "B_parameters" -> paramsB |> ]];	
 
