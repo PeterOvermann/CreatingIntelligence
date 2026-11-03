@@ -730,7 +730,8 @@ temporal[config_Association] :=
 		
 			Xstate = {}, Xcontext = {}},
 
-	plugin = Lookup[config, "plugin", replacement][config];
+	plugin = Lookup[config, "plugin", replacement][
+		Join[config, <|"receive_blocks" -> config["send_blocks"]|>]];
 
 	(* Memory parameters *)
 	paramsA = Plus @@ config["receive_blocks"];

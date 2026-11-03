@@ -894,8 +894,10 @@ def temporal(config):
             plugin_factory,
             replacement)
 
-    plugin = plugin_factory(config)
-
+    # The update rule acts on the item block only, not on the context blocks.
+    plugin = plugin_factory(
+        {**config, "receive_blocks": config.get("send_blocks", [])})
+        
     receive_blocks = config.get("receive_blocks", [])
     send_blocks = config.get("send_blocks", [])
 

@@ -3005,115 +3005,118 @@ aggregates an orderless temporal state.
 def temporal(config):
     """
     Temporal-associative memory component.
-    Learns higher-order sequences on the fly and predicts the next token.
+    Learns first-order sequences by default (replacement plugin),
+    and higher-order sequences with the permutation plugin and capacity > 0.
     A hybrid between auto-associative and hetero-associative architectures.
     Uses the same temporal integration plugins and parameterization as
-    "delay". Default plugin: permutation. With latch (default), empty input
-    gives empty output and leaves the component unchanged (event-driven).
+    "delay". Default plugin: replacement.
+    The first input block is the item; further input blocks are context.
+    Learns (previous state & previous context) -> current item, and returns
+    the prediction for the next item only.
     """
-    plugin_factory = config.get("plugin", permutation)
+    plugin_factory = config.get("plugin", replacement)
 
     if isinstance(plugin_factory, str):
         import sys
         plugin_factory = getattr(
             sys.modules[__name__],
             plugin_factory,
-            permutation)
+            replacement)
 
-    plugin = plugin_factory(config)
-
+    # The update rule acts on the item block only, not on the context blocks.
+    plugin = plugin_factory(
+        {**config, "receive_blocks": config.get("send_blocks", [])})
+        
     receive_blocks = config.get("receive_blocks", [])
-    dims = [b[0] for b in receive_blocks]
+    send_blocks = config.get("send_blocks", [])
 
-    params = [sum(b[0] for b in receive_blocks), sum(b[1]
-                                                     for b in receive_blocks)]
-    pop = params[1] if len(params) > 1 else 0
+    # Memory parameters
+    paramsA = [sum(b[0] for b in receive_blocks),
+               sum(b[1] for b in receive_blocks)]
+    paramsB = list(send_blocks[0])
+    Nitem, Pitem = paramsB
 
-
-    # Limit size of query pattern, relative to pop.
-    # Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
+    contextdims = [b[0] for b in receive_blocks[1:]]
+    if contextdims:
+        Ncontext = sum(b[0] for b in receive_blocks[1:])
+        Pcontext = sum(b[1] for b in receive_blocks[1:])
     else:
-        absratelimit = sum(dims)
+        Ncontext, Pcontext = 0, 0
 
+    # Absolute rate limits. Default: unlimited.
+    limititem = round(Pitem * config.get("rate_limit", Nitem / Pitem))
+    limitcontext = (round(Pcontext * config.get("rate_limit", Ncontext / Pcontext))
+                    if Pcontext > 0 else 0)
+
+    # Pre-integration decay (leak rate).
     decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 1.0)
-    abscapacity = round(capacity_factor * pop)
+    # Temporal capacity, carry over from previous cycle.
+    abscapacity = round(Pitem * config.get("capacity", 0.0))
+    # Proportional stochastic subsampling for memory query.
     decimation = config.get("decimate", 1.0)
-    # Latch: empty input leaves the component unchanged
-    latch = config.get("latch", True)
 
-    # Memory with identical input and output parameters
+    # Label indicating the number of context blocks.
+    label = plugin["label"] + "\u25a1" * len(contextdims)
+
+    # Instantiate the memory.
     m_config = dict(config)
     m_config.update({
-        "A_parameters": params,
-        "B_parameters": params
+        "A_parameters": paramsA,
+        "B_parameters": paramsB
     })
-
     M = Memory(m_config)
+
     Xstate = []
-    prediction = []
+    Xcontext = []
 
-    def f(*blocks):
-        nonlocal Xstate, prediction
-        X = multiset_block_join(list(blocks), dims)
+    def f(item, *blocks):
+        nonlocal Xstate, Xcontext
 
-        # Latch: empty input gives empty output, no learning, no state update
-        if not X and latch:
-            return tuple(multiset_block_split([], dims))
+        # Multiset rate limiting of the current item.
+        X = item
+        if len(X) > limititem:
+            X = sorted(rng.choice(X, size=limititem, replace=False).tolist())
 
-        # Rate limiting equally applies to positive and negative elements
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Pre-integration stochastic decay
+        # Pre-integration stochastic decay of previous state.
         if decay > 0.0:
             keep_size = math.floor((1.0 - decay) * len(Xstate))
             Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=keep_size,
-                    replace=False).tolist())
+                rng.choice(Xstate, size=keep_size, replace=False).tolist())
 
-        # Always learn.
-        M["store"](resolve_normal(Xstate), resolve_normal(X))
+        # Always learn (previous state & previous context) -> current item.
+        M["store"](resolve_block_join_normal([Xstate, Xcontext], [Nitem, Ncontext]),
+                   resolve_normal(X))
 
-        # Multiset subsampling applied to previous state
+        # Multiset rate limiting of the items of the current context.
+        Xcontext = multiset_block_join(list(blocks), contextdims)
+        if len(Xcontext) > limitcontext:
+            Xcontext = sorted(
+                rng.choice(Xcontext, size=limitcontext, replace=False).tolist())
+
+        # Multiset subsampling applied to previous state.
         if len(Xstate) > abscapacity:
             Xstate = sorted(
-                rng.choice(
-                    Xstate,
-                    size=abscapacity,
-                    replace=False).tolist())
+                rng.choice(Xstate, size=abscapacity, replace=False).tolist())
 
-        # Temporal integration via update rules
+        # Temporal integration via update rules.
         Xstate = plugin["updaterule"](X, Xstate)
 
-        # Proportional multiset subsampling applied to the integrated state
-        Xdec = Xstate
+        # Proportional multiset subsampling applied to the integrated state,
+        # to break symmetry during retrieval.
+        Xdec = multiset_block_join([Xstate, Xcontext], [Nitem, Ncontext])
         if decimation < 1.0:
             sample_size = math.floor(decimation * len(Xdec))
             Xdec = sorted(
-                rng.choice(
-                    Xdec,
-                    size=sample_size,
-                    replace=False).tolist())
+                rng.choice(Xdec, size=sample_size, replace=False).tolist())
 
-        # Predict next token
-        prediction = M["retrieve"](resolve_normal(Xdec))
-
-        return tuple(multiset_block_split(prediction, dims))
+        # Predict next token.
+        return (M["retrieve"](resolve_normal(Xdec)),)
 
     result = dict(plugin)
     result.update({
         "function": f,
-        "checks": ["arginp", "argout", "ident"],
-        "shape": "square", "fill": 14
+        "checks": ["dimfirst", "oneout"],
+        "shape": "square", "label": label, "size": 10, "fill": 14
     })
     result.update(M)
 
