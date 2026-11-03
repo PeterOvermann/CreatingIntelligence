@@ -3394,6 +3394,7 @@
         },
         {
           "component": "temporal",
+          "plugin": "permutation",
           "send": [21],
           "receive": [11],
           "capacity": 3.0,

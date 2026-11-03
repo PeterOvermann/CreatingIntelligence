@@ -725,7 +725,7 @@ Default plugin: replacement.
 *)
 
 temporal[config_Association] := 
-	Module[ {f, M, plugin, decay, decimation, label,
+	Module[ {f, M, plugin, decay, decimation, label, size,
 		limititem, limitcontext, abscapacity,
 		paramsA, paramsB, contextdims, Nitem, Pitem, Ncontext, Pcontext,
 		
@@ -756,6 +756,7 @@ temporal[config_Association] :=
 	
 	(* Label indicating the number of context blocks. *)
 	label = plugin["label"] <> StringJoin[Table[ "\[EmptySquare]", Length[contextdims]]];
+	size = If[Length[contextdims] == 0, plugin["size"], 10];
 	
 	(* Instantiate the memory. *)
 	M = Memory[Join[config, 
@@ -798,7 +799,7 @@ temporal[config_Association] :=
 		];
 
 	Join[ plugin, <| "function" -> f, "checks" -> {"dimfirst", "oneout"},
-		"shape" -> "square", "label"->label, "size" -> 10, "fill" -> 14 |>, M]	
+		"shape" -> "square", "label"->label, "size" -> size, "fill" -> 14 |>, M]	
 	]
 
 
@@ -1035,6 +1036,8 @@ heteroencoder[config_Association] :=
 	]
 
 
+(* UNDOCUMENTED COMPONENT *)
+
 (*
 Generates a prediction based on the current input (slot #1) 
 and context (slots #2,...).
@@ -1089,6 +1092,8 @@ noise[config_Association] := Module[ {f},
 		"fill" -> 13, "size" -> 18 |>
 	]	
 
+
+(* UNDOCUMENTED COMPONENT *)
 
 (* 
 Source of empty sets: a dummy input for receive slots that are 
