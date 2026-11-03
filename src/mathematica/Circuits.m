@@ -579,8 +579,7 @@ delay[config_Association] :=
 
 
 (* 
-Plug-ins for update rules ("auto" component") 
-and temporal integration ("delay" component).
+Update rule plugins.
 *)
 
 
