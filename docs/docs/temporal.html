@@ -109,7 +109,6 @@
 <li><a href="noise.html">noise</a></li>
 <li><a href="auto.html">auto</a></li>
 <li><a href="associator.html">associator</a></li>
-<li><a href="predictor.html">predictor</a></li>
 <li><a href="heteroencoder.html">heteroencoder</a></li>
 <li><a href="temporal.html">temporal</a></li>
 </ul></li>
@@ -161,20 +160,16 @@ class="sidebar-icon">π</span>permutation</a></li>
         <li>Learns the association of the previous state with the
         current input.</li>
         <li>Predicts the next input based on the current state.</li>
+        <li>Supports temporal integration of signals across evaluation
+        cycles, governed by update rule plugins.</li>
+        <li>The state consists of the temporally integrated signal
+        combined with optional context blocks.</li>
         <li>Always learns, even when the prediction is correct. This may
         broaden the base temporal associations.</li>
         <li>A closed feedback loop enables generative behavior.</li>
-        <li>Uses update rule plugins to control the mechanics of
-        temporal integration.</li>
-        <li>Supports temporal integration of signals across evaluation
-        cycles, governed by update rule plugins.</li>
         <li>With the <a
         href="permutation.html"><code>permutation</code></a> update
         rule, the temporal order of inputs is preserved.</li>
-        <li>With <code>latch</code> (default), the component is
-        event-driven, so empty cycles are skipped entirely.</li>
-        <li>Supports the same set of update rules as the <a
-        href="delay.html"><code>delay</code></a> component.</li>
         <li>Controls sparsity through stochastic subsampling
         mechanisms.<br />
         </li>
@@ -211,16 +206,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tr>
         <td style="text-align: left;"><code>plugin</code></td>
         <td style="text-align: center;"><a
-        href="permutation.html"><code>permutation</code></a></td>
+        href="permutation.html"><code>replacement</code></a></td>
         <td style="text-align: left;">update rule, governing the
         temporal integration logic</td>
-        </tr>
-        <tr>
-        <td style="text-align: left;"><code>latch</code></td>
-        <td style="text-align: center;">true</td>
-        <td style="text-align: left;">whether an empty input gives empty
-        output and leaves the component unchanged (no learning, no state
-        update)</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>rate_limit</code></td>
@@ -236,9 +224,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         <tr>
         <td style="text-align: left;"><code>capacity</code></td>
-        <td style="text-align: center;">1</td>
+        <td style="text-align: center;">0</td>
         <td style="text-align: left;">relative population carried over
-        from previous state (bypassed with <code>replacement</code>
+        from previous state (has no effect with <code>replacement</code>
         plugin)</td>
         </tr>
         <tr>
@@ -253,23 +241,6 @@ class="sidebar-icon">π</span>permutation</a></li>
         <p>Use standard <a href="components.html">style options</a> to
         customize the component’s appearance in circuit schematics.</p>
         <h2
-        id="temporal-associative-memory-with-state-permutation">Temporal
-        associative memory with state permutation</h2>
-        <p>The <code>temporal</code> component applies the <a
-        href="permutation.html"><code>permutation</code></a> update rule
-        by default. This mechanism accumulates a temporal state by
-        iteratively permuting it at every timestep, encoding the
-        ordering of prior inputs.</p>
-        <div class="sourceCode" id="cb1"><pre
-        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;temporal&quot;</span><span class="fu">,</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;capacity&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
-        <p><img width="240" alt="image" src="img/temporal_permutation.png"><br></p>
-        <h2
         id="temporal-associative-memory-with-replacement-update">Temporal
         associative memory with replacement update</h2>
         <p>With the <a
@@ -277,15 +248,31 @@ class="sidebar-icon">π</span>permutation</a></li>
         rule, the current input replaces the internal state, bypassing
         the <code>capacity</code> setting. This mechanism directly
         associates each signal to the subsequent signal.</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;temporal&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;replacement&quot;</span><span class="fu">,</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+        <p><img width="240" alt="image" src="img/temporal_replacement.png"><br></p>
+        <h2
+        id="temporal-associative-memory-with-state-permutation">Temporal
+        associative memory with state permutation</h2>
+        <p>The <code>temporal</code> component with the <a
+        href="permutation.html"><code>permutation</code></a> update rule
+        accumulates a temporal state by iteratively permuting it at
+        every timestep, encoding the ordering of prior inputs.</p>
         <div class="sourceCode" id="cb2"><pre
         class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;hyperparameters&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;default&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1000</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">},</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;temporal&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;replacement&quot;</span><span class="fu">,</span> </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;temporal&quot;</span><span class="fu">,</span> <span class="dt">&quot;plugin&quot;</span><span class="fu">:</span> <span class="st">&quot;permutation&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;capacity&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
-        <p><img width="240" alt="image" src="img/temporal_replacement.png"><br></p>
+        <p><img width="240" alt="image" src="img/temporal_permutation.png"><br></p>
         <h2
         id="temporal-associative-memory-with-difference-update">Temporal
         associative memory with difference update</h2>

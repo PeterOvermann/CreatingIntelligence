@@ -104,7 +104,10 @@ ResolveGraded[x_List] := Module[{AE, AI, countsE, countsI},
 Transparently joins multisets. Preserves duplicates and negative signs. 
 *)
 
-MultisetBlockJoin[blocks : {__List}, dims : {__Integer}] := Module[{offsets},
+MultisetBlockJoin[blocks : {___List}, dims : {___Integer}] := Module[{offsets},
+	
+	If[ dims === {}, Return[{}]];
+	
 	(* Calculate the starting index for each block *)
 	offsets = FoldList[Plus, 0, Most[dims]];
 	
@@ -717,54 +720,66 @@ Temporal-associative memory component.
 Learns higher-order sequences on the fly and predicts the next token.
 A hybrid between auto-associative and hetero-associative architectures.
 Uses the same temporal integration plugins and parameterization as "delay".
-Default plugin: permutation. With latch (default), empty input gives empty
-output and leaves the component unchanged (event-driven).
+Default plugin: replacement. 
 *)
 
 temporal[config_Association] := 
-	Module[ {f, M, plugin, dims, params, pop, decay, decimation, 
-			absratelimit, abscapacity, latch, Xstate = {}, Xdec, prediction = {}},
+	Module[ {f, M, plugin, decay, decimation, label,
+		limititem, limitcontext, abscapacity,
+		paramsA, paramsB, contextdims, Nitem, Pitem, Ncontext, Pcontext,
+		
+			Xstate = {}, Xcontext = {}},
 
-	plugin = Lookup[config, "plugin", permutation][config];
+	plugin = Lookup[config, "plugin", replacement][config];
 
-	dims = First /@ config["receive_blocks"];
-	params = Plus @@ config["receive_blocks"];
-	pop  = Last[params];
+	(* Memory parameters *)
+	paramsA = Plus @@ config["receive_blocks"];
+	{Nitem, Pitem} = paramsB = First[config["send_blocks"]];
 	
-	(* Limit size of query pattern. Default: unlimited. *)			
-	absratelimit = Round[pop * Lookup[config, "rate_limit", Total[dims]/pop]];	
+	contextdims = First /@ Rest[config["receive_blocks"]];
+	
+	{Ncontext, Pcontext} = 
+		If[Length[contextdims] > 0, Plus @@ Rest[config["receive_blocks"]], {0, 0}];
+	
+	(* Absolute rate limits. Default: unlimited. *)			
+	limititem = Round[Pitem * Lookup[config, "rate_limit", Nitem/Pitem]];
+	limitcontext = If[Pcontext > 0,
+		Round[Pcontext * Lookup[config, "rate_limit", Ncontext/Pcontext]], 0];
+
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
-	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
+	abscapacity = Round[ Pitem * Lookup[config, "capacity", 0]];				
 	(* Proportional stochastic subsampling for memory query. *)
 	decimation = Lookup[config, "decimate", 1];
-	(* Latch: empty input leaves the component unchanged. *)
-	latch = Lookup[config, "latch", True];
-
+	
+	(* Label indicating the number of context blocks. *)
+	label = plugin["label"] <> StringJoin[Table[ "\[EmptySquare]", Length[contextdims]]];
+	
 	(* Memory with identical input and output parameters. *)
 	M = Memory[Join[config, 
-		<| "A_parameters" -> params, "B_parameters" -> params |> ]];	
+		<| "A_parameters" -> paramsA, "B_parameters" -> paramsB |> ]];	
 
-
-	f[blocks__List] := Module[ {X},
+	f[item_List, blocks___List] := Module[ {X, Xdec},
 		
-		X = MultisetBlockJoin[ {blocks}, dims];
+		(* Multiset rate limiting of the current item. *)
+		X = item;
+		If[Length[X] > limititem, 
+			X = Sort[RandomSample[X, limititem]]]; 
 
-		(* Latch: empty input gives empty output, no learning, no state update. *)
-		If[X === {} && latch, Return[Unevaluated[Sequence @@ (({} &) /@ dims)]]];
-		
-		(* Rate limiting equally applies to positive and negative elements *)
-		If[Length[X] > absratelimit, 
-			X = Sort[RandomSample[X, absratelimit]]]; 
-
-		(* Pre-integration stochastic decay. *)
+		(* Pre-integration stochastic decay of previous state. *)
 		If[decay > 0, Xstate = 
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
+		
+		(* Always learn {previous state & previous context) -> current item. *)
+		M["store"][ResolveBlockJoinNormal[{Xstate, Xcontext}, {Nitem, Ncontext}], 
+			ResolveNormal[X]];
 
-		(* Always learn. *)
-		M["store"][ResolveNormal[Xstate], ResolveNormal[X]];
-
+		(* Multiset rate limiting of the item of the current context. *)
+		Xcontext = MultisetBlockJoin[ {blocks}, contextdims];
+		If[Length[Xcontext] > limitcontext, 
+			Xcontext = Sort[RandomSample[Xcontext, limitcontext]]]; 
+				
 		(* Multiset subsampling applied to previous state. *)
 		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
 	
@@ -773,19 +788,16 @@ temporal[config_Association] :=
 
 		(* Proportional multiset subsampling applied to the integrated state,
 		 to break symmetry during retrieval. *)
-		Xdec = Xstate;
+		Xdec = MultisetBlockJoin[{Xstate, Xcontext}, {Nitem, Ncontext}];
 		If[decimation < 1,  
 			Xdec = Sort[RandomSample[Xdec, Floor[decimation * Length[Xdec]]]]]; 
 
 		(* Predict next token. *)
-		prediction = M["retrieve"][ResolveNormal[Xdec]];
-
-		Sequence @@ MultisetBlockSplit[prediction, dims]
+		M["retrieve"][ResolveNormal[Xdec]]
 		];
 
-	Join[ plugin, <| "function" -> f, 
-		"checks" -> {"arginp", "argout", "ident"},
-		"shape" -> "square", "fill" -> 14 |>, M]	
+	Join[ plugin, <| "function" -> f, "checks" -> {"dimfirst", "oneout"},
+		"shape" -> "square", "label"->label, "size" -> 10, "fill" -> 14 |>, M]	
 	]
 
 

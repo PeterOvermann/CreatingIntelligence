@@ -18,7 +18,6 @@
   - [noise](noise.md)
   - [auto](auto.md)
   - [associator](associator.md)
-  - [predictor](predictor.md)
   - [heteroencoder](heteroencoder.md)
   - [temporal](temporal.md)
 

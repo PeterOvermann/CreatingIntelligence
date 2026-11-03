@@ -1,4 +1,4 @@
-# Generated from main on 2026-11-01
+# Generated from main on 2026-11-03
 
 # Source: README.md
 
@@ -2657,136 +2657,6 @@ def associator(config):
 
 
 
-# Source: predictor.md
-
-
-CIRCUIT COMPONENTS
-
-# predictor
-
-<img width="240" alt="image" src="img/predictor.png"><br>
-
-Hetero-associative memory component for predictive learning.
-
-See also: https://creatingintelligence.org/#predictive-learning
-
-
-
-## Details and properties
-
-- Wrapper for a hetero-associative topological memory instance.
-- Associates the data from the previous execution cycle with the current label signal.
-- Typically used as readout node in reservoir architectures.
-- Receives the label from its first `receive` block and data from the remaining blocks.
-- Always learns, also when the prediction was correct.
-- A closed feedback loop enables generative prediction. 
-- Sends the inferred label.
-- Resolves multiset and inhibitory input prior to processing.
-
-
-<br>
-
- 
-| Property        | Default | Description |
-|:------------|:-----:|:----------------------------------------|
-| `send`        |  *required*    |  integer, representing a single output slot |
-| `receive`     |  *required*    |  two or more input slots with pathway tags |
-| `threshold`     | *automatic*    |  relative pattern matching threshold  |
-| `residual`      | *unlimited*    |  non-matching query elements that may be absorbed as noise, relative to the input population; 0 requires a full match ([details](design_principles.md#full-and-partial-matching-with-residual)) |
-
-<br>
-
-Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
-
-
-
-## Predictive learning
-
-
-A basic setup for predictive learning with hetero-associative memory:
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1], "label": "label"},
-	{"component": "input", "send": [2], "label": "data"},
-	{"component": "predictor", "send": [11], "receive": [1, 2]},
-	{"component": "output", "receive": [11], "label": "pred"}
-  ]}
-```
-
-<img width="240" alt="image" src="img/predictor_circuit.png"><br>
-
-
-
-## Source code
-
-```python
-def predictor(config):
-    """
-    Generates a prediction based on the current input (slot #1) 
-    and context (slots #2,...).
-    Automatically learns the correct prediction in the following cycle.
-    """
-    receive_blocks = config.get("receive_blocks", [])
-    itemconfig = receive_blocks[0]
-    contextconfig = receive_blocks[1:]
-
-    # Extract decimation parameter, defaulting to 1.0
-    decimation = config.get("decimate", 1.0)
-
-    params_A = [sum(b[0] for b in contextconfig), sum(b[1]
-                    for b in contextconfig)]
-    params_B = itemconfig
-
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params_A,
-        "B_parameters": params_B
-    })
-
-    M = Memory(m_config)
-    X = []
-    prediction = []
-
-    def f(item, *blocks):
-        nonlocal X, prediction
-        Y = resolve_normal(item)
-
-        M["store"](X, Y) # always learn
-
-        X = resolve_block_join_normal(
-            list(blocks), [b[0] for b in contextconfig])
-
-        # Apply stochastic subsampling to X before retrieval
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(X))
-            Xdec = sorted(
-                rng.choice(
-                    X,
-                    size=sample_size,
-                    replace=False).tolist())
-        else:
-            Xdec = X
-
-        prediction = M["retrieve"](Xdec)
-
-        return (prediction,)
-
-    result = {
-        "function": f,
-        "checks": ["dimfirst", "oneout"],
-        "shape": "square", "fill": 11, "size": 18, "label": "▶▶"
-    }
-    result.update(M)
-    return result
-```
-
-
-
-
-
-
 # Source: heteroencoder.md
 
 
@@ -3001,13 +2871,11 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 
 - Learns the association of the previous state with the current input.
 - Predicts the next input based on the current state.
+- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
+- The state consists of the temporally integrated signal combined with optional context blocks.
 - Always learns, even when the prediction is correct. This may broaden the base temporal associations.
 - A closed feedback loop enables generative behavior.
-- Uses update rule plugins to control the mechanics of temporal integration.
-- Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
 - With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
-- With `latch` (default), the component is event-driven, so empty cycles are skipped entirely.
-- Supports the same set of update rules as the [`delay`](delay.md) component.
 - Controls sparsity through stochastic subsampling mechanisms.  
 - Represents the integrated state as a multiset.
 - Supports multiple input or output blocks.
@@ -3020,37 +2888,15 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 |:------------|:-----:|:----------------------------------------|
 | `send`        |  *required*    |  `[integer,...]` representing one or more output slots |
 | `receive`     |  *required*    |  one or more input slots with pathway tags |
-| `plugin`	    | [`permutation`](permutation.md) | update rule, governing the temporal integration logic |  
-| `latch`	    | true | whether an empty input gives empty output and leaves the component unchanged (no learning, no state update) |  
+| `plugin`	    | [`replacement`](permutation.md) | update rule, governing the temporal integration logic |  
 | `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
-| `capacity`      | 1    | relative population carried over from previous state (bypassed with `replacement` plugin) |
+| `capacity`      | 0    | relative population carried over from previous state (has no effect with `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |
 
 <br>
 
 Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
-
-
-## Temporal associative memory with state permutation
-
-The `temporal` component applies the [`permutation`](permutation.md) update rule by default.
-This mechanism accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
-
-
-```json
-{ "hyperparameters": {"default": [1000, 10]},
-  "dataflow": [
-	{"component": "input", "send": [1]},
-	{"component": "temporal", 
-		"send": [11], "receive": [1], "capacity": 2},
-	{"component": "output", "receive": [11]}
-  ]}
-```
-
-<img width="240" alt="image" src="img/temporal_permutation.png"><br>
-
-
 
 
 ## Temporal associative memory with replacement update
@@ -3072,6 +2918,28 @@ each signal to the subsequent signal.
 ```
 
 <img width="240" alt="image" src="img/temporal_replacement.png"><br>
+
+
+
+## Temporal associative memory with state permutation
+
+The `temporal` component with the [`permutation`](permutation.md) update rule accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
+
+
+```json
+{ "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [1]},
+	{"component": "temporal", "plugin": "permutation",
+		"send": [11], "receive": [1], "capacity": 2},
+	{"component": "output", "receive": [11]}
+  ]}
+```
+
+<img width="240" alt="image" src="img/temporal_permutation.png"><br>
+
+
+
 
 
 
@@ -3275,8 +3143,7 @@ See also: https://creatingintelligence.org/#update-rules
 
 ## Details
 
-- Plugin for [`auto`](auto.md), [`delay`](delay.md), and [`temporal`](temporal.md) components.
-- Default update rule for [`auto`](auto.md) and [`delay`](delay.md).
+- Default update rule for [`auto`](auto.md), [`delay`](delay.md) and [`temporal`](temporal.md) components.
 - Bypasses the component's `capacity` setting.
 - Transparently handles multisets and inhibitory signals.
 

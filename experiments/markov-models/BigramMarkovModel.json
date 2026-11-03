@@ -14,7 +14,7 @@
 
 	{"component": "delay", "send": [62], "receive": [61], "rate_limit": 3.0},
 
-	{"component": "predictor", "send": [101], "receive": [11, [11, 61]]},
+	{"component": "temporal", "send": [101], "receive": [11, 61]},
 
 	{"component": "output", "plugin": "codec", "receive": [101]}
   ]
