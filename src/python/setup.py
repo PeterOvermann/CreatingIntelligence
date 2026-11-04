@@ -72,6 +72,8 @@ libmemory_ext = Extension(
         "Memory_get_threshold",
         "Memory_set_residual",
         "Memory_get_residual",
+        "Memory_get_matching",
+        "Memory_clear_matching",
         "Memory_count",
         "Memory_free",
         "Memory_write",
