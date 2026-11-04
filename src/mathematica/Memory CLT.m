@@ -20,7 +20,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 Memory[config_Association] :=
 
 	Module[ {process, NA, PA, NB, PB, tostr, opt = Nothing, T = Nothing, 
-		ropt = Nothing, residual = Nothing, store, retrieve, clear, memorycount},
+		ropt = Nothing, residual = Nothing, store, retrieve, matching, clear, 
+		memorycount},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -64,6 +65,14 @@ Memory[config_Association] :=
 			ToExpression /@ StringSplit[str]
 			];
 
+		(* Matching elements from the last retrieval. Empty upon 
+			initialization and after a failed retrieval. *)
+		matching := Module[ {str},
+			WriteLine[process, "matching"];
+			str = ReadLine[process];
+			If[ str === "", {}, ToExpression /@ StringSplit[str]]
+			];
+
 		clear := KillProcess[process];
 		memorycount := (WriteLine[process, "memorycount"]; 
 								ToExpression[ReadLine[process]]);
@@ -75,12 +84,12 @@ Memory[config_Association] :=
 			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
+			"matching" :> matching,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "C_CLT"
 		|> 
 		]
-
 
 
 Memory::params  = "Invalid hyperparameters: `1`";

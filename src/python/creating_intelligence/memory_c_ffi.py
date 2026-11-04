@@ -82,6 +82,12 @@ lib.Memory_set_residual.restype = None
 lib.Memory_get_residual.argtypes = [ctypes.c_void_p]
 lib.Memory_get_residual.restype = ctypes.c_int
 
+lib.Memory_get_matching.argtypes = [ctypes.c_void_p]
+lib.Memory_get_matching.restype = ctypes.POINTER(CSet)
+
+lib.Memory_clear_matching.argtypes = [ctypes.c_void_p]
+lib.Memory_clear_matching.restype = None
+
 lib.Memory_count.argtypes = [ctypes.c_void_p]
 lib.Memory_count.restype = ctypes.c_int64
 
@@ -139,6 +145,7 @@ def Memory(config: dict) -> dict:
 
     def retrieve(A):
         if len(A) == 0: 
+            lib.Memory_clear_matching(M)
             return []
             
         cset_A, _ref_A = _make_cset(A, NA)
@@ -156,6 +163,12 @@ def Memory(config: dict) -> dict:
         res_set = res_ptr.contents
         return [res_set.a[i] + 1 for i in range(res_set.p)]
         
+    def matching():
+        # Matching elements from the last retrieval. Empty upon
+        # initialization and after a failed retrieval.
+        X = lib.Memory_get_matching(M).contents
+        return [X.a[i] + 1 for i in range(X.p)]
+
     def memorycount():
         return lib.Memory_count(M)
 
@@ -169,6 +182,7 @@ def Memory(config: dict) -> dict:
         "residual": residual,
         "store": store,
         "retrieve": retrieve,
+        "matching": matching,
         "clear": clear,
         "memorycount": memorycount,
         "backend": "c_ffi"

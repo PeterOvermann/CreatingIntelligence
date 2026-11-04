@@ -24,6 +24,20 @@ DLLEXPORT void TAMsetresidual (void *m, int r)
 DLLEXPORT int TAMgetresidual(void *m)
 	{ return Memory_get_residual( (Memory*) m); }
 
+// Matching elements from the last retrieval. Xbits needs room for Adimension
+// elements. Xpop is 0 upon initialization and after a failed retrieval.
+DLLEXPORT void TAMgetmatching(void *m, int *Xbits, int *Xpop)
+	{
+	Set *X = Memory_get_matching((Memory*) m);
+
+	// Convert X to 1-based numbering. X can be an empty list.
+	*Xpop = X->p; for (int i = 0; i < X->p; i++) Xbits[i] = X->a[i] + 1;
+	}
+
+// Clear the matching elements, for retrievals that skip the C backend.
+DLLEXPORT void TAMclearmatching(void *m)
+	{ Memory_clear_matching((Memory*) m); }
+
 DLLEXPORT int TAMmemory(void *m)
 	{ return Memory_count ( (Memory*) m); }
 

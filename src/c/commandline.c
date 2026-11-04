@@ -51,6 +51,9 @@ static void print_help(void)
 	printf("Matching residual\n");
 	printf("   residual\n\n");
 
+	printf("Matching elements from last retrieval\n");
+	printf("   matching\n\n");
+
 	printf("Memory count (bits)\n");
 	printf("   memorycount\n\n");
 
@@ -141,6 +144,10 @@ int main(int argc, char *argv[])
 
 		else if ( strcmp(inputline, "residual\n") == 0)
 			{ printf("%d\n", Memory_get_residual(H)); fflush(stdout);}
+
+		// Matching elements from the last retrieval (or an empty line).
+		else if ( strcmp(inputline, "matching\n") == 0)
+			{ Set_print(Memory_get_matching(H), 1); printf("\n"); fflush(stdout);}
 
 		else if ( strcmp(inputline, "quit\n") == 0)
 			return 0;

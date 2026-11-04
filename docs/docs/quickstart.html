@@ -273,11 +273,12 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;B_parameters&#39;</span>: (<span class="dv">1000</span>, <span class="dv">10</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;T&#39;</span>: <span class="dv">7</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;backend&#39;</span>: <span class="st">&#39;c_ffi&#39;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;clear&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.clear at <span class="bn">0x10d7fcd50</span><span class="op">&gt;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;memorycount&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.memorycount at <span class="bn">0x109b95380</span><span class="op">&gt;</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;residual&#39;</span>: <span class="dv">1000</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;retrieve&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.retrieve at <span class="bn">0x109a65c70</span><span class="op">&gt;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;store&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.store at <span class="bn">0x109a65d20</span><span class="op">&gt;</span>}</span></code></pre></div>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;clear&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.clear at <span class="bn">0x10c9ce090</span><span class="op">&gt;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;matching&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.matching at <span class="bn">0x10a6ce8d0</span><span class="op">&gt;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;memorycount&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.memorycount at <span class="bn">0x10c9cdfe0</span><span class="op">&gt;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;residual&#39;</span>: <span class="dv">1000</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;retrieve&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.retrieve at <span class="bn">0x10a61ecf0</span><span class="op">&gt;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a> <span class="st">&#39;store&#39;</span>: <span class="op">&lt;</span>function Memory.<span class="op">&lt;</span><span class="bu">locals</span><span class="op">&gt;</span>.store at <span class="bn">0x10a61eda0</span><span class="op">&gt;</span>}</span></code></pre></div>
         <p>Store an autoassociation in memory, then retrieve it from a
         partial, noisy query pattern:</p>
         <p><strong>Code</strong></p>
@@ -323,6 +324,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tr>
         <td style="text-align: left;"><code>store</code></td>
         <td style="text-align: left;">write to memory</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;"><code>matching</code></td>
+        <td style="text-align: left;">matching subset of last query</td>
         </tr>
         <tr>
         <td style="text-align: left;"><code>retrieve</code></td>

@@ -28,13 +28,18 @@ The above configuration rendered as schematics:
 
 <br>
 
-The  `Circuit` factory function compiles a circuit configuration (dict or  JSON) and returns a dispatch dictionary. This output includes a `function` property, representing the set-processing function defined by the circuit.  
+The `Circuit` factory function compiles a circuit configuration (dict or JSON)
+and returns a dispatch dictionary. This output includes a `function` property,
+representing the set-processing function defined by the circuit.
 
-The circuit `function` takes one argument per input component, and returns a tuple consisting of one element per output component.
+The circuit `function` takes one argument per input component, and returns a
+tuple consisting of one element per output component.
 
-The default type of input and output blocks is mathematical sets or multisets. Excitatory
-signals are represented as positive integers, while their negative counterparts represent
-inhibitory signals. Optional input encoders and output decoders convert between external datatypes and the internal set-based representations.
+The default type of input and output blocks is mathematical sets or multisets.
+Excitatory signals are represented as positive integers, while their negative
+counterparts represent inhibitory signals. Optional input encoders and output
+decoders convert between external datatypes and the internal set-based
+representations.
 
 
 
@@ -117,11 +122,12 @@ pprint(mem)
  'B_parameters': (1000, 10),
  'T': 7,
  'backend': 'c_ffi',
- 'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
- 'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
+ 'clear': <function Memory.<locals>.clear at 0x10c9ce090>,
+ 'matching': <function Memory.<locals>.matching at 0x10a6ce8d0>,
+ 'memorycount': <function Memory.<locals>.memorycount at 0x10c9cdfe0>,
  'residual': 1000,
- 'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
- 'store': <function Memory.<locals>.store at 0x109a65d20>}
+ 'retrieve': <function Memory.<locals>.retrieve at 0x10a61ecf0>,
+ 'store': <function Memory.<locals>.store at 0x10a61eda0>}
 ```
 
 Store an autoassociation in memory, then retrieve it from a partial, noisy query pattern:
@@ -149,6 +155,7 @@ Properties of the output dictionary:
 | `T` |  retrieval pattern matching threshold   |
 | `residual` |  absolute number of non-matching query elements that may be absorbed as noise (N if unlimited)  |
 | `store` |  write to memory  |
+| `matching` | matching subset of last query |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
 | `backend` |   backend version identifier  |
@@ -163,8 +170,8 @@ written in Standard C is used. Switch to a native Python
  MEMORY_BACKEND="python"
  ```
 
-The same mechanism allows custom backend versions to be plugged into the framework
-and selected via the environment variable.
+The same mechanism allows custom backend versions to be plugged into the
+framework and selected via the environment variable.
 
  
 

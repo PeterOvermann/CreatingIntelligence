@@ -26,8 +26,8 @@ Memory[config_Association] :=
 
 	Module[ 
 		{M, NA, PA, NB, PB, T, new, setthreshold, getthreshold, setresidual,
-		getresidual, memory, read, write, store, retrieve, 
-		free, clear, memorycount},
+		getresidual, getmatching, clearmatching, memory, read, write, store, 
+		retrieve, matching, free, clear, memorycount},
 
 		new = ForeignFunctionLoad["TAM", "TAMnew", 
 			{"CInt", "CInt", "CInt", "CInt"} -> "OpaqueRawPointer"];
@@ -43,6 +43,13 @@ Memory[config_Association] :=
 
 		getresidual = ForeignFunctionLoad["TAM", "TAMgetresidual", 
 			{"OpaqueRawPointer"} -> "CInt"];
+
+		getmatching = ForeignFunctionLoad["TAM", "TAMgetmatching", 
+			{"OpaqueRawPointer", "RawPointer"::["CInt"], 
+			"RawPointer"::["CInt"]} -> "Void"];
+
+		clearmatching = ForeignFunctionLoad["TAM", "TAMclearmatching", 
+			{"OpaqueRawPointer"} -> "Void"];
 
 		memory = ForeignFunctionLoad["TAM", "TAMmemory", 
 			{"OpaqueRawPointer"} -> "CInt"];
@@ -90,11 +97,20 @@ Memory[config_Association] :=
 		
 		(* Retrieve. *)
 		retrieve[A_List] := Module[ {Y, Yn},
-			If[Length[A] === 0, Return[{}]];
+			If[Length[A] === 0, clearmatching[M]; Return[{}]];
 			Y = RawMemoryAllocate["CInt", NB];
 			Yn = RawMemoryAllocate["CInt"];
 			read[M, RawMemoryExport[A, "CInt"], Length[A], Y, Yn];
 			RawMemoryImport[Y, {"List", RawMemoryRead[Yn]}]
+			];
+		
+		(* Matching elements from the last retrieval. Empty upon 
+			initialization and after a failed retrieval. *)
+		matching := Module[ {X, Xn},
+			X = RawMemoryAllocate["CInt", NA];
+			Xn = RawMemoryAllocate["CInt"];
+			getmatching[M, X, Xn];
+			RawMemoryImport[X, {"List", RawMemoryRead[Xn]}]
 			];
 		
 		clear := free[M];
@@ -107,12 +123,12 @@ Memory[config_Association] :=
 			"residual" -> getresidual[M],
 			"store" -> store,
 			"retrieve" -> retrieve,
+			"matching" :> matching,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "C_FFI"
 		|>
 		]
-
 
 
 Memory::params  = "Invalid hyperparameters: `1`";

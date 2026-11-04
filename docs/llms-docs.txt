@@ -1,4 +1,4 @@
-# Generated from main on 2026-11-03
+# Generated from main on 2026-11-04
 
 # Source: README.md
 
@@ -134,13 +134,18 @@ The above configuration rendered as schematics:
 
 <br>
 
-The  `Circuit` factory function compiles a circuit configuration (dict or  JSON) and returns a dispatch dictionary. This output includes a `function` property, representing the set-processing function defined by the circuit.  
+The `Circuit` factory function compiles a circuit configuration (dict or JSON)
+and returns a dispatch dictionary. This output includes a `function` property,
+representing the set-processing function defined by the circuit.
 
-The circuit `function` takes one argument per input component, and returns a tuple consisting of one element per output component.
+The circuit `function` takes one argument per input component, and returns a
+tuple consisting of one element per output component.
 
-The default type of input and output blocks is mathematical sets or multisets. Excitatory
-signals are represented as positive integers, while their negative counterparts represent
-inhibitory signals. Optional input encoders and output decoders convert between external datatypes and the internal set-based representations.
+The default type of input and output blocks is mathematical sets or multisets.
+Excitatory signals are represented as positive integers, while their negative
+counterparts represent inhibitory signals. Optional input encoders and output
+decoders convert between external datatypes and the internal set-based
+representations.
 
 
 
@@ -223,11 +228,12 @@ pprint(mem)
  'B_parameters': (1000, 10),
  'T': 7,
  'backend': 'c_ffi',
- 'clear': <function Memory.<locals>.clear at 0x10d7fcd50>,
- 'memorycount': <function Memory.<locals>.memorycount at 0x109b95380>,
+ 'clear': <function Memory.<locals>.clear at 0x10c9ce090>,
+ 'matching': <function Memory.<locals>.matching at 0x10a6ce8d0>,
+ 'memorycount': <function Memory.<locals>.memorycount at 0x10c9cdfe0>,
  'residual': 1000,
- 'retrieve': <function Memory.<locals>.retrieve at 0x109a65c70>,
- 'store': <function Memory.<locals>.store at 0x109a65d20>}
+ 'retrieve': <function Memory.<locals>.retrieve at 0x10a61ecf0>,
+ 'store': <function Memory.<locals>.store at 0x10a61eda0>}
 ```
 
 Store an autoassociation in memory, then retrieve it from a partial, noisy query pattern:
@@ -255,6 +261,7 @@ Properties of the output dictionary:
 | `T` |  retrieval pattern matching threshold   |
 | `residual` |  absolute number of non-matching query elements that may be absorbed as noise (N if unlimited)  |
 | `store` |  write to memory  |
+| `matching` | matching subset of last query |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
 | `backend` |   backend version identifier  |
@@ -269,8 +276,8 @@ written in Standard C is used. Switch to a native Python
  MEMORY_BACKEND="python"
  ```
 
-The same mechanism allows custom backend versions to be plugged into the framework
-and selected via the environment variable.
+The same mechanism allows custom backend versions to be plugged into the
+framework and selected via the environment variable.
 
  
 
@@ -4333,6 +4340,10 @@ def Memory(config: dict) -> dict:
     mem = {}
     zero = np.zeros(NB + 1, dtype=np.int8)
 
+    # Matching elements from the last retrieval. Empty upon initialization
+    # and after a failed retrieval.
+    last_matching = []
+
     def store(A, B=None):
         if B is None:
             B = A
@@ -4353,6 +4364,8 @@ def Memory(config: dict) -> dict:
                 mem[key] = np.bitwise_or(mem[key], v)
 
     def retrieve(A):
+        nonlocal last_matching
+        last_matching = []
 
         X = A
         
@@ -4403,9 +4416,13 @@ def Memory(config: dict) -> dict:
                 return []
 
             if len(new_X) == P:
+                last_matching = list(new_X)
                 return Y
 
             X = new_X
+
+    def matching():
+        return list(last_matching)
 
     def memorycount():
         return sum(np.sum(v) for v in mem.values())
@@ -4420,6 +4437,7 @@ def Memory(config: dict) -> dict:
         "residual": residual,
         "store": store,
         "retrieve": retrieve,
+        "matching": matching,
         "clear": clear,
         "memorycount": memorycount,
         "backend": "python"
@@ -4478,7 +4496,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, 
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, matching = {},
 				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -4528,6 +4546,7 @@ Memory[config_Association] :=
 		retrieve[A_List] := 
 			Module[ {X, P, Y, Tquery, R, Ri, sub2, v, t, w, ws, h, cutoff},
 			(* Step 1: Initialize. *)
+			matching = {};
 			X = A; 
 			Tquery = Max[T, Length[A] - residual];
 			
@@ -4570,7 +4589,7 @@ Memory[config_Association] :=
 				If[h === Tquery &&  h < Length[X], X = {}; Return[{}]];
 	
 				(* Finished if X has converged. *)
-				If[Length[X] == P, Return[Y]];
+				If[Length[X] == P, matching = X; Return[Y]];
 				
 				(* Step 10: Iterate.  *)
 				]
@@ -4586,6 +4605,7 @@ Memory[config_Association] :=
 			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
+			"matching" :> matching,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "Reference"
@@ -4705,9 +4725,6 @@ typedef struct
 							//  that may be absorbed as noise
 	
 	Set *X;					//	Matching elements from last memory retrieval.
-
-
-
 	} Memory;
 
 
@@ -4721,6 +4738,13 @@ int  Memory_get_threshold (Memory*);
 //	Residual (absolute)
 void   Memory_set_residual (Memory*, int);
 int Memory_get_residual (Memory*);
+
+// Get matching elements from last retrieval
+Set *Memory_get_matching (Memory*);
+
+// Clear matching elements from last retrieval
+void Memory_clear_matching (Memory*);
+
 
 //	Destructor
 void Memory_free (Memory*);

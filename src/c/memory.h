@@ -102,7 +102,7 @@ int Memory_get_residual (Memory*);
 // Get matching elements from last retrieval
 Set *Memory_get_matching (Memory*);
 
-// Get matching elements from last retrieval
+// Clear matching elements from last retrieval
 void Memory_clear_matching (Memory*);
 
 

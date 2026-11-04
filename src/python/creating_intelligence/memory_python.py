@@ -56,6 +56,10 @@ def Memory(config: dict) -> dict:
     mem = {}
     zero = np.zeros(NB + 1, dtype=np.int8)
 
+    # Matching elements from the last retrieval. Empty upon initialization
+    # and after a failed retrieval.
+    last_matching = []
+
     def store(A, B=None):
         if B is None:
             B = A
@@ -76,6 +80,8 @@ def Memory(config: dict) -> dict:
                 mem[key] = np.bitwise_or(mem[key], v)
 
     def retrieve(A):
+        nonlocal last_matching
+        last_matching = []
 
         X = A
         
@@ -126,9 +132,13 @@ def Memory(config: dict) -> dict:
                 return []
 
             if len(new_X) == P:
+                last_matching = list(new_X)
                 return Y
 
             X = new_X
+
+    def matching():
+        return list(last_matching)
 
     def memorycount():
         return sum(np.sum(v) for v in mem.values())
@@ -143,6 +153,7 @@ def Memory(config: dict) -> dict:
         "residual": residual,
         "store": store,
         "retrieve": retrieve,
+        "matching": matching,
         "clear": clear,
         "memorycount": memorycount,
         "backend": "python"
