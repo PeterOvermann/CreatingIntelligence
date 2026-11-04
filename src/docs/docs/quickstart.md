@@ -155,7 +155,7 @@ Properties of the output dictionary:
 | `T` |  retrieval pattern matching threshold   |
 | `residual` |  absolute number of non-matching query elements that may be absorbed as noise (N if unlimited)  |
 | `store` |  write to memory  |
-| `matching` | matching subset of last query |
+| `matching` | matching subset from last query |
 | `retrieve` | read from memory  |
 | `memorycount` |   memory usage (bits)  |
 | `backend` |   backend version identifier  |

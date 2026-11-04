@@ -535,7 +535,7 @@ delay[config_Association] :=
 	(* Pre-integration decay (leak rate). *)			
 	decay = Lookup[config, "decay", 0];
 	(* Temporal capacity, carry over from previous cycle. *)
-	abscapacity = Round[ pop * Lookup[config, "capacity", 1]];				
+	abscapacity = Round[ pop * Lookup[config, "capacity", 0]];				
 	(* Proportional stochastic subsampling. *)
 	decimation = Lookup[config, "decimate", 1];
 	(* Latch option. *)

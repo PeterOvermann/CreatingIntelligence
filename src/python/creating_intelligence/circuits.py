@@ -633,7 +633,7 @@ def delay(config):
         absratelimit = sum(dims1)
 
     decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 1.0)
+    capacity_factor = config.get("capacity", 0.0)
     abscapacity = round(capacity_factor * pop)
     decimation = config.get("decimate", 1.0)
     latch = config.get("latch", False)

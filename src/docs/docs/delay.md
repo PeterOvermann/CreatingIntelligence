@@ -10,10 +10,10 @@ optionally integrating signals over multiple timesteps.
 
 ## Details and properties
 
-- By default, the `delay` component delays the inbound signal by one time step.
+- Delays signal propagation by one time step.
 - Supports temporal integration of signals across evaluation cycles, governed by
  update rule plugins.
-- Uses the same set of update rules for temporal integration as the [`temporal`](temporal.md) component.
+- Uses the same temporal integration mechanism as [`temporal`](temporal.md).
 - Is stateless by default (`replacement` update rule) and stateful with any other update rule.
 - Controls sparsity through stochastic subsampling mechanisms.  
 - Transparently handles multisets and inhibitory signals.
@@ -31,7 +31,7 @@ optionally integrating signals over multiple timesteps.
 | `latch`	    | false | whether to leave the state unchanged if the input is empty (no decay, no capacity subsampling, no update)  |  
 | `rate_limit`    | unlimited | subsample input if population exceeds the rate limit |    
 | `decay`         | 0    | pre-integration decay (leak rate) |
-| `capacity`      | 1    | relative population carried over from previous state (bypassed with default `replacement` plugin) |
+| `capacity`      | 0    | relative population carried over from previous state (bypassed with default `replacement` plugin) |
 | `decimate`      | 1    | proportional stochastic decimation |
 
 <br>
