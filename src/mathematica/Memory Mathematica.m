@@ -28,7 +28,7 @@ See "Memory Reference.nb" for a plain reference implementation.
 Memory[config_Association] :=
 
 	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, capacity, zero,
-		store, retrieve, clear, memorycount, accumulate},
+		store, retrieve, matching = {}, clear, memorycount, accumulate},
 			
 		{NA, PA} = config["A_parameters"];
 		{NB, PB} = config["B_parameters"];
@@ -95,6 +95,8 @@ Memory[config_Association] :=
 		retrieve[A_List] := 
 			Module[{X = A, P, Y, Tquery, R, vals, valsY, t, w, ws, h, cutoff},
 			
+			matching = {};
+			
 			Tquery = Max[T, Length[A] - residual];
 			
 			While[True,
@@ -128,7 +130,7 @@ Memory[config_Association] :=
 				X = Pick[X, UnitStep[w - cutoff], 1];
 
 				If[h === Tquery && h < Length[X], Return[{}]];
-				If[Length[X] == P, Return[Y]];
+				If[Length[X] == P, matching = X; Return[Y]];
 				]
 			];	
   		
@@ -142,6 +144,7 @@ Memory[config_Association] :=
 			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
+			"matching" :> matching,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "Mathematica"

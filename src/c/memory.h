@@ -85,9 +85,6 @@ typedef struct
 							//  that may be absorbed as noise
 	
 	Set *X;					//	Matching elements from last memory retrieval.
-
-
-
 	} Memory;
 
 
@@ -101,6 +98,10 @@ int  Memory_get_threshold (Memory*);
 //	Residual (absolute)
 void   Memory_set_residual (Memory*, int);
 int Memory_get_residual (Memory*);
+
+// Get matching elements from last retrieval
+Set *Memory_get_matching (Memory*);
+
 
 //	Destructor
 void Memory_free (Memory*);

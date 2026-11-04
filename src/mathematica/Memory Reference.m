@@ -26,7 +26,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, 
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, matching = {},
 				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -76,6 +76,7 @@ Memory[config_Association] :=
 		retrieve[A_List] := 
 			Module[ {X, P, Y, Tquery, R, Ri, sub2, v, t, w, ws, h, cutoff},
 			(* Step 1: Initialize. *)
+			matching = {};
 			X = A; 
 			Tquery = Max[T, Length[A] - residual];
 			
@@ -118,7 +119,7 @@ Memory[config_Association] :=
 				If[h === Tquery &&  h < Length[X], X = {}; Return[{}]];
 	
 				(* Finished if X has converged. *)
-				If[Length[X] == P, Return[Y]];
+				If[Length[X] == P, matching = X; Return[Y]];
 				
 				(* Step 10: Iterate.  *)
 				]
@@ -134,6 +135,7 @@ Memory[config_Association] :=
 			"residual" -> residual,
 			"store" -> store,
 			"retrieve" -> retrieve,
+			"matching" :> matching,
 			"clear" :> clear,
 			"memorycount" :> memorycount,
 			"backend" -> "Reference"

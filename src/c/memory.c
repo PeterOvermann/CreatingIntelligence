@@ -597,6 +597,12 @@ int 	Memory_get_residual (Memory *self)
 	return self->residual;
 	}
 
+// Get matching elements from last retrieval
+Set *Memory_get_matching (Memory *self)
+	{
+	return self->X;
+	}
+
 
 void Memory_free (Memory *self)
 	{
@@ -708,7 +714,6 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	Set_copy(X, A);
 
 	// Per-query pattern matching threshold
-	
 	int Tquery = self->T;
 	
 	if (Tquery < X->p - self->residual)
@@ -744,18 +749,15 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 
 		// Step 2: Threshold check.
 		int P = X->p;
-		if (P < Tquery)
-			break; // Y->p = 0 at this point.
+		if (P < Tquery) { X->p = 0; break; } // No match. Y->p = 0 at this point.
 
 		// Initialize total and per-element response vectors.
 		for (int k = 0; k < ny; k++) R[k] = 0;
 		for (int k = 0; k < ny * P; k++) Ri[k] = 0;
-						
-	
+							
 		byte* bytevector = (byte*) memx8; // Has length ny
 	
 		// Step 3: Expansion coding.
-		
 		for (int i = 1; i < P; i++ )
 			for (int j = 0; j < i; j++)
 				{
@@ -792,13 +794,12 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	
 		// Step 5: Select (KWTA with threshold T(T-1)/2)
 		int K = self->Bpopulation; // The K for KWTA.
-
 		
 		// Use Tq(Tq-1)/2 as response threshold.
 		kwta(K, ny, R, Tquery * (Tquery - 1)/2, Y);
 		
 		// Step 6: Threshold check.
-		if (Y->p == 0) {X->p = 0; break;}
+		if (Y->p == 0) {X->p = 0; break;} // No match
 
 		// Step 7: Per-element weights.
 		for (int i = 0; i < P; i++) W[i] = 0;
@@ -818,7 +819,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 		int cutoff = Ws[P - h];
 		
 		if (h < Tquery)
-			{ Y->p = X->p = 0; break; }
+			{ Y->p = X->p = 0; break; } // No match
 		
 		// Step 9: Refine.
 		
@@ -828,7 +829,7 @@ Set* Memory_read (Memory *self, Set *A, Set *Y)
 	
 		// Edge case:
 		if (h == Tquery && h < X->p) 
-			{ Y->p = X->p = 0; break; }
+			{ X->p = Y->p = 0; break; } // No match.
 			
 		if (X->p == P) break; // Success. X has converged.
 	
