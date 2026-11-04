@@ -602,6 +602,11 @@ Set *Memory_get_matching (Memory *self)
 	{
 	return self->X;
 	}
+	
+void Memory_clear_matching (Memory *self)
+	{
+	self->X->p = 0;
+	}
 
 
 void Memory_free (Memory *self)
