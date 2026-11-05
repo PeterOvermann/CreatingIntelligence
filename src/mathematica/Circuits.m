@@ -1184,7 +1184,6 @@ circuit[config_Association] :=
 	If[ {config["receive_blocks"], config["send_blocks"]} =!= params,
 			Message[Circuit::embedded, params]; plugin = <||>];
 		
-	(* Raw evaluation, bypassing encoding and decoding. *)
 	f[blocks__] := plugin["function"][blocks];
 	
 	Join[plugin, 
@@ -1204,11 +1203,8 @@ Circuit`TagMap = <|
 "veto"            -> "X", (* clears all paths if any X path is non-empty *)
 "mandatory"       -> "*", (* clears all paths if any * path is empty *)
 "priority"        -> "!", (* clears all non-! paths if any ! path is non-empty *) 
-"dependency"      -> "&", (* clears & paths if any non-& path is empty (AND) *)
 "fallback"        -> "|", (* clears | paths if any non-| path is non-empty (NOR) *)
-"barrier"         -> "=", (* clears = paths if any = path is empty *)
-"kwta_excitatory" -> "K", (* top-k of positives by multiplicity, ties included *)
-"kwta_absolute"   -> "k", (* top-k of all elements by multiplicity, ties included *)
+"kwta"            -> "k", (* top-k of all elements by multiplicity, ties included *)
 "log"             -> "?", (* print log of path contents *)
 "show_slot"       -> "#", (* render slot number *)
 "show_dimension"  -> "$", (* render N *)
@@ -1245,7 +1241,7 @@ Circuit[expr_] := Module[
 		permutations = <||>,
 
 		(* Runtime functions. *)
-		evaluate, patheval, pathmerge, componenteval,
+		evaluate, patheval, receiveblocks, componenteval,
 									
 		(* This circuit's clock. *)
 		tick = 0,
@@ -1434,7 +1430,7 @@ Circuit[expr_] := Module[
 		If[ MatchQ[config["component"], input | output], Return[]];
 		
 		(* Evaluate received pathways and latch inputs. *)
-		x = pathmerge /@ config["receive_paths"];
+		x = receiveblocks[ config["receive_paths"]];
 			
 		(* This component's callback function. *)
 		result = config["function"][Sequence @@ x]; 
@@ -1499,62 +1495,59 @@ Circuit[expr_] := Module[
 		x
 		];
 		
-
-	(* 
-	Merge pathways. Also apply this if there's only one pathway.
-	*)
-	pathmerge[id_Integer] := pathmerge[ {id}];
-	
-	pathmerge[list : {__Integer}] := 
-		Module[ {x, paths, tags, merged},
-
-		x = patheval /@ list;
-		paths = pathways /@ list;
 		
-		(* List of Booleans with the same length as x. *)
-		tags = Function[t, MemberQ[Lookup[#, "tags", {}], t] & /@ paths];		
-		(* Logical gating. *)
+	receiveblocks[ list_List ] :=
+		Module[ {blocks, tags, x, merged, kwta, thresh},
+		(* Wrap integers (single paths) into lists to achieve a uniform
+		 2D matrix structure for the blocks. *)
+		blocks = If[IntegerQ[#], {#}, #] & /@ list;
+		
+		(* tags["name"] gives a matrix of booleans *)
+		tags = Function[t, Map[ MemberQ[Lookup[pathways[#], "tags", {}], t] &, blocks, {-1}]];
+		
+		(* Matrix of lists, congruent with blocks. *)
+		x = Map[ patheval, blocks, {-1}];
+		
+		(* Veto *)
+		If[ MemberQ[Pick[x, tags["veto"]], {__}, {2}], Return[{}& /@ list]];
 
-		If[MemberQ[Pick[x, tags["veto"]], {__}], Return[{}]];
+		(* Mandatory *)
+		If[ MemberQ[Pick[x, tags["mandatory"]], {}, {2}], Return[{}& /@ list]];
+		
+		(* Priority *)
+		If[MemberQ[Pick[x, tags["priority"]], {__}, {2}], 
+			x = MapThread[If[#1, #2, {}] &, {tags["priority"], x}, 2] ];
 
-		If[MemberQ[Pick[x, tags["mandatory"]], {}], Return[{}]];
+		(* Fallback *)
+		If[MemberQ[Pick[x, Map[Not, tags["fallback"], {2}]], {__}, {2}], 
+			x = MapThread[If[#1, {}, #2] &, {tags["fallback"], x}, 2] ];
+		
+		(* Aggregate the survivors per block *)
+		merged = Multiset /@ x;
 
-		If[MemberQ[Pick[x, tags["priority"]], {__}], 
-			x = MapThread[If[#1, #2, {}] &, {tags["priority"], x}] ];
-
-		If[MemberQ[Pick[x, Not /@ tags["dependency"]], {}], 
-			x = MapThread[If[#1, {}, #2] &, {tags["dependency"], x}] ];
-			
-		If[MemberQ[Pick[x, Not /@ tags["fallback"]], {__}], 
-			x = MapThread[If[#1, {}, #2] &, {tags["fallback"], x}] ];
-
-		If[Or @@ tags["barrier"] && MemberQ[Pick[x, tags["barrier"]], {}],
-             x = MapThread[If[#1, {}, #2]&, {tags["barrier"], x}]];
-
-		(* Aggregate the survivors. *)
-		merged = Multiset[x];
-	
 		(* Optional kWTA. *) 
-		If[Or @@ tags["kwta_excitatory"] || Or @@ tags["kwta_absolute"],
-			Module[{k, U, tally, kth},
-			k = Min[#["hyperparameters"][[2]] & /@ paths ];
-			U = If[Or @@ tags["kwta_excitatory"], Select[Positive][merged], merged];
-			tally = SortBy[Tally[U], Last];
-			merged = If[Length[tally] <= k,
+		kwta[multiset_List, blck_List, flag_?BooleanQ] :=
+			Module[{k, tally, kth},
+			If[ ! flag, Return[multiset]];
+			k = Min[#["hyperparameters"][[2]] & /@ (pathways /@ blck) ];
+			tally = SortBy[Tally[multiset], Last];
+			If[Length[tally] <= k,
 				Sort[First /@ tally],
 				kth = tally[[-k, 2]];
 				Sort[First /@ Select[tally, Last[#] >= kth &]]]
-			]
-		];
-
-		(* Optional thresholding of the merged signal, after kWTA. *)
-		If[Or @@ tags["threshold"] &&
-			Length[merged] < Min[#["hyperparameters"][[2]] & /@ paths ],
-			merged = {}];	
+			];
 			
-									
+		merged = MapThread[kwta, {merged, blocks, Or @@@ tags["kwta"] } ];	
+
+		(* Optional thresholding. *) 
+		thresh[multiset_List, blck_List, flag_?BooleanQ] :=
+			If[ flag && Length[multiset] < Min[#["hyperparameters"][[2]] & 
+				/@ (pathways /@ blck) ], {}, multiset];
+			
+		merged = MapThread[thresh, {merged, blocks, Or @@@ tags["threshold"] } ];
+
 		merged
-		];
+		];	
 		
 	(* Raw tick-tock evaluation cycle. *)
 	evaluate[x_List] := Module[ {},
@@ -1579,14 +1572,9 @@ Circuit[expr_] := Module[
 		currentstate = nextstate;
 				
 		(* Gather outputs, reading from currentstate. *)
-		pathmerge /@ outputedges
+		receiveblocks[outputedges]
 		];
 
-	(* 
-	Raw evaluation with optional multiplexing.
-	Operates on preprocessed (encoded) data.
-	Used directly by embedded circuits.
-	*)	
 	multiplex[x_List] := Module[ {y = {}, mult},
 	
 		If[ Length[x] =!= Length[inputslots], 
@@ -1607,7 +1595,7 @@ Circuit[expr_] := Module[
 		Do[y = If[gate === 1, evaluate[x], 
 			evaluate[{} & /@ x]], {gate, mult}];
 			
-		y (* Can be empty if all gates are zero. *)
+		y 
 		];			
 
 

@@ -1571,8 +1571,7 @@ TAG_MAP = {
     "multiset": "+", "inhibit": "-", "permute": "π",
     "noise": "~", "rate_limit": "R", "threshold": "T",
     "veto": "X", "mandatory": "*", "priority": "!",
-    "dependency": "&", "fallback": "|", "barrier": "=",
-    "kwta_excitatory": "K", "kwta_absolute": "k",
+    "fallback": "|", "kwta": "k",
     "log": "?", "show_slot": "#", "show_dimension": "$",
     "show_population": "%"
 }
@@ -1827,65 +1826,80 @@ def Circuit(expr):
 
         return x
 
-    def pathmerge(ids):
-        if isinstance(ids, int):
-            ids = [ids]
+    def receiveblocks(receive_list):
+        """
+        Evaluates and merges the receive paths of one component (or of the
+        circuit's output nodes), returning one multiset per block.
+        Gating tags (veto, mandatory, priority, fallback) act across all
+        blocks; kwta and threshold act per block.
+        """
+        # Wrap single paths into lists: uniform 2D block structure.
+        blocks = [[b] if isinstance(b, int) else list(b)
+                  for b in receive_list]
 
-        x_list = [patheval(i) for i in ids]
-        paths = [pathways[i] for i in ids]
-
+        # has_tag(t) gives a matrix of booleans, congruent with blocks.
         def has_tag(t):
-            return [t in p.get("tags", []) for p in paths]
+            return [[t in pathways[i].get("tags", []) for i in block]
+                    for block in blocks]
 
-        veto_tags = has_tag("veto")
-        if any(x for i, x in enumerate(x_list) if veto_tags[i] and x):
-            return []
+        # Matrix of lists, congruent with blocks.
+        x = [[patheval(i) for i in block] for block in blocks]
 
-        mandatory_tags = has_tag("mandatory")
-        if any(not x for i, x in enumerate(x_list) if mandatory_tags[i]):
-            return []
+        # Payloads of the paths whose mask entry equals `select`.
+        def pick(mask, select=True):
+            return [xi for xb, mb in zip(x, mask)
+                    for xi, m in zip(xb, mb) if m == select]
 
+        # Veto
+        if any(pick(has_tag("veto"))):
+            return [[] for _ in blocks]
+
+        # Mandatory
+        if not all(pick(has_tag("mandatory"))):
+            return [[] for _ in blocks]
+
+        # Priority
         priority_tags = has_tag("priority")
-        if any(x for i, x in enumerate(x_list) if priority_tags[i] and x):
-            x_list = [x if priority_tags[i] else []
-                      for i, x in enumerate(x_list)]
+        if any(pick(priority_tags)):
+            x = [[xi if m else [] for xi, m in zip(xb, mb)]
+                 for xb, mb in zip(x, priority_tags)]
 
-        dependency_tags = has_tag("dependency")
-        if any(not x for i, x in enumerate(x_list) if not dependency_tags[i]):
-            x_list = [[] if dependency_tags[i]
-                      else x for i, x in enumerate(x_list)]
-
+        # Fallback
         fallback_tags = has_tag("fallback")
-        if any(x for i, x in enumerate(x_list) if not fallback_tags[i] and x):
-            x_list = [[] if fallback_tags[i]
-                      else x for i, x in enumerate(x_list)]
+        if any(pick(fallback_tags, select=False)):
+            x = [[[] if m else xi for xi, m in zip(xb, mb)]
+                 for xb, mb in zip(x, fallback_tags)]
 
-        barrier_tags = has_tag("barrier")
-        if any(barrier_tags) and any(not x for i,
-                                     x in enumerate(x_list) if barrier_tags[i]):
-            x_list = [[] if barrier_tags[i]
-                      else x for i, x in enumerate(x_list)]
+        # Aggregate the survivors per block.
+        merged = [multiset(xb) for xb in x]
 
-        merged = multiset(x_list)
+        # Smallest default population among a block's paths.
+        def minpop(block):
+            return min(pathways[i]["hyperparameters"][1] for i in block)
 
-        kwta_exc_tags = has_tag("kwta_excitatory")
-        kwta_abs_tags = has_tag("kwta_absolute")
-
-        # Optional kWTA. Ranks elements by multiplicity across all paths
-        # (within-path counts of multiset paths included). Passes every
-        # element at or above the k-th highest count, ties included. With
-        # k or fewer distinct elements, all pass. Outputs a set.
-        if any(kwta_exc_tags) or any(kwta_abs_tags):
-            k = min(p["hyperparameters"][1] for p in paths)
-            U = [i for i in merged if i > 0] if any(kwta_exc_tags) else merged
-
-            tally = Counter(U)
+        # Optional kWTA, per block. Ranks elements by multiplicity across
+        # the block's paths (within-path counts of multiset paths included).
+        # Passes every element at or above the k-th highest count, ties
+        # included. With k or fewer distinct elements, all pass. Outputs a set.
+        def kwta(ms, block, flag):
+            if not flag:
+                return ms
+            k = minpop(block)
+            tally = Counter(ms)
             if len(tally) <= k:
-                merged = sorted(tally)
-            else:
-                kth = sorted(tally.values())[-k]
-                merged = sorted(
-                    [val for val, count in tally.items() if count >= kth])
+                return sorted(tally)
+            kth = sorted(tally.values())[-k]
+            return sorted(v for v, c in tally.items() if c >= kth)
+
+        merged = [kwta(ms, block, any(flags)) for ms, block, flags
+                  in zip(merged, blocks, has_tag("kwta"))]
+
+        # Optional thresholding, per block, after kWTA.
+        def thresh(ms, block, flag):
+            return [] if flag and len(ms) < minpop(block) else ms
+
+        merged = [thresh(ms, block, any(flags)) for ms, block, flags
+                  in zip(merged, blocks, has_tag("threshold"))]
 
         return merged
 
@@ -1893,7 +1907,7 @@ def Circuit(expr):
         if config.get("component") in ("input", "output"):
             return
 
-        inputs = [pathmerge(rp) for rp in config.get("receive_paths", [])]
+        inputs = receiveblocks(config.get("receive_paths", []))
 
         func = config.get("function")
         result = func(*inputs) if func else tuple([]
@@ -1919,7 +1933,9 @@ def Circuit(expr):
         # Snapshot state, preparing for extraction and next cycle
         currentstate = dict(nextstate)
 
-        return [pathmerge(edge) for edge in outputedges]
+        # Gather outputs. The output nodes form the blocks of the
+        # circuit's output, so gating tags act across them.
+        return receiveblocks(outputedges)
 
     def multiplex(x):
         if len(x) != len(inputslots):

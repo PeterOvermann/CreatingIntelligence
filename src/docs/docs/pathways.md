@@ -124,7 +124,9 @@ This pathway conveys multisets:
 
 <img width="130" alt="image" src="img/input_output_multiset.png"><br>
 
-Inhibitory pathways transport multisets, flipping all positive elements to negative elements. Within this framework, this mechanism is the exclusive source of inhibitory signals apart from external input.
+Inhibitory pathways transport multisets, flipping all positive elements 
+to negative elements. Within this framework, this mechanism is the exclusive 
+source of inhibitory signals apart from external input.
 
 
 ```json
@@ -147,21 +149,18 @@ Inhibitory pathways transport multisets, flipping all positive elements to negat
 | `veto` |  X    |  clears all paths if a veto path is non-empty | 
 | `mandatory` |  *   |  clears all paths if a mandatory path is empty | 
 | `priority` |  !   |  clears all non-priority paths if a priority path is non-empty |
-| `dependency` |  &    |  clears dependency paths if any non-dependency path is empty (AND) |
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
-| `barrier` | =  |  clears barrier paths if any barrier path is empty |
-| `kwta_excitatory` | K  |  passes the top-k excitatory elements ranked by multiplicity, ties included, with k taken to be the default population |
-| `kwta_absolute` | k   |  passes the top-k elements ranked by total saliency (multiplicity of excitatory and inhibitory elements), ties included, with k taken to be the default population |
+| `kwta` | k   |  passes the top-k elements ranked by total saliency (multiplicity of excitatory and inhibitory elements), ties included, with k taken to be the default population |
 
 
-kWTA operates on the merged signal and also applies to a single path. If any
+kWTA operates per block on the merged signal and also applies to a single path. If any
 path of a merge carries a kWTA tag, the whole merge is filtered. Each element
 is scored by its multiplicity summed over all merged paths: a set path
 contributes one count per element, a multiset path contributes its duplicate
 counts. All elements scoring at or above the k-th highest score pass, so ties
-at the threshold are included; with k or fewer distinct elements, all pass.
-k is the smallest default population among the merged paths. The output is a
-set: `kwta_excitatory` ignores inhibitory elements, while `kwta_absolute` may
+at the threshold are included. With k or fewer distinct elements, all pass.
+k is the smallest default population among the merged paths. The output is a set
+of positive elements and may 
 pass inhibitory winners as negative elements. kWTA applies no minimum score:
 a flat input passes unchanged. Thresholding or rate limiting the result is
 left to a downstream path or component.
@@ -177,8 +176,8 @@ paths win; if the paths share no elements, their union passes.
 	{"component": "input", "send": [1]},
 	{"component": "input", "send": [2]},
 	{"component": "delay", "send": [11], 
-		"receive": [[{"slot": 1, "tags": ["kwta_absolute"]}, 
-					 {"slot": 2, "tags": ["kwta_absolute"]}]]},
+		"receive": [[{"slot": 1, "tags": ["kwta"]}, 
+					 {"slot": 2, "tags": ["kwta"]}]]},
 	{"component": "output", "receive": [11]}
   ]}
 ```
@@ -193,7 +192,7 @@ kWTA on a single multiset path selects the most frequent elements:
   "dataflow": [
 	{"component": "input", "send": [1]},
 	{"component": "output", 
-		"receive": [{"slot": 1, "tags": ["multiset", "kwta_absolute"]}]}
+		"receive": [{"slot": 1, "tags": ["multiset", "kwta"]}]}
   ]}
 ```
 

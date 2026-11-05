@@ -2365,7 +2365,7 @@
           "receive": [
             {
               "slot": 11,
-              "tags": ["kwta_absolute", "multiset"]
+              "tags": ["kwta", "multiset"]
             }
           ]
         }
@@ -2402,11 +2402,11 @@
             [
               {
                 "slot": 11,
-                "tags": ["kwta_absolute"]
+                "tags": ["kwta"]
               },
               {
                 "slot": 12,
-                "tags": ["kwta_absolute"]
+                "tags": ["kwta"]
               }
             ]
           ]
@@ -2443,11 +2443,11 @@
             [
               {
                 "slot": 11,
-                "tags": ["multiset", "kwta_absolute"]
+                "tags": ["multiset", "kwta"]
               },
               {
                 "slot": 12,
-                "tags": ["multiset", "kwta_absolute"]
+                "tags": ["multiset", "kwta"]
               }
             ]
           ]
@@ -2491,11 +2491,11 @@
             [
               {
                 "slot": 11,
-                "tags": ["multiset", "kwta_excitatory"]
+                "tags": ["multiset", "kwta"]
               },
               {
                 "slot": 12,
-                "tags": ["multiset", "kwta_excitatory"]
+                "tags": ["multiset", "kwta"]
               }
             ]
           ]
@@ -2515,7 +2515,7 @@
           [1, 1, 2, 3, 5, 6, 7, -11],
           [2, 3, 4, 4, 5, 8, 9, -11]
         ],
-        "output": [[1, 2, 3, 4, 5]]
+        "output": [[-11, 1, 2, 3, 4, 5]]
       }
     ]
   },

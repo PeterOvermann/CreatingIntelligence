@@ -351,32 +351,13 @@ class="sidebar-icon">π</span>permutation</a></li>
         priority path is non-empty</td>
         </tr>
         <tr>
-        <td style="text-align: left;"><code>dependency</code></td>
-        <td style="text-align: center;">&amp;</td>
-        <td style="text-align: left;">clears dependency paths if any
-        non-dependency path is empty (AND)</td>
-        </tr>
-        <tr>
         <td style="text-align: left;"><code>fallback</code></td>
         <td style="text-align: center;">|</td>
         <td style="text-align: left;">clears fallback paths if any
         non-fallback path is non-empty (NOR)</td>
         </tr>
         <tr>
-        <td style="text-align: left;"><code>barrier</code></td>
-        <td style="text-align: center;">=</td>
-        <td style="text-align: left;">clears barrier paths if any
-        barrier path is empty</td>
-        </tr>
-        <tr>
-        <td style="text-align: left;"><code>kwta_excitatory</code></td>
-        <td style="text-align: center;">K</td>
-        <td style="text-align: left;">passes the top-k excitatory
-        elements ranked by multiplicity, ties included, with k taken to
-        be the default population</td>
-        </tr>
-        <tr>
-        <td style="text-align: left;"><code>kwta_absolute</code></td>
+        <td style="text-align: left;"><code>kwta</code></td>
         <td style="text-align: center;">k</td>
         <td style="text-align: left;">passes the top-k elements ranked
         by total saliency (multiplicity of excitatory and inhibitory
@@ -385,20 +366,19 @@ class="sidebar-icon">π</span>permutation</a></li>
         </tr>
         </tbody>
         </table>
-        <p>kWTA operates on the merged signal and also applies to a
-        single path. If any path of a merge carries a kWTA tag, the
+        <p>kWTA operates per block on the merged signal and also applies
+        to a single path. If any path of a merge carries a kWTA tag, the
         whole merge is filtered. Each element is scored by its
         multiplicity summed over all merged paths: a set path
         contributes one count per element, a multiset path contributes
         its duplicate counts. All elements scoring at or above the k-th
-        highest score pass, so ties at the threshold are included; with
+        highest score pass, so ties at the threshold are included. With
         k or fewer distinct elements, all pass. k is the smallest
-        default population among the merged paths. The output is a set:
-        <code>kwta_excitatory</code> ignores inhibitory elements, while
-        <code>kwta_absolute</code> may pass inhibitory winners as
-        negative elements. kWTA applies no minimum score: a flat input
-        passes unchanged. Thresholding or rate limiting the result is
-        left to a downstream path or component.</p>
+        default population among the merged paths. The output is a set
+        of positive elements and may pass inhibitory winners as negative
+        elements. kWTA applies no minimum score: a flat input passes
+        unchanged. Thresholding or rate limiting the result is left to a
+        downstream path or component.</p>
         <p>In this circuit, two paths are merged via kWTA. Elements
         present on both paths win; if the paths share no elements, their
         union passes.</p>
@@ -408,8 +388,8 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;delay&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">,</span> </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;kwta_absolute&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span> </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;kwta_absolute&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]]</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;kwta&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;kwta&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]]</span><span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">11</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="240" alt="image" src="img/delay_kwta.png"><br></p>
@@ -420,7 +400,7 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dataflow&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;input&quot;</span><span class="fu">,</span> <span class="dt">&quot;send&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">]</span><span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;multiset&quot;</span><span class="ot">,</span> <span class="st">&quot;kwta_absolute&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;multiset&quot;</span><span class="ot">,</span> <span class="st">&quot;kwta&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/kwta_absolute.png"><br></p>
         <h2 id="schematics-rendering-and-data-logging">Schematics
