@@ -316,8 +316,9 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;component&quot;</span><span class="fu">:</span> <span class="st">&quot;output&quot;</span><span class="fu">,</span> <span class="dt">&quot;receive&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;slot&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;inhibit&quot;</span><span class="ot">]</span><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
         <p><img width="130" alt="image" src="img/input_output_inhibitory.png"><br></p>
-        <h2 id="pathway-merging-and-signal-flow-control">Pathway merging
-        and signal flow control</h2>
+        <h2 id="signal-gating-tags">Signal gating tags</h2>
+        <p>Gating tags act across all receive blocks of a component. for
+        a circuit, the output nodes form the blocks of its output.</p>
         <table>
         <colgroup>
         <col style="width: 21%" />
@@ -356,6 +357,23 @@ class="sidebar-icon">π</span>permutation</a></li>
         <td style="text-align: left;">clears fallback paths if any
         non-fallback path is non-empty (NOR)</td>
         </tr>
+        </tbody>
+        </table>
+        <h2 id="kwta">kWTA</h2>
+        <table>
+        <colgroup>
+        <col style="width: 21%" />
+        <col style="width: 11%" />
+        <col style="width: 67%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th style="text-align: left;">Tag</th>
+        <th style="text-align: center;">Display</th>
+        <th style="text-align: left;">Description</th>
+        </tr>
+        </thead>
+        <tbody>
         <tr>
         <td style="text-align: left;"><code>kwta</code></td>
         <td style="text-align: center;">k</td>
@@ -375,10 +393,10 @@ class="sidebar-icon">π</span>permutation</a></li>
         highest score pass, so ties at the threshold are included. With
         k or fewer distinct elements, all pass. k is the smallest
         default population among the merged paths. The output is a set
-        of positive elements and may pass inhibitory winners as negative
-        elements. kWTA applies no minimum score: a flat input passes
-        unchanged. Thresholding or rate limiting the result is left to a
-        downstream path or component.</p>
+        and may pass inhibitory winners as negative elements. kWTA
+        applies no minimum score: a flat input passes unchanged.
+        Thresholding or rate limiting the result is left to a downstream
+        path or component.</p>
         <p>In this circuit, two paths are merged via kWTA. Elements
         present on both paths win; if the paths share no elements, their
         union passes.</p>

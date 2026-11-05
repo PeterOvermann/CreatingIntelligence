@@ -141,7 +141,10 @@ source of inhibitory signals apart from external input.
 
 
 
-## Pathway merging and signal flow control
+## Signal gating tags
+
+Gating tags act across all receive blocks of a component.
+for a circuit, the output nodes form the blocks of its output.
 
 
 | Tag   | Display | Description |
@@ -150,7 +153,16 @@ source of inhibitory signals apart from external input.
 | `mandatory` |  *   |  clears all paths if a mandatory path is empty | 
 | `priority` |  !   |  clears all non-priority paths if a priority path is non-empty |
 | `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
+
+
+
+## kWTA
+
+
+| Tag   | Display | Description |
+|:------------|:-----:|:----------------------------------------|
 | `kwta` | k   |  passes the top-k elements ranked by total saliency (multiplicity of excitatory and inhibitory elements), ties included, with k taken to be the default population |
+
 
 
 kWTA operates per block on the merged signal and also applies to a single path. If any
@@ -159,8 +171,7 @@ is scored by its multiplicity summed over all merged paths: a set path
 contributes one count per element, a multiset path contributes its duplicate
 counts. All elements scoring at or above the k-th highest score pass, so ties
 at the threshold are included. With k or fewer distinct elements, all pass.
-k is the smallest default population among the merged paths. The output is a set
-of positive elements and may 
+k is the smallest default population among the merged paths. The output is a set and may 
 pass inhibitory winners as negative elements. kWTA applies no minimum score:
 a flat input passes unchanged. Thresholding or rate limiting the result is
 left to a downstream path or component.
