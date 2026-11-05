@@ -788,8 +788,13 @@ source of inhibitory signals apart from external input.
 
 ## Signal gating tags
 
-Gating tags act across all receive blocks of a component.
-for a circuit, the output nodes form the blocks of its output.
+Gating tags `veto`, `mandatory`, and `priority` act across all 
+receive blocks of a component.
+
+For a circuit, the output nodes form the blocks of its output.
+
+The `fallback` tag operates per block.
+
 
 
 | Tag   | Display | Description |
@@ -1468,27 +1473,8 @@ This uses the [`flyhash`](flyhash.md) encoder:
 
 ## Source code
 
-```python
-def input(config):
-    """
-    At the beginning of each cycle, external input is pushed
-    into the input's send slots. Input nodes have no "receive" slots.
-    The callback function serves as an optional encoder/preprocessing plugin.
-    """
-    pluginconfig = config.copy()
-    if "send_blocks" in config and config["send_blocks"]:
-        pluginconfig["hyperparameters"] = config["send_blocks"][0]
-
-    plugin_factory = config.get("plugin")
-
-    if callable(plugin_factory):
-        plugin = plugin_factory(pluginconfig)
-    else:
-        # Default Identity function
-        plugin = {"function": lambda x: x}
-
-    return plugin | {"size": 10, "checks": ["input", "oneout"]}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert input*
 
 
 
@@ -1603,27 +1589,8 @@ same plugin instance to decode the SHRs, exactly reversing the mapping.
 
 ## Source code
 
-```python
-def output(config):
-    """
-    At the end of each cycle, the output's input edges are read out.
-    Output nodes have no "send" slots.
-    The callback function serves as an optional decoder/postprocessing plugin.
-    """
-    pluginconfig = config.copy()
-    if "receive_blocks" in config and config["receive_blocks"]:
-        pluginconfig["hyperparameters"] = config["receive_blocks"][0]
-
-    plugin_factory = config.get("plugin")
-
-    if callable(plugin_factory):
-        plugin = plugin_factory(pluginconfig)
-    else:
-        # Default Identity function
-        plugin = {"function": lambda x: x}
-
-    return plugin | {"size": 10, "checks": ["output", "oneinp"]}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert output*
 
 
 
@@ -1732,117 +1699,16 @@ match the parameters of its inbound and outbound slots.
 
 ## Source code
 
-```python
-def circuit(config):
-    """
-    Embedded circuit component.
-    Multiple circuit components can reference the same embedded instance.
-    """
-    plugin_factory = config.get("plugin", shared)
-
-    if isinstance(plugin_factory, str):
-        import sys
-        plugin_factory = getattr(sys.modules[__name__], plugin_factory, shared)
-
-    plugin = plugin_factory(config)
-    if not plugin:
-        return {}
-
-    params = [plugin.get("receive_blocks", []), plugin.get("send_blocks", [])]
-
-    if [config.get("receive_blocks", []), config.get(
-            "send_blocks", [])] != params:
-        raise ValueError(
-            f"Hyperparameters of embedded circuit do not match: {params}")
-
-    def f(*blocks):
-        return plugin["function"](*blocks)
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "checks": ["arginp", "argout"],
-        "size": 9
-    })
-
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert circuit*
 
 ### Plugins
 
-```python
-def shared(config):
-    """Plug-in for embedding a precompiled circuit."""
-    name = config.get("name")
-    if not name:
-        raise ValueError(
-            f"Missing 'name' property in shared circuit: {config}")
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert shared*
 
-    sub = circuit_registry.get(name)
-    if not sub:
-        raise ValueError(f"Unknown circuit '{name}'.")
-
-    result = dict(sub)
-    result["label"] = name
-    result.pop("clear", None)
-
-    return result
-```
-
-```python
-def file(config):
-    file_path = config.get("name")
-    if not file_path:
-        raise CircuitError(f"Missing 'name' property in {config}")
-
-    if not file_path.endswith(".json"):
-        file_path += ".json"
-
-    # Search current working directory first, then sys.path
-    search_paths = [""] + sys.path
-
-    full_path = None
-    for base in search_paths:
-        target = os.path.join(base, file_path) if base else file_path
-        if os.path.exists(target):
-            full_path = target
-            break
-
-    if not full_path:
-        raise CircuitError(
-            f"File '{file_path}' not found in current directory or sys.path.")
-
-    with open(full_path, "r") as f:
-        circ_expr = json.load(f)
-
-    # Rescale hyperparameters of embedded circuit
-    scale = config.get("scale")
-    default_hp = circ_expr.get("hyperparameters", {}).get("default")
-
-    if (isinstance(scale, (list, tuple)) and len(scale) == 2 and
-            isinstance(default_hp, (list, tuple)) and len(default_hp) == 2):
-
-        # Calculate separate scaling factors
-        rescale_factor_n = scale[0] / default_hp[0]
-        rescale_factor_p = scale[1] / default_hp[1]
-
-        # Apply scaling to all hyperparameters in the embedded circuit
-        for k, v in circ_expr["hyperparameters"].items():
-            if isinstance(v, (list, tuple)) and len(v) == 2:
-                circ_expr["hyperparameters"][k] = [
-                    round(v[0] * rescale_factor_n),
-                    round(v[1] * rescale_factor_p)
-                ]
-
-    # Compile the imported circuit
-    sub = Circuit(circ_expr)
-
-    # Extract up to 5 characters from the filename for the label
-    base_name = os.path.splitext(os.path.basename(file_path))[0]
-    sub["label"] = base_name[:5]
-
-    return sub
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert file*
 
 
 
@@ -2030,94 +1896,8 @@ The accumulated state retains information about the order within the temporal se
 
 ## Source code
 
-```python
-def delay(config):
-    plugin_factory = config.get("plugin", replacement)
-
-    if isinstance(plugin_factory, str):
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            replacement)
-
-    plugin = plugin_factory(config)
-
-    if plugin_factory is replacement:
-        plugin.pop("label", None)
-        
-    dims1 = [b[0] for b in config.get("receive_blocks", [])]
-    dims2 = [b[0] for b in config.get("send_blocks", [])]
-    pop = sum(b[1] for b in config.get("receive_blocks", []))
-
-    # Limit size of query pattern, relative to pop.
-    # Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
-    else:
-        absratelimit = sum(dims1)
-
-    decay = config.get("decay", 0.0)
-    capacity_factor = config.get("capacity", 0.0)
-    abscapacity = round(capacity_factor * pop)
-    decimation = config.get("decimate", 1.0)
-    latch = config.get("latch", False)
-
-    Xstate = []
-
-    def f(*blocks):
-        nonlocal Xstate
-        X = multiset_block_join(list(blocks), dims1)
-
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Latch: an empty input leaves the state unchanged
-        # (no decay, no capacity subsampling, no integration)
-        if not (latch and len(X) == 0):
-            if decay > 0.0:
-                keep_size = math.floor((1.0 - decay) * len(Xstate))
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=keep_size,
-                        replace=False).tolist())
-
-            if len(Xstate) > abscapacity:
-                Xstate = sorted(
-                    rng.choice(
-                        Xstate,
-                        size=abscapacity,
-                        replace=False).tolist())
-
-            # Temporal integration via update rules
-            Xstate = plugin["updaterule"](X, Xstate)
-
-        # Proportional multiset subsampling applied to output
-        Xdec = Xstate
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(Xdec))
-            Xdec = sorted(
-                rng.choice(
-                    Xdec,
-                    size=sample_size,
-                    replace=False).tolist())
-
-        return tuple(multiset_block_split(Xdec, dims2))
-
-    result = dict(plugin)
-
-    result.update({
-        "function": f,
-        "checks": ["arginp", "argout", "totaldim"],
-        "fill": 13
-    })
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert delay*
 
 
 
@@ -2188,24 +1968,8 @@ Use an inhibitory pathway to make the noise subtractive:
 
 ## Source code
 
-```python
-def noise(config):
-    n, p = config.get("send_blocks", [[0, 0]])[0]
-
-    def f(*blocks):
-        return (
-            sorted(
-                rng.choice(range(1, n + 1),
-                    size=p,
-                    replace=False).tolist()),
-        )
-
-    return {
-        "function": f,
-        "checks": ["input", "oneout"],
-        "label": "~", "fill": 13, "size": 18
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert noise*
 
 
 
@@ -2384,112 +2148,8 @@ retains the matching elements between the query and the retrieved pattern.
 
 ## Source code
 
-```python
-def auto(config):
-    plugin_factory = config.get("plugin", replacement)
-
-    if isinstance(plugin_factory, str):
-        # Resolve string name to function dynamically
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            replacement)
-
-    plugin = plugin_factory(config)
-
-    receive_blocks = config.get("receive_blocks", [])
-    dims = [b[0] for b in receive_blocks]
-
-    # params = Plus @@ config["receive_blocks"] (Sums Ns and Ps respectively)
-    params = [sum(b[0] for b in receive_blocks), sum(b[1]
-                                                     for b in receive_blocks)]
-    pop = params[1] if len(params) > 1 else 0
-
-    # Limit size of query pattern, relative to pop.
-    # Default: total input dimension (no limit).
-    if "rate_limit" in config:
-        absratelimit = round(pop * config["rate_limit"])
-    else:
-        absratelimit = sum(dims)
-
-    decimation = config.get("decimate", 1.0)
-
-    # Learning thresholds
-    min_val = pop
-    max_val = pop
-    learn_val = config.get("learn", False)
-
-    if isinstance(learn_val, (int, float)) and not isinstance(learn_val, bool):
-        min_val = max_val = round(learn_val * pop)
-    elif isinstance(learn_val, (list, tuple)) and len(learn_val) == 2:
-        min_val = round(learn_val[0] * pop)
-        max_val = round(learn_val[1] * pop)
-
-    # Memory with identical input and output parameters
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params,
-        "B_parameters": params
-    })
-
-    # Memory backend
-    M = Memory(m_config)
-
-    def f(*blocks):
-        # Join partitions and apply inhibition
-        A = resolve_block_join_normal(list(blocks), dims)
-        X = A
-
-        # Limit the rate of incoming positives
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Proportional decimation
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(X))
-            Xdec = sorted(
-                rng.choice(
-                    X,
-                    size=sample_size,
-                    replace=False).tolist())
-        else:
-            Xdec = X
-
-        # Always learn if "learn" is True
-        if learn_val is True:
-            M["store"](A)
-
-        # Memory retrieval with decimated and rate-limited input state
-        Y = M["retrieve"](Xdec)
-
-        # Learn input A if retrieval fails and it falls within thresholds
-        if not Y and min_val <= len(A) <= max_val:
-            if learn_val is not True:
-                M["store"](A)
-            Y = A
-
-        X_out = plugin["updaterule"](Y, X)
-        X_out = sorted(list(set(X_out)))
-
-        return tuple(multiset_block_split(X_out, dims))
-
-    # Merge plugin attributes, component defaults, and Memory closures (e.g.,
-    # "clear")
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "checks": ["arginp", "argout", "ident"],
-        "shape": "square", "fill": 8
-    })
-    result.update(M)
-
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert auto*
 
 
 
@@ -2583,93 +2243,8 @@ The following circuit implements a state transition memory that stores {S,contex
 
 ## Source code
 
-```python
-def associator(config):
-    """
-    Generic hetero-associative component.
-
-    Stores heteroassociations A -> B.
-    A can be block-coded.
-
-    receive: B, A1, A2, ...
-    send:    B
-
-    If B and A1 are in the same dimensional space, this component
-    represents a state transition memory:
-
-    receive: S', S, C1,...
-    send:    S'
-    """
-    receive_blocks = config.get("receive_blocks", [])
-    Adims = [b[0] for b in receive_blocks[1:]]
-
-    params_A = [sum(b[0] for b in receive_blocks[1:]), sum(b[1]
-                    for b in receive_blocks[1:])]
-    params_B = receive_blocks[0]
-
-    Apop = params_A[1]
-
-    # Limit size of query pattern. Applies to both storage and retrieval.
-    # Default: unlimited.
-    absratelimit = round(
-        Apop * config.get("rate_limit", sum(Adims) / Apop))
-
-    # Proportional stochastic subsampling, applied to the query only.
-    decimation = config.get("decimate", 1.0)
-
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params_A,
-        "B_parameters": params_B
-    })
-
-    M = Memory(m_config)
-
-    # Special label for state transition memory
-    label = ""
-    if len(Adims) > 0 and \
-            list(receive_blocks[0]) == list(receive_blocks[1]):
-        label = "■" + "□" * (len(Adims) - 1)
-
-    def f(B, *blocks):
-        # Apply and drop inhibitory elements.
-        X = resolve_block_join_normal(list(blocks), Adims)
-        Y = resolve_normal(B)
-
-        # Limit the rate of incoming positives.
-        if len(X) > absratelimit:
-            X = sorted(
-                rng.choice(
-                    X,
-                    size=absratelimit,
-                    replace=False).tolist())
-
-        # Always learn (does nothing if B is empty)
-        M["store"](X, Y)
-
-        # Proportional stochastic decimation of query pattern.
-        Xdec = X
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(X))
-            Xdec = sorted(
-                rng.choice(
-                    X,
-                    size=sample_size,
-                    replace=False).tolist())
-        if len(Xdec) < Apop:
-            Xdec = X
-
-        return (M["retrieve"](Xdec),)
-
-    result = {
-        "function": f,
-        "checks": ["dimfirst", "multinp", "oneout"],
-        "label": label, "size": 10,
-        "shape": "square", "fill": 11
-    }
-    result.update(M)
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert associator*
 
 
 
@@ -2808,62 +2383,8 @@ previously encoded input.
 
 ## Source code
 
-```python
-def heteroencoder(config):
-    """
-    Heteroencoder A -> B. A may be partitioned. Has no input for B.
-    """
-    receive_blocks = config.get("receive_blocks", [])
-    dims = [b[0] for b in receive_blocks]
-
-    params_A = [sum(b[0] for b in receive_blocks), sum(b[1]
-                    for b in receive_blocks)]
-    params_B = config.get("send_blocks", [[0, 0]])[0]
-
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": params_A,
-        "B_parameters": params_B
-    })
-
-    M = Memory(m_config)
-
-    learning_threshold = M["T"]
-
-    def f(*blocks):
-        X = resolve_block_join_normal(list(blocks), dims)
-
-        # An input below the pattern matching threshold T can never
-        # retrieve its token, and the token cannot
-        # compose with later writes, because each new token is random.
-        if len(X) < learning_threshold:
-            return ([],)
-
-        Y = M["retrieve"](X)
-
-        # Generate new SHR encoding if retrieval fails.
-        if not Y:
-            n, p = params_B
-            Y = sorted(
-                rng.choice(
-                    range(1, n + 1),
-                    size=p, replace=False).tolist())
-
-        # Always learn, broadening X as an attractor.
-        M["store"](X, Y)
-        return (Y,)
-
-    result = {
-        "function": f,
-        "checks": ["arginp", "oneout"],
-        "shape": "square",
-        "fill": 11,
-        "size": 18,
-        "label": "◀▶"
-    }
-    result.update(M)
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert heteroencoder*
 
 
 
@@ -3019,127 +2540,8 @@ aggregates an orderless temporal state.
 
 ## Source code
 
-```python
-def temporal(config):
-    """
-    Temporal-associative memory component.
-    Learns first-order sequences by default (replacement plugin),
-    and higher-order sequences with the permutation plugin and capacity > 0.
-    A hybrid between auto-associative and hetero-associative architectures.
-    Uses the same temporal integration plugins and parameterization as
-    "delay". Default plugin: replacement.
-    The first input block is the item; further input blocks are context.
-    Learns (previous state & previous context) -> current item, and returns
-    the prediction for the next item only.
-    """
-    plugin_factory = config.get("plugin", replacement)
-
-    if isinstance(plugin_factory, str):
-        import sys
-        plugin_factory = getattr(
-            sys.modules[__name__],
-            plugin_factory,
-            replacement)
-
-    # The update rule acts on the item block only, not on the context blocks.
-    plugin = plugin_factory(
-        {**config, "receive_blocks": config.get("send_blocks", [])})
-        
-    receive_blocks = config.get("receive_blocks", [])
-    send_blocks = config.get("send_blocks", [])
-
-    # Memory parameters
-    paramsA = [sum(b[0] for b in receive_blocks),
-               sum(b[1] for b in receive_blocks)]
-    paramsB = list(send_blocks[0])
-    Nitem, Pitem = paramsB
-
-    contextdims = [b[0] for b in receive_blocks[1:]]
-    if contextdims:
-        Ncontext = sum(b[0] for b in receive_blocks[1:])
-        Pcontext = sum(b[1] for b in receive_blocks[1:])
-    else:
-        Ncontext, Pcontext = 0, 0
-
-    # Absolute rate limits. Default: unlimited.
-    limititem = round(Pitem * config.get("rate_limit", Nitem / Pitem))
-    limitcontext = (round(Pcontext * config.get("rate_limit", Ncontext / Pcontext))
-                    if Pcontext > 0 else 0)
-
-    # Pre-integration decay (leak rate).
-    decay = config.get("decay", 0.0)
-    # Temporal capacity, carry over from previous cycle.
-    abscapacity = round(Pitem * config.get("capacity", 0.0))
-    # Proportional stochastic subsampling for memory query.
-    decimation = config.get("decimate", 1.0)
-
-    # Label indicating the number of context blocks.
-    label = plugin["label"] + "\u25a1" * len(contextdims)
-
-    # Instantiate the memory.
-    m_config = dict(config)
-    m_config.update({
-        "A_parameters": paramsA,
-        "B_parameters": paramsB
-    })
-    M = Memory(m_config)
-
-    Xstate = []
-    Xcontext = []
-
-    def f(item, *blocks):
-        nonlocal Xstate, Xcontext
-
-        # Multiset rate limiting of the current item.
-        X = item
-        if len(X) > limititem:
-            X = sorted(rng.choice(X, size=limititem, replace=False).tolist())
-
-        # Pre-integration stochastic decay of previous state.
-        if decay > 0.0:
-            keep_size = math.floor((1.0 - decay) * len(Xstate))
-            Xstate = sorted(
-                rng.choice(Xstate, size=keep_size, replace=False).tolist())
-
-        # Always learn (previous state & previous context) -> current item.
-        M["store"](resolve_block_join_normal([Xstate, Xcontext], [Nitem, Ncontext]),
-                   resolve_normal(X))
-
-        # Multiset rate limiting of the items of the current context.
-        Xcontext = multiset_block_join(list(blocks), contextdims)
-        if len(Xcontext) > limitcontext:
-            Xcontext = sorted(
-                rng.choice(Xcontext, size=limitcontext, replace=False).tolist())
-
-        # Multiset subsampling applied to previous state.
-        if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(Xstate, size=abscapacity, replace=False).tolist())
-
-        # Temporal integration via update rules.
-        Xstate = plugin["updaterule"](X, Xstate)
-
-        # Proportional multiset subsampling applied to the integrated state,
-        # to break symmetry during retrieval.
-        Xdec = multiset_block_join([Xstate, Xcontext], [Nitem, Ncontext])
-        if decimation < 1.0:
-            sample_size = math.floor(decimation * len(Xdec))
-            Xdec = sorted(
-                rng.choice(Xdec, size=sample_size, replace=False).tolist())
-
-        # Predict next token.
-        return (M["retrieve"](resolve_normal(Xdec)),)
-
-    result = dict(plugin)
-    result.update({
-        "function": f,
-        "checks": ["dimfirst", "oneout"],
-        "shape": "square", "label": label, "size": 10, "fill": 14
-    })
-    result.update(M)
-
-    return result
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert temporal*
 
 
 
@@ -3237,10 +2639,8 @@ each signal to the subsequent signal.
 
 ## Source code
 
-```python
-def replacement(config):
-    return {"updaterule": lambda y, x: y, "label": "▼", "size": 18}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert replacement*
 
 
 
@@ -3294,11 +2694,8 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-```python
-def residual(config):
-    return {"updaterule": lambda y, x: resolve_graded(
-        multiset([x, [-i for i in y]])), "label": "▲", "size": 18}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert residual*
 
 
 
@@ -3377,11 +2774,8 @@ the symmetric multiset difference of the state and the incoming signal.
 
 ## Source code
 
-```python
-def difference(config):
-    return {"updaterule": lambda y, x: sorted(
-        [abs(i) for i in multiset([y, [-i for i in x]])]), "label": "△", "size": 20}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert difference*
 
 
 
@@ -3463,11 +2857,8 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-```python
-def complement(config):
-    return {"updaterule": lambda y, x: resolve_graded(
-        multiset([y, [-i for i in x]])), "label": "▽", "size": 20}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert complement*
 
 
 
@@ -3562,11 +2953,8 @@ aggregates an orderless state representing prior inputs.
 
 ## Source code
 
-```python
-def augmentation(config):
-    return {"updaterule": lambda y, x: multiset(
-        [y, x]), "label": "∪", "size": 14}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert augmentation*
 
 
 
@@ -3619,17 +3007,8 @@ See also: https://creatingintelligence.org/#auto-associative-memory
 
 ## Source code
 
-```python
-def coincidence(config):
-    def multiset_intersection(y, x):
-        counts_y = Counter(y)
-        counts_x = Counter(x)
-        res = []
-        for k, v in counts_y.items():
-            res.extend([k] * min(v, counts_x.get(k, 0)))
-        return sorted(res)
-    return {"updaterule": multiset_intersection, "label": "∩", "size": 14}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert coincidence*
 
 
 
@@ -3700,22 +3079,8 @@ aggregates a state that preserves the order of prior inputs.
 
 ## Source code
 
-```python
-def permutation(config):
-    dims = sum(b[0] for b in config.get("receive_blocks", []))
-    dim = dims if dims else 0
-    perm = rng.choice(
-        range(1, dim + 1),
-        size = dim,
-        replace=False).tolist() if dim > 0 else []
-
-    def updaterule(y, x):
-        mapped_x = sorted([(1 if i > 0 else -1 if i < 0 else 0)
-                          * perm[abs(i) - 1] for i in x if i != 0])
-        return multiset([y, mapped_x])
-
-    return {"updaterule": updaterule, "label": "π", "size": 16}
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert permutation*
 
 
 
@@ -3772,69 +3137,8 @@ mirroring the input.
 
 ## Source code
 
-```python
-def codec(config):
-    """General-purpose SHR encoder/decoder for symbolic expressions."""
-
-    # Extract hyperparameters from config
-    hyperparameters = config.get("hyperparameters", [0, 0])
-    n, p = hyperparameters[0], hyperparameters[1]
-    lex_key = (n, p)
-
-    # Initialize global hash table if missing for these dimensions
-    if lex_key not in circuit_codec_lexicon:
-        circuit_codec_lexicon[lex_key] = {None: []}
-
-    lex = circuit_codec_lexicon[lex_key]
-
-    # Use auto-associative pattern matching threshold
-    T = matching_threshold((n, p), (n, p))
-
-    def f(expr):
-        # Encoding logic
-        if config.get("component") == "input":
-            if isinstance(expr, list):
-                # Bundle multiple tokens
-                bundled = []
-                for e in expr:
-                    res = f(e)
-                    if res:
-                        bundled.extend(res)
-                return sorted(list(set(bundled)))
-
-            if expr not in lex:
-                # 1-based indexing for native arrays
-                sampled = rng.choice(range(1, n + 1), size=p, replace=False)
-                lex[expr] = sorted(sampled.tolist())
-
-            return lex[expr]
-
-        # Decoding logic
-        if not expr:
-            return None
-
-        overlaps = {k: len(set(v).intersection(expr))
-                    for k, v in lex.items() if k is not None}
-
-        result = [k for k, overlap in overlaps.items() if overlap >= T]
-
-        if len(result) == 0:
-            return None
-        elif len(result) == 1:
-            return result[0]
-        else:
-            return sorted(result)
-
-    def clear():
-        lex.clear()
-        lex[None] = []
-
-    return {
-        "label": "SYM",
-        "function": f,
-        "clear": clear
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert codec*
 
 
 
@@ -3895,70 +3199,8 @@ The following circuit encodes integers 0 to 19 as non-overlapping SHRs with popu
 
 ## Source code
 
-```python
-def category(config):
-    hyperparameters = config.get("hyperparameters", [0, 0])
-    n, p = hyperparameters[0], hyperparameters[1]
-
-    K = config.get("categories", n // p if p > 0 else 0)
-    if K * p > n:
-        raise ValueError(
-            f"Encoder requires dimension {K * p} or greater.")
-
-    partitionsize = n // K if K > 0 else 0
-
-    lex_key = (n, p, K)
-
-    if lex_key not in circuit_category_lexicon:
-        circuit_category_lexicon[lex_key] = {None: []}
-
-    lex = circuit_category_lexicon[lex_key]
-    T = matching_threshold((n, p), (n, p))
-    
-    def f(expr):
-        if config.get("component") == "input":
-            if not isinstance(expr, int) or expr < 0 or expr >= K:
-                return []
-
-            if expr not in lex:
-                # 1-based indexing for native arrays
-                start = partitionsize * expr + 1
-                end = start + partitionsize
-                lex[expr] = list(range(start, end))
-
-            pool = lex[expr]
-            sample_size = min(p, len(pool))
-            return sorted(
-                rng.choice(
-                    pool,
-                    size=sample_size,
-                    replace=False).tolist())
-
-        if not expr:
-            return None
-
-        overlaps = {k: len(set(v).intersection(expr))
-                    for k, v in lex.items() if k is not None}
-
-        result = [k for k, overlap in overlaps.items() if overlap >= T]
-
-        if len(result) == 0:
-            return None
-        elif len(result) == 1:
-            return result[0]
-        else:
-            return sorted(result)
-
-    def clear():
-        lex.clear()
-        lex[None] = []
-
-    return {
-        "label": "CAT",
-        "function": f,
-        "clear": clear
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert category*
 
 
 
@@ -4005,49 +3247,8 @@ The following circuit classifies SDRs, returning bin numbers 1,2,...
 
 ## Source code
 
-```python
-def binning(config):
-    hyperparameters = config.get("hyperparameters", [0, 0])
-    n, p = hyperparameters[0], hyperparameters[1]
-    lex_key = (n, p)
-
-    if lex_key not in circuit_binning_lexicon:
-        circuit_binning_lexicon[lex_key] = {None: []}
-
-    lex = circuit_binning_lexicon[lex_key]
-    T = matching_threshold((n, p), (n, p))
-
-    if config.get("component") == "input":
-        raise ValueError("binning cannot be used as an encoder.")
-
-    def f(expr):
-        if not expr:
-            return 0
-
-        overlaps = {k: len(set(v).intersection(expr))
-                    for k, v in lex.items() if k is not None}
-
-        bins = [k for k, overlap in overlaps.items() if overlap >= T]
-
-        if len(bins) == 0:
-            new_bin = len(lex)
-            lex[new_bin] = expr
-            return new_bin
-        elif len(bins) == 1:
-            return bins[0]
-        else:
-            return sorted(bins)
-
-    def clear():
-        lex.clear()
-        lex[None] = []
-
-    return {
-        "label": "BIN",
-        "function": f,
-        "clear": clear
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert binning*
 
 
 
@@ -4100,62 +3301,8 @@ The following circuit encodes dense vectors as SDRs.
 
 ## Source code
 
-```python
-def vectorencoder(config):
-    hyperparameters = config.get("hyperparameters", [0, 0])
-    n, p = hyperparameters[0], hyperparameters[1]
-    key = (n, p)
-
-    if key not in circuit_vectorencoder_matrices:
-        circuit_vectorencoder_matrices[key] = {}
-
-    R = circuit_vectorencoder_matrices[key]
-
-    if config.get("component") == "output":
-        raise ValueError("vectorencoder cannot be used as a decoder.")
-
-    def f(lst):
-        if not isinstance(lst, list):
-            lst = list(lst)
-        d = len(lst)
-        if p <= 0 or d == 0:
-            return []
-
-        sparsity = config.get("sparsity", float(1.0 / math.sqrt(d)))
-
-        if d not in R:
-            num_ones = round(n * d * sparsity)
-            flat_indices = rng.choice(n * d, size=num_ones, replace=False)
-            rows = flat_indices // d
-            cols = flat_indices % d
-            vals = np.ones(num_ones)
-
-            R[d] = sp.csr_matrix((vals, (rows, cols)), shape=(n, d))
-
-        matrix = R[d]
-        vec = matrix.dot(np.array(lst))
-
-        min_val, max_val = np.min(vec), np.max(vec)
-        span = max_val - min_val
-        scale = max(abs(min_val), abs(max_val))
-        tolerance = 1e-10
-
-        if scale == 0 or span <= tolerance * scale:
-            return []
-
-        k = min(p, len(vec))
-        top_k_indices = np.argsort(vec)[-k:]
-        return sorted((top_k_indices + 1).tolist())
-
-    def clear():
-        R.clear()
-
-    return {
-        "label": "VEC",
-        "function": f,
-        "clear": clear
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert vectorencoder*
 
 
 
@@ -4203,69 +3350,8 @@ The following circuit encodes dense vectors as SDRs:
 
 ## Source code
 
-```python
-def flyhash(config):
-    hyperparameters = config.get("hyperparameters", [0, 0])
-    n, p = hyperparameters[0], hyperparameters[1]
-    key = (n, p)
-
-    if key not in circuit_flyhash_matrices:
-        circuit_flyhash_matrices[key] = {}
-        circuit_flyhash_resting[key] = {}
-
-    R = circuit_flyhash_matrices[key]
-    restingpotential = circuit_flyhash_resting[key]
-
-    sparsity = config.get("sparsity", 0.1)
-
-    if config.get("component") == "output":
-        raise ValueError("flyhash cannot be used as a decoder.")
-
-    def f(lst):
-        if not isinstance(lst, list):
-            lst = list(lst)
-        d = len(lst)
-        if p <= 0 or d == 0:
-            return []
-
-        arr = np.array(lst)
-        centeredlist = arr - np.mean(arr)
-        tolerance = 1e-10
-
-        if d not in R:
-            c = max(1, round(d * sparsity))
-
-            rows = np.repeat(np.arange(n), c)
-            cols = np.concatenate(
-                [rng.choice(d, size=c, replace=False) for _ in range(n)])
-            vals = np.ones(n * c)
-
-            R[d] = sp.csr_matrix((vals, (rows, cols)), shape=(n, d))
-            restingpotential[d] = rng.uniform(0, tolerance * 0.01, size=n)
-
-        vec = R[d].dot(centeredlist) + restingpotential[d]
-
-        min_val, max_val = np.min(vec), np.max(vec)
-        span = max_val - min_val
-        scale = max(abs(min_val), abs(max_val))
-
-        if scale == 0 or span <= tolerance * scale:
-            return []
-
-        k = min(p, len(vec))
-        top_k_indices = np.argsort(vec)[-k:]
-        return sorted((top_k_indices + 1).tolist())
-
-    def clear():
-        R.clear()
-        restingpotential.clear()
-
-    return {
-        "label": "FLY",
-        "function": f,
-        "clear": clear
-    }
-```
+<!-- Error processing circuits.py: unindent does not match any outer indentation level (<unknown>, line 1868) -->
+*from circuits.py insert flyhash*
 
 
 

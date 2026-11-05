@@ -143,8 +143,13 @@ source of inhibitory signals apart from external input.
 
 ## Signal gating tags
 
-Gating tags act across all receive blocks of a component.
-for a circuit, the output nodes form the blocks of its output.
+Gating tags `veto`, `mandatory`, and `priority` act across all 
+receive blocks of a component.
+
+For a circuit, the output nodes form the blocks of its output.
+
+The `fallback` tag operates per block.
+
 
 
 | Tag   | Display | Description |

@@ -1513,15 +1513,18 @@ Circuit[expr_] := Module[
 
 		(* Mandatory *)
 		If[ MemberQ[Pick[x, tags["mandatory"]], {}, {2}], Return[{}& /@ list]];
-		
+	
 		(* Priority *)
-		If[MemberQ[Pick[x, tags["priority"]], {__}, {2}], 
-			x = MapThread[If[#1, #2, {}] &, {tags["priority"], x}, 2] ];
+		If[MemberQ[Pick[x, tags["priority"]], {__}, {2}],
+			x = MapThread[MapThread[If[#1, #2, {}] &, {#1, #2}] &,
+			{tags["priority"], x}]];
 
-		(* Fallback *)
-		If[MemberQ[Pick[x, Map[Not, tags["fallback"], {2}]], {__}, {2}], 
-			x = MapThread[If[#1, {}, #2] &, {tags["fallback"], x}, 2] ];
-		
+		(* Fallback, per block *)
+		x = MapThread[
+			If[MemberQ[Pick[#2, #1, False], {__}],
+				MapThread[If[#1, {}, #2] &, {#1, #2}], #2] &, 
+				{tags["fallback"], x}];	
+									
 		(* Aggregate the survivors per block *)
 		merged = Multiset /@ x;
 

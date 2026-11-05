@@ -1864,12 +1864,12 @@ def Circuit(expr):
             x = [[xi if m else [] for xi, m in zip(xb, mb)]
                  for xb, mb in zip(x, priority_tags)]
 
-        # Fallback
-        fallback_tags = has_tag("fallback")
-        if any(pick(fallback_tags, select=False)):
-            x = [[[] if m else xi for xi, m in zip(xb, mb)]
-                 for xb, mb in zip(x, fallback_tags)]
-
+         # Fallback, per block
+         fallback_tags = has_tag("fallback")
+         x = [[[] if m else xi for xi, m in zip(xb, mb)]
+              if any(xi for xi, m in zip(xb, mb) if not m) else xb
+              for xb, mb in zip(x, fallback_tags)]
+ 
         # Aggregate the survivors per block.
         merged = [multiset(xb) for xb in x]
 
