@@ -166,9 +166,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         href="delay.html"><code>delay</code></a>.</li>
         <li>The state consists of the temporally integrated signal
         combined with optional context blocks.</li>
-        <li>Always learns, except if an input is tagged
-        <code>priority</code> and the signal comes from a non-priority
-        pathway.</li>
+        <li>If any input path is tagged priority, learns only in cycles
+        where a priority path carries a signal; otherwise always
+        learns.</li>
         <li>Learning when the prediction is correct may broaden the base
         temporal associations.</li>
         <li>A closed feedback loop enables generative behavior. Use

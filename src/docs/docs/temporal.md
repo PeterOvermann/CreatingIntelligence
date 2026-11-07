@@ -17,7 +17,7 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 - Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
 - Uses the same temporal integration mechanism as [`delay`](delay.md).
 - The state consists of the temporally integrated signal combined with optional context blocks.
-- Always learns, except if an input is tagged `priority` and the signal comes from a non-priority pathway.
+- If any input path is tagged priority, learns only in cycles where a priority path carries a signal; otherwise always learns.
 - Learning when the prediction is correct may broaden the base temporal associations.
 - A closed feedback loop enables generative behavior. Use pathway tags to prevent learning from feedback.
 - With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
