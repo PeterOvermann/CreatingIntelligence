@@ -144,9 +144,8 @@ source of inhibitory signals apart from external input.
 ## Signal gating tags
 
 Gating tags `veto`, `mandatory`, and `priority` act across all 
-receive blocks of a component.
-
-For a circuit, the output nodes form the blocks of its output.
+receive blocks of a component. For a circuit, the output nodes represent 
+the blocks of its output.
 
 The `fallback` tag operates per block.
 
@@ -157,7 +156,8 @@ The `fallback` tag operates per block.
 | `veto` |  X    |  clears all paths if a veto path is non-empty | 
 | `mandatory` |  *   |  clears all paths if a mandatory path is empty | 
 | `priority` |  !   |  clears all non-priority paths if a priority path is non-empty |
-| `fallback` | &#124;   |  clears fallback paths if any non-fallback path is non-empty (NOR) |
+| `fallback` | &#124;   |  clears fallback paths within the same block if any non-fallback path within
+the block is non-empty (NOR) |
 
 
 

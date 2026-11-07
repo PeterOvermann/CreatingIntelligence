@@ -319,9 +319,8 @@ class="sidebar-icon">π</span>permutation</a></li>
         <h2 id="signal-gating-tags">Signal gating tags</h2>
         <p>Gating tags <code>veto</code>, <code>mandatory</code>, and
         <code>priority</code> act across all receive blocks of a
-        component.</p>
-        <p>For a circuit, the output nodes form the blocks of its
-        output.</p>
+        component. For a circuit, the output nodes represent the blocks
+        of its output.</p>
         <p>The <code>fallback</code> tag operates per block.</p>
         <table>
         <colgroup>
@@ -358,8 +357,13 @@ class="sidebar-icon">π</span>permutation</a></li>
         <tr>
         <td style="text-align: left;"><code>fallback</code></td>
         <td style="text-align: center;">|</td>
-        <td style="text-align: left;">clears fallback paths if any
-        non-fallback path is non-empty (NOR)</td>
+        <td style="text-align: left;">clears fallback paths within the
+        same block if any non-fallback path within</td>
+        </tr>
+        <tr>
+        <td style="text-align: left;">the block is non-empty (NOR)</td>
+        <td style="text-align: center;"></td>
+        <td style="text-align: left;"></td>
         </tr>
         </tbody>
         </table>
