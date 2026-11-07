@@ -541,7 +541,6 @@ delay[config_Association] :=
 	(* Latch option. *)
 	latch = Lookup[config, "latch", False];
 
-
 	f[blocks__List] := Module[ {X, Xdec},
 		
 		X = MultisetBlockJoin[ {blocks}, dims1];
@@ -588,7 +587,6 @@ Replaces #2 with #1.
 *)
 replacement[_Association] :=
 	<|"updaterule" -> (#1 &), "label" -> "\[FilledDownTriangle]", "size" -> 18 |>;
-
 		
 (* 
 Multiset Complement[#2, #1]. Removes #1 from #2. Retains novel input.
@@ -624,7 +622,6 @@ coincidence[_Association] :=
 	<|"updaterule" -> (Module[{cY = Counts[#1], cX = Counts[#2]}, 
         Flatten @ KeyValueMap[ConstantArray[#1, Min[#2, Lookup[cX, #1, 0]]] &, cY]] &), 
         "label" -> "\[Intersection]", "size" -> 14 |>;
-
   
 (*
 Multiset Union of [ #1, permutation[#2]]
@@ -773,9 +770,11 @@ temporal[config_Association] :=
 		If[decay > 0, Xstate = 
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 		
-		(* Always learn {previous state & previous context) -> current item. *)
-		M["store"][ResolveBlockJoinNormal[{Xstate, Xcontext}, {Nitem, Ncontext}], 
-			ResolveNormal[X]];
+		(* Learn {previous state & previous context) -> current item
+			unless there is a priority tag and the signal is non-priority. *)
+		If[config["environment"]["priority"] =!= False,
+			M["store"][ResolveBlockJoinNormal[{Xstate, Xcontext}, 
+				{Nitem, Ncontext}], ResolveNormal[X]]];
 
 		(* Multiset rate limiting of the item of the current context. *)
 		Xcontext = MultisetBlockJoin[ {blocks}, contextdims];
@@ -1239,6 +1238,8 @@ Circuit[expr_] := Module[
 		outputedges = {},
 		
 		permutations = <||>,
+		
+		environment = <|0 -> <||>|>,
 
 		(* Runtime functions. *)
 		evaluate, patheval, receiveblocks, componenteval,
@@ -1273,6 +1274,8 @@ Circuit[expr_] := Module[
 		{ config, compilepathway, slotparams, fillparams}, 
 				
 		++ nodeid;
+		
+		environment[nodeid] = <||>;
 		
 		compilepathway[receive_] := Module[{e, tag},
 			
@@ -1346,6 +1349,8 @@ Circuit[expr_] := Module[
 			"receive_paths" -> compilepathway /@ Lookup[node, "receive", {}],
 		
 			"node_id" -> nodeid, (* Used only for schematics visualization. *)
+
+			With[{id = nodeid}, "environment" :> environment[id]],
 			
 			(* Extract slot numbers *)
 			"send_slots" -> Cases[Lookup[node, "send", {}], _Integer],
@@ -1430,7 +1435,7 @@ Circuit[expr_] := Module[
 		If[ MatchQ[config["component"], input | output], Return[]];
 		
 		(* Evaluate received pathways and latch inputs. *)
-		x = receiveblocks[ config["receive_paths"]];
+		x = receiveblocks[ config["receive_paths"], config["node_id"] ];
 			
 		(* This component's callback function. *)
 		result = config["function"][Sequence @@ x]; 
@@ -1496,7 +1501,7 @@ Circuit[expr_] := Module[
 		];
 		
 		
-	receiveblocks[ list_List ] :=
+	receiveblocks[ list_List, id_Integer ] :=
 		Module[ {blocks, tags, x, merged, kwta, thresh},
 		(* Wrap integers (single paths) into lists to achieve a uniform
 		 2D matrix structure for the blocks. *)
@@ -1508,6 +1513,9 @@ Circuit[expr_] := Module[
 		(* Matrix of lists, congruent with blocks. *)
 		x = Map[ patheval, blocks, {-1}];
 		
+		environment[id]["priority"] = 
+			If[MemberQ[tags["priority"], True, {2}], False, None];
+		
 		(* Veto *)
 		If[ MemberQ[Pick[x, tags["veto"]], {__}, {2}], Return[{}& /@ list]];
 
@@ -1516,8 +1524,9 @@ Circuit[expr_] := Module[
 	
 		(* Priority *)
 		If[MemberQ[Pick[x, tags["priority"]], {__}, {2}],
+			environment[id]["priority"] = True;
 			x = MapThread[MapThread[If[#1, #2, {}] &, {#1, #2}] &,
-			{tags["priority"], x}]];
+				{tags["priority"], x}]];
 
 		(* Fallback, per block *)
 		x = MapThread[
@@ -1575,7 +1584,7 @@ Circuit[expr_] := Module[
 		currentstate = nextstate;
 				
 		(* Gather outputs, reading from currentstate. *)
-		receiveblocks[outputedges]
+		receiveblocks[outputedges, 0]
 		];
 
 	multiplex[x_List] := Module[ {y = {}, mult},

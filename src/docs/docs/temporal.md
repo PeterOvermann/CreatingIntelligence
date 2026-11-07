@@ -17,8 +17,9 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 - Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
 - Uses the same temporal integration mechanism as [`delay`](delay.md).
 - The state consists of the temporally integrated signal combined with optional context blocks.
-- Always learns, even when the prediction is correct. This may broaden the base temporal associations.
-- A closed feedback loop enables generative behavior.
+- Always learns, except if an input is tagged `priority` and the signal comes from a non-priority pathway.
+- Learning when the prediction is correct may broaden the base temporal associations.
+- A closed feedback loop enables generative behavior. Use pathway tags to prevent learning from feedback.
 - With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
 - Controls sparsity through stochastic subsampling mechanisms.  
 - Represents the integrated state as a multiset.
@@ -43,7 +44,7 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 Use standard [style options](components.md) to customize the component's appearance in circuit schematics.
 
 
-## Temporal associative memory with replacement update
+## Temporal memory with replacement update
 
 With the [`replacement`](replacement.md) update rule, the current input
 replaces the internal state,
@@ -63,9 +64,7 @@ each signal to the subsequent signal.
 
 <img width="240" alt="image" src="img/temporal_replacement.png"><br>
 
-
-
-## Temporal associative memory with state permutation
+## Temporal memory with state permutation
 
 The `temporal` component with the [`permutation`](permutation.md) update rule accumulates a temporal state by iteratively permuting it at every timestep, encoding the ordering of prior inputs.
 
@@ -83,11 +82,29 @@ The `temporal` component with the [`permutation`](permutation.md) update rule ac
 <img width="240" alt="image" src="img/temporal_permutation.png"><br>
 
 
+## Generative temporal memory
+
+With a closed feedback loop, temporal memory generates outputs when its
+input is empty. Tagging the external input `priority` ensures that the 
+memory does not learn from its own feedback.
+
+
+```json
+{  "hyperparameters": {"default": [1000, 10]},
+  "dataflow": [
+	{"component": "input", "send": [11]},
+	{"component": "temporal", "plugin": "permutation", "send": [21], 
+	 "receive": [[{"slot": 11, "tags": ["priority"]}, 21]], "capacity": 2},
+	{"component": "output", "receive": [21]}
+  ]
+}
+```
+
+<img width="240" alt="image" src="img/temporal_feedback.png"><br>
 
 
 
-
-## Temporal associative memory with difference update
+## Temporal memory with difference update
 
 The [`difference`](difference.md) 
 update rule replaces the internal state with 
@@ -106,7 +123,7 @@ the symmetric multiset difference of the state and the incoming signal.
 
 <img width="240" alt="image" src="img/temporal_difference.png"><br>
 
-## Temporal associative memory with complement plugin
+## Temporal memory with complement plugin
 
 ```json
 { "hyperparameters": {"default": [1000, 10]},
@@ -121,7 +138,7 @@ the symmetric multiset difference of the state and the incoming signal.
 <img width="240" alt="image" src="img/temporal_complement.png"><br>
 
 
-## Temporal associative memory with state augmentation
+## Temporal memory with state augmentation
 
 The  [`augmentation`](augmentation.md) update rule plugin
 aggregates an orderless temporal state.

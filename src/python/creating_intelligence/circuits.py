@@ -954,9 +954,12 @@ def temporal(config):
             Xstate = sorted(
                 rng.choice(Xstate, size=keep_size, replace=False).tolist())
 
-        # Always learn (previous state & previous context) -> current item.
-        M["store"](resolve_block_join_normal([Xstate, Xcontext], [Nitem, Ncontext]),
-                   resolve_normal(X))
+        # Learn (previous state & previous context) -> current item.
+        # With priority-tagged inputs, learn only when priority fired.
+        if config.get("environment", {}).get("priority") is not False:
+            M["store"](resolve_block_join_normal([Xstate, Xcontext],
+                                                 [Nitem, Ncontext]),
+                       resolve_normal(X))
 
         # Multiset rate limiting of the items of the current context.
         Xcontext = multiset_block_join(list(blocks), contextdims)
@@ -1606,6 +1609,10 @@ def Circuit(expr):
     nodeid = 0
     edgeid = 0
 
+    # Runtime pathway events per node, written by receiveblocks.
+    # Node id 0 collects the events of the circuit's outputs.
+    environment = {0: {}}
+
     def slotparams(slot):
         hyperparameters = expr.get("hyperparameters", {})
         default = hyperparameters.get("default", [100, 3])
@@ -1668,6 +1675,7 @@ def Circuit(expr):
         nonlocal nodeid
         nodeid += 1
         current_node_id = nodeid
+        environment[current_node_id] = {}
 
         rec_paths = [compilepathway(r) for r in node.get("receive", [])]
 
@@ -1695,6 +1703,9 @@ def Circuit(expr):
         config.update({
             "receive_paths": rec_paths,
             "node_id": current_node_id,
+            # Shared reference: receiveblocks mutates this dict in place,
+            # so the component sees the current cycle's events.
+            "environment": environment[current_node_id],
             "send_slots": send_slots,
             "scale": expr.get("hyperparameters", {}).get("default"),
             "receive_blocks": [fillparams(r) for r in node.get("receive", [])],
@@ -1826,7 +1837,7 @@ def Circuit(expr):
 
         return x
 
-    def receiveblocks(receive_list):
+    def receiveblocks(receive_list, node_id):
         """
         Evaluates and merges the receive paths of one component (or of the
         circuit's output nodes), returning one multiset per block.
@@ -1841,6 +1852,13 @@ def Circuit(expr):
         def has_tag(t):
             return [[t in pathways[i].get("tags", []) for i in block]
                     for block in blocks]
+
+        # Pathway events of this cycle. Mutated in place, never rebound.
+        # priority: None without priority-tagged paths, False if they are
+        # all silent (or the inputs were vetoed), True if priority fired.
+        env = environment[node_id]
+        priority_tags = has_tag("priority")
+        env["priority"] = False if any(map(any, priority_tags)) else None
 
         # Matrix of lists, congruent with blocks.
         x = [[patheval(i) for i in block] for block in blocks]
@@ -1859,8 +1877,8 @@ def Circuit(expr):
             return [[] for _ in blocks]
 
         # Priority
-        priority_tags = has_tag("priority")
         if any(pick(priority_tags)):
+            env["priority"] = True
             x = [[xi if m else [] for xi, m in zip(xb, mb)]
                  for xb, mb in zip(x, priority_tags)]
 
@@ -1907,7 +1925,8 @@ def Circuit(expr):
         if config.get("component") in ("input", "output"):
             return
 
-        inputs = receiveblocks(config.get("receive_paths", []))
+        inputs = receiveblocks(config.get("receive_paths", []),
+                               config["node_id"])
 
         func = config.get("function")
         result = func(*inputs) if func else tuple([]
@@ -1935,7 +1954,7 @@ def Circuit(expr):
 
         # Gather outputs. The output nodes form the blocks of the
         # circuit's output, so gating tags act across them.
-        return receiveblocks(outputedges)
+        return receiveblocks(outputedges, 0)
 
     def multiplex(x):
         if len(x) != len(inputslots):

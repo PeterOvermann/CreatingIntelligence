@@ -837,6 +837,53 @@
       "dataflow": [
         {
           "component": "input",
+          "plugin": "codec",
+          "send": [11]
+        },
+        {
+          "component": "input",
+          "plugin": "codec",
+          "send": [12]
+        },
+        {
+          "component": "delay",
+          "send": [21],
+          "receive": [
+            [
+              {
+                "slot": 11,
+                "tags": ["priority"]
+              },
+              12
+            ]
+          ]
+        },
+        {
+          "component": "output",
+          "plugin": "codec",
+          "receive": [21]
+        }
+      ]
+    },
+    "cases": [
+      {
+        "input": ["A", "B"],
+        "output": ["A"]
+      },
+      {
+        "input": [null, "B"],
+        "output": ["B"]
+      }
+    ]
+  },
+  {
+    "circuit": {
+      "hyperparameters": {
+        "default": [1000, 5]
+      },
+      "dataflow": [
+        {
+          "component": "input",
           "send": [11]
         },
         {
@@ -3418,7 +3465,7 @@
       },
       {
         "input": ["A"],
-        "output": ["__"]
+        "output": ["B"]
       },
       {
         "input": ["A"],
@@ -3426,7 +3473,7 @@
       },
       {
         "input": ["B"],
-        "output": ["__"]
+        "output": ["A"]
       }
     ]
   }
