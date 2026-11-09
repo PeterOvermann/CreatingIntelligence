@@ -722,7 +722,7 @@ Default plugin: replacement.
 
 temporal[config_Association] := 
 	Module[ {f, M, plugin, decay, decimation, label, size,
-		limititem, limitcontext, abscapacity,
+		limititem, limitcontext, abscapacity, learning = False,
 		paramsA, paramsB, contextdims, Nitem, Pitem, Ncontext, Pcontext,
 		
 			Xstate = {}, Xcontext = {}},
@@ -770,19 +770,35 @@ temporal[config_Association] :=
 		If[decay > 0, Xstate = 
 			Sort[RandomSample[Xstate, Floor[(1 - decay) * Length[Xstate]]]]];
 		
-		(* Learn {previous state & previous context) -> current item
-			unless there is a priority tag and the signal is non-priority. *)
-		If[config["environment"]["priority"] =!= False,
+		(* Learn (previous state & previous context) -> current item,
+			unless there are priority tags and the current or the previous
+			signal is non-priority. *)
+		If[learning && config["environment"]["priority"] =!= False,
 			M["store"][ResolveBlockJoinNormal[{Xstate, Xcontext}, 
 				{Nitem, Ncontext}], ResolveNormal[X]]];
-
+		
+		(* ALTERNATIVE 
+			(* Learn (previous state & previous context) -> current item,
+			unless there are priority tags and the current or the previous
+			signal is non-priority. At the onset of learning signals,
+			clear the temporally integrated state instead. *)
+		If[config["environment"]["priority"] =!= False,
+			If[learning,
+				M["store"][ResolveBlockJoinNormal[{Xstate, Xcontext}, 
+					{Nitem, Ncontext}], ResolveNormal[X]],
+				Xstate = {}]];
+		*)
+		
+		
+		learning = config["environment"]["priority"] =!= False;
+		
 		(* Multiset rate limiting of the item of the current context. *)
 		Xcontext = MultisetBlockJoin[ {blocks}, contextdims];
 		If[Length[Xcontext] > limitcontext, 
 			Xcontext = Sort[RandomSample[Xcontext, limitcontext]]]; 
 				
 		(* Multiset subsampling applied to previous state. *)
-		Xstate = RandomSample[Xstate, UpTo[abscapacity]]; 
+		Xstate = Sort[RandomSample[Xstate, UpTo[abscapacity]]]; 
 	
 		(* Temporal integration via update rules. *)
 		Xstate = plugin["updaterule"][X, Xstate];

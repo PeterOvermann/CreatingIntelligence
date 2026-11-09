@@ -131,7 +131,8 @@ Copyright © 2026 Peter Overmann. All rights reserved.
 
 #### [Memory Properties](#memory-properties)
 
-##### [Hyperparameters](#hyperparameters) • [Memory capacity](#memory-capacity) • [Storage efficiency](#storage-efficiency) • [Noise tolerance](#noise-tolerance) • [Pattern matching threshold](#pattern-matching-threshold) • [Separating known from unknown](#separating-known-from-unknown)
+##### [Hyperparameters](#hyperparameters) • [Memory capacity](#memory-capacity) • [Storage efficiency](#storage-efficiency) • [Noise tolerance](#noise-tolerance) • [Pattern matching threshold](#pattern-matching-threshold) • [Separating known from unknown](#separating-known-from-unknown) • [The hidden clique structure of memory](#the-hidden-clique-structure-of-memory)
+
 
 #### [Computing With Sets](#computing-with-sets)
 
@@ -1506,8 +1507,18 @@ predictions.
 The biological equivalent of kWTA is lateral inhibition, where active neurons
 suppress their neighbors via inhibitory interneurons.
 
-In the context of associative memory, kWTA has a long history as a recall strategy. Graham and Willshaw (1995) showed that selecting the output units with the highest dendritic sums improves recall from a binary associative net presented with partial or noisy cues, and Gripon et al. (2016) compare this “winners-take-all” threshold with other retrieval dynamics for sparse associative memories. Topological memory uses the same selection step, applied to responses summed over pairs of input elements rather than over individual inputs. What follows the selection &mdash; steps 6 to 11 of the [memory retrieval algorithm](#retrieving-associations) &mdash; is specific to this framework: the iterative refinement of the input, which retains only the input elements that consistently support the selected output, and returns an empty result if no unique match emerges.
-
+In the context of associative memory, kWTA has a long history as a recall
+strategy. Graham and Willshaw (1995) showed that selecting the output units
+with the highest dendritic sums improves recall from a binary associative net
+presented with partial or noisy cues, and Gripon et al. (2016) compare this
+“winners-take-all” threshold with other retrieval dynamics for sparse
+associative memories. Topological memory uses the same selection step, applied
+to responses summed over pairs of input elements rather than over individual
+inputs. What follows the selection &mdash; steps 6 to 11 of the [memory
+retrieval algorithm](#retrieving-associations) &mdash; is specific to this
+framework: the iterative refinement of the input, which retains only the input
+elements that consistently support the selected output, and returns an empty
+result if no unique match emerges.
 
 
 <br>
@@ -1559,7 +1570,7 @@ matrix, as one may think, but in this three-dimensional structure.
 
 # <a id="memory-properties">Memory Properties</a>
 
-##### [Hyperparameters](#hyperparameters) • [Memory capacity](#memory-capacity) • [Storage efficiency](#storage-efficiency) • [Noise tolerance](#noise-tolerance) • [Pattern matching threshold](#pattern-matching-threshold) • [Separating known from unknown](#separating-known-from-unknown)
+##### [Hyperparameters](#hyperparameters) • [Memory capacity](#memory-capacity) • [Storage efficiency](#storage-efficiency) • [Noise tolerance](#noise-tolerance) • [Pattern matching threshold](#pattern-matching-threshold) • [Separating known from unknown](#separating-known-from-unknown) • [The hidden clique structure of memory](#the-hidden-clique-structure-of-memory)
 
 
 
@@ -1666,8 +1677,22 @@ This formula shows that the sparsity of $A$ has a stronger impact on capacity
 than that of $B$, primarily due to the combinatorial expansion occurring from
 the input to the hidden layer.
 
-Topological memory belongs to the family of binary associative memories introduced by Willshaw, Buneman and Longuet-Higgins (1969), who showed that storage efficiency peaks at $\ln(2) \approx 69$ per cent of the theoretical maximum when half of the connections are set. Palm (1980) analysed the capacity in detail. Addressing memory sets by pairs of input elements makes topological memory a third-order version of this model. Löwe and Vermet (2026) prove storage scales of order $N^3/(\ln N)^3$ for third-order Willshaw memories, in the sense that a stored pattern is a fixed point of one-step threshold retrieval. Recovery from partial or noisy cues, which the retrieval algorithm discussed here addresses, is not covered by their analysis.
-
+Topological memory belongs to the family of binary associative memories
+introduced by Willshaw, Buneman and Longuet-Higgins (1969), who showed that
+storage efficiency peaks at $\ln(2) \approx 69$ per cent of the theoretical
+maximum when half of the connections are set. Palm (1980) analysed the capacity
+in detail. Addressing memory sets by pairs of input elements makes topological
+memory a third-order version of this model. This pair-addressed architecture
+was introduced in my Triadic Memory report (Overmann 2022): a hidden layer of
+$N(N-1)/2$ units, one for each pair of input elements, with modifiable
+connections to every output element, and its tridirectional extension, a rank-3
+memory tensor of size $N \times N \times N$. That report used small integer
+counters. The binary storage described here, which turns the design into a
+clipped, Willshaw-type memory, was adopted later. Löwe and Vermet (2026) prove
+storage scales of order $N^3/(\ln N)^3$ for third-order Willshaw memories, in
+the sense that a stored pattern is a fixed point of one-step threshold
+retrieval. Recovery from partial or noisy cues, which the retrieval algorithm
+discussed here addresses, is not covered by their analysis.
 
 The following plot shows the relationship between memory density and the number
 of stored SHRs. A configuration with $N = 1{,}000$ and $P = 10$ has a
@@ -1960,6 +1985,85 @@ responses to random query patterns.
   <img width="405" alt="image" src="assets/falsepositive.png"><br>
   <em>Probability of false-positive responses to random queries, as a function of memory density $\rho$. This simulation uses heteroassociations with $N=1{,}000$ and $P=10$.</em>
 </p>
+
+
+<br> 
+<a id="the-hidden-clique-structure-of-memory"></a>
+
+### The hidden clique structure of memory
+
+Every memory storage bit connects an input pair $\{i, j\}$ to an output element
+$k$: the memory is a set of triples, the union of the memory traces written by
+the stored associations. Storing an association $A \to B$ writes a complete
+block, linking all pairs $\{i, j\} \subseteq A$ to all $k \in B$. An
+autoassociation is the special case $A \to A$, where the trace folds onto
+itself. Its off-diagonal bits are three copies of the $\binom{P}{3}$ triples
+within $A$. The diagonal bits $(i,j) \to i$ and $(i,j) \to j$ record only that
+the pair occurred &mdash; nearly all are set well below the nominal capacity. A
+stored autoassociation is a clique in a 3-uniform hypergraph: the element-level
+form of the symmetric [crossassociation](#cross-associative-memory) 
+$A \times A \to A$.
+
+Each off-diagonal bit is covered by a Poisson-distributed number of stored
+items. At nominal capacity the mean is $\ln 2$, hence $\rho^* = 0.5$, and no
+bit is set without cause.
+
+At this density, a loaded memory and a memory of random bits look superficially
+alike. Low-order statistics barely tell them apart: in an auto-associative
+memory with $N = 1{,}000$, $P = 10$, the joint entropy of the four triples
+within a random 4-set falls short of its maximum by about $2 \cdot 10^{-4}$
+bits. The difference lies in complete, combinatorial structures.
+
+In a random memory, the expected number of input sets of size $s$
+whose pairs all link to the same $r$ outputs is
+
+$$E(s, r) = \binom{N_A}{s}\binom{N_B}{r}\,\rho^{\binom{s}{2} r}$$
+
+At $N = 1{,}000$ and $\rho = 0.5$, these chance structures reach $(5, 15)$,
+$(6, 7)$, $(7, 4)$, $(8, 3)$ and $(10, 2)$, but no further. Retrieval
+effectively accepts only complete structures with at least $T$ input elements
+and at least $P_B$ outputs. With $T = 7$, a random memory is expected to
+contain $E(7, 10) \approx 3 \cdot 10^{-23}$ of them. For autoassociations, the
+minimal accepted structure is a 7-clique whose pairs all link to 3 further
+elements. A random memory is expected to contain about $10^{-4}$ of them.
+Complete 10-cliques occur with expectation $\binom{N}{10}\, 2^{-\binom{10}{3}}
+\approx 2 \cdot 10^{-13}$, and the largest chance cliques have 8 elements.
+
+Fixed populations give an attractor a shape that chance won't produce, so a
+random memory has no attractors at all. In a hetero-associative memory, the
+shape is invisible within any single output element. The pairs linked to one
+output element form a graph of density $0.5$, which contains about
+$\binom{N_A}{10}\, 2^{-45} \approx 7.5 \cdot 10^9$ chance 10-cliques, against
+roughly 7,700 stored ones. The signal lies in the alignment of $P_B$ such
+graphs.
+   
+Because chance structures stop short of the stored shape, we can 
+reconstroct the stored items the memory bits. A search grows candidate sets by
+intersecting the memory sets of their pairs. Spurious branches die out
+within a few steps. In an experiment with an auto-associative memory filled to
+nominal capacity $C$, this search recovered all items containing a given
+element (about $CP/N \approx 9{,}600$), with no false positives.
+
+At nominal capacity, the memory is a redundant representation of its contents.
+An autoassociation at $P = 10$ carries about 60 bits of information but spans
+120 triples, so it remains identifiable from a subset of its bits. This
+redundancy underlies recall from partial queries.
+
+Retrieval reliably succeeds when a query overlaps a stored pattern in at least
+$T$ elements. For typical configurations where $P > T$, the margin $P - T$
+absorbs missing and wrong query elements.
+
+Topological memory is a third-order Willshaw memory, and Löwe and Vermet (2026)
+prove storage scales of order $N^3/(\ln N)^3$ for it. Their model draws patterns with independent random bits rather than fixed
+populations, and retrieves with a single thresholded voting step: in the
+terminology used here, [raw retrieval](#raw-memory-retrieval) with a fixed
+threshold in place of kWTA. Their results concern the stability of a
+single stored pattern. Several features of topological memory lie outside that
+analysis: fixed populations with kWTA output (which define the shape of the
+memory traces described here), third-order heteroassociation between distinct
+spaces, recall from partial and noisy queries, rejection of unknown input, a
+nominal capacity for finite $N$ with the constant $\ln 2$, and the absence of
+spurious attractors for queries of typical size.
 
 
 
@@ -5559,7 +5663,7 @@ When a stochastic memory decay mechanism is enabled, we can protect commonly use
 
 Besides [autoassociations](#auto-associative-memory) and [heteroassociations](#hetero-associative-memory), the core
 algorithm supports a third type: crossassociations. This structure, first
-described in the *Triadic Memory* paper, completes the basic associative memory
+described in my *Triadic Memory* report (Overmann 2022), completes the basic associative memory
 mechanisms in this computational framework.
 
 
@@ -6470,6 +6574,7 @@ deep learning paradigm and the computationalist framework introduced in this wor
   number={10},
   pages={144},
   year={2026},
+  doi={10.1007/s10955-026-03713-z},
   note={arXiv:2603.26217}
 }
 
@@ -6550,6 +6655,17 @@ deep learning paradigm and the computationalist framework introduced in this wor
   pages={168--177},
   year={1988}
 }
+
+
+@misc{overmann2022,
+  title={Triadic Memory: A Fundamental Algorithm for Cognitive Computing},
+  author={Overmann, Peter},
+  year={2022},
+  howpublished={Research report, posted online 2 April 2022, revised 20 April 2022},
+  note={https://github.com/PeterOvermann/Writings/blob/main/TriadicMemory.pdf}
+}
+
+
 
 @article{palm1980,
   title={On Associative Memory},

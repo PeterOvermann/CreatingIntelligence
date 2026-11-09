@@ -928,6 +928,7 @@ def temporal(config):
 
     # Label indicating the number of context blocks.
     label = plugin["label"] + "\u25a1" * len(contextdims)
+    size = plugin.get("size", 10) if not contextdims else 10
 
     # Instantiate the memory.
     m_config = dict(config)
@@ -939,9 +940,10 @@ def temporal(config):
 
     Xstate = []
     Xcontext = []
+    learning = False
 
     def f(item, *blocks):
-        nonlocal Xstate, Xcontext
+        nonlocal Xstate, Xcontext, learning
 
         # Multiset rate limiting of the current item.
         X = item
@@ -954,12 +956,15 @@ def temporal(config):
             Xstate = sorted(
                 rng.choice(Xstate, size=keep_size, replace=False).tolist())
 
-        # Learn (previous state & previous context) -> current item.
-        # With priority-tagged inputs, learn only when priority fired.
-        if config.get("environment", {}).get("priority") is not False:
+        # Learn (previous state & previous context) -> current item,
+        # unless there are priority tags and the current or the previous
+        # signal is non-priority.
+        if learning and config.get("environment", {}).get("priority") is not False:
             M["store"](resolve_block_join_normal([Xstate, Xcontext],
                                                  [Nitem, Ncontext]),
                        resolve_normal(X))
+
+        learning = config.get("environment", {}).get("priority") is not False
 
         # Multiset rate limiting of the items of the current context.
         Xcontext = multiset_block_join(list(blocks), contextdims)
@@ -969,8 +974,8 @@ def temporal(config):
 
         # Multiset subsampling applied to previous state.
         if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(Xstate, size=abscapacity, replace=False).tolist())
+            Xstate = rng.choice(Xstate, size=abscapacity, replace=False).tolist()
+        Xstate = sorted(Xstate)
 
         # Temporal integration via update rules.
         Xstate = plugin["updaterule"](X, Xstate)
@@ -990,7 +995,7 @@ def temporal(config):
     result.update({
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "square", "label": label, "size": 10, "fill": 14
+        "shape": "square", "label": label, "size": size, "fill": 14
     })
     result.update(M)
 
