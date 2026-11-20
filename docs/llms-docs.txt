@@ -1,4 +1,4 @@
-# Generated from main on 2026-11-07
+# Generated from main on 2026-11-20
 
 # Source: README.md
 
@@ -2862,9 +2862,7 @@ def heteroencoder(config):
         "function": f,
         "checks": ["arginp", "oneout"],
         "shape": "square",
-        "fill": 11,
-        "size": 18,
-        "label": "◀▶"
+        "fill": 15
     }
     result.update(M)
     return result
@@ -2896,7 +2894,7 @@ See also: https://creatingintelligence.org/#temporal-associative-memory
 - Supports temporal integration of signals across evaluation cycles, governed by update rule plugins.
 - Uses the same temporal integration mechanism as [`delay`](delay.md).
 - The state consists of the temporally integrated signal combined with optional context blocks.
-- If any input path is tagged priority, learns only in cycles where a priority path carries a signal; otherwise always learns.
+- If any input path is tagged priority, learns only when a priority path carried a signal in both the current and the previous cycle.
 - Learning when the prediction is correct may broaden the base temporal associations.
 - A closed feedback loop enables generative behavior. Use pathway tags to prevent learning from feedback.
 - With the [`permutation`](permutation.md) update rule, the temporal order of inputs is preserved.
@@ -3097,6 +3095,7 @@ def temporal(config):
 
     # Label indicating the number of context blocks.
     label = plugin["label"] + "\u25a1" * len(contextdims)
+    size = plugin.get("size", 10) if not contextdims else 10
 
     # Instantiate the memory.
     m_config = dict(config)
@@ -3108,9 +3107,10 @@ def temporal(config):
 
     Xstate = []
     Xcontext = []
+    learning = False
 
     def f(item, *blocks):
-        nonlocal Xstate, Xcontext
+        nonlocal Xstate, Xcontext, learning
 
         # Multiset rate limiting of the current item.
         X = item
@@ -3123,12 +3123,15 @@ def temporal(config):
             Xstate = sorted(
                 rng.choice(Xstate, size=keep_size, replace=False).tolist())
 
-        # Learn (previous state & previous context) -> current item.
-        # With priority-tagged inputs, learn only when priority fired.
-        if config.get("environment", {}).get("priority") is not False:
+        # Learn (previous state & previous context) -> current item,
+        # unless there are priority tags and the current or the previous
+        # signal is non-priority.
+        if learning and config.get("environment", {}).get("priority") is not False:
             M["store"](resolve_block_join_normal([Xstate, Xcontext],
                                                  [Nitem, Ncontext]),
                        resolve_normal(X))
+
+        learning = config.get("environment", {}).get("priority") is not False
 
         # Multiset rate limiting of the items of the current context.
         Xcontext = multiset_block_join(list(blocks), contextdims)
@@ -3138,8 +3141,8 @@ def temporal(config):
 
         # Multiset subsampling applied to previous state.
         if len(Xstate) > abscapacity:
-            Xstate = sorted(
-                rng.choice(Xstate, size=abscapacity, replace=False).tolist())
+            Xstate = rng.choice(Xstate, size=abscapacity, replace=False).tolist()
+        Xstate = sorted(Xstate)
 
         # Temporal integration via update rules.
         Xstate = plugin["updaterule"](X, Xstate)
@@ -3159,7 +3162,7 @@ def temporal(config):
     result.update({
         "function": f,
         "checks": ["dimfirst", "oneout"],
-        "shape": "square", "label": label, "size": 10, "fill": 14
+        "shape": "square", "label": label, "size": size, "fill": 14
     })
     result.update(M)
 

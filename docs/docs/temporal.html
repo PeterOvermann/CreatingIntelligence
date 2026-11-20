@@ -166,9 +166,9 @@ class="sidebar-icon">π</span>permutation</a></li>
         href="delay.html"><code>delay</code></a>.</li>
         <li>The state consists of the temporally integrated signal
         combined with optional context blocks.</li>
-        <li>If any input path is tagged priority, learns only in cycles
-        where a priority path carries a signal; otherwise always
-        learns.</li>
+        <li>If any input path is tagged priority, learns only when a
+        priority path carried a signal in both the current and the
+        previous cycle.</li>
         <li>Learning when the prediction is correct may broaden the base
         temporal associations.</li>
         <li>A closed feedback loop enables generative behavior. Use
@@ -388,73 +388,78 @@ class="sidebar-icon">π</span>permutation</a></li>
 <span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Label indicating the number of context blocks.</span></span>
 <span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    label <span class="op">=</span> plugin[<span class="st">&quot;label&quot;</span>] <span class="op">+</span> <span class="st">&quot;</span><span class="ch">\u25a1</span><span class="st">&quot;</span> <span class="op">*</span> <span class="bu">len</span>(contextdims)</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Instantiate the memory.</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: paramsA,</span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: paramsB</span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>    Xstate <span class="op">=</span> []</span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    Xcontext <span class="op">=</span> []</span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(item, <span class="op">*</span>blocks):</span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>        <span class="kw">nonlocal</span> Xstate, Xcontext</span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset rate limiting of the current item.</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> item</span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(X) <span class="op">&gt;</span> limititem:</span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>            X <span class="op">=</span> <span class="bu">sorted</span>(rng.choice(X, size<span class="op">=</span>limititem, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Pre-integration stochastic decay of previous state.</span></span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decay <span class="op">&gt;</span> <span class="fl">0.0</span>:</span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>            keep_size <span class="op">=</span> math.floor((<span class="fl">1.0</span> <span class="op">-</span> decay) <span class="op">*</span> <span class="bu">len</span>(Xstate))</span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> <span class="bu">sorted</span>(</span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xstate, size<span class="op">=</span>keep_size, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Learn (previous state &amp; previous context) -&gt; current item.</span></span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>        <span class="co"># With priority-tagged inputs, learn only when priority fired.</span></span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> config.get(<span class="st">&quot;environment&quot;</span>, {}).get(<span class="st">&quot;priority&quot;</span>) <span class="kw">is</span> <span class="kw">not</span> <span class="va">False</span>:</span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>            M[<span class="st">&quot;store&quot;</span>](resolve_block_join_normal([Xstate, Xcontext],</span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>                                                 [Nitem, Ncontext]),</span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>                       resolve_normal(X))</span>
-<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset rate limiting of the items of the current context.</span></span>
-<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>        Xcontext <span class="op">=</span> multiset_block_join(<span class="bu">list</span>(blocks), contextdims)</span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xcontext) <span class="op">&gt;</span> limitcontext:</span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>            Xcontext <span class="op">=</span> <span class="bu">sorted</span>(</span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xcontext, size<span class="op">=</span>limitcontext, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset subsampling applied to previous state.</span></span>
-<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xstate) <span class="op">&gt;</span> abscapacity:</span>
-<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> <span class="bu">sorted</span>(</span>
-<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xstate, size<span class="op">=</span>abscapacity, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    size <span class="op">=</span> plugin.get(<span class="st">&quot;size&quot;</span>, <span class="dv">10</span>) <span class="cf">if</span> <span class="kw">not</span> contextdims <span class="cf">else</span> <span class="dv">10</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Instantiate the memory.</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    m_config <span class="op">=</span> <span class="bu">dict</span>(config)</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>    m_config.update({</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;A_parameters&quot;</span>: paramsA,</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;B_parameters&quot;</span>: paramsB</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> Memory(m_config)</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    Xstate <span class="op">=</span> []</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>    Xcontext <span class="op">=</span> []</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    learning <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> f(item, <span class="op">*</span>blocks):</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>        <span class="kw">nonlocal</span> Xstate, Xcontext, learning</span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset rate limiting of the current item.</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> item</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(X) <span class="op">&gt;</span> limititem:</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>            X <span class="op">=</span> <span class="bu">sorted</span>(rng.choice(X, size<span class="op">=</span>limititem, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Pre-integration stochastic decay of previous state.</span></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decay <span class="op">&gt;</span> <span class="fl">0.0</span>:</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>            keep_size <span class="op">=</span> math.floor((<span class="fl">1.0</span> <span class="op">-</span> decay) <span class="op">*</span> <span class="bu">len</span>(Xstate))</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xstate, size<span class="op">=</span>keep_size, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Learn (previous state &amp; previous context) -&gt; current item,</span></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>        <span class="co"># unless there are priority tags and the current or the previous</span></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>        <span class="co"># signal is non-priority.</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> learning <span class="kw">and</span> config.get(<span class="st">&quot;environment&quot;</span>, {}).get(<span class="st">&quot;priority&quot;</span>) <span class="kw">is</span> <span class="kw">not</span> <span class="va">False</span>:</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>            M[<span class="st">&quot;store&quot;</span>](resolve_block_join_normal([Xstate, Xcontext],</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>                                                 [Nitem, Ncontext]),</span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>                       resolve_normal(X))</span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>        learning <span class="op">=</span> config.get(<span class="st">&quot;environment&quot;</span>, {}).get(<span class="st">&quot;priority&quot;</span>) <span class="kw">is</span> <span class="kw">not</span> <span class="va">False</span></span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset rate limiting of the items of the current context.</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>        Xcontext <span class="op">=</span> multiset_block_join(<span class="bu">list</span>(blocks), contextdims)</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xcontext) <span class="op">&gt;</span> limitcontext:</span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>            Xcontext <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xcontext, size<span class="op">=</span>limitcontext, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
 <span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Temporal integration via update rules.</span></span>
-<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>        Xstate <span class="op">=</span> plugin[<span class="st">&quot;updaterule&quot;</span>](X, Xstate)</span>
-<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Proportional multiset subsampling applied to the integrated state,</span></span>
-<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>        <span class="co"># to break symmetry during retrieval.</span></span>
-<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>        Xdec <span class="op">=</span> multiset_block_join([Xstate, Xcontext], [Nitem, Ncontext])</span>
-<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decimation <span class="op">&lt;</span> <span class="fl">1.0</span>:</span>
-<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>            sample_size <span class="op">=</span> math.floor(decimation <span class="op">*</span> <span class="bu">len</span>(Xdec))</span>
-<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>            Xdec <span class="op">=</span> <span class="bu">sorted</span>(</span>
-<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xdec, size<span class="op">=</span>sample_size, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
-<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Predict next token.</span></span>
-<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (M[<span class="st">&quot;retrieve&quot;</span>](resolve_normal(Xdec)),)</span>
-<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="bu">dict</span>(plugin)</span>
-<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>    result.update({</span>
-<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
-<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;dimfirst&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
-<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>, <span class="st">&quot;label&quot;</span>: label, <span class="st">&quot;size&quot;</span>: <span class="dv">10</span>, <span class="st">&quot;fill&quot;</span>: <span class="dv">14</span></span>
-<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
-<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Multiset subsampling applied to previous state.</span></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(Xstate) <span class="op">&gt;</span> abscapacity:</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>            Xstate <span class="op">=</span> rng.choice(Xstate, size<span class="op">=</span>abscapacity, replace<span class="op">=</span><span class="va">False</span>).tolist()</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>        Xstate <span class="op">=</span> <span class="bu">sorted</span>(Xstate)</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Temporal integration via update rules.</span></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>        Xstate <span class="op">=</span> plugin[<span class="st">&quot;updaterule&quot;</span>](X, Xstate)</span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Proportional multiset subsampling applied to the integrated state,</span></span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>        <span class="co"># to break symmetry during retrieval.</span></span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>        Xdec <span class="op">=</span> multiset_block_join([Xstate, Xcontext], [Nitem, Ncontext])</span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> decimation <span class="op">&lt;</span> <span class="fl">1.0</span>:</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>            sample_size <span class="op">=</span> math.floor(decimation <span class="op">*</span> <span class="bu">len</span>(Xdec))</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>            Xdec <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>                rng.choice(Xdec, size<span class="op">=</span>sample_size, replace<span class="op">=</span><span class="va">False</span>).tolist())</span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Predict next token.</span></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (M[<span class="st">&quot;retrieve&quot;</span>](resolve_normal(Xdec)),)</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="bu">dict</span>(plugin)</span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>    result.update({</span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;function&quot;</span>: f,</span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checks&quot;</span>: [<span class="st">&quot;dimfirst&quot;</span>, <span class="st">&quot;oneout&quot;</span>],</span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;shape&quot;</span>: <span class="st">&quot;square&quot;</span>, <span class="st">&quot;label&quot;</span>: label, <span class="st">&quot;size&quot;</span>: size, <span class="st">&quot;fill&quot;</span>: <span class="dv">14</span></span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>    result.update(M)</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
       </article>
     </section>
   </main>

@@ -1304,9 +1304,7 @@ def heteroencoder(config):
         "function": f,
         "checks": ["arginp", "oneout"],
         "shape": "square",
-        "fill": 11,
-        "size": 18,
-        "label": "◀▶"
+        "fill": 15
     }
     result.update(M)
     return result

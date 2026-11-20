@@ -1046,8 +1046,7 @@ heteroencoder[config_Association] :=
 		]; 
 			
 	Join[ <| "function" -> f, "checks" -> {"arginp", "oneout"}, 
-		"shape" -> "square",  "fill" -> 11,  "size" -> 18,
-		"label" -> "\[FilledLeftTriangle]\[FilledRightTriangle]" |>, M]
+		"shape" -> "square", "fill" -> 15 |>, M]
 	]
 
 
