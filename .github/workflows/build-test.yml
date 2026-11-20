@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         # Oldest supported (match requires-python in pyproject.toml) and newest.
-        python-version: ["3.9", "3.14"]
+        python-version: ["3.10", "3.14"]
 
     steps:
     - name: Checkout code

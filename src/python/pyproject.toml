@@ -8,7 +8,7 @@ version = "0.1.0a11"
 dynamic = ["dependencies"]
 description = "A computational foundation for AGI, based on hyperdimensional sparse data and framed in set theory."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [{ name = "Peter Overmann", email = "mail@creatingintelligence.org" }]
 license = "MIT"
 classifiers = [
