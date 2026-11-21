@@ -1385,7 +1385,7 @@ def noise(config):
     return {
         "function": f,
         "checks": ["input", "oneout"],
-        "label": "~", "fill": 13, "size": 18
+        "label": "noise", "shape": "none", "size": 10
     }
 
 

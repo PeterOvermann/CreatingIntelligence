@@ -1102,8 +1102,8 @@ noise[config_Association] := Module[ {f},
 	f[blocks___] := 
 		Sort[RandomSample[Range[#1], #2]]& @@ First[config["send_blocks"]]; 
 	
-	<| "function" -> f, "checks" -> {"input", "oneout"}, "label" -> "~",
-		"fill" -> 13, "size" -> 18 |>
+	<| "function" -> f, "checks" -> {"input", "oneout"}, 
+		"shape" -> "none", "size" -> 10, "label" -> "noise" |>
 	]	
 
 
