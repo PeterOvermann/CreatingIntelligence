@@ -26,7 +26,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, matching = {},
+	Module[ {mem = <||>, NA, PA, NB, PB, T, residual, matching = {},
 				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];
@@ -36,11 +36,12 @@ Memory[config_Association] :=
 					Message[Memory::params, config]];	
 
 		(* Memory capacity, needed for default threshold calculation. *)
-		capacity = If[NA == NB && PA == PB, 
+		capacity = Round[If[NA == NB && PA == PB, 
 				Log[2.0] NA (NA - 1) (NA - 2) / (PA (PA - 1) (PA - 2)),
-				Log[2.0] NA (NA - 1) NB / (PA (PA - 1) PB)];
+				Log[2.0] NA (NA - 1) NB / (PA (PA - 1) PB)]];
 			
 		(* Default pattern matching threshold. *)
+		T = Max[1, Quotient[(PA + 1)^2, NA + 2]];
 		While[T < PA && capacity^2 * Binomial[PA, T] * Binomial[NA-PA, PA-T] / 
 				Binomial[NA, PA] >= 1, T++];
 
