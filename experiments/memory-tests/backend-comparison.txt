@@ -1,0 +1,79 @@
+Generated with backend-comparison.py
+System: macOS-26.7.1-arm64-arm-64bit-Mach-O, arm64, Python 3.14.5
+Backends: creating_intelligence.memory_python, creating_intelligence.memory_c_ffi
+Date: 2026-11-22
+
+Python vs C backend, auto-associative memory at 1000/10, target density 0.1, 1000 queries per test
+
+Threshold T: python 7, c_ffi 7  ok
+
+Filled with 143141 patterns in 9 s, density 0.1000
+memorycount: python 49952537, c_ffi 49952537  ok
+
+Retrieval (random inputs: correct = empty result)
+
+|         test |      backend |      correct |        empty |        false |     same out |
+|--------------|--------------|--------------|--------------|--------------|--------------|
+|        exact |       python |         1000 |            0 |            0 |    1000/1000 |
+|              |        c_ffi |         1000 |            0 |            0 |           ok |
+|    +10 noise |       python |         1000 |            0 |            0 |    1000/1000 |
+|              |        c_ffi |         1000 |            0 |            0 |           ok |
+|     -2 noise |       python |         1000 |            0 |            0 |    1000/1000 |
+|              |        c_ffi |         1000 |            0 |            0 |           ok |
+| random 10-20 |       python |         1000 |            0 |            0 |    1000/1000 |
+|              |        c_ffi |         1000 |            0 |            0 |           ok |
+
+Example retrievals (first 2 queries of each test)
+
+exact:
+  query    35 140 487 532 619 731 764 824 920 975
+  python   35 140 487 532 619 731 764 824 920 975
+  c_ffi    35 140 487 532 619 731 764 824 920 975
+
+  query    95 112 220 284 412 775 805 853 948 994
+  python   95 112 220 284 412 775 805 853 948 994
+  c_ffi    95 112 220 284 412 775 805 853 948 994
+
++10 noise:
+  query    49  84 126 202 227 359 405 462 730 753 797 838 839 841 845 867 900 933 957 966
+  stored  202 227 359 462 730 797 838 867 933 966
+  python  202 227 359 462 730 797 838 867 933 966
+  c_ffi   202 227 359 462 730 797 838 867 933 966
+
+  query    37 162 168 251 375 463 478 487 492 598 666 667 730 848 849 877 909 956 968 982
+  stored  251 463 487 666 667 849 877 909 956 982
+  python  251 463 487 666 667 849 877 909 956 982
+  c_ffi   251 463 487 666 667 849 877 909 956 982
+
+-2 noise:
+  query   337 410 435 461 736 870 880 996
+  stored  278 337 410 435 461 516 736 870 880 996
+  python  278 337 410 435 461 516 736 870 880 996
+  c_ffi   278 337 410 435 461 516 736 870 880 996
+
+  query    77 262 431 471 665 673 723 988
+  stored   77 262 286 431 471 665 673 723 829 988
+  python   77 262 286 431 471 665 673 723 829 988
+  c_ffi    77 262 286 431 471 665 673 723 829 988
+
+random 10-20:
+  query    42  81 137 226 234 300 357 361 389 447 671 707 751 817 879
+  python  (empty)
+  c_ffi   (empty)
+
+  query    75  86 241 402 448 471 491 503 508 509 524 541 689
+  python  (empty)
+  c_ffi   (empty)
+
+Threshold T on a grid of configurations
+
+|        NA/PA |        NB/PB |     T python |      T c_ffi |        check |
+|--------------|--------------|--------------|--------------|--------------|
+|      1000/10 |      1000/10 |            7 |            7 |           ok |
+|      1000/20 |      1000/20 |            9 |            9 |           ok |
+|       500/10 |       500/10 |            7 |            7 |           ok |
+|      2000/10 |      2000/10 |            7 |            7 |           ok |
+|      1000/10 |      1001/10 |            7 |            7 |           ok |
+|      1000/10 |       500/20 |            7 |            7 |           ok |
+
+Overall: all checks passed
