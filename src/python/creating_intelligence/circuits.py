@@ -221,11 +221,11 @@ def matching_threshold(A_params, B_params):
     NA, PA = A_params
     NB, PB = B_params
 
-    if PA <= 2 or PB <= 2:
-        return 0
+    if PA <= 2 or PB <= 0:
+        return max(2, PA)
 
     cap = memory_capacity(A_params, B_params)
-    T = 1
+    T = 2
 
     while T < PA and (
         cap**2 *

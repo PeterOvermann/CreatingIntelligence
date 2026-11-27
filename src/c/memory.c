@@ -360,6 +360,10 @@ static double overlap_probability(int n, int p, int v)
 	return prob;
 	}
 
+// Pattern matching threshold T
+// Uses auto-associative capacity if NA == NB and PA == PB,
+// otherwise the hetero-associative capacity
+
 // 	Pattern matching threshold T
 
 static int matching_threshold (int NA, int PA, int NB, int PB)
@@ -372,15 +376,17 @@ static int matching_threshold (int NA, int PA, int NB, int PB)
 	else			// Hetero-associative.
 		icap = (double)PA / (double)NA * (double)(PA-1) /
 			(double)(NA-1) * (double)PB / (double)NB / M_LN2;
-		
-	for (int v = 4; v <= PA; v++)
-		if (overlap_probability(NA, PA, v) < icap*icap)
-			return v;
-	
-	// Use PA as threshold if PA too small to satisfy the inequality.
-	return PA;
-	}
 
+	// Round the capacity, consistent with the other platforms.
+	icap = 1.0 / round(1.0 / icap);
+
+	for (int T = 2; T <= PA; T++)
+		if (overlap_probability(NA, PA, T) < icap*icap)
+			return T;
+
+	// Use PA as threshold if PA too small to satisfy the inequality (minimum 2).
+	return PA < 2 ? 2 : PA;
+	}
 
 // -------------------------------------------------------------------------- //
 //	Bit-level operations
@@ -556,7 +562,7 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	self->Adimension 	= na;						// A hyperparameters
 	self->Apopulation	= pa;
 
-	self->Bdimension 	= nb;						// B hyperparameters
+	self->Bdimension 	= nb;						// B hyperparameters (same as A if auto-associative)
 	self->Bpopulation	= pb;
 	
 	self->T = matching_threshold(na, pa, nb, pb);	// Absolute pattern matching threshold
@@ -571,12 +577,9 @@ Memory* Memory_new (int na, int pa, int nb, int pb)
 	return self;
 	}
 	
-// Pattern matching threshold note: We always use the auto-associative value (based on the capacity
-// of an auto-associative memory). For most hyperparameter configurations it is identical to the
-// hetero-associative threshold, and in rare cases larger by one. It's always safe to use the larger
-// threshold. Furthermore, for SDR-processing heteroassociations often the threshold is user-defined.
 	
-	
+// Override automatic threshold
+
 void 	Memory_set_threshold (Memory *self, int t)	// Override default threshold
 	{
 	self->T = t;

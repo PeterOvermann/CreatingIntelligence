@@ -26,7 +26,7 @@ See "Memory Native.nb" for a performance-optimized version.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, matching = {},
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 2, residual, matching = {},
 				capacity, zero, store, retrieve, clear, memorycount},
 			
 		{NA, PA} = config["A_parameters"];

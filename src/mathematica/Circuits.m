@@ -211,8 +211,8 @@ MemoryCapacity[{NA_, PA_}, {NB_, PB_}] :=
 
 
 MatchingThreshold[{NA_Integer, PA_Integer}, {NB_Integer, PB_Integer}] :=		
-	Module[ {cap, T = 1},
-		If[ PA <= 2 || PB <= 2, Return[0]]; (* Prevent division by zero. *)
+	Module[ {cap, T = 2},
+		If[ PA <= 2 || PB <= 0, Return[Max[2,PA]]]; (* Prevent division by zero. *)
 		cap = MemoryCapacity[{NA, PA}, {NB, PB}];
 		While[T < PA && cap^2 * Binomial[PA, T] Binomial[NA - PA, PA - T] / 
 			Binomial[NA, PA] >= 1, T++]; 

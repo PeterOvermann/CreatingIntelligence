@@ -27,7 +27,7 @@ See "Memory Reference.nb" for a plain reference implementation.
 
 Memory[config_Association] :=
 
-	Module[ {mem = <||>, NA, PA, NB, PB, T = 1, residual, capacity, zero,
+	Module[ {mem = <||>, NA, PA, NB, PB, T = 2, residual, capacity, zero,
 		store, retrieve, matching = {}, clear, memorycount, accumulate},
 			
 		{NA, PA} = config["A_parameters"];
